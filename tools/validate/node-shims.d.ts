@@ -11,8 +11,15 @@ declare module 'node:fs' {
   export function existsSync(path: string): boolean;
   export function readdirSync(path: string): string[];
   export function readdirSync(path: string, options: { withFileTypes: true }): Dirent[];
+  export interface Stats {
+    size: number;
+    isFile(): boolean;
+    isDirectory(): boolean;
+  }
+  export function statSync(path: string): Stats;
   export function mkdirSync(path: string, options?: { recursive?: boolean }): void;
   export function rmSync(path: string, options?: { recursive?: boolean; force?: boolean }): void;
+  export function renameSync(oldPath: string, newPath: string): void;
   export function mkdtempSync(prefix: string): string;
 }
 

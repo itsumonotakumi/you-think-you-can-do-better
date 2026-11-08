@@ -20,6 +20,8 @@ jobs:
       - run: npm test
       - run: npm run check
       - run: npx vite build
+      # 配布物に含まれる依存（本番依存）に警告が無いことを確認する
+      - run: npm audit --omit=dev --audit-level=low
   e2e:
     # main への反映時のみ（設計書 12章）
     if: github.event_name == 'push'

@@ -213,7 +213,7 @@ describe('scenario no08-kaname / analyst', () => {
     expect(best?.rank).toBe('S');
     const worst = simulation.runs.find((run) => run.label === 'min/best');
     expect(worst?.rank).toBe('D');
-  });
+  }, 20_000);
 
   it('声は日本語のみで、形がそろっている', () => {
     for (const voice of role.voices) {

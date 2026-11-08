@@ -59,17 +59,15 @@ export function buildData(options: BuildOptions): BuildResult {
     assertSafeScenarioId(sc.scenario.id, sc.dir);
   }
 
-  // 単体実行でも validate と同じ検査を全部通す。1つでもエラーなら書き出さない。
-  if (project.scenarios.length > 0) {
-    const result = runChecks(project);
-    if (result.errors.length > 0) {
-      const first = result.errors[0]!;
-      const rest = result.errors.length - 1;
-      throw new Error(
-        `${first.file}:${first.line}: [${first.code}] ${first.message}`
-        + (rest > 0 ? `（ほか ${rest} 件のエラー）` : ''),
-      );
-    }
+  // 単体実行でも validate と同じ検査を全部通す。シナリオ0件でも共通データは検査する。
+  const result = runChecks(project);
+  if (result.errors.length > 0) {
+    const first = result.errors[0]!;
+    const rest = result.errors.length - 1;
+    throw new Error(
+      `${first.file}:${first.line}: [${first.code}] ${first.message}`
+      + (rest > 0 ? `（ほか ${rest} 件のエラー）` : ''),
+    );
   }
 
   const scenarios: Scenario[] = project.scenarios.map((sc) => sc.scenario as Scenario);

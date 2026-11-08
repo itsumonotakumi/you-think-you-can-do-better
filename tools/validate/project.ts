@@ -1,5 +1,5 @@
 // 入力（シナリオ・根拠・文言・音素材）をまとめて読む。validate と build-data の共通入口。
-import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readYaml, readYamlFile, locate } from './source.ts';
@@ -121,6 +121,21 @@ function collectAudioFiles(absDir: string, prefix: string, out: string[]): void 
 
 const DENYLIST_KEYS = ['companies', 'services', 'people', 'countries', 'comparisons'] as const;
 
+/**
+ * 禁止リストの最低件数。空配列に書き換えて検査を無効化できないようにする。
+ * people は架空の人物だけなので空でよい。
+ */
+export const DENYLIST_MIN: Readonly<Record<(typeof DENYLIST_KEYS)[number], number>> = {
+  companies: 5,
+  services: 5,
+  people: 0,
+  countries: 5,
+  comparisons: 1,
+};
+
+/** comparisons の正規表現の長さ上限（指数的なバックトラックを避ける） */
+export const MAX_COMPARISON_PATTERN = 200;
+
 function loadDenylist(root: string, issues: Issue[]): Denylist {
   const relative = 'tools/validate/denylist.yaml';
   const empty: Denylist = { companies: [], services: [], people: [], countries: [], comparisons: [] };
@@ -148,9 +163,11 @@ function loadDenylist(root: string, issues: Issue[]): Denylist {
       'denylist.yaml がないため同梱の既定リストで検査する'));
   }
   const result: Denylist = { companies: [], services: [], people: [], countries: [], comparisons: [] };
+  const invalid = new Set<string>();
   for (const key of DENYLIST_KEYS) {
     const value = data[key];
     if (!Array.isArray(value)) {
+      invalid.add(key);
       issues.push(issue(source.file, locate(data, key)?.line ?? 1, 'C16',
         `denylist の ${key} は配列で書く`));
       continue;
@@ -162,6 +179,16 @@ function loadDenylist(root: string, issues: Issue[]): Denylist {
         continue;
       }
       if (key === 'comparisons') {
+        if (entry.length > MAX_COMPARISON_PATTERN) {
+          issues.push(issue(source.file, locate(data, key)?.line ?? 1, 'C20',
+            `denylist の comparisons は ${MAX_COMPARISON_PATTERN} 文字以内にする（いま ${entry.length} 文字）`));
+          continue;
+        }
+        if (isRiskyComparison(entry)) {
+          issues.push(issue(source.file, locate(data, key)?.line ?? 1, 'C20',
+            `denylist の comparisons が指数的に評価されうる形: ${entry}`));
+          continue;
+        }
         try {
           new RegExp(entry);
         } catch {
@@ -173,7 +200,21 @@ function loadDenylist(root: string, issues: Issue[]): Denylist {
       result[key].push(entry);
     }
   }
+  // 最低件数。下回れば検査が実質無効になるためエラーにする。
+  for (const key of DENYLIST_KEYS) {
+    if (invalid.has(key)) continue;
+    const min = DENYLIST_MIN[key];
+    if (result[key].length < min) {
+      issues.push(issue(source.file, locate(data, key)?.line ?? 1, 'C16',
+        `denylist の ${key} は ${min} 件以上にする（いま ${result[key].length} 件）`));
+    }
+  }
   return result;
+}
+
+/** グループの内側にも量指定子がある形（(a+)+ など）を拒否する */
+export function isRiskyComparison(pattern: string): boolean {
+  return /\((?:[^()\\]|\\.)*[+*](?:[^()\\]|\\.)*\)\s*(?:[+*]|\{\d*,?\d*\})/.test(pattern);
 }
 
 function loadLocales(root: string, issues: Issue[]): Record<string, LocaleData> {
@@ -258,7 +299,27 @@ function loadReferences(root: string, issues: Issue[]): ParsedSource | null {
 function loadScenarios(root: string, issues: Issue[]): LoadedScenario[] {
   const absScenarios = join(root, 'scenarios');
   const result: LoadedScenario[] = [];
-  for (const dir of listDirs(absScenarios)) {
+  // フォルダを消す・名前を変えると検査0件のまま通ってしまうため、不在・読めないはエラーにする。
+  try {
+    if (!statSync(absScenarios).isDirectory()) {
+      issues.push(issue('scenarios', 1, 'C17', 'scenarios はフォルダでなければならない'));
+      return result;
+    }
+  } catch {
+    issues.push(issue('scenarios', 1, 'C17', 'scenarios フォルダがない、または読めない'));
+    return result;
+  }
+  let dirs: string[];
+  try {
+    dirs = readdirSync(absScenarios, { withFileTypes: true })
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort();
+  } catch {
+    issues.push(issue('scenarios', 1, 'C17', 'scenarios フォルダを読めない'));
+    return result;
+  }
+  for (const dir of dirs) {
     if (dir.startsWith('_')) continue;
     const yamlRel = `scenarios/${dir}/scenario.yaml`;
     const sceneSource = readYaml(root, yamlRel);
@@ -303,6 +364,9 @@ function loadScenarios(root: string, issues: Issue[]): LoadedScenario[] {
       roleSources,
       scenario: { ...sceneData, roles },
     });
+  }
+  if (result.length === 0) {
+    issues.push(issue('scenarios', 1, 'C17', 'シナリオが0件（scenarios/<id>/scenario.yaml を置く）'));
   }
   return result;
 }

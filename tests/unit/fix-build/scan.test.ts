@@ -10,13 +10,14 @@ afterEach(() => {
 
 type Deny = NonNullable<TestFiles['denylist']>;
 
+/** 最低件数を満たす無害な既定リスト（各テストは必要なキーだけ差し替える） */
 function deny(overrides: Partial<Deny> = {}): Deny {
   return {
-    companies: [],
-    services: [],
+    companies: ['ZZ企業1', 'ZZ企業2', 'ZZ企業3', 'ZZ企業4', 'ZZ企業5'],
+    services: ['ZZサービス1', 'ZZサービス2', 'ZZサービス3', 'ZZサービス4', 'ZZサービス5'],
     people: [],
-    countries: [],
-    comparisons: [],
+    countries: ['ZZ国1', 'ZZ国2', 'ZZ国3', 'ZZ国4', 'ZZ国5'],
+    comparisons: ['ZZ比較表現'],
     ...overrides,
   };
 }
@@ -61,7 +62,7 @@ function withAudio(author = '作者', title = 'クリック'): (files: TestFiles
 describe('C16 の走査範囲', () => {
   it('locales の notices を見る', () => {
     const project = run((files) => {
-      files.denylist = deny({ companies: ['GMO'] });
+      files.denylist = deny({ companies: ['GMO', 'ZZ企業1', 'ZZ企業2', 'ZZ企業3', 'ZZ企業4'] });
       files.notices.ja.criminal = 'GMO が攻撃した';
     });
     expect(project.result.errors.some((e) => e.code === 'C16')).toBe(true);
@@ -69,7 +70,7 @@ describe('C16 の走査範囲', () => {
 
   it('locales の ui を見る（NFKC・全角）', () => {
     const project = run((files) => {
-      files.denylist = deny({ companies: ['GMO'] });
+      files.denylist = deny({ companies: ['GMO', 'ZZ企業1', 'ZZ企業2', 'ZZ企業3', 'ZZ企業4'] });
       files.ui.ja!.common!['extra.one'] = 'ＧＭＯ の事件';
     });
     expect(project.result.errors.some((e) => e.code === 'C16')).toBe(true);
@@ -77,7 +78,7 @@ describe('C16 の走査範囲', () => {
 
   it('ゼロ幅文字を除いて照合する', () => {
     const project = run((files) => {
-      files.denylist = deny({ companies: ['GMO'] });
+      files.denylist = deny({ companies: ['GMO', 'ZZ企業1', 'ZZ企業2', 'ZZ企業3', 'ZZ企業4'] });
       files.ui.ja!.common!['extra.one'] = 'G\u200bM\u200dO';
     });
     expect(project.result.errors.some((e) => e.code === 'C16')).toBe(true);
@@ -85,7 +86,7 @@ describe('C16 の走査範囲', () => {
 
   it('空白を除いて照合する', () => {
     const project = run((files) => {
-      files.denylist = deny({ companies: ['GMO'] });
+      files.denylist = deny({ companies: ['GMO', 'ZZ企業1', 'ZZ企業2', 'ZZ企業3', 'ZZ企業4'] });
       files.scenario.tagline = { ja: 'G M O', en: 'x' };
     });
     expect(project.result.errors.some((e) => e.code === 'C16')).toBe(true);
@@ -93,7 +94,7 @@ describe('C16 の走査範囲', () => {
 
   it('audio-manifest を見る', () => {
     const project = run((files) => {
-      files.denylist = deny({ companies: ['GMO'] });
+      files.denylist = deny({ companies: ['GMO', 'ZZ企業1', 'ZZ企業2', 'ZZ企業3', 'ZZ企業4'] });
       withAudio('作者', 'GMO の音')(files);
     });
     expect(project.result.errors.some((e) => e.code === 'C16')).toBe(true);
@@ -101,7 +102,7 @@ describe('C16 の走査範囲', () => {
 
   it('クレジットの作者名は対象外', () => {
     const project = run((files) => {
-      files.denylist = deny({ companies: ['GMO'] });
+      files.denylist = deny({ companies: ['GMO', 'ZZ企業1', 'ZZ企業2', 'ZZ企業3', 'ZZ企業4'] });
       withAudio('GMO', 'クリック')(files);
     });
     expect(project.result.errors.some((e) => e.code === 'C16')).toBe(false);

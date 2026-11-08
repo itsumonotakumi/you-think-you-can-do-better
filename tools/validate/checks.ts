@@ -10,7 +10,7 @@ import {
 } from '../../src/engine/types.ts';
 import type { Rank, Reference, RoleId, Scenario } from '../../src/engine/types.ts';
 import { locate } from './source.ts';
-import { loadProject } from './project.ts';
+import { loadProject, isRiskyComparison, MAX_COMPARISON_PATTERN } from './project.ts';
 import type { Issue, LoadedScenario, Obj, Project } from './project.ts';
 import { simulatePaths, RANDOM_RUNS_PER_ROLE } from './paths.ts';
 import type { PathSimulation } from './paths.ts';
@@ -52,6 +52,23 @@ function isLocalized(value: unknown): boolean {
   if (!isObj(value)) return false;
   return Object.keys(value).some((key) => LANG_SET.has(key))
     && Object.values(value).every((v) => typeof v === 'string');
+}
+
+/** オブジェクトのキーとして使うと危険な予約語（プロトタイプ汚染・継承参照） */
+const DANGEROUS_KEYS: ReadonlySet<string> = new Set(['__proto__', 'constructor', 'prototype']);
+
+function isDangerousKey(key: string): boolean {
+  return DANGEROUS_KEYS.has(key);
+}
+
+/** ID に危険なキーが混ざっていないか。混ざっていればエラーを積む。 */
+function checkIdKey(
+  value: unknown,
+  id: string,
+  add: (value: unknown, key: string, message: string) => void,
+  label: string,
+): void {
+  if (isDangerousKey(id)) add(value, 'id', `${label}の id に使えない予約語: ${id}`);
 }
 
 function report(
@@ -406,6 +423,7 @@ function checkTrigger(trigger: unknown, onError: (message: string) => void): voi
       return;
     }
     for (const [key, value] of Object.entries(t.flags)) {
+      if (isDangerousKey(key)) onError(`trigger.flags のキーに使えない予約語: ${key}`);
       if (typeof value !== 'boolean') onError(`trigger.flags.${key} は true/false`);
     }
     return;
@@ -437,6 +455,7 @@ function checkFlags(flags: unknown, onError: (message: string) => void): void {
     return;
   }
   for (const [key, value] of Object.entries(flags)) {
+    if (isDangerousKey(key)) onError(`フラグのキーに使えない予約語: ${key}`);
     if (typeof value !== 'boolean') onError(`フラグ ${key} は true/false`);
   }
 }
@@ -459,6 +478,7 @@ function checkCondition(
     return;
   }
   for (const [key, value] of Object.entries(condition.flags)) {
+    if (isDangerousKey(key)) add(condition, 'when', `when.flags のキーに使えない予約語: ${key}`);
     if (typeof value !== 'boolean') add(condition, 'when', `when.flags.${key} は true/false`);
   }
 }
@@ -471,8 +491,11 @@ function checkChoice(
 ): void {
   const c = asObj(choice);
   if (!isStr(c.id)) add(choice, 'id', '選択肢の id がない');
-  else if (choiceIds.has(c.id)) add(choice, 'id', `選択肢の id が重複: ${c.id}`);
-  else choiceIds.add(c.id);
+  else {
+    checkIdKey(choice, c.id, add, '選択肢');
+    if (choiceIds.has(c.id)) add(choice, 'id', `選択肢の id が重複: ${c.id}`);
+    else choiceIds.add(c.id);
+  }
   checkLocalized(c.text, (m) => add(choice, 'text', m));
   if (!isInt(c.minutes) || c.minutes <= 0 || c.minutes % 15 !== 0) add(choice, 'minutes', 'minutes は 15 の倍数');
   if (!CATEGORY_SET.has(c.category)) add(choice, 'category', `category が不正: ${c.category}`);
@@ -484,7 +507,9 @@ function checkChoice(
   if (c.fatalAlternate !== undefined && !isNum(c.fatalAlternate)) add(choice, 'fatalAlternate', 'fatalAlternate は数値');
   if (c.detail !== undefined) {
     const drafts = asObj(script.drafts);
-    if (!isStr(c.detail) || !isObj(drafts[c.detail])) add(choice, 'detail', `detail の drafts キーがない: ${c.detail}`);
+    if (!isStr(c.detail) || !Object.hasOwn(drafts, c.detail) || !isObj(drafts[c.detail])) {
+      add(choice, 'detail', `detail の drafts キーがない: ${c.detail}`);
+    }
   }
   if (c.delayed !== undefined) {
     if (!Array.isArray(c.delayed)) add(choice, 'delayed', 'delayed は配列');
@@ -511,6 +536,7 @@ function checkDetailItem(
 ): void {
   const i = asObj(item);
   if (!isStr(i.id)) add(item, 'id', '細目の id がない');
+  else checkIdKey(item, i.id, add, '細目');
   if (!isNum(i.points)) add(item, 'points', '細目の points は数値');
   if (!AXIS_SET.has(i.axis)) add(item, 'axis', `axis が不正: ${i.axis}`);
   if (!Array.isArray(i.refs)) add(item, 'refs', 'refs は配列');
@@ -540,6 +566,7 @@ function checkDrafts(drafts: unknown, add: (value: unknown, key: string, message
   }
   for (const [key, value] of Object.entries(drafts)) {
     const draft = asObj(value);
+    if (isDangerousKey(key)) add(value, 'title', `drafts のキーに使えない予約語: ${key}`);
     checkLocalized(draft.title, (m) => add(value, 'title', `${key}: ${m}`));
     if (!Array.isArray(draft.slots) || draft.slots.length === 0) {
       add(value, 'slots', `${key}: slots がない`);
@@ -549,8 +576,11 @@ function checkDrafts(drafts: unknown, add: (value: unknown, key: string, message
     for (const slotValue of draft.slots) {
       const slot = asObj(slotValue);
       if (!isStr(slot.id)) add(slotValue, 'id', '部品の id がない');
-      else if (slotIds.has(slot.id)) add(slotValue, 'id', `部品の id が重複: ${slot.id}`);
-      else slotIds.add(slot.id);
+      else {
+        checkIdKey(slotValue, slot.id, add, '部品');
+        if (slotIds.has(slot.id)) add(slotValue, 'id', `部品の id が重複: ${slot.id}`);
+        else slotIds.add(slot.id);
+      }
       checkLocalized(slot.label, (m) => add(slotValue, 'label', m));
       if (slot.auto !== undefined && typeof slot.auto !== 'boolean') add(slotValue, 'auto', 'auto は true/false');
       const hasItems = Array.isArray(slot.items);
@@ -1008,6 +1038,44 @@ export function normalizeForMatch(text: string): string {
   return text.normalize('NFKC').replace(/[\s\u200b-\u200d\ufeff]/gu, '').toLowerCase();
 }
 
+/** 記号（・.-_ など）も除いた形。G.M.O や G・M・O の素通りを防ぐ。 */
+export function normalizeLoose(text: string): string {
+  return normalizeForMatch(text).replace(/[\p{P}\p{S}]/gu, '');
+}
+
+/** 記号を除いた形での部分一致。前後が英字なら別の語の一部とみなす。 */
+function looseIncludes(haystack: string, needle: string): boolean {
+  // 短すぎる語は普通の単語に紛れるため、記号違いの照合には使わない
+  if (needle.length < 3) return false;
+  let from = 0;
+  for (;;) {
+    const index = haystack.indexOf(needle, from);
+    if (index < 0) return false;
+    const before = index > 0 ? haystack[index - 1] ?? '' : '';
+    const after = haystack[index + needle.length] ?? '';
+    if (!/[a-z]/.test(before) && !/[a-z]/.test(after)) return true;
+    from = index + 1;
+  }
+}
+
+interface DenyTerm {
+  label: string;
+  term: string;
+  needle: string;
+  loose: string;
+}
+
+/** 禁止語に当たればその語を返す。 */
+function findDenied(text: string, terms: DenyTerm[]): DenyTerm | null {
+  const normalized = normalizeForMatch(text);
+  const loose = normalizeLoose(text);
+  for (const term of terms) {
+    if (normalized.includes(term.needle)) return term;
+    if (looseIncludes(loose, term.loose)) return term;
+  }
+  return null;
+}
+
 interface ScanTarget {
   root: unknown;
   file: string;
@@ -1034,38 +1102,56 @@ function scanTargets(project: Project, includeScenarios = true): ScanTarget[] {
 /** クレジットの作者名と、作品名そのものは C16 の対象外にする。 */
 const C16_SKIP_KEYS: ReadonlySet<string> = new Set(['author', 'creditText', 'sa.title.product']);
 
-function denyTerms(project: Project): { label: string; term: string }[] {
-  const list: { label: string; term: string }[] = [];
-  for (const term of project.denylist.companies) list.push({ label: '企業名', term });
-  for (const term of project.denylist.services) list.push({ label: 'サービス名', term });
-  for (const term of project.denylist.people) list.push({ label: '人物名', term });
-  for (const term of project.denylist.countries) list.push({ label: '国名', term });
+function denyTerms(project: Project): DenyTerm[] {
+  const list: DenyTerm[] = [];
+  const push = (label: string, term: string) => {
+    const needle = normalizeForMatch(term);
+    if (needle.length === 0) return;
+    list.push({ label, term, needle, loose: normalizeLoose(term) });
+  };
+  for (const term of project.denylist.companies) push('企業名', term);
+  for (const term of project.denylist.services) push('サービス名', term);
+  for (const term of project.denylist.people) push('人物名', term);
+  for (const term of project.denylist.countries) push('国名', term);
   return list;
+}
+
+/** 根拠データの summary は作者が書くので C16 の対象にする（title・issuer は実名のため除く）。 */
+function checkReferenceSummaries(project: Project, terms: DenyTerm[], out: Issue[]): void {
+  const file = project.references?.file ?? 'references/references.yaml';
+  const byId = project.referencesById as Map<string, Obj> | undefined;
+  if (!byId) return;
+  for (const [id, ref] of byId) {
+    const summary = asObj(ref.summary);
+    for (const [lang, text] of Object.entries(summary)) {
+      if (typeof text !== 'string') continue;
+      const hit = findDenied(text, terms);
+      if (hit) report(out, file, summary, lang, 'C16', `${id}: ${hit.label}の禁止語が含まれる: ${hit.term}`);
+    }
+  }
 }
 
 export function checkC16(project: Project): Issue[] {
   const out: Issue[] = [];
-  const terms = denyTerms(project)
-    .map(({ label, term }) => ({ label, term, normalized: normalizeForMatch(term) }))
-    .filter(({ normalized }) => normalized.length > 0);
+  const terms = denyTerms(project);
   if (terms.length === 0) return out;
   for (const target of scanTargets(project)) {
     for (const { text, container, key } of walkStrings(target.root, null, '')) {
       if (typeof key === 'string' && C16_SKIP_KEYS.has(key)) continue;
-      const normalized = normalizeForMatch(text);
-      for (const { label, term, normalized: needle } of terms) {
-        if (normalized.includes(needle)) {
-          report(out, target.file, container, key, 'C16', `${label}の禁止語が含まれる: ${term}`);
-        }
-      }
+      const hit = findDenied(text, terms);
+      if (hit) report(out, target.file, container, key, 'C16', `${hit.label}の禁止語が含まれる: ${hit.term}`);
     }
   }
+  checkReferenceSummaries(project, terms, out);
   return out;
 }
 
 function validComparisons(project: Project): RegExp[] {
   const result: RegExp[] = [];
   for (const pattern of project.denylist.comparisons) {
+    // 長すぎるパターンと指数的な形は評価しない（loadDenylist が C20 として報告する）
+    if (pattern.length > MAX_COMPARISON_PATTERN) continue;
+    if (isRiskyComparison(pattern)) continue;
     try {
       result.push(new RegExp(pattern));
     } catch {
@@ -1075,6 +1161,9 @@ function validComparisons(project: Project): RegExp[] {
   return result;
 }
 
+/** C20 で照合する1件の文字数上限（長文での指数的バックトラックを避ける） */
+export const MAX_COMPARISON_TARGET = 10_000;
+
 export function checkC20(project: Project): Issue[] {
   const out: Issue[] = [];
   const patterns = validComparisons(project);
@@ -1082,7 +1171,10 @@ export function checkC20(project: Project): Issue[] {
   for (const target of scanTargets(project)) {
     for (const { text, container, key } of walkStrings(target.root, null, '')) {
       const normalized = normalizeForMatch(text);
-      if (patterns.some((pattern) => pattern.test(normalized))) {
+      const subject = normalized.length > MAX_COMPARISON_TARGET
+        ? normalized.slice(0, MAX_COMPARISON_TARGET)
+        : normalized;
+      if (patterns.some((pattern) => pattern.test(subject))) {
         report(out, target.file, container, key, 'C20', '実在企業との比較表現がある');
       }
     }
@@ -1092,12 +1184,18 @@ export function checkC20(project: Project): Issue[] {
 
 // ---------------- C17 YAML の書式（＋文章中の HTML） ----------------
 
+/**
+ * 文章中の HTML・実体参照。閉じの > が無い <img や、&lt;script&gt; も対象にする。
+ * 「a < b」のような不等号は対象外（< の直後が英字・/・! のときだけ）。
+ */
+const HTML_PATTERN = /<[A-Za-z/!]|&(?:lt|gt|amp|quot|apos|#\d+|#x[0-9a-f]+);/i;
+
 export function checkC17(project: Project): Issue[] {
   const out: Issue[] = [];
   const scan = (root: unknown, fallback: string) => {
     for (const { text, container, key } of walkStrings(root, null, '')) {
-      if (/<[^>]*>/.test(text)) {
-        report(out, fallback, container, key, 'C17', '文章に HTML（<...>）を含めない');
+      if (HTML_PATTERN.test(text)) {
+        report(out, fallback, container, key, 'C17', '文章に HTML や実体参照（<...>・&lt; など）を含めない');
       }
     }
   };

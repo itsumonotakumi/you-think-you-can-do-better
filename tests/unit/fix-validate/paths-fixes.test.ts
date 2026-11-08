@@ -40,9 +40,8 @@ describe('ランダム走行', () => {
     const simulation = randomRuns();
     const random = simulation.runs.filter((run) => run.label.startsWith('random/'));
     expect(simulation.failures).toEqual([]);
-    expect(random.length).toBeGreaterThan(0);
-    // 同じ状態に何度も入る走行は打ち切るので上限より少ない
-    expect(simulation.runs.length).toBeLessThan(2020);
+    // 訪問回数は走行ごとに数えるので、状態が同じでも打ち切られず全部完走する
+    expect(random.length).toBe(2000);
     expect(simulation.runs.every((run) => run.finished)).toBe(true);
   });
 
