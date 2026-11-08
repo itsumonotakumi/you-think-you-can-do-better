@@ -53,10 +53,11 @@ describe('S05 / S06 の安全・作法', () => {
 });
 
 describe('S05 の要件', () => {
-  it('上部バー・状況・選択肢・声・記録・字幕を組み立てる', () => {
-    for (const name of ['TopBar', 'Typewriter', 'ChoiceList', 'VoiceList', 'NotePanel', 'CaptionBar']) {
+  it('上部バー・状況・選択肢・声・記録を組み立てる（字幕は App が持つ）', () => {
+    for (const name of ['TopBar', 'Typewriter', 'ChoiceList', 'VoiceList', 'NotePanel']) {
       expect(s05).toContain(name);
     }
+    expect(s05).not.toContain('<CaptionBar');
   });
 
   it('演出キューを audio と effects に渡す', () => {

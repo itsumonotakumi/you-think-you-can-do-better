@@ -67,9 +67,10 @@ describe('演出キューと字幕の一元化', () => {
     expect(app).toContain('$captions[0]');
   });
 
-  it('字幕は S05 と S06 に出す（S07 は別担当）', () => {
-    expect(s05).toContain('<CaptionBar');
-    expect(s06).toContain('<CaptionBar');
+  it('字幕は共通の親（App）に出し、各画面には置かない', () => {
+    expect(app).toContain('<CaptionBar');
+    expect(s05).not.toContain('<CaptionBar');
+    expect(s06).not.toContain('<CaptionBar');
   });
 
   it('字幕は待ち行列と履歴の両方を表示する', () => {

@@ -9,6 +9,7 @@ import {
 import { DEFAULT_SETTINGS } from '../../../src/storage';
 import type { CueCaption } from '../../../src/app/parts/logic';
 import { fixture } from '../../fixtures/scenario';
+import CaptionBar from '../../../src/app/parts/CaptionBar.svelte';
 import S07Press from '../../../src/app/screens/S07Press.svelte';
 import * as s07Module from '../../../src/app/screens/S07Press.svelte';
 
@@ -110,10 +111,10 @@ describe('会見の字幕に出す合図', () => {
   });
 });
 
-describe('S07 の字幕表示', () => {
+describe('S07 の字幕表示（共通の親が出す）', () => {
   it('字幕の待ち行列の先頭を CaptionBar で出す', () => {
     enqueueCaptions(s07.pressCaptionItems(['fiveSeconds']));
-    const { body } = render(S07Press);
+    const { body } = render(CaptionBar);
     expect(body).toContain('role="status"');
     expect(body).toContain('残り5秒');
   });
@@ -124,7 +125,7 @@ describe('S07 の字幕表示', () => {
     expect(head).toBeDefined();
     advanceCaption(head!.captionId);
 
-    const { body } = render(S07Press);
+    const { body } = render(CaptionBar);
     expect(body).toContain('時間切れ');
     expect(body).toContain('残り5秒');
   });
@@ -147,7 +148,7 @@ describe('S07 の字幕表示', () => {
     expect(queue[0]).toMatchObject({ kind: 'text' });
     expect(get(captionHistory).length).toBeGreaterThanOrEqual(2);
 
-    const { body } = render(S07Press);
+    const { body } = render(CaptionBar);
     expect(body).toContain('残り5秒');
   });
 });
