@@ -1,0 +1,22 @@
+# 音素材の一覧（設計書 10.6）
+# 素材が未選定のため、いまは空。形式は AudioAsset[]（src/engine/types.ts）。
+# 例:
+# - id: tension_mid
+#   kind: bgm                     # bgm | se | ambience
+#   file: bgm/tension_mid.mp3
+#   loop: true
+#   title: 曲名
+#   author: 作者名
+#   site: 配布サイト名
+#   url: https://example.com/material
+#   termsUrl: https://example.com/terms
+#   termsCheckedAt: 2026-11-08
+#   conditions:
+#     game: true
+#     free: true
+#     modify: true
+#     creditRequired: false
+#     creditText: ""
+#     themeOk: true
+#     redistribution: embedded-only
+[]

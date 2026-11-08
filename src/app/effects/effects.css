@@ -1,0 +1,114 @@
+/* 画面演出（設計書 10.4 / 10.5）。クラスは document.documentElement に付く。
+   明滅は1秒3回以下。フラッシュは1回だけ・明るさ変化は控えめにする。 */
+
+html.fx-shake body {
+  animation: fx-shake 0.3s ease-in-out 1;
+}
+
+@keyframes fx-shake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-3px, 1px, 0); }
+  40% { transform: translate3d(2px, -1px, 0); }
+  60% { transform: translate3d(-2px, 1px, 0); }
+  80% { transform: translate3d(1px, 0, 0); }
+}
+
+/* 記者会見のフラッシュ。白い面の明滅を弱め、1回だけにする */
+html.fx-flash::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: #fff;
+  opacity: 0;
+  animation: fx-flash 0.2s ease-out 1 both;
+}
+
+@keyframes fx-flash {
+  0% { opacity: 0; }
+  35% { opacity: 0.18; }
+  100% { opacity: 0; }
+}
+
+/* 通知の雪崩。声が連続して流れ込む間の軽い揺れ */
+html.fx-avalanche body {
+  animation: fx-avalanche 0.6s ease-out 1;
+}
+
+@keyframes fx-avalanche {
+  0% { transform: translate3d(0, -2px, 0); }
+  30% { transform: translate3d(1px, 1px, 0); }
+  60% { transform: translate3d(-1px, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* 深夜帯。明るさを落として時計を目立たせる */
+html.fx-night body {
+  filter: brightness(0.72) saturate(0.85);
+  transition: filter 0.6s ease;
+}
+
+/* 早送り。時計が進む間の軽い流れ */
+html.fx-fastforward::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.05) 0 2px,
+    transparent 2px 10px
+  );
+  animation: fx-fastforward 0.6s linear infinite;
+}
+
+@keyframes fx-fastforward {
+  from { transform: translateY(0); }
+  to { transform: translateY(10px); }
+}
+
+/* 期限の赤。点滅させず、色と太さで伝える */
+html.fx-deadline {
+  --fx-deadline-color: #e5484d;
+}
+
+html.fx-deadline [data-fx='deadline'],
+html.fx-deadline .deadline {
+  color: #e5484d;
+  font-weight: 700;
+}
+
+/* 体力不足のぼかし。対象は [data-fx='blur'] を付けた要素だけ */
+html.fx-blur [data-fx='blur'] {
+  filter: blur(2px);
+  opacity: 0.55;
+}
+
+/* エンディングのスタンプ */
+html.fx-stamp [data-fx='stamp'] {
+  transform-origin: center;
+  animation: fx-stamp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) 1 both;
+}
+
+@keyframes fx-stamp {
+  0% { transform: scale(1.6); opacity: 0; }
+  60% { transform: scale(0.96); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 端末・設定で「動きを減らす」ときは動きを止める */
+@media (prefers-reduced-motion: reduce) {
+  html.fx-shake body,
+  html.fx-avalanche body,
+  html.fx-stamp [data-fx='stamp'] {
+    animation: none !important;
+  }
+
+  html.fx-flash::after,
+  html.fx-fastforward::before {
+    display: none;
+    animation: none !important;
+  }
+}
