@@ -115,3 +115,19 @@
   summary: { ja: "内部からの持ち出しは証拠保全と法的手続きの順序が重要", en: "Preserve evidence before legal steps for insider leaks" }
   checkedAt: 2026-11-08
   legalPack: jp
+- id: no03-pci-dss
+  title: { ja: "PCI DSS（クレジットカード産業データセキュリティ基準）", en: "PCI DSS (Payment Card Industry Data Security Standard)" }
+  issuer: { ja: "PCI SSC（PCIセキュリティ標準評議会）", en: "PCI Security Standards Council" }
+  version: "2026-11"
+  section: { ja: "加盟店におけるカード会員データの保護と、決済ページの管理", en: "Merchant protection of cardholder data and payment page management" }
+  summary: { ja: "カード情報を扱う加盟店は、決済ページの改ざん検知とスクリプトの管理を行い、カード情報を保存しない設計を優先する", en: "Merchants detect tampering on payment pages, manage scripts, and avoid storing card data" }
+  checkedAt: 2026-11-08
+  legalPack: jp
+- id: no03-ipa-web
+  title: { ja: "安全なウェブサイトの作り方", en: "How to Build Secure Websites" }
+  issuer: { ja: "IPA（情報処理推進機構）", en: "IPA" }
+  version: "2026-11"
+  section: { ja: "ウェブサイトの改ざん対策と、ソフトウェアの更新・運用", en: "Website tampering countermeasures and software updates" }
+  summary: { ja: "古いソフトウェアを使い続けないこと、改ざんを検知する仕組みを持つこと、被害を受けたときの手順を決めておくこと", en: "Avoid outdated software, detect tampering, and prepare response procedures" }
+  checkedAt: 2026-11-08
+  legalPack: jp
