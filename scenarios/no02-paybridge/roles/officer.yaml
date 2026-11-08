@@ -37,6 +37,12 @@ events:
     voices: [v-ev-weekly]
     gauges: { flame: 5 }
     caption: { ja: '週刊誌から、セキュリティコード保存の疑いについて取材が来た。', en: '' }
+  - id: ev-extortion
+    at: { day: 2, minutes: 960 }
+    voices: [v-ev-extortion]
+    gauges: { flame: 5 }
+    sound: { se: [mail_arrive] }
+    caption: { ja: '研究者を名乗る人物から、データ公開を予告するメールが届いた。', en: '' }
 points:
   - id: p01-first-call
     at: { day: 0, minutes: 960 }
@@ -139,7 +145,7 @@ points:
     text: { ja: '21時。カード会社から「不正利用の監視を強めています。影響のある経路を止めますか」と聞かれた。止めれば、夜間の決済も一部止まる。', en: '' }
     voices: [v03-public, v03-coward, v03-ok]
     notable:
-      - { id: note-gov-share, text: { ja: '自治体には停止する範囲と再開の見込みを伝え、公表文面を事前に共有すると約束した。', en: '' } }
+      - { id: note-stop-range, text: { ja: '21時、カード会社と自治体に停止範囲と再開の見込みを伝えた。', en: '' } }
     choices:
       - id: p03-keep
         text: { ja: '止めずに監視を強め、翌朝の利用状況を見て決める。', en: '' }
@@ -271,10 +277,11 @@ points:
     at: { day: 2, minutes: 540 }
     phase: investigate
     sound: { se: [mail_arrive] }
-    text: { ja: '9時。カード会社との協議。調査で、保存しない設計だったカードのセキュリティコードが、三年前の接続仕様で保存されていたことが分かった。当時の決裁はあなたの部門にある。', en: '' }
+    text: { ja: '9時。カード会社との協議。調査で、保存しない設計だったカードのセキュリティコードが、三年前の接続仕様の変更でデバッグ用ログに残る設定が入り、そのまま本番に残っていたことが分かった。当時の決裁はあなたの部門にある。', en: '' }
     voices: [v06-vendor, v06-law, v06-ok]
     notable:
-      - { id: note-card-code, text: { ja: 'カードのセキュリティコードを、三年前の接続仕様で保存していた事実と、廃止の予定を記録した。', en: '' } }
+      - { id: note-card-code, text: { ja: 'カードのセキュリティコードを、三年前の接続仕様の変更でデバッグ用ログに残る設定が入り、そのまま本番に残っていた事実と、廃止の予定を記録した。', en: '' } }
+      - { id: note-prior-warning, text: { ja: '二年前、技術者がセキュリティコード保存の停止を上申し、自部門が接続仕様の変更費用を理由に先送りした。', en: '' } }
     choices:
       - id: p06-blame
         text: { ja: '加盟店が保存していた不備として説明する。', en: '' }
@@ -304,7 +311,7 @@ points:
         points: 100
         refs: [no03-pci-dss, ppc-report-scope]
         gauges: { flame: -5, trust: 10, stamina: -15 }
-        setFlags: { codeAdmitted: true, codeStopped: true }
+        setFlags: { codeAdmitted: true, codeStopped: true, codeFixed: true }
         detail: card-explanation
         items:
           - { id: p06-c-content, points: 10, axis: content, refs: [no03-pci-dss] }
@@ -344,7 +351,7 @@ points:
           - { id: p07-b-order, points: 8, axis: order, refs: [meti-disclosure-guidance] }
           - { id: p07-b-wording, points: 5, axis: wording, refs: [jpcert-handling] }
       - id: p07-pr-brief
-        text: { ja: '広報に事実を渡し、概数と確定値を分けた補足資料を用意する。記者には背景説明の場を設け、社名は出さない。', en: '' }
+        text: { ja: '広報に事実を渡し、概数と確定値を分けた補足資料を用意する。社名を含めた事実を広報から出す準備をする。', en: '' }
         minutes: 120
         category: recover
         points: 100
@@ -360,8 +367,10 @@ points:
     at: { day: 3, minutes: 540 }
     phase: notify
     sound: { se: [phone_ring] }
-    text: { ja: '9時。個人情報保護委員会への速報の期限が近い。法務は「カード会員データの範囲をどう書くか」と聞いてきた。件数はまだ概数。', en: '' }
+    text: { ja: '9時。個人情報保護委員会への速報の期限が近い。自治体分は委託元の報告に任せられるが、カード会員データは当社分として出す。法務は「範囲をどう書くか」と聞いてきた。件数はまだ概数。', en: '' }
     voices: [v08-ceo, v08-law, v08-ok]
+    notable:
+      - { id: note-gov-share, text: { ja: '自治体には公表の文面を先に共有する。', en: '' } }
     choices:
       - id: p08-wait
         text: { ja: '件数が確定してから報告する。', en: '' }
@@ -491,8 +500,51 @@ points:
           - { id: p10-c-record, points: 8, axis: record, refs: [jpcert-handling] }
           - { id: p10-c-order, points: 5, axis: order, refs: [meti-disclosure-guidance] }
 
+  - id: p12-stamina
+    at: { day: 8, minutes: 540 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: '9時。対策会議は五日連続の徹夜。加盟店窓口も限界で、現場から「このままだと確認漏れが出る」という声が出ている。', en: '' }
+    voices: [v12-flattery, v12-public, v12-ok]
+    choices:
+      - id: p12-allnight
+        text: { ja: '全員で最後まで走り抜く。ここで休むと流れが切れる。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -30
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -20, damage: 10, trust: -5 }
+        delayed:
+          - { afterPhases: 2, points: -40, gauges: { stamina: -15, damage: 10 }, reason: { ja: '疲労から確認漏れが起き、復旧作業がやり直しになった。', en: '' } }
+        items:
+          - { id: p12-a-care, points: -10, axis: care, refs: [ipa-sme-guideline] }
+          - { id: p12-a-care2, points: -8, axis: care, refs: [ipa-sme-guideline] }
+      - id: p12-shift
+        text: { ja: '半日ごとの交代制を敷き、自分も休む。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: 10, trust: 5 }
+        items:
+          - { id: p12-b-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: p12-b-care2, points: 5, axis: care, refs: [ipa-sme-guideline] }
+      - id: p12-shift-care
+        text: { ja: '交代制に加え、外部ヘルプデスクと臨時の加盟店窓口を増員する。社員のケアも案内する。', en: '' }
+        minutes: 150
+        category: recover
+        points: 100
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: 15, trust: 10, flame: -5 }
+        setFlags: { staffSupport: true }
+        items:
+          - { id: p12-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: p12-c-care2, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: p12-c-care3, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: p12-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+
   - id: p11-resume
-    at: { day: 5, minutes: 600 }
+    at: { day: 12, minutes: 600 }
     phase: recover
     sound: { se: [phone_ring] }
     text: { ja: '10時。カード決済の再開。検証は終わっていないが、加盟店からは「いつ戻るのか」と毎日連絡が来る。', en: '' }
@@ -537,54 +589,11 @@ points:
           - { id: p11-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
           - { id: p11-c-time, points: 5, axis: time, refs: [meti-csm-guideline] }
 
-  - id: p12-stamina
-    at: { day: 8, minutes: 540 }
-    phase: recover
-    sound: { se: [notify_chat] }
-    text: { ja: '9時。対策会議は五日連続の徹夜。加盟店窓口も限界で、現場から「このままだと確認漏れが出る」という声が出ている。', en: '' }
-    voices: [v12-flattery, v12-public, v12-ok]
-    choices:
-      - id: p12-allnight
-        text: { ja: '全員で最後まで走り抜く。ここで休むと流れが切れる。', en: '' }
-        minutes: 120
-        category: hurt
-        points: -30
-        refs: [ipa-sme-guideline]
-        gauges: { stamina: -20, damage: 10, trust: -5 }
-        delayed:
-          - { afterPhases: 2, points: -40, gauges: { stamina: -15, damage: 10 }, reason: { ja: '疲労から確認漏れが起き、復旧作業がやり直しになった。', en: '' } }
-        items:
-          - { id: p12-a-care, points: -10, axis: care, refs: [ipa-sme-guideline] }
-          - { id: p12-a-care2, points: -8, axis: care, refs: [ipa-sme-guideline] }
-      - id: p12-shift
-        text: { ja: '半日ごとの交代制を敷き、自分も休む。', en: '' }
-        minutes: 90
-        category: maintain
-        points: 20
-        refs: [ipa-sme-guideline]
-        gauges: { stamina: 10, trust: 5 }
-        items:
-          - { id: p12-b-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
-          - { id: p12-b-care2, points: 5, axis: care, refs: [ipa-sme-guideline] }
-      - id: p12-shift-care
-        text: { ja: '交代制に加え、外部ヘルプデスクと臨時の加盟店窓口を増員する。社員のケアも案内する。', en: '' }
-        minutes: 150
-        category: recover
-        points: 100
-        refs: [ipa-sme-guideline]
-        gauges: { stamina: 15, trust: 10, flame: -5 }
-        setFlags: { staffSupport: true }
-        items:
-          - { id: p12-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
-          - { id: p12-c-care2, points: 8, axis: care, refs: [ipa-sme-guideline] }
-          - { id: p12-c-care3, points: 8, axis: care, refs: [ipa-sme-guideline] }
-          - { id: p12-c-record, points: 5, axis: record, refs: [jpcert-handling] }
-
   - id: p13-compensation
-    at: { day: 12, minutes: 600 }
+    at: { day: 12, minutes: 840 }
     phase: recover
     sound: { se: [notify_news] }
-    text: { ja: '10時。決済が止まった間の加盟店の損失をどう補償するか。金額と対象を決める日。', en: '' }
+    text: { ja: '14時。決済が止まった間の加盟店の損失をどう補償するか。金額と対象を決める日。', en: '' }
     voices: [v13-vendor, v13-law, v13-ok]
     choices:
       - id: p13-none
@@ -592,33 +601,33 @@ points:
         minutes: 60
         category: hurt
         points: -150
-        refs: [ppc-notify-person]
+        refs: [meti-csm-guideline]
         gauges: { flame: 20, trust: -15 }
         items:
-          - { id: p13-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
-          - { id: p13-a-care2, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: p13-a-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+          - { id: p13-a-care2, points: -10, axis: care, refs: [meti-csm-guideline] }
       - id: p13-flat
         text: { ja: '加盟店に一律の少額見舞金を出す。', en: '' }
         minutes: 120
         category: recover
         points: 50
-        refs: [ppc-notify-person]
+        refs: [meti-csm-guideline]
         gauges: { flame: -5, trust: 5, stamina: -10 }
         items:
-          - { id: p13-b-care, points: 8, axis: care, refs: [ppc-notify-person] }
-          - { id: p13-b-content, points: 5, axis: content, refs: [ppc-notify-person] }
+          - { id: p13-b-care, points: 8, axis: care, refs: [meti-csm-guideline] }
+          - { id: p13-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
       - id: p13-tiered
         text: { ja: '損失に応じた段階補償を決め、相談窓口と説明会を用意する。小さい加盟店には申請の支援も付ける。', en: '' }
         minutes: 180
         category: recover
         points: 120
-        refs: [ppc-notify-person]
+        refs: [meti-csm-guideline]
         gauges: { flame: -10, trust: 15, stamina: -10 }
         setFlags: { compensation: true }
         items:
-          - { id: p13-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
-          - { id: p13-c-care2, points: 8, axis: care, refs: [ppc-notify-person] }
-          - { id: p13-c-content, points: 8, axis: content, refs: [ppc-notify-person] }
+          - { id: p13-c-care, points: 8, axis: care, refs: [meti-csm-guideline] }
+          - { id: p13-c-care2, points: 8, axis: care, refs: [meti-csm-guideline] }
+          - { id: p13-c-content, points: 8, axis: content, refs: [meti-csm-guideline] }
 
   - id: p14-card-contract
     at: { day: 18, minutes: 600 }
@@ -798,9 +807,9 @@ drafts:
         label: { ja: '提出までの時間', en: '' }
         auto: true
         items:
-          - { id: ce-t-48h, when: { withinHours: 48 }, points: 10, axis: time, refs: [ppc-report-prelim] }
-          - { id: ce-t-96h, when: { withinHours: 96 }, points: 3, axis: time, refs: [ppc-report-prelim] }
-          - { id: ce-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [ppc-report-prelim] }
+          - { id: ce-t-48h, when: { withinHours: 48 }, points: 10, axis: time, refs: [meti-csm-guideline] }
+          - { id: ce-t-96h, when: { withinHours: 96 }, points: 3, axis: time, refs: [meti-csm-guideline] }
+          - { id: ce-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [meti-csm-guideline] }
       - id: scope
         label: { ja: '対象となる取引の範囲', en: '' }
         options:
@@ -979,10 +988,10 @@ drafts:
           - { id: br-nx-none, text: { ja: '次回の予定を書かない', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance] }
 voices:
   - { id: v01-ceo, media: boss, misleading: true, type: boss-pressure, text: { ja: '今夜はもう上がらせてやれ。正確な報告が揃うまで、明日の定例会議で聞けばいい。', en: '' }, trigger: { at: point } }
-  - { id: v01-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'また大げさに。カード側は関係ないだろ。', en: '' }, trigger: { at: point } }
+  - { id: v01-coward, media: sns, misleading: true, type: public-opinion, text: { ja: 'また大げさに。カード側は関係ないだろ。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: '黒瀬「決済系のログは消さずに、まず状況を教えてほしい」。', en: '' }, trigger: { at: point } }
   - { id: v01-after, media: sns, misleading: false, text: { ja: '取締役が出てきたところで、調査は進まない。', en: '' }, trigger: { at: after, choice: p01-taskforce } }
-  - { id: v02-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '決済を止めたくないなら、影響のある機器を初期化すれば安全ですよ。ログは要りません。', en: '' }, trigger: { at: point } }
+  - { id: v02-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '初期化して作り直せば決済は一日も止まりません。ログはバックアップから後で追えます。', en: '' }, trigger: { at: point } }
   - { id: v02-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '危なそうだったので、バックアップ系の電源を抜いておきました。これで安全です。', en: '' }, trigger: { at: point } }
   - { id: v02-ok, media: chat, misleading: false, text: { ja: '曽根「電源を切らずに切り離せます。修正は並行して当てられます」。', en: '' }, trigger: { at: point } }
   - { id: v02-after, media: sns, misleading: false, text: { ja: '証拠保全より、決済を止めないことを優先してほしい。', en: '' }, trigger: { at: after, choice: p02-business-plan } }
@@ -991,11 +1000,11 @@ voices:
   - { id: v03-ok, media: chat, misleading: false, text: { ja: '藤崎「自治体の担当者なら、朝8時に電話をもらえれば窓口で案内できる」。', en: '' }, trigger: { at: point } }
   - { id: v03-after, media: news, misleading: false, text: { ja: '委託元を差し置いて、カード会社と先に話すのか。', en: '' }, trigger: { at: after, choice: p03-protect } }
   - { id: v04-ceo, media: boss, misleading: true, type: boss-pressure, text: { ja: '残業で何とかしろ。窓口を増やす金はない。', en: '' }, trigger: { at: point } }
-  - { id: v04-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'また大げさに。いつもの窓口で足りる。', en: '' }, trigger: { at: point } }
+  - { id: v04-coward, media: sns, misleading: true, type: public-opinion, text: { ja: 'また大げさに。いつもの窓口で足りる。', en: '' }, trigger: { at: point } }
   - { id: v04-ok, media: chat, misleading: false, text: { ja: '現場「小さい加盟店ほど電話がつながらないと言っています」。', en: '' }, trigger: { at: point } }
   - { id: v04-after, media: news, misleading: false, text: { ja: '専用窓口を作ったところで、補償がないなら同じだ。', en: '' }, trigger: { at: after, choice: p04-dedicated-plan } }
   - { id: v05-ceo, media: boss, misleading: true, type: boss-pressure, text: { ja: '報告は口頭でいい。書面にすると、あとで責任を問われるぞ。', en: '' }, trigger: { at: point } }
-  - { id: v05-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'まだ分かっていないことを書面にすると、訂正だらけになる。', en: '' }, trigger: { at: point } }
+  - { id: v05-coward, media: sns, misleading: true, type: public-opinion, text: { ja: 'まだ分かっていないことを書面にすると、訂正だらけになる。', en: '' }, trigger: { at: point } }
   - { id: v05-ok, media: chat, misleading: false, text: { ja: '城戸「決裁が要るなら、事実と選択肢を書面で出して」。', en: '' }, trigger: { at: point } }
   - { id: v05-after, media: sns, misleading: false, text: { ja: '取締役が書面を出したところで、社長が決めるんだろ。', en: '' }, trigger: { at: after, choice: p05-written-ask } }
   - { id: v06-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '加盟店が保存していただけです。当社の決済代行には問題ありません。', en: '' }, trigger: { at: point } }
@@ -1003,15 +1012,15 @@ voices:
   - { id: v06-ok, media: chat, misleading: false, text: { ja: '大賀「当時の決裁は自部門です。こちらから言うべきです」。', en: '' }, trigger: { at: point } }
   - { id: v06-after, media: news, misleading: false, text: { ja: 'カード会社に言ったら、うちの決済は止まるのか。', en: '' }, trigger: { at: after, choice: p06-own } }
   - { id: v07-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、本当は十倍漏れてる。今すぐ全部公表しろ。', en: '' }, trigger: { at: point } }
-  - { id: v07-coward, media: news, misleading: true, type: coward-critique, text: { ja: '社名が出ていないなら、黙っていればいい。', en: '' }, trigger: { at: point } }
+  - { id: v07-coward, media: news, misleading: true, type: public-opinion, text: { ja: '社名が出ていないなら、黙っていればいい。', en: '' }, trigger: { at: point } }
   - { id: v07-ok, media: chat, misleading: false, text: { ja: '早瀬「報道の内容は、ほぼ事実です」。', en: '' }, trigger: { at: point } }
-  - { id: v07-after, media: sns, misleading: false, text: { ja: '背景説明とは、都合のいいことだけ話すのか。', en: '' }, trigger: { at: after, choice: p07-pr-brief } }
+  - { id: v07-after, media: sns, misleading: false, text: { ja: '社名を出して、都合のいいことだけ話すのか。', en: '' }, trigger: { at: after, choice: p07-pr-brief } }
   - { id: v08-ceo, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が確定するまで外には出すな。', en: '' }, trigger: { at: point } }
   - { id: v08-law, media: board, misleading: true, type: law-ish, text: { ja: 'カード会員データはカード会社が報告する。当社は出さなくていい。', en: '' }, trigger: { at: point } }
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '大賀「不正の目的のおそれがあれば、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
   - { id: v08-after, media: news, misleading: false, text: { ja: 'まだ確定していないのに速報を出すのか。説明が二転三転するぞ。', en: '' }, trigger: { at: after, choice: p08-file-plan } }
   - { id: v09-public, media: sns, misleading: true, type: public-opinion, text: { ja: '先に加盟店へ言うとパニックになる。報道を待て。', en: '' }, trigger: { at: point } }
-  - { id: v09-coward, media: news, misleading: true, type: coward-critique, text: { ja: 'まだ確定していないのに加盟店へ言うのか。余計な混乱を招く。', en: '' }, trigger: { at: point } }
+  - { id: v09-coward, media: news, misleading: true, type: public-opinion, text: { ja: 'まだ確定していないのに加盟店へ言うのか。余計な混乱を招く。', en: '' }, trigger: { at: point } }
   - { id: v09-ok, media: chat, misleading: false, text: { ja: '営業「報道で知る前に、担当から直接伝えたいという声が出ています」。', en: '' }, trigger: { at: point } }
   - { id: v09-after, media: sns, misleading: false, text: { ja: '先に加盟店へ言って、パニックになった。', en: '' }, trigger: { at: after, choice: p09-notify-plan } }
   - { id: v10-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '他社の決済代行に切り替える準備をしています。今すぐ値引きしてください。', en: '' }, trigger: { at: point } }
@@ -1043,7 +1052,7 @@ voices:
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '調査委員「攻撃に使える部分だけ伏せれば、公開できます」。', en: '' }, trigger: { at: point } }
   - { id: v16-after, media: news, misleading: false, text: { ja: '今さら報告書を出して、宣伝か。', en: '' }, trigger: { at: after, choice: p16-share } }
   - { id: v17-flattery, media: chat, misleading: true, type: flattery, text: { ja: '準備なんていりません。取締役ならその場で答えられます。', en: '' }, trigger: { at: point } }
-  - { id: v17-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '会見なんて開かなければいい。長引くだけです。', en: '' }, trigger: { at: point } }
+  - { id: v17-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '会見なんて開かなければいい。長引くだけです。', en: '' }, trigger: { at: point } }
   - { id: v17-ok, media: chat, misleading: false, text: { ja: '早瀬「記録を手元に置いて、事実だけ答えましょう」。', en: '' }, trigger: { at: point } }
   - { id: v17-after, media: news, misleading: false, text: { ja: '台本を読んでいるだけ。誠意がない。', en: '' }, trigger: { at: after, choice: p17-ready } }
   - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「調査中」なんだ。', en: '' }, trigger: { at: manual } }
@@ -1052,3 +1061,4 @@ voices:
   - { id: v-ev-audit, media: vendor, misleading: false, text: { ja: 'カード会社「保存してはいけない情報の扱いについて、今日中に説明してほしい」。', en: '' }, trigger: { at: manual } }
   - { id: v-ev-churn, media: news, misleading: false, text: { ja: '大口の加盟店が、代替の決済代行の検討を始めた。', en: '' }, trigger: { at: manual } }
   - { id: v-ev-weekly, media: board, misleading: false, text: { ja: '週刊誌から「セキュリティコード保存の疑い」について取材が来ている。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-extortion, media: attacker, misleading: false, text: { ja: '研究者を名乗る人物から「顧客データの一部を持っている。公開する」というメールが届いた。', en: '' }, trigger: { at: manual } }

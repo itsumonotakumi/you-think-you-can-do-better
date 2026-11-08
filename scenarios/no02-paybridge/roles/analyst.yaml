@@ -36,7 +36,7 @@ events:
     voices: [v-ev-client]
     gauges: { flame: 5 }
     sound: { se: [phone_ring] }
-    caption: { ja: '委託先から、調査状況の説明を求められている。', en: '' }
+    caption: { ja: '委託元から、調査状況の説明を求められている。', en: '' }
 points:
   - id: a01-first-alert
     at: { day: 0, minutes: 975 }
@@ -101,7 +101,7 @@ points:
     at: { day: 0, minutes: 1050 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '17時30分。同じフレームワークは、社内の決済サーバー、バックアップ系、委託先の接続装置にも残っている。修正を当てる候補は、台帳の上では三百台を超える。', en: '' }
+    text: { ja: '17時30分。同じフレームワークは、社内の決済サーバー、バックアップ系、委託元の接続装置にも残っている。修正を当てる候補は、台帳の上では三百台を超える。', en: '' }
     voices: [v02-vendor, v02-popular, v02-ok]
     popular: { choiceId: a02-one, percent: 61 }
     choices:
@@ -249,7 +249,7 @@ points:
         text: { ja: '自分のSNSに「大きな障害が出ている」と書いて、現場に知らせる。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -100
         refs: [meti-disclosure-guidance]
         gauges: { flame: 15, trust: -10 }
         delayed:
@@ -273,7 +273,7 @@ points:
     at: { day: 0, minutes: 1335 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '22時15分。侵害されたサーバーから、決済基盤の管理APIキーと、委託先の連携用キーが読める状態だった。止めれば、委託先の収納処理も止まる。', en: '' }
+    text: { ja: '22時15分。侵害されたサーバーから、決済基盤の管理APIキーと、委託元の連携用キーが読める状態だった。止めれば、委託元の収納処理も止まる。', en: '' }
     voices: [v05-vendor, v05-law, v05-ok]
     choices:
       - id: a05-keep
@@ -387,12 +387,14 @@ points:
     sound: { se: [phone_ring] }
     text: { ja: '3時。自治体の技術担当から電話が来た。「うちのサイトで、何か起きていますか」。まだ報道はない。相手は深夜の当直で、こちらも確たることは分かっていない。', en: '' }
     voices: [v07-law, v07-coward, v07-ok]
+    notable:
+      - { id: note-gov-share, text: { ja: '自治体には分かっている事実と時刻を伝え、朝の正式な連絡を約束した。', en: '' } }
     choices:
       - id: a07-wait
-        text: { ja: '朝まで待ち、正式な連絡ルートで伝える。', en: '' }
+        text: { ja: '上にも連絡せず、朝まで待つ。', en: '' }
         minutes: 60
         category: hurt
-        points: -30
+        points: -60
         refs: [jpcert-handling]
         gauges: { trust: -5 }
         coward: true
@@ -400,7 +402,7 @@ points:
           - { id: a07-a-time, points: -6, axis: time, refs: [jpcert-handling] }
           - { id: a07-a-order, points: -6, axis: order, refs: [jpcert-handling] }
       - id: a07-share
-        text: { ja: '分かっている事実と時刻を伝え、朝に正式な連絡を入れると約束する。', en: '' }
+        text: { ja: '当直のCSIRTリーダーに即時連絡して了解を取り、分かっている事実と時刻だけを伝え、朝の正式連絡を約束する。', en: '' }
         minutes: 45
         category: maintain
         points: 30
@@ -412,7 +414,7 @@ points:
           - { id: a07-b-care, points: 6, axis: care, refs: [jpcert-handling] }
           - { id: a07-b-time, points: 4, axis: time, refs: [jpcert-handling] }
       - id: a07-share-plan
-        text: { ja: '事実と時刻を伝え、相手側のログも保全してもらい、共同の調査手順を決める。', en: '' }
+        text: { ja: 'CSIRTリーダーの了解を得て事実と時刻を伝え、相手側のログも保全してもらい、共同の調査手順を決める。', en: '' }
         minutes: 90
         category: recover
         points: 120
@@ -425,10 +427,10 @@ points:
           - { id: a07-c-content, points: 4, axis: content, refs: [nist-sp800-61r3] }
           - { id: a07-c-record, points: 4, axis: record, refs: [cissp-cbk-secops] }
       - id: a07-sns
-        text: { ja: '自分のSNSに「委託先でも被害が出ている」と書く。', en: '' }
+        text: { ja: '自分のSNSに「委託元でも被害が出ている」と書く。', en: '' }
         minutes: 30
         category: hurt
-        points: -37
+        points: -120
         refs: [meti-disclosure-guidance]
         gauges: { flame: 20, trust: -15 }
         items:
@@ -495,10 +497,10 @@ points:
     at: { day: 1, minutes: 600 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '10時。侵害されたサーバーのデバッグログに、カードのセキュリティコードが残っていた。保存しない設計のはずだった。調査用のコピーは取ってあるが、同じ設定のサーバーは本番にも残っている。', en: '' }
+    text: { ja: '10時。侵害されたサーバーのデバッグログに、カードのセキュリティコードが残っていた。設定は三年前の接続仕様の変更で入ったものらしい。当時の決裁は決済事業部門にある。調査用のコピーは取ってあるが、同じ設定のサーバーは本番にも残っている。', en: '' }
     voices: [v09-law, v09-vendor, v09-ok]
     notable:
-      - { id: note-card-code, text: { ja: 'デバッグログにカードのセキュリティコードが保存されていた。同じ設定のサーバーが本番に残っている。', en: '' } }
+      - { id: note-card-code, text: { ja: 'デバッグログにカードのセキュリティコードが保存されていた。設定は三年前の接続仕様の変更で入り、同じ設定のサーバーが本番に残っている。', en: '' } }
     choices:
       - id: a09-delete
         text: { ja: 'ログを削除し、保存の事実をなかったことにする。', en: '' }
@@ -519,7 +521,7 @@ points:
         points: 150
         refs: [ppc-report-scope, meti-csm-guideline]
         gauges: { trust: 10, flame: -5, stamina: -10 }
-        setFlags: { cardCodeReported: true }
+        setFlags: { cardCodeReported: true, codeFixed: true }
         items:
           - { id: a09-b-order, points: 6, axis: order, refs: [ppc-report-scope] }
           - { id: a09-b-content, points: 6, axis: content, refs: [meti-csm-guideline] }
@@ -558,13 +560,14 @@ points:
       - id: a10-wait
         text: { ja: '定例メンテまで待ち、その間に監視を強める。', en: '' }
         minutes: 60
-        category: hurt
-        points: -37
+        category: fatal
+        points: -200
         refs: [meti-csm-guideline]
         gauges: { flame: 10, damage: 15, trust: -10 }
         coward: true
+        setFlags: { waitedForMaintenance: true }
         delayed:
-          - { afterPhases: 1, points: -15, gauges: { damage: 15, flame: 10 }, reason: { ja: '待つ間に、公表済みの脆弱性を突かれた形跡が別のサーバーで見つかった。', en: '' } }
+          - { afterPhases: 1, points: -15, gauges: { damage: 15, flame: 10 }, reason: { ja: '規程遵守賞の表彰状が届いた日、待っていたサーバーから同じ手口の通信が出た。', en: '' } }
         items:
           - { id: a10-a-time, points: -8, axis: time, refs: [jpcert-handling] }
           - { id: a10-a-content, points: -8, axis: content, refs: [nist-sp800-61r3] }
@@ -609,7 +612,7 @@ points:
     at: { day: 1, minutes: 1200 }
     phase: investigate
     sound: { se: [mail_arrive] }
-    text: { ja: '20時。侵入に使われたのは、委託先の保守用アカウントだった。リモート保守の接続は、今も開いている。委託先の担当者は「うちの管理下では問題ない」と言う。', en: '' }
+    text: { ja: '20時。侵入後、攻撃者は保守ベンダーの保守用アカウントを奪い、横展開に使っていた。リモート保守の接続は、今も開いている。保守ベンダーの担当者は「うちの管理下では問題ない」と言う。', en: '' }
     voices: [v11-vendor, v11-insider, v11-ok]
     choices:
       - id: a11-keep
@@ -625,7 +628,7 @@ points:
           - { id: a11-a-content, points: -8, axis: content, refs: [nist-sp800-61r3] }
           - { id: a11-a-record, points: -6, axis: record, refs: [jpcert-handling] }
       - id: a11-disable
-        text: { ja: '保守用アカウントを止め、委託先に連絡して接続履歴を共有してもらう。', en: '' }
+        text: { ja: '保守用アカウントを止め、保守ベンダーに連絡して接続履歴を共有してもらう。', en: '' }
         minutes: 90
         category: maintain
         points: 30
@@ -638,7 +641,7 @@ points:
           - { id: a11-b-care, points: 4, axis: care, refs: [meti-csm-guideline] }
           - { id: a11-b-record, points: 4, axis: record, refs: [jpcert-handling] }
       - id: a11-disable-plan
-        text: { ja: '接続を止め、委託先と共同で接続履歴を確認し、再開の条件を決める。', en: '' }
+        text: { ja: '接続を止め、保守ベンダーと共同で接続履歴を確認し、再開の条件を決める。', en: '' }
         minutes: 120
         category: recover
         points: 150
@@ -651,10 +654,10 @@ points:
           - { id: a11-c-care, points: 6, axis: care, refs: [meti-csm-guideline] }
           - { id: a11-c-record, points: 4, axis: record, refs: [jpcert-handling] }
       - id: a11-blame
-        text: { ja: '委託先の責任だと社内に報告する。', en: '' }
+        text: { ja: '保守ベンダーの責任だと社内に報告する。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -80
         refs: [meti-csm-guideline]
         gauges: { flame: 15, trust: -10 }
         items:
@@ -839,7 +842,7 @@ points:
     at: { day: 3, minutes: 840 }
     phase: notify
     sound: { se: [typing] }
-    text: { ja: '14時。個人情報保護委員会への速報の材料を、法務に渡す時間。件数は概数で、確定していない。カードのセキュリティコードを保存していた事実も、まだ社内の一部しか知らない。', en: '' }
+    text: { ja: '14時。個人情報保護委員会への速報の材料を、法務に渡す時間。自治体分は委託元の報告に任せ、当社はカード会員データ分を出す。件数は概数で、確定していない。カードのセキュリティコードを保存していた事実も、まだ社内の一部しか知らない。', en: '' }
     voices: [v15-law, v15-boss, v15-ok]
     notable:
       - { id: note-prelim-material, text: { ja: '速報の材料を渡した時刻と、その時点で確定していた範囲を記録した。', en: '' } }
@@ -900,7 +903,7 @@ points:
     at: { day: 4, minutes: 540 }
     phase: investigate
     sound: { se: [phone_ring] }
-    text: { ja: '9時。調査会社の報告。攻撃者は三週間前から社内にいて、同じ手口が複数の委託先でも使われている可能性がある。委託先の一つは、まだ調査に同意していない。', en: '' }
+    text: { ja: '9時。調査会社の報告。攻撃者は三週間前から社内にいて、同じ手口が複数の委託元でも使われている可能性がある。委託元の一つは、まだ調査に同意していない。', en: '' }
     voices: [v16-past, v16-insider, v16-ok]
     choices:
       - id: a16-narrow
@@ -915,7 +918,7 @@ points:
           - { id: a16-a-content2, points: -8, axis: content, refs: [nist-sp800-61r3] }
           - { id: a16-a-record, points: -4, axis: record, refs: [jpcert-handling] }
       - id: a16-expand
-        text: { ja: '全委託先・全システムに調査を広げ、証拠を第三者委員会に渡せる形に整理して上に上げる。', en: '' }
+        text: { ja: '全委託元・全システムに調査を広げ、証拠を第三者委員会に渡せる形に整理して上に上げる。', en: '' }
         minutes: 240
         category: maintain
         points: 30
@@ -928,7 +931,7 @@ points:
           - { id: a16-b-record, points: 4, axis: record, refs: [jpcert-handling] }
           - { id: a16-b-care, points: 4, axis: care, refs: [meti-csm-guideline] }
       - id: a16-expand-plan
-        text: { ja: '調査を広げ、委託先ごとの連絡窓口と、被害者への説明材料を先に用意する。', en: '' }
+        text: { ja: '調査を広げ、委託元ごとの連絡窓口と、被害者への説明材料を先に用意する。', en: '' }
         minutes: 300
         category: recover
         points: 150
@@ -941,7 +944,7 @@ points:
           - { id: a16-c-care, points: 6, axis: care, refs: [ppc-notify-person] }
           - { id: a16-c-record, points: 4, axis: record, refs: [jpcert-handling] }
       - id: a16-shift-blame
-        text: { ja: '委託先の調査を待ち、自社の調査範囲は変えない。', en: '' }
+        text: { ja: '委託元の調査を待ち、自社の調査範囲は変えない。', en: '' }
         minutes: 60
         category: hurt
         points: -30
@@ -956,23 +959,23 @@ points:
     at: { day: 5, minutes: 660 }
     phase: notify
     sound: { se: [typing] }
-    text: { ja: '11時。本人通知の対象リストを作る時間。対象は数百万件にのぼる。退会した人、申込みの途中で止まった人も含まれる。メールアドレスが空の行も多い。', en: '' }
+    text: { ja: '11時。本人通知の対象リストを作る時間。対象は数百万件にのぼる。過去に支払った人、決済が途中で失敗した人も含まれる。メールアドレスが空の行も多い。', en: '' }
     voices: [v17-field, v17-expert, v17-ok]
     choices:
       - id: a17-current
-        text: { ja: '現行の利用者だけを対象にする。', en: '' }
+        text: { ja: '今回の支払いの利用者だけを対象にする。', en: '' }
         minutes: 90
         category: hurt
         points: -30
         refs: [ppc-notify-person]
         gauges: { flame: 10, trust: -10 }
         delayed:
-          - { afterPhases: 1, points: -9, gauges: { flame: 10 }, reason: { ja: '退会者への通知漏れが指摘され、追加の通知が必要になった。', en: '' } }
+          - { afterPhases: 1, points: -9, gauges: { flame: 10 }, reason: { ja: '過去に支払った人への通知漏れが指摘され、追加の通知が必要になった。', en: '' } }
         items:
           - { id: a17-a-content, points: -10, axis: content, refs: [ppc-notify-person] }
           - { id: a17-a-care, points: -6, axis: care, refs: [ppc-notify-person] }
       - id: a17-all
-        text: { ja: '退会者と申込み途中の人も含め、重複を除いて対象リストを作る。', en: '' }
+        text: { ja: '過去に支払った人と、決済が途中で失敗した人も含め、重複を除いて対象リストを作る。', en: '' }
         minutes: 240
         category: recover
         points: 150
@@ -1281,7 +1284,7 @@ drafts:
         label: { ja: '原因の書き方', en: '' }
         options:
           - { id: pn-ca-known, text: { ja: '公表済みの脆弱性を突かれた可能性を、断定を避けて書く', en: '' }, points: 6, axis: content, refs: [meti-disclosure-guidance] }
-          - { id: pn-ca-blame, text: { ja: '「委託先の設定ミスが原因」と断定する', en: '' }, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: pn-ca-blame, text: { ja: '「委託元の設定ミスが原因」と断定する', en: '' }, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
       - id: record
         label: { ja: '版の管理', en: '' }
         options:
@@ -1297,7 +1300,7 @@ voices:
   - { id: v02-ok, media: chat, misleading: false, text: { ja: '基盤運用「影響しうる機器の棚卸しを先に。台帳と実機を突き合わせましょう」。', en: '' }, trigger: { at: point } }
   - { id: v02-after, media: news, misleading: false, text: { ja: '台帳を見ている間に、攻撃者は動いている。', en: '' }, trigger: { at: after, choice: a02-inventory-plan } }
   - { id: v03-law, media: board, misleading: true, type: law-ish, text: { ja: '保存期間は規程で決まっています。過ぎたログは消えて当然です。', en: '' }, trigger: { at: point } }
-  - { id: v03-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'ログは容量を食うだけです。消えたら消えたで、調査はできますよ。', en: '' }, trigger: { at: point } }
+  - { id: v03-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'ログは容量を食うだけです。消えても、バックアップから後で追えますよ。', en: '' }, trigger: { at: point } }
   - { id: v03-ok, media: chat, misleading: false, text: { ja: '監視運用「調査対象の期間を切り出して、ハッシュと時刻を付けて保全しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v03-after, media: sns, misleading: false, text: { ja: 'ログを保全する時間があるなら、原因を出せ。', en: '' }, trigger: { at: after, choice: a03-export-plan } }
   - { id: v04-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '確定したことだけ報告してくれ。中途半端だと、上も動けない。', en: '' }, trigger: { at: point } }
@@ -1305,17 +1308,17 @@ voices:
   - { id: v04-ok, media: chat, misleading: false, text: { ja: 'セキュリティ責任者「分かったこと、分からないこと、次にやることを分けて出してくれ」。', en: '' }, trigger: { at: point } }
   - { id: v04-after, media: boss, misleading: false, text: { ja: 'まだ分かっていないのに、上に報告するのか。', en: '' }, trigger: { at: after, choice: a04-report } }
   - { id: v05-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: 'キーを止めると取引先の業務が止まります。影響が確認できてからでいいのでは。', en: '' }, trigger: { at: point } }
-  - { id: v05-law, media: board, misleading: true, type: law-ish, text: { ja: '契約上、キーの失効は委託先の同意が必要です。今は動かさないほうが安全です。', en: '' }, trigger: { at: point } }
+  - { id: v05-law, media: board, misleading: true, type: law-ish, text: { ja: '契約上、キーの失効は委託元の同意が必要です。今は動かさないほうが安全です。', en: '' }, trigger: { at: point } }
   - { id: v05-ok, media: chat, misleading: false, text: { ja: '基盤運用「侵害されたキーは止めて、新しいキーに切り替える手順を用意しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v05-after, media: sns, misleading: false, text: { ja: 'キーを止められて、こちらの連携が止まった。説明しろ。', en: '' }, trigger: { at: after, choice: a05-rotate-plan } }
   - { id: v06-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '再起動すれば直りますよ。いつもそうしてます。', en: '' }, trigger: { at: point } }
-  - { id: v06-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'メモリを取っても分かりません。初期化して作り直すのが一番です。', en: '' }, trigger: { at: point } }
+  - { id: v06-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'メモリを取るより、初期化して作り直すほうが早いですよ。ログは残しています。', en: '' }, trigger: { at: point } }
   - { id: v06-ok, media: chat, misleading: false, text: { ja: '調査担当「メモリ、ディスク、ログの順で保全し、ハッシュを記録しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v06-after, media: sns, misleading: false, text: { ja: '調査を優先して、サーバーを返さないのか。', en: '' }, trigger: { at: after, choice: a06-image } }
   - { id: v07-law, media: board, misleading: true, type: law-ish, text: { ja: '公表前の情報は、口外しないのが筋です。', en: '' }, trigger: { at: point } }
-  - { id: v07-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '深夜に下手に連絡すると、こちらが疑われますよ。', en: '' }, trigger: { at: point } }
-  - { id: v07-ok, media: chat, misleading: false, text: { ja: '公共事業部「分かっている事実だけを伝えて、朝に正式な連絡を入れましょう」。', en: '' }, trigger: { at: point } }
-  - { id: v07-after, media: news, misleading: false, text: { ja: '深夜に委託先へ連絡して、何を話したのか。', en: '' }, trigger: { at: after, choice: a07-share-plan } }
+  - { id: v07-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '深夜に下手に連絡すると、こちらが疑われますよ。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: 'CSIRTリーダー「分かっている事実だけを伝えて、朝に正式な連絡を入れましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v07-after, media: news, misleading: false, text: { ja: '深夜に委託元へ連絡して、何を話したのか。', en: '' }, trigger: { at: after, choice: a07-share-plan } }
   - { id: v08-public, media: sns, misleading: true, type: public-opinion, text: { ja: '止めるな。月末の納付があるんだ。', en: '' }, trigger: { at: point } }
   - { id: v08-coward, media: news, misleading: true, type: coward-critique, text: { ja: '止める判断が遅い。経営は何をしていた。', en: '' }, trigger: { at: point } }
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '公共事業部「止める場合の影響と復旧見込みを添えて、上に上げましょう」。', en: '' }, trigger: { at: point } }
@@ -1329,8 +1332,8 @@ voices:
   - { id: v10-ok, media: chat, misleading: false, text: { ja: '基盤運用「緊急変更の手続きと、戻せる手順を用意しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v10-after, media: news, misleading: false, text: { ja: '定例を待たずに触るのか。障害が出たらどうする。', en: '' }, trigger: { at: after, choice: a10-emergency } }
   - { id: v11-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '弊社の管理下では問題ありません。アカウントは止めないでください。', en: '' }, trigger: { at: point } }
-  - { id: v11-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、別の委託先にも同じ穴がある。調べても終わらないぞ。', en: '' }, trigger: { at: point } }
-  - { id: v11-ok, media: chat, misleading: false, text: { ja: '委託先窓口「いったん接続を止めて、一緒に履歴を確認しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v11-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、別の委託元にも同じ穴がある。調べても終わらないぞ。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '保守ベンダーの窓口「いったん接続を止めて、一緒に履歴を確認しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v11-after, media: vendor, misleading: false, text: { ja: '保守を止められて、こちらの作業が止まった。', en: '' }, trigger: { at: after, choice: a11-disable-plan } }
   - { id: v12-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '丸い数字でいい。細かい数字は後で直せ。', en: '' }, trigger: { at: point } }
   - { id: v12-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、本当は十倍漏れている。今すぐ全部公表しろ。', en: '' }, trigger: { at: point } }
@@ -1349,12 +1352,12 @@ voices:
   - { id: v15-ok, media: chat, misleading: false, text: { ja: '法務「分かっている範囲と、まだ確認中の範囲を分けて書きましょう」。', en: '' }, trigger: { at: point } }
   - { id: v15-after, media: news, misleading: false, text: { ja: '確定していない数字を出すのか。', en: '' }, trigger: { at: after, choice: a15-submit-full } }
   - { id: v16-past, media: boss, misleading: true, type: past-success, text: { ja: '前の障害は範囲を絞って収まった。今回も同じでいい。', en: '' }, trigger: { at: point } }
-  - { id: v16-insider, media: board, misleading: true, type: fake-insider, text: { ja: '別の委託先でも同じ穴がある。調べれば終わらないぞ。', en: '' }, trigger: { at: point } }
+  - { id: v16-insider, media: board, misleading: true, type: fake-insider, text: { ja: '別の委託元でも同じ穴がある。調べれば終わらないぞ。', en: '' }, trigger: { at: point } }
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '調査担当「事実を整理して、調査範囲の拡大を上に上げましょう」。', en: '' }, trigger: { at: point } }
   - { id: v16-after, media: news, misleading: false, text: { ja: '調査範囲を広げて、いつ終わるのか。', en: '' }, trigger: { at: after, choice: a16-expand-plan } }
-  - { id: v17-field, media: chat, misleading: true, type: well-meant-field, text: { ja: 'メールで一斉に送れば十分です。書面は費用がかかります。', en: '' }, trigger: { at: point } }
+  - { id: v17-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '今回の支払いの人だけで十分です。過去の人に送ると、問い合わせが増えます。', en: '' }, trigger: { at: point } }
   - { id: v17-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '通知するとパニックになります。公表だけで十分です。', en: '' }, trigger: { at: point } }
-  - { id: v17-ok, media: chat, misleading: false, text: { ja: '顧客対応「退会者と申込み途中の人も含めて、重複を除いて数えましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v17-ok, media: chat, misleading: false, text: { ja: '顧客対応「過去に支払った人と、決済が途中で失敗した人も含めて、重複を除いて数えましょう」。', en: '' }, trigger: { at: point } }
   - { id: v17-after, media: sns, misleading: false, text: { ja: '書面が届くまで、何をすればいいか分からない。', en: '' }, trigger: { at: after, choice: a17-all-plan } }
   - { id: v18-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '二週間も止めているのは臆病すぎる。他社ならもう再開している。', en: '' }, trigger: { at: point } }
   - { id: v18-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '検証に時間をかけると、復旧費用が増えますよ。', en: '' }, trigger: { at: point } }
@@ -1369,4 +1372,4 @@ voices:
   - { id: v-coward-4, media: news, misleading: false, text: { ja: '臆病な対応が被害を広げた。担当者の上も責任を問うべきだ。', en: '' }, trigger: { at: manual } }
   - { id: v-ev-night, media: chat, misleading: false, text: { ja: '現場「アラートが多すぎて、どれが本物か分かりません」。', en: '' }, trigger: { at: manual } }
   - { id: v-ev-board, media: board, misleading: false, text: { ja: '社内掲示板「現場は何をしている。説明が欲しい」。', en: '' }, trigger: { at: manual } }
-  - { id: v-ev-client, media: news, misleading: false, text: { ja: '委託先「調査の状況と、情報の取り扱いを説明してほしい」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-client, media: news, misleading: false, text: { ja: '委託元「調査の状況と、情報の取り扱いを説明してほしい」。', en: '' }, trigger: { at: manual } }
