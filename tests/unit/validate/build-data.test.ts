@@ -55,16 +55,19 @@ describe('build-data', () => {
     expect(readJson(join(out, 'index.json'))).toEqual([]);
   });
 
-  it('シナリオが無いときは空の出力で検査も通る', () => {
-    const project = createProject();
+  it('シナリオが無いときは C17 エラーにし、共通データの誤りも報告する', () => {
+    const project = createProject((files) => {
+      files.references[1]!.deadlineHours = -1;
+    });
     cleanups.push(project.cleanup);
     rmSync(join(project.root, 'scenarios'), { recursive: true, force: true });
     const result = validateProject({ root: project.root, today: '2026-11-08' });
-    expect(result.errors).toEqual([]);
+    expect(result.errors.some((e) => e.code === 'C17' && e.message.includes('scenarios'))).toBe(true);
+    // シナリオ0件でも根拠データは検査する
+    expect(result.errors.some((e) => e.code === 'C15')).toBe(true);
 
     const out = join(project.root, 'out');
-    buildData({ root: project.root, outDir: out });
-    expect(readJson(join(out, 'index.json'))).toEqual([]);
-    expect(readJson(join(out, 'audio.json'))).toEqual([]);
+    // 最初に並ぶエラーは根拠データのこともあるが、必ず書き出さない
+    expect(() => buildData({ root: project.root, outDir: out })).toThrow(/\[C1[57]\]/);
   });
 });

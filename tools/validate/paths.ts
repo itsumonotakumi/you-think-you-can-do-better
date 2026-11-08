@@ -4,6 +4,8 @@
 //   - 方針別（最大点・最小点・fatal 回避・fatal 1回）の決定的な走行
 //   - シナリオIDから作るシード付き疑似乱数で選択・文案・会見の回答を選ぶ走行
 // を流す。同じ（判断ID・旗・ゲージの帯・fatal・点数帯）の状態に何度も入る走行は打ち切る。
+// 訪問回数は走行ごとに数える（走行をまたいで共有すると、先に走った数本で後の走行が
+// 打ち切られ、実際には到達できるランクを見落とす）。
 //
 // 注意: node --experimental-strip-types は拡張子なしの import を解決できない。
 // engine の各ファイルは拡張子なしで import しているため、実行時だけ解決フックを足す
@@ -87,7 +89,7 @@ const engine: typeof import('../../src/engine/index.ts') = await import('../../s
 
 const POLICIES: readonly PathPolicy[] = ['max', 'min', 'avoid-fatal', 'one-fatal'];
 const SHIFTS = [0, 1, 2, 3];
-/** 同じ状態を何回まで通すか（これを超えた走行は打ち切る） */
+/** 同じ状態を1回の走行で何回まで通すか（これを超えた走行は打ち切る） */
 const MAX_STATE_VISITS = 8;
 
 // ---------------- シード付き疑似乱数（mulberry32） ----------------
@@ -233,8 +235,8 @@ interface RunOptions {
   /** random なら選択・文案・会見の回答を乱数で選ぶ */
   mode: 'policy' | 'random';
   rng: () => number;
-  /** ランダム走行で、同じ状態に入った回数を数えて打ち切るための集合 */
-  seen: Map<string, number> | null;
+  /** ランダム走行で、同じ状態に入った回数を数えて打ち切るか（表は走行ごとに作る） */
+  prune: boolean;
   /** ランダム走行の表示名 */
   label?: string;
 }
@@ -265,6 +267,8 @@ function playOne(
   let answerIndex = 0;
   const picks: string[] = [];
   const taken = { fatal: false };
+  // 訪問回数表は走行ごとに作る（共有すると先の走行が後の走行を打ち切ってしまう）
+  const seen: Map<string, number> | null = options.prune ? new Map<string, number>() : null;
 
   const tick = () => {
     steps += 1;
@@ -273,11 +277,11 @@ function playOne(
 
   /** 同じ状態に何度も入る走行は打ち切る（上限まで同じ状態を許す） */
   const pruned = (candidate: PlayState): boolean => {
-    if (!options.seen) return false;
+    if (!seen) return false;
     const key = pathStateKey(candidate);
-    const count = options.seen.get(key) ?? 0;
+    const count = seen.get(key) ?? 0;
     if (count >= MAX_STATE_VISITS) return true;
-    options.seen.set(key, count + 1);
+    seen.set(key, count + 1);
     return false;
   };
 
@@ -300,7 +304,8 @@ function playOne(
 
     if (next === 'draft') {
       const key = state.pendingDraft;
-      const draft = key ? scenario.roles[role]?.drafts?.[key] : undefined;
+      const drafts = scenario.roles[role]?.drafts;
+      const draft = key && drafts && Object.hasOwn(drafts, key) ? drafts[key] : undefined;
       if (!draft) throw new Error(`文案が見つかりません: ${key ?? '(なし)'}`);
       tick();
       const selections = options.mode === 'random'
@@ -362,7 +367,6 @@ export function simulatePaths(
   const failures: PathFailure[] = [];
   const randomRuns = options.randomRuns ?? 0;
   const rng = mulberry32(options.seed ?? seedFor(`${scenario.id}/${role}`));
-  const seen = new Map<string, number>();
 
   const attempt = (runOptions: RunOptions, label: string) => {
     try {
@@ -377,13 +381,13 @@ export function simulatePaths(
   for (const policy of POLICIES) {
     // 方針どおりの最善手
     attempt(
-      { policy, choiceShift: null, draftShift: null, maxSteps, mode: 'policy', rng, seen: null },
+      { policy, choiceShift: null, draftShift: null, maxSteps, mode: 'policy', rng, prune: false },
       `${policy}/best`,
     );
     // 各判断で第 k 候補を選ぶ決定的な変種
     for (const shift of SHIFTS) {
       attempt(
-        { policy, choiceShift: shift, draftShift: shift, maxSteps, mode: 'policy', rng, seen: null },
+        { policy, choiceShift: shift, draftShift: shift, maxSteps, mode: 'policy', rng, prune: false },
         `${policy}/k${shift}`,
       );
     }
@@ -392,7 +396,7 @@ export function simulatePaths(
   for (let i = 0; i < randomRuns; i += 1) {
     const label = `random/${i + 1}`;
     attempt(
-      { policy: 'max', choiceShift: null, draftShift: null, maxSteps, mode: 'random', rng, seen, label },
+      { policy: 'max', choiceShift: null, draftShift: null, maxSteps, mode: 'random', rng, prune: true, label },
       label,
     );
   }

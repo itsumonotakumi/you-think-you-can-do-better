@@ -13,13 +13,14 @@ afterEach(() => {
 
 type Deny = NonNullable<TestFiles['denylist']>;
 
+/** 最低件数を満たす無害な既定リスト（各テストは必要なキーだけ差し替える） */
 function deny(overrides: Partial<Deny> = {}): Deny {
   return {
-    companies: [],
-    services: [],
+    companies: ['ZZ企業1', 'ZZ企業2', 'ZZ企業3', 'ZZ企業4', 'ZZ企業5'],
+    services: ['ZZサービス1', 'ZZサービス2', 'ZZサービス3', 'ZZサービス4', 'ZZサービス5'],
     people: [],
-    countries: [],
-    comparisons: [],
+    countries: ['ZZ国1', 'ZZ国2', 'ZZ国3', 'ZZ国4', 'ZZ国5'],
+    comparisons: ['ZZ比較表現'],
     ...overrides,
   };
 }
@@ -62,9 +63,18 @@ describe('denylist の fail-closed', () => {
 
   it('正しい denylist はエラーなし', () => {
     const project = validateFixture((files) => {
-      files.denylist = deny({ companies: ['GMO'], comparisons: ['社より(?:も)?(?:早|遅)'] });
+      files.denylist = deny({ companies: ['GMO', 'ZZ企業1', 'ZZ企業2', 'ZZ企業3', 'ZZ企業4'],
+        comparisons: ['社より(?:も)?(?:早|遅)'] });
     });
     cleanups.push(project.cleanup);
     expect(project.result.errors).toEqual([]);
+  });
+
+  it('最低件数を下回る配列はエラー', () => {
+    const project = validateFixture((files) => {
+      files.denylist = deny({ companies: ['GMO'] });
+    });
+    cleanups.push(project.cleanup);
+    expect(project.result.errors.some((e) => e.code === 'C16' && e.message.includes('companies'))).toBe(true);
   });
 });

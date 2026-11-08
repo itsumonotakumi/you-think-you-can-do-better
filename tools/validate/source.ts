@@ -1,6 +1,6 @@
 // YAML を読み、値の位置（ファイル・行）を引けるようにする。
 import { parseDocument, LineCounter, isMap, isSeq } from 'yaml';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 /** YAML 1ファイルの上限（バイト）。 */
@@ -124,17 +124,35 @@ export function parseYamlText(file: string, text: string): ParsedSource {
   return { file, data, errors, warnings };
 }
 
-/** 絶対パスの YAML を読む。存在しなければ null。 */
+function fileError(displayFile: string, message: string): ParsedSource {
+  return { file: displayFile, data: null, errors: [{ line: 1, message }], warnings: [] };
+}
+
+/** 絶対パスの YAML を読む。存在しなければ null。読めないときはエラーを持った結果を返す。 */
 export function readYamlFile(full: string, displayFile: string): ParsedSource | null {
-  if (!existsSync(full)) return null;
-  const bytes = readFileSync(full);
+  // サイズは読む前に見る（巨大なファイルをメモリに載せない）
+  let size: number;
+  try {
+    const stat = statSync(full);
+    if (!stat.isFile()) {
+      return fileError(displayFile, 'ファイルではなくフォルダになっている');
+    }
+    size = stat.size;
+  } catch (error) {
+    if ((error as { code?: string }).code === 'ENOENT') return null;
+    return fileError(displayFile, `ファイルを読めない: ${(error as Error).message}`);
+  }
+  if (size > MAX_YAML_BYTES) {
+    return fileError(displayFile, `ファイルが大きすぎる（上限 ${MAX_YAML_BYTES} バイト、いま ${size} バイト）`);
+  }
+  let bytes: Uint8Array;
+  try {
+    bytes = readFileSync(full);
+  } catch (error) {
+    return fileError(displayFile, `ファイルを読めない: ${(error as Error).message}`);
+  }
   if (bytes.length > MAX_YAML_BYTES) {
-    return {
-      file: displayFile,
-      data: null,
-      errors: [{ line: 1, message: `ファイルが大きすぎる（上限 ${MAX_YAML_BYTES} バイト）` }],
-      warnings: [],
-    };
+    return fileError(displayFile, `ファイルが大きすぎる（上限 ${MAX_YAML_BYTES} バイト）`);
   }
   return parseYamlText(displayFile, decoder.decode(bytes));
 }
