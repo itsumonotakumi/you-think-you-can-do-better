@@ -1,6 +1,6 @@
 # HANDOFF
 
-最終更新: 2026-11-08（Wave2 完了 / Wave3 実行中）
+最終更新: 2026-11-08（Wave3 完了 / Wave4 実行中）
 
 ## 体制
 - オーケストレーター: Claude Opus 5.5（計画・契約・マージ判断）
@@ -29,8 +29,13 @@
   - E2E で発見: i18n 未初期化（main.ts で初期化して修正）、続きからで $state プロキシを渡していた（$state.snapshot で修正）
   - 結合後: シナリオ6本、単体 423件、E2E 12件（PC・スマホ幅）すべて合格
   - 脆弱性検査の指摘（中）: 保存データの要素検証不足、build-data の id 未検証・検査迂回、denylist の fail-open、Actions の SHA 未固定
-- Wave3 🔄 OpenCode 6並列: No.7〜No.10 経営者ロール / fix-app（保存データ検証・例外境界）/ fix-build（検査ツールと CI の強化）＋ Codex 品質検査2本
-- 残り: Actions の SHA 固定（fix-build のマージ後にオーケストレーターが gh api で実施）、Codex 指摘の修正
+- Wave3 ✅ OpenCode 6並列: No.7〜No.10 経営者ロール / fix-app（保存データ検証・例外境界）/ fix-build（検査ツールと CI の強化）
+  - 結合後: シナリオ10本（経営者ロール）、単体 552件、E2E 12件すべて合格
+  - Actions を SHA 固定、Dependabot 追加（オーケストレーター）
+  - Codex 品質検査: エンジン・検査12件（高6）、画面10件（高2）→ `.worktrees/_prompts/codex-q1.md` / `codex-q2.md`
+- Wave4 🔄 8並列: fix-engine / fix-validate / fix-ui-resume / fix-ui-main / No.2 officer・lead・analyst / No.3 officer
+- 残り: No.3〜No.10 の残りロール（23本）、S07 での字幕表示、CI に E2E を追加、英語本文、音声素材
+- 簡略化: シナリオの版が変わった時は「はじめから」のみ（旧版の続きは作らない）
 - Wave4〜: No.2〜No.10 の残りロール、英語本文、音声素材
 
 ## 運用メモ
