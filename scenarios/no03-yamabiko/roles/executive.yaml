@@ -13,6 +13,11 @@ deadlines:
     label: { ja: '個人情報保護委員会への速報', en: '' }
     points: -120
     doneFlag: ppcFiled
+  - id: dl-ppc-final
+    ref: ppc-report-final-malicious
+    label: { ja: '個人情報保護委員会への確報', en: '' }
+    points: -150
+    doneFlag: ppcFinalFiled
 events:
   - id: ev-card-second
     at: { day: 2, minutes: 540 }
@@ -39,7 +44,7 @@ points:
     at: { day: 0, minutes: 600 }
     phase: detect
     sound: { se: [phone_ring] }
-    text: { ja: '午前10時。カード会社から電話が入る。「御社のサイトの決済画面で、不審な通信が確認されました」。8年前に制作会社が作ったままのサイトで、保守契約はもうない。', en: '' }
+    text: { ja: '午前10時。配達先にいるあなたの携帯に、妻から電話が転送される。「カード会社が、うちの決済画面で不審な通信があったと」。8年前に制作会社が作ったままのサイトで、保守契約はもうない。', en: '' }
     voices: [v01-card, v01-wife, v01-ok]
     notable:
       - { id: note-first-call, text: { ja: '午前10時、カード会社から決済画面の不審な通信について連絡があった。', en: '' } }
@@ -77,7 +82,7 @@ points:
         points: 80
         refs: [jpcert-handling, no03-pci-dss]
         gauges: { flame: 5, damage: -10, trust: 8, stamina: -10 }
-        setFlags: { stoppedCart: true }
+        setFlags: { stoppedCart: true, cardCompanyInformed: true }
         items:
           - { id: p01-c-content, points: 8, axis: content, refs: [no03-pci-dss] }
           - { id: p01-c-record, points: 8, axis: record, refs: [jpcert-handling] }
@@ -133,10 +138,10 @@ points:
           - { id: p02-c-care, points: 3, axis: care, refs: [ipa-sme-guideline] }
 
   - id: p03-stop-site
-    at: { day: 0, minutes: 900 }
+    at: { day: 0, minutes: 840 }
     phase: contain
     sound: { se: [notify_sns] }
-    text: { ja: '午後3時。1日の注文は、いつもこの時間から増える。サイトの売上が6割を占める店で、止めるかどうかを今日中に決めなければならない。', en: '' }
+    text: { ja: '午後2時。1日の注文は、いつもこの時間から増える。サイトの売上が6割を占める店で、止めるかどうかを今日中に決めなければならない。', en: '' }
     voices: [v03-public, v03-coward, v03-wife, v03-ok]
     choices:
       - id: p03-keep
@@ -183,7 +188,7 @@ points:
     at: { day: 1, minutes: 540 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '翌朝。管理画面のパスワードは、倉庫のホワイトボードに書いたまま、五人で共用している。変更すると、今日の出荷が止まる。', en: '' }
+    text: { ja: '翌朝。管理画面のパスワードは、倉庫のホワイトボードに書いたまま、あなたと倉庫の熊谷、事務の村瀬の3人で共用している。変更すると、今日の出荷が止まる。', en: '' }
     voices: [v04-law, v04-insider, v04-ok]
     choices:
       - id: p04-keep
@@ -281,7 +286,7 @@ points:
     at: { day: 1, minutes: 1080 }
     phase: organize
     sound: { se: [notify_chat] }
-    text: { ja: '夕方。商工会議所の経営相談員が「無料で専門家を派遣できる」と教えてくれた。妻は「外に話すと、近所に知られる」と渋る。', en: '' }
+    text: { ja: '夕方。外部の手続きは、まだ終わっていない。弁護士と保険は、誰にも相談できていない。妻は「外に話すと、近所に知られる」と渋る。', en: '' }
     voices: [v06-flattery, v06-wife, v06-ok]
     choices:
       - id: p06-alone
@@ -296,10 +301,10 @@ points:
           - { id: p06-a-order, points: -10, axis: order, refs: [ipa-sme-guideline] }
           - { id: p06-a-care, points: -8, axis: care, refs: [ipa-sme-guideline] }
       - id: p06-advisor
-        text: { ja: '専門家派遣を申し込み、家族と倉庫の担当者で分担を決める。', en: '' }
+        text: { ja: '分担だけ決め、弁護士と保険は後回しにする。', en: '' }
         minutes: 120
         category: maintain
-        points: 30
+        points: 20
         refs: [ipa-sme-guideline]
         gauges: { trust: 5, stamina: -5 }
         setFlags: { advisor: true }
@@ -308,7 +313,7 @@ points:
           - { id: p06-b-care, points: 5, axis: care, refs: [ipa-sme-guideline] }
           - { id: p06-b-record, points: 5, axis: record, refs: [cissp-cbk-secops] }
       - id: p06-advisor-team
-        text: { ja: '専門家派遣を申し込み、弁護士と保険代理店にも連絡する。誰が何を担当するかを紙に書いて全員に配る。', en: '' }
+        text: { ja: '弁護士と保険代理店にも連絡する。誰が何を担当するかを紙に書いて全員に配る。', en: '' }
         minutes: 150
         category: recover
         points: 80
@@ -412,7 +417,7 @@ points:
     at: { day: 3, minutes: 480 }
     phase: notify
     sound: { se: [clock_tick] }
-    text: { ja: '3日目の朝。対象の期間はまだ確定していない。個人情報保護委員会への速報を、今日中に出すかどうかで迷っている。', en: '' }
+    text: { ja: '3日目の朝。カード会社の連絡から、まもなく72時間になる。対象の期間はまだ確定していない。午前中に出すかどうかで迷っている。', en: '' }
     voices: [v09-law, v09-tax, v09-ok]
     choices:
       - id: p09-wait
@@ -555,8 +560,8 @@ points:
       - id: p12-restore
         text: { ja: '以前のバックアップから戻す。設定はそのまま使う。', en: '' }
         minutes: 120
-        category: fatal
-        points: -250
+        category: hurt
+        points: -150
         refs: [nist-sp800-61r3]
         gauges: { damage: 20, flame: 10, trust: -15 }
         setFlags: { restoredOld: true }
@@ -638,7 +643,7 @@ points:
     at: { day: 9, minutes: 600 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '9日目の朝。妻は経理と問い合わせを一人で回している。倉庫の担当者は、夜中まで返品の処理をしている。', en: '' }
+    text: { ja: '9日目の朝。村瀬は問い合わせを一人で回し、妻は経理と窓口の両方に出ている。倉庫の担当者は、夜中まで返品の処理をしている。', en: '' }
     voices: [v14-flattery, v14-public, v14-ok]
     choices:
       - id: p14-allnight
@@ -696,27 +701,27 @@ points:
           - { id: p15-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p15-a-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
       - id: p15-publish
-        text: { ja: '攻撃に使える部分だけ伏せて、報告書を公開する。', en: '' }
+        text: { ja: '攻撃に使える部分だけ伏せて、報告書を公開し、確報を提出する。', en: '' }
         minutes: 180
         category: recover
         points: 100
         refs: [meti-disclosure-guidance]
         gauges: { flame: -10, trust: 12, stamina: -10 }
-        setFlags: { reportPublished: true }
+        setFlags: { reportPublished: true, ppcFinalFiled: true }
         detail: final-report
         items:
           - { id: p15-b-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
           - { id: p15-b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
           - { id: p15-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
       - id: p15-publish-share
-        text: { ja: '攻撃に使える部分だけ伏せて公開し、再発防止の進み具合を毎月出す。学んだことを商工会議所の勉強会で話す。', en: '' }
+        text: { ja: '攻撃に使える部分だけ伏せて公開し、確報を提出する。再発防止の進み具合を毎月出す。学んだことを商工会議所の勉強会で話す。', en: '' }
         minutes: 240
         category: increase
         points: 300
         fatalAlternate: 50
         refs: [meti-disclosure-guidance, ipa-sme-guideline]
         gauges: { flame: -15, trust: 20, stamina: -15 }
-        setFlags: { reportPublished: true, sharedWithPeers: true }
+        setFlags: { reportPublished: true, sharedWithPeers: true, ppcFinalFiled: true }
         detail: final-report
         items:
           - { id: p15-c-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
@@ -772,8 +777,8 @@ drafts:
         label: { ja: '出す時刻', en: '' }
         auto: true
         items:
-          - { id: cn-t-96h, when: { withinHours: 96 }, points: 10, axis: time, refs: [ppc-notify-person] }
-          - { id: cn-t-120h, when: { withinHours: 120 }, points: 3, axis: time, refs: [ppc-notify-person] }
+          - { id: cn-t-79h, when: { withinHours: 79 }, points: 10, axis: time, refs: [ppc-notify-person] }
+          - { id: cn-t-84h, when: { withinHours: 84 }, points: 3, axis: time, refs: [ppc-notify-person] }
           - { id: cn-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [ppc-notify-person] }
       - id: who
         label: { ja: '対象', en: '' }
@@ -937,7 +942,7 @@ voices:
   - { id: v02-ok, media: chat, misleading: false, text: { ja: 'レンタルサーバー「スナップショットはこちらで取得できます」。', en: '' }, trigger: { at: point } }
   - { id: v02-after, media: sns, misleading: false, text: { ja: '記録を取ったところで、店は強くならない。', en: '' }, trigger: { at: after, choice: p02-snapshot-seal } }
   - { id: v03-public, media: sns, misleading: true, type: public-opinion, text: { ja: '6割が止まるなら、昼の注文だけでも流してくれ。', en: '' }, trigger: { at: point } }
-  - { id: v03-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'まだ止めてないのか。のんびりしているな。', en: '' }, trigger: { at: point } }
+  - { id: v03-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '止めたら負けだ。近所の店は止めずにやってるぞ。', en: '' }, trigger: { at: point } }
   - { id: v03-wife, media: chat, misleading: true, type: past-success, text: { ja: '前の台風のときも、止めずに乗り切ったじゃない。', en: '' }, trigger: { at: point } }
   - { id: v03-ok, media: chat, misleading: false, text: { ja: '妻「止めるなら、電話注文の段取りを今夜のうちに決めましょう」。', en: '' }, trigger: { at: point } }
   - { id: v03-after, media: sns, misleading: false, text: { ja: '電話注文なんて、今どき誰が使うんだ。', en: '' }, trigger: { at: after, choice: p03-stop-care } }
@@ -950,11 +955,11 @@ voices:
   - { id: v05-ok, media: chat, misleading: false, text: { ja: '商工会議所「専門家の派遣と、警察への相談は無料でできます」。', en: '' }, trigger: { at: point } }
   - { id: v05-after, media: sns, misleading: false, text: { ja: '専門家を入れたら、余計に金がかかるだけだ。', en: '' }, trigger: { at: after, choice: p05-scoped-support } }
   - { id: v06-flattery, media: chat, misleading: true, type: flattery, text: { ja: '社長ひとりで十分です。外部を入れると、噂が広がりますよ。', en: '' }, trigger: { at: point } }
-  - { id: v06-wife, media: chat, misleading: true, type: coward-critique, text: { ja: '外に話したら、近所に知られる。そんなの嫌だ。', en: '' }, trigger: { at: point } }
+  - { id: v06-wife, media: chat, misleading: true, type: boss-pressure, text: { ja: '外に話したら、近所に知られる。そんなの嫌だ。', en: '' }, trigger: { at: point } }
   - { id: v06-ok, media: chat, misleading: false, text: { ja: '経理「保険の相談は、契約している代理店を通せます」。', en: '' }, trigger: { at: point } }
   - { id: v06-after, media: chat, misleading: false, text: { ja: '妻「知らない人が店に入るのは、やっぱり落ち着かない」。', en: '' }, trigger: { at: after, choice: p06-advisor-team } }
   - { id: v07-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の者だけど、本当は全注文が抜かれてる。今すぐ全部言え。', en: '' }, trigger: { at: point } }
-  - { id: v07-past, media: boss, misleading: true, type: past-success, text: { ja: '前の不正注文も、少し返金して終わっただろう。', en: '' }, trigger: { at: point } }
+  - { id: v07-past, media: chat, misleading: true, type: past-success, text: { ja: '妻「前の不正注文も、少し返金して終わったでしょ」。', en: '' }, trigger: { at: point } }
   - { id: v07-ok, media: chat, misleading: false, text: { ja: '調査担当「偽の決済画面が、いつから表示されていたかを先に確定しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v07-after, media: news, misleading: false, text: { ja: 'カード会社に話したことで、取引の停止が先に決まるのでは。', en: '' }, trigger: { at: after, choice: p07-all-card } }
   - { id: v08-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '制作会社「古いデータはこちらのサーバーにあります。消しておきますね」。', en: '' }, trigger: { at: point } }
@@ -970,15 +975,15 @@ voices:
   - { id: v10-ok, media: chat, misleading: false, text: { ja: '妻「高齢のお客様は、メールを見ない人も多い」。', en: '' }, trigger: { at: point } }
   - { id: v10-after, media: sns, misleading: false, text: { ja: 'メール一通で済ませるのか。誠意が見えない。', en: '' }, trigger: { at: after, choice: p10-mail-call } }
   - { id: v11-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '社長、粘り強い店だって言おう。バズれば客が戻る。', en: '' }, trigger: { at: point } }
-  - { id: v11-popular, media: sns, misleading: true, type: popular, text: { ja: '他のプレイヤーの多くは、サイトに短いお詫びだけ出すを選んでいます。', en: '' }, trigger: { at: point } }
+  - { id: v11-popular, media: sns, misleading: true, type: popular, text: { ja: '他のプレイヤーの多くは『サイトに短いお詫びを出す』を選んでいます。', en: '' }, trigger: { at: point } }
   - { id: v11-ok, media: chat, misleading: false, text: { ja: '広報を頼んだ知人「先に被害者のことを書こう」。', en: '' }, trigger: { at: point } }
   - { id: v11-after, media: sns, misleading: false, text: { ja: '自分の店の宣伝か。被害者のことは二の次だな。', en: '' }, trigger: { at: after, choice: p11-full } }
   - { id: v12-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '制作会社「作り直すより、直したほうが安いですよ」。', en: '' }, trigger: { at: point } }
-  - { id: v12-past, media: boss, misleading: true, type: past-success, text: { ja: '前回の入れ替えも、既存の設定のままで問題なかった。', en: '' }, trigger: { at: point } }
+  - { id: v12-past, media: vendor, misleading: true, type: past-success, text: { ja: '制作会社「前回の入れ替えも、既存の設定のままで問題なかったでしょう」。', en: '' }, trigger: { at: point } }
   - { id: v12-ok, media: chat, misleading: false, text: { ja: '専門家「古い画面と設定は持ち込まず、注文と顧客のデータだけ移しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v12-after, media: sns, misleading: false, text: { ja: '作り直しで、前より強くなったのか。見せてもらおう。', en: '' }, trigger: { at: after, choice: p12-rebuild } }
   - { id: v13-public, media: sns, misleading: true, type: public-opinion, text: { ja: '再開はいつだ。待てない客から離れていく。', en: '' }, trigger: { at: point } }
-  - { id: v13-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '二週間も止めて、臆病すぎる。', en: '' }, trigger: { at: point } }
+  - { id: v13-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '一週間以上も止めて、臆病すぎる。', en: '' }, trigger: { at: point } }
   - { id: v13-ok, media: chat, misleading: false, text: { ja: '出荷担当「電話注文は回っています。Webは検証が終わってからで」。', en: '' }, trigger: { at: point } }
   - { id: v13-after, media: sns, misleading: false, text: { ja: '再開が遅い。近所の店はもう動いている。', en: '' }, trigger: { at: after, choice: p13-step-monitor } }
   - { id: v14-flattery, media: chat, misleading: true, type: flattery, text: { ja: '社長が寝なければ、みんなついてきます。', en: '' }, trigger: { at: point } }
