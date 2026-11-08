@@ -116,11 +116,19 @@
   checkedAt: 2026-11-08
   legalPack: jp
 - id: "no02-timely-disclosure"
-  title: { ja: "上場企業の会社情報の適時開示（開示府令）", en: "Timely disclosure of corporate information by listed companies" }
-  issuer: { ja: "金融庁", en: "Financial Services Agency" }
+  title: { ja: "上場会社の適時開示（証券取引所の有価証券上場規程）", en: "Timely disclosure by listed companies (exchange listing rules)" }
+  issuer: { ja: "証券取引所（日本取引所グループ）", en: "Stock exchange (Japan Exchange Group)" }
   version: "2026-11"
-  section: { ja: "業績や事業に重要な影響を及ぼす情報の適時開示", en: "Timely disclosure of information materially affecting business" }
+  section: { ja: "会社の運営・業務に関する重要な事実の適時開示", en: "Timely disclosure of material facts about corporate operations" }
   summary: { ja: "業績や事業に重要な影響を及ぼす事実は、事実が確定していなくても速やかに開示し、進捗を更新する", en: "Disclose material facts promptly even before they are fully confirmed, and update progress" }
+  checkedAt: "2026-11-08"
+  legalPack: "jp"
+- id: "no02-ppc-report-entrusted"
+  title: { ja: "個人情報保護法 委託先の漏えい等報告（委託元への通知）", en: "APPI breach reporting for entrusted data (notice to the entrusting party)" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
+  version: "2026-11"
+  section: { ja: "法第26条第1項ただし書、施行規則第9条。委託先が委託元へ通知した場合は委員会への報告義務を負わない", en: "APPI Art. 26(1) proviso, Enforcement Rules Art. 9" }
+  summary: { ja: "委託元の個人データを預かる委託先は、委託元へ通知すれば委員会への報告は委託元が行う。自社の顧客データは自社分として報告する", en: "An entrusted processor may notify the entrusting party instead of reporting to the commission" }
   checkedAt: "2026-11-08"
   legalPack: "jp"
 - id: no03-pci-dss

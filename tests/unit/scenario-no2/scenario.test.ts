@@ -183,6 +183,36 @@ describe('no02-paybridge / executive', () => {
     expect(needsNote).toBeGreaterThanOrEqual(1);
   });
 
+  it('記者会見の回答は、実施していないことを断定しない', () => {
+    const press = scenario.press;
+    expect(press).toBeTruthy();
+    const questions = press?.questions ?? [];
+    expect(questions.map((q) => q.id)).toContain('q-vuln');
+    for (const q of questions) {
+      const always = q.answers.filter((a) => a.when === undefined && !a.requiresNote);
+      expect(always.length, `${q.id} に条件なしで選べる回答がない`).toBeGreaterThanOrEqual(1);
+    }
+    const codeFix = questions.flatMap((q) => q.answers).find((a) => a.id === 'a-code-fix');
+    expect(codeFix?.when).toEqual({ flags: { codeFixed: true } });
+    const codeFixedBy = role.points.flatMap((p) => p.choices).filter((c) => c.setFlags?.codeFixed);
+    expect(codeFixedBy.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('p04 は委託元との発表の順番を法令に沿って採点する', () => {
+    const wait = choiceById.get('p04-wait');
+    const share = choiceById.get('p04-share');
+    const silent = choiceById.get('p04-silent');
+    expect(wait?.category).toBe('hurt');
+    expect(wait?.points).toBe(-80);
+    expect(share?.category).toBe('recover');
+    expect(share?.points).toBe(100);
+    expect(silent?.category).toBe('hurt');
+    expect(silent?.points).toBe(-120);
+    expect(silent?.setFlags?.hidFacts).toBeUndefined();
+    expect(silent?.setFlags?.deferredToClient).toBe(true);
+    expect(share?.refs).toContain('no02-ppc-report-entrusted');
+  });
+
   it('文言は日本語のみで、HTMLを含まない', () => {
     const localized = collectLocalized(scenario);
     expect(localized.length).toBeGreaterThan(50);

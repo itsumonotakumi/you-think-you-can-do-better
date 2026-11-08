@@ -66,7 +66,7 @@ press:
       answers:
         - { id: a-code-spec, text: { ja: '業務上、必要だったためです。', en: '' }, points: -80 }
         - { id: a-code-miss, text: { ja: '保存しない設計にできていませんでした。', en: '' }, points: 30 }
-        - { id: a-code-fix, text: { ja: '保存を廃止し、取引先への確認を終えました。経緯と再発防止を公表します。', en: '' }, points: 80 }
+        - { id: a-code-fix, text: { ja: '保存を廃止し、取引先への確認を終えました。経緯と再発防止を公表します。', en: '' }, points: 80, when: { flags: { codeFixed: true } } }
     - id: q-count
       seconds: 30
       timeoutPoints: -30
@@ -83,8 +83,16 @@ press:
         - { id: a-market-fast, text: { ja: '速やかに開示しました。', en: '' }, points: -30 }
         - { id: a-market-late, text: { ja: '初動の判断が遅れました。', en: '' }, points: 30 }
         - { id: a-market-record, text: { ja: '開示までの判断を記録しています。検証結果とともに公表します。', en: '' }, points: 80, requiresNote: note-timely }
+    - id: q-vuln
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: '注意喚起が出た日に、なぜ修正を当てていなかったのですか。', en: '' }
+      answers:
+        - { id: a-vuln-rule, text: { ja: '定例メンテの規程に従いました。', en: '' }, points: -80 }
+        - { id: a-vuln-none, text: { ja: '緊急修正の手順がありませんでした。', en: '' }, points: 30 }
+        - { id: a-vuln-fix, text: { ja: '手順を作り、年1回の訓練と記録の確認を入れます。経緯を公表します。', en: '' }, points: 80 }
   extraQuestions:
-    - when: { flags: { hidFacts: true } }
+    - when: { flags: { maintenanceExplained: true } }
       question:
         id: q-hidden
         seconds: 25
