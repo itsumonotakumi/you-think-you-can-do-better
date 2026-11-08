@@ -1,0 +1,113 @@
+# No.10 ネクサス半導体（半導体製造装置）
+# 元事例は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+id: no10-nexus
+version: '1.0.0'
+status: latest
+published: '2026-11-08'
+sourcePeriod: { ja: '生成AIの社内利用をめぐる事例の構造を参考にしたフィクション', en: '' }
+difficulty: 3
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: '漏らしたのは、一番真面目な社員だった', en: '' }
+tagline: { ja: '生成AIを解禁して三週間。漏れたのは、コードと会議録。禁じるか、使わせるか。', en: '' }
+company:
+  name: { ja: 'ネクサス半導体株式会社', en: '' }
+  industry: { ja: '半導体製造装置の設計・製造', en: '' }
+  size: { ja: '従業員1200名、創業40年、国内市場に上場', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '白瀬 剛', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: cto
+      name: { ja: '三雲 理恵', en: '' }
+      title: { ja: '取締役CTO', en: '' }
+    - id: ciso
+      name: { ja: '一ノ瀬 修', en: '' }
+      title: { ja: '執行役員情報セキュリティ責任者', en: '' }
+    - id: pr
+      name: { ja: '早瀬 麻衣', en: '' }
+      title: { ja: '広報部長', en: '' }
+    - id: hr
+      name: { ja: '嘉納 智子', en: '' }
+      title: { ja: '人事部長', en: '' }
+    - id: legal
+      name: { ja: '御崎 圭', en: '' }
+      title: { ja: '法務部長', en: '' }
+    - id: ops
+      name: { ja: '大倉 隆', en: '' }
+      title: { ja: '製造本部長', en: '' }
+start: { day: 0, minutes: 570 }
+initialGauges: { damage: 15, flame: 0, trust: 72, stamina: 100 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-why
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: 'なぜ三週間も、入力に気づかなかったのですか。', en: '' }
+      answers:
+        - { id: a-why-none, text: { ja: '便利に使っていたので、監視はしていませんでした。', en: '' }, points: -30 }
+        - { id: a-why-design, text: { ja: '入力履歴を見る仕組みがなく、確認が遅れました。', en: '' }, points: 30 }
+        - { id: a-why-verify, text: { ja: '三週間気づかなかった理由を検証し、入力制限と監査の仕組みとあわせて公表します。', en: '' }, points: 80, requiresNote: note-ai-log }
+    - id: q-employee
+      seconds: 25
+      timeoutPoints: -30
+      text: { ja: '入力した社員を処分したのですか。', en: '' }
+      answers:
+        - { id: a-emp-fire, text: { ja: '懲戒解雇にしました。', en: '' }, points: -100 }
+        - { id: a-emp-warn, text: { ja: '注意指導にとどめました。', en: '' }, points: 30 }
+        - { id: a-emp-own, text: { ja: '本人の意図を聞き、処分より再発防止を優先しました。その理由も含めて説明します。', en: '' }, points: 80, requiresNote: note-employee-intent }
+    - id: q-customer
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: '顧客の製造プロセスが漏れたのではありませんか。', en: '' }
+      answers:
+        - { id: a-cust-none, text: { ja: '漏えいはありません。', en: '' }, points: -100 }
+        - { id: a-cust-part, text: { ja: '入力に含まれていました。影響範囲を調査しています。', en: '' }, points: 30 }
+        - { id: a-cust-open, text: { ja: '含まれていました。対象と経緯を特定し、顧客への説明と再発防止を公表します。', en: '' }, points: 80, requiresNote: note-customer-process }
+    - id: q-ban
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '生成AIを、これからも使うのですか。', en: '' }
+      answers:
+        - { id: a-ban-yes, text: { ja: 'はい。便利なので使い続けます。', en: '' }, points: -30 }
+        - { id: a-ban-managed, text: { ja: '管理された環境に限って使います。', en: '' }, points: 30 }
+        - { id: a-ban-design, text: { ja: '入力制限と監査を技術的に強制した環境でのみ使い、再開の条件も公表します。', en: '' }, points: 60 }
+  extraQuestions:
+    - when: { flags: { downplayed: true } }
+      question:
+        id: q-cover
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '当初「漏えいではない」と説明したのはなぜですか。', en: '' }
+        answers:
+          - { id: a-cover-avoid, text: { ja: '漏えいではないからです。', en: '' }, points: -100 }
+          - { id: a-cover-late, text: { ja: '説明の判断が遅れました。', en: '' }, points: 30 }
+          - { id: a-cover-correct, text: { ja: '言葉が不正確でした。訂正と経緯を公表します。', en: '' }, points: 80 }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '事件のあと、社内のAI利用は禁止ではなく管理で定着した。顧客からは「あの説明は誠実だった」と言われ、同じ業界の会社が研修の教材として使っている。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが、顧客との契約は続いた。入力制限のルールは残り、現場は不便を感じながらも、大きな事故なく半年が過ぎた。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '会社は立ち直ったが、大口の顧客を一つ失った。残った顧客との関係を、時間をかけて作り直すことになった。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '第三者委員会は、初動と説明の不備を指摘した。経営陣は交代し、残された社員が限られた予算でルール整備を続けている。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '顧客との契約は打ち切られ、行政からの報告徴収も重なった。どこで判断を誤ったのか、記録を読み返す日が続く。', en: '' }
+salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 10, min: 40, max: 130 }
