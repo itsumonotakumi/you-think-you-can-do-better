@@ -34,7 +34,9 @@ beforeEach(() => {
   });
 });
 
-afterEach(() => {
+afterEach(async () => {
+  // 起動処理（非同期）の残りが終わってから仮の document / window を外す
+  await new Promise((resolve) => setTimeout(resolve, 50));
   vi.unstubAllGlobals();
 });
 
