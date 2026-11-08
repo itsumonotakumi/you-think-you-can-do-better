@@ -16,7 +16,7 @@ deadlines:
     points: -150
     doneFlag: ppcPrelimFiled
   - id: dl-officer-ppc-final
-    ref: ppc-report-final
+    ref: ppc-report-final-malicious
     label: { ja: '個人情報保護委員会への確報', en: '' }
     points: -150
     doneFlag: ppcFinalFiled

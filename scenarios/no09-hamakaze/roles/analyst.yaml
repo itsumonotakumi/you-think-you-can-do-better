@@ -829,7 +829,7 @@ points:
     at: { day: 12, minutes: 600 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '午前10時。復旧から二週間。監視の目をいつ通常に戻すか。現場は疲れており、追加の点検を嫌がっている。', en: '' }
+    text: { ja: '午前10時。復旧から一週間。監視の目をいつ通常に戻すか。現場は疲れており、追加の点検を嫌がっている。', en: '' }
     voices: [v18-coward, v18-popular, v18-ok]
     choices:
       - id: p18-a-stop

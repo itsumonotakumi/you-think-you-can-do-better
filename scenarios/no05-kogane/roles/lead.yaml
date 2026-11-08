@@ -16,7 +16,7 @@ deadlines:
     points: -150
     doneFlag: ppcPrelimFiled
   - id: dl-ppc-final
-    ref: ppc-report-final
+    ref: ppc-report-final-malicious
     label: { ja: '個人情報保護委員会への確報', en: '' }
     points: -100
     doneFlag: ppcFinalFiled
@@ -1149,7 +1149,7 @@ points:
     at: { day: 27, minutes: 600 }
     phase: after
     sound: { se: [typing] }
-    text: { ja: '個人情報保護委員会への確報の期限が近い。件数は確定し、対象は顧客名簿の一部、項目は氏名・住所・電話番号・注文履歴。侵入経路と対策も書ける。だが、書き切れない項目が一つ残っている。復号できなかったデータの最終的な扱いだ。', en: '' }
+    text: { ja: '個人情報保護委員会への確報は、不正の目的のおそれがある事態として60日以内。期限まで残り一か月あまりだ。件数は確定し、対象は顧客名簿の一部、項目は氏名・住所・電話番号・注文履歴。侵入経路と対策も書ける。だが、書き切れない項目が一つ残っている。復号できなかったデータの最終的な扱いだ。', en: '' }
     voices: [v21-law, v21-coward, v21-ok]
     choices:
       - id: p21-wait
@@ -1157,44 +1157,44 @@ points:
         minutes: 90
         category: hurt
         points: -150
-        refs: [ppc-report-final]
+        refs: [ppc-report-final-malicious]
         gauges: { flame: 15, trust: -15 }
         coward: true
         items:
-          - { id: p21-a-time, points: -10, axis: time, refs: [ppc-report-final] }
-          - { id: p21-a-record, points: -8, axis: record, refs: [ppc-report-final] }
+          - { id: p21-a-time, points: -10, axis: time, refs: [ppc-report-final-malicious] }
+          - { id: p21-a-record, points: -8, axis: record, refs: [ppc-report-final-malicious] }
       - id: p21-vague
         text: { ja: '確定した項目だけを書いて出す。', en: '' }
         minutes: 90
         category: hurt
         points: -60
-        refs: [ppc-report-final]
+        refs: [ppc-report-final-malicious]
         gauges: { trust: -5 }
         items:
-          - { id: p21-b-content, points: -8, axis: content, refs: [ppc-report-final] }
-          - { id: p21-b-record, points: -5, axis: record, refs: [ppc-report-final] }
+          - { id: p21-b-content, points: -8, axis: content, refs: [ppc-report-final-malicious] }
+          - { id: p21-b-record, points: -5, axis: record, refs: [ppc-report-final-malicious] }
       - id: p21-file
         text: { ja: '不明点は不明と書いて、期限どおりに確報を出す。', en: '' }
         minutes: 120
         category: maintain
         points: 10
-        refs: [ppc-report-final]
+        refs: [ppc-report-final-malicious]
         gauges: { trust: 5, stamina: -10 }
         setFlags: { ppcFinalFiled: true }
         items:
-          - { id: p21-c-content, points: 4, axis: content, refs: [ppc-report-final] }
-          - { id: p21-c-time, points: 3, axis: time, refs: [ppc-report-final] }
-          - { id: p21-c-record, points: 3, axis: record, refs: [ppc-report-final] }
+          - { id: p21-c-content, points: 4, axis: content, refs: [ppc-report-final-malicious] }
+          - { id: p21-c-time, points: 3, axis: time, refs: [ppc-report-final-malicious] }
+          - { id: p21-c-record, points: 3, axis: record, refs: [ppc-report-final-malicious] }
       - id: p21-file-detail
         text: { ja: '確報に、侵入経路、影響範囲、再発防止の実施状況、残る不明点と次回の報告予定を書いて出す。', en: '' }
         minutes: 150
         category: recover
         points: 80
-        refs: [ppc-report-final, meti-disclosure-guidance]
+        refs: [ppc-report-final-malicious, meti-disclosure-guidance]
         gauges: { trust: 10, stamina: -10 }
         setFlags: { ppcFinalFiled: true, finalDetailed: true }
         items:
-          - { id: p21-d-content, points: 8, axis: content, refs: [ppc-report-final] }
+          - { id: p21-d-content, points: 8, axis: content, refs: [ppc-report-final-malicious] }
           - { id: p21-d-record, points: 8, axis: record, refs: [meti-disclosure-guidance] }
           - { id: p21-d-care, points: 5, axis: care, refs: [meti-disclosure-guidance] }
 

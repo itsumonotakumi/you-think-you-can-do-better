@@ -17,7 +17,7 @@ deadlines:
     points: -100
     doneFlag: ppcMaterialsSent
   - id: dl-ppc-final
-    ref: ppc-report-final
+    ref: ppc-report-final-malicious
     label: { ja: '漏えい等報告の確報に使う材料の提出', en: '' }
     points: -80
     doneFlag: ppcFinalMaterialsSent
@@ -1139,7 +1139,7 @@ points:
         minutes: 180
         category: recover
         points: 120
-        refs: [meti-csm-guideline, jpcert-handling, ppc-report-final]
+        refs: [meti-csm-guideline, jpcert-handling, ppc-report-final-malicious]
         gauges: { flame: -10, trust: 15, stamina: -10 }
         setFlags: { fullTimeline: true, ppcFinalMaterialsSent: true }
         items:
@@ -1152,7 +1152,7 @@ points:
         minutes: 240
         category: recover
         points: 150
-        refs: [meti-csm-guideline, jpcert-handling, ppc-report-final, cissp-cbk-secops]
+        refs: [meti-csm-guideline, jpcert-handling, ppc-report-final-malicious, cissp-cbk-secops]
         gauges: { flame: -15, trust: 20, stamina: -15 }
         setFlags: { fullTimeline: true, ppcFinalMaterialsSent: true, preventionPublished: true }
         items:
