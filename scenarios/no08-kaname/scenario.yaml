@@ -4,7 +4,7 @@ id: no08-kaname
 version: '1.0.0'
 status: latest
 published: '2026-11-08'
-sourcePeriod: { ja: '2020年代前半の部品供給網を巡る事件の構造を参考にしたフィクション', en: '' }
+sourcePeriod: { ja: '部品供給網を巡る事件の構造を参考にしたフィクション', en: '' }
 difficulty: 3
 languages: [ja]
 referencesVersion: '2026-11-08'
@@ -13,7 +13,7 @@ title: { ja: 'うちが止まると、取引先のラインが止まる', en: ''
 tagline: { ja: '土曜の夜の電話。自社を守る判断が、取引先の工場を止める。', en: '' }
 company:
   name: { ja: 'カナメ精工株式会社', en: '' }
-  industry: { ja: '自動車部品（精密プレス・樹脂成形）', en: '' }
+  industry: { ja: '自動車部品（精密切削・金属加工。ブレーキ・ステアリング部品）', en: '' }
   size: { ja: '従業員480名、国内3拠点、非上場', en: '' }
   people:
     - id: ceo
@@ -54,8 +54,8 @@ press:
       text: { ja: '取引先との接続を切ったのは、なぜですか。', en: '' }
       answers:
         - { id: a-link-none, text: { ja: '取引先の了解は得ていません。', en: '' }, points: -50 }
-        - { id: a-link-explain, text: { ja: '広げないための判断でした。', en: '' }, points: 30 }
-        - { id: a-link-own, text: { ja: '止まった分の影響は当社が負います。判断と連絡の時刻はこちらの記録のとおりです。', en: '' }, points: 80, requiresNote: note-link }
+        - { id: a-link-explain, text: { ja: '広げないための判断でした。', en: '' }, points: 30, when: { flags: { linkCut: true } } }
+        - { id: a-link-own, text: { ja: '止まった分の影響は当社が負います。判断と連絡の時刻はこちらの記録のとおりです。', en: '' }, points: 80, requiresNote: note-link, when: { flags: { linkCut: true } } }
     - id: q-check
       seconds: 25
       timeoutPoints: -30
@@ -77,9 +77,9 @@ press:
       timeoutPoints: -30
       text: { ja: '身代金は支払ったのですか。', en: '' }
       answers:
-        - { id: a-ransom-paid, text: { ja: '支払いました。', en: '' }, points: -100 }
+        - { id: a-ransom-paid, text: { ja: '支払いました。', en: '' }, points: -100, when: { flags: { paidRansom: true } } }
         - { id: a-ransom-none, text: { ja: '答えられません。', en: '' }, points: -30 }
-        - { id: a-ransom-refuse, text: { ja: '支払っていません。警察に相談し、取引先にも説明しました。', en: '' }, points: 80 }
+        - { id: a-ransom-refuse, text: { ja: '支払っていません。警察に相談し、取引先にも説明しました。', en: '' }, points: 80, when: { flags: { paidRansom: false } } }
     - id: q-parts
       seconds: 25
       timeoutPoints: -30
