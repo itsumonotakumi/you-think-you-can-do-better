@@ -16,7 +16,7 @@ deadlines:
     points: -150
     doneFlag: ppcPrelimFiled
   - id: dl-ppc-final
-    ref: ppc-report-final
+    ref: ppc-report-final-malicious
     label: { ja: '個人情報保護委員会への確報', en: '' }
     points: -100
     doneFlag: ppcFinalFiled
@@ -814,7 +814,7 @@ points:
     at: { day: 20, minutes: 600 }
     phase: notify
     sound: { se: [clock_tick] }
-    text: { ja: '午前10時。確報の期限が近づいている。対象者数はまだ動いているが、技術的には出せる状態になった。どう出すか。', en: '' }
+    text: { ja: '午前10時。確報を出せる状態になった。期限はまだ先だが、対象者数はまだ動いている。どう出すか。', en: '' }
     voices: [v17-law, v17-boss, v17-ok]
     choices:
       - id: p17-wait
@@ -822,37 +822,37 @@ points:
         minutes: 120
         category: hurt
         points: -120
-        refs: [ppc-report-final]
+        refs: [ppc-report-final-malicious]
         gauges: { flame: 10, trust: -10 }
         coward: true
         setFlags: { finalDelayed: true }
         items:
-          - { id: p17-a-time, points: -10, axis: time, refs: [ppc-report-final] }
-          - { id: p17-a-record, points: -10, axis: record, refs: [ppc-report-final] }
+          - { id: p17-a-time, points: -10, axis: time, refs: [ppc-report-final-malicious] }
+          - { id: p17-a-record, points: -10, axis: record, refs: [ppc-report-final-malicious] }
       - id: p17-file
         text: { ja: '分かっている範囲で確報を出し、件数が動く可能性を書く。', en: '' }
         minutes: 180
         category: maintain
         points: 10
-        refs: [ppc-report-final]
+        refs: [ppc-report-final-malicious]
         gauges: { trust: 5, stamina: -10 }
         setFlags: { ppcFinalFiled: true }
         items:
-          - { id: p17-b-time, points: 5, axis: time, refs: [ppc-report-final] }
-          - { id: p17-b-content, points: 5, axis: content, refs: [ppc-report-final] }
+          - { id: p17-b-time, points: 5, axis: time, refs: [ppc-report-final-malicious] }
+          - { id: p17-b-content, points: 5, axis: content, refs: [ppc-report-final-malicious] }
           - { id: p17-b-record, points: 3, axis: record, refs: [jpcert-handling] }
       - id: p17-file-plan
         text: { ja: '確報を出し、更新の予定と、対象者への通知体制を添える。', en: '' }
         minutes: 240
         category: recover
         points: 100
-        refs: [ppc-report-final, ppc-notify-person]
+        refs: [ppc-report-final-malicious, ppc-notify-person]
         gauges: { trust: 10, stamina: -15 }
         setFlags: { ppcFinalFiled: true, finalWithPlan: true }
         items:
-          - { id: p17-c-content, points: 8, axis: content, refs: [ppc-report-final] }
+          - { id: p17-c-content, points: 8, axis: content, refs: [ppc-report-final-malicious] }
           - { id: p17-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
-          - { id: p17-c-time, points: 5, axis: time, refs: [ppc-report-final] }
+          - { id: p17-c-time, points: 5, axis: time, refs: [ppc-report-final-malicious] }
 
   - id: p18-fix
     at: { day: 26, minutes: 600 }
@@ -1143,7 +1143,7 @@ voices:
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '現場「同じ番号から、何件も問い合わせが来ています」。', en: '' }, trigger: { at: point } }
   - { id: v17-law, media: board, misleading: true, type: law-ish, text: { ja: '件数が確定するまで待って、それから出せばいい。', en: '' }, trigger: { at: point } }
   - { id: v17-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '数字が増えると取引先に響く。もう少し待とう。', en: '' }, trigger: { at: point } }
-  - { id: v17-ok, media: chat, misleading: false, text: { ja: '法務「不正の目的が疑われるなら、期限は30日です。今日出せます」。', en: '' }, trigger: { at: point } }
+  - { id: v17-ok, media: chat, misleading: false, text: { ja: '法務「不正の目的が疑われるなら、期限は60日です。今日出せます」。', en: '' }, trigger: { at: point } }
   - { id: v18-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '点検は弊社に任せてください。立派な報告書を作ります。', en: '' }, trigger: { at: point } }
   - { id: v18-past, media: boss, misleading: true, type: past-success, text: { ja: '研修を増やせば十分だ。前もそうして乗り切った。', en: '' }, trigger: { at: point } }
   - { id: v18-ok, media: chat, misleading: false, text: { ja: '監査「仕組みにしないと、人はまた同じことをします」。', en: '' }, trigger: { at: point } }
