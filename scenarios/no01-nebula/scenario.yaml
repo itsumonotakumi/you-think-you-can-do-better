@@ -1,10 +1,12 @@
-# No.1 ネビュラクラウド（大手ホスティング）
+# No.1 ネビュラクラウド（大手クラウドサービス）
 # 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+# 公開判定メモ: 元事件の公式発表・調査報告書の確認日を公開判定に記録するまでは、
+# 時期を特定できる書き方を避け、sourcePeriod を年代だけにぼかしている（要件: 続報が出そろうまで待つ）。
 id: no01-nebula
 version: '1.0.0'
 status: latest
 published: '2026-11-08'
-sourcePeriod: { ja: '2026年秋の事件の構造を参考にしたフィクション', en: '' }
+sourcePeriod: { ja: '2020年代の事件の構造を参考にしたフィクション', en: '' }
 difficulty: 5
 languages: [ja]
 referencesVersion: '2026-11-08'
@@ -13,8 +15,8 @@ title: { ja: '安全を売る会社が、安全でなかった', en: '' }
 tagline: { ja: '長期潜伏、身代金要求、そして情報戦。経営者の判断が試される。', en: '' }
 company:
   name: { ja: 'ネビュラクラウド株式会社', en: '' }
-  industry: { ja: 'クラウド・ホスティング', en: '' }
-  size: { ja: '従業員900名、国内市場に上場', en: '' }
+  industry: { ja: 'クラウドサービス', en: '' }
+  size: { ja: '従業員千名規模、国内市場に上場', en: '' }
   people:
     - id: ceo
       name: { ja: '桐生 聡', en: '' }
@@ -45,30 +47,14 @@ audio:
     after: calm
 press:
   questions:
-    - id: q-warning
-      seconds: 30
-      timeoutPoints: -30
-      text: { ja: '社内から事前に指摘があったというのは本当ですか。', en: '' }
-      answers:
-        - { id: a-warning-none, text: { ja: '確認しておりません。', en: '' }, points: -30 }
-        - { id: a-warning-admit, text: { ja: '指摘はありました。生かせませんでした。', en: '' }, points: 30 }
-        - { id: a-warning-own, text: { ja: '指摘はありました。生かせなかった責任は経営にあります。', en: '' }, points: 80, requiresNote: note-warning }
     - id: q-delay
       seconds: 25
       timeoutPoints: -30
-      text: { ja: 'なぜ二か月半も気づかなかったのですか。', en: '' }
+      text: { ja: 'なぜ数か月も気づかなかったのですか。', en: '' }
       answers:
         - { id: a-delay-attack, text: { ja: '高度な攻撃だったためです。', en: '' }, points: -80 }
         - { id: a-delay-design, text: { ja: '監視とログ保全の設計が不十分でした。', en: '' }, points: 30 }
-        - { id: a-delay-verify, text: { ja: '侵入を二か月半気づかなかった原因を検証し、再発防止策とともに公表します。', en: '' }, points: 80, requiresNote: note-scope }
-    - id: q-money
-      seconds: 35
-      timeoutPoints: -30
-      text: { ja: '見舞金の金額の根拠を教えてください。', en: '' }
-      answers:
-        - { id: a-money-flat, text: { ja: '気持ちとして一律に決めました。', en: '' }, points: -50 }
-        - { id: a-money-tier, text: { ja: '被害の重さに応じた段階を設けました。', en: '' }, points: 30 }
-        - { id: a-money-public, text: { ja: '対象と根拠を公表し、追加の請求にも誠実に対応します。', en: '' }, points: 80 }
+        - { id: a-delay-verify, text: { ja: '侵入を数か月気づかなかった原因を検証し、再発防止策とともに公表します。', en: '' }, points: 80, requiresNote: note-scope }
     - id: q-disclosure
       seconds: 30
       timeoutPoints: -30
@@ -82,10 +68,31 @@ press:
       timeoutPoints: -30
       text: { ja: '身代金は支払ったのですか。', en: '' }
       answers:
-        - { id: a-ransom-paid, text: { ja: '支払いました。', en: '' }, points: -100 }
+        - { id: a-ransom-paid, text: { ja: '支払いました。警察に報告し、経緯を公表します。', en: '' }, points: 30, when: { flags: { paidRansom: true } } }
+        - { id: a-ransom-deny, text: { ja: '支払っていません。そのような事実はありません。', en: '' }, points: -300, when: { flags: { paidRansom: true } } }
+        - { id: a-ransom-refuse, text: { ja: '支払っていません。警察に相談し、犯罪組織への資金提供を避けました。', en: '' }, points: 80, when: { flags: { paidRansom: false } } }
         - { id: a-ransom-none, text: { ja: '答えられません。', en: '' }, points: -30 }
-        - { id: a-ransom-refuse, text: { ja: '支払っていません。警察に相談し、犯罪組織への資金提供を避けました。', en: '' }, points: 80 }
   extraQuestions:
+    - when: { flags: { hidWarning: false } }
+      question:
+        id: q-warning
+        seconds: 30
+        timeoutPoints: -30
+        text: { ja: '社内から事前に指摘があったというのは本当ですか。', en: '' }
+        answers:
+          - { id: a-warning-none, text: { ja: '確認しておりません。', en: '' }, points: -30 }
+          - { id: a-warning-admit, text: { ja: '指摘はありました。生かせませんでした。', en: '' }, points: 30 }
+          - { id: a-warning-own, text: { ja: '指摘はありました。生かせなかった責任は経営にあります。', en: '' }, points: 80, requiresNote: note-warning }
+    - when: { flags: { compensation: true } }
+      question:
+        id: q-money
+        seconds: 35
+        timeoutPoints: -30
+        text: { ja: '見舞金の金額の根拠を教えてください。', en: '' }
+        answers:
+          - { id: a-money-flat, text: { ja: '気持ちとして一律に決めました。', en: '' }, points: -50 }
+          - { id: a-money-tier, text: { ja: '被害の重さに応じた段階を設けました。', en: '' }, points: 30 }
+          - { id: a-money-public, text: { ja: '対象と根拠を公表し、追加の請求にも誠実に対応します。', en: '' }, points: 80 }
     - when: { flags: { hidFacts: true } }
       question:
         id: q-hidden

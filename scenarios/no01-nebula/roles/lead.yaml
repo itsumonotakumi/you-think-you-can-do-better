@@ -42,10 +42,10 @@ points:
     at: { day: 0, minutes: 1185 }
     phase: detect
     sound: { se: [notify_chat] }
-    text: { ja: '19時45分。SOCのアラートが三件、同時に上がった。顧客サーバー三台で不審なプロセスが動き、外部へ定期的に通信している。同じセグメントには五百台の顧客サーバーがぶら下がっている。', en: '' }
+    text: { ja: '19時45分。SOCのアラートが三件、同時に上がった。顧客サーバー三台で不審なプロセスが動き、外部へ定期的に通信している。同じセグメントには数百台の顧客サーバーがぶら下がっている。', en: '' }
     voices: [v01-boss, v01-field, v01-ok]
     notable:
-      - { id: note-first-alert, text: { ja: '19時45分、SOCが三台の不審な通信を検知。同じセグメントに五百台。', en: '' } }
+      - { id: note-first-alert, text: { ja: '19時45分、SOCが三台の不審な通信を検知。同じセグメントに数百台。', en: '' } }
     choices:
       - id: p01-wait
         text: { ja: '誤検知の可能性が高いと判断し、明日の定例会議で報告する。', en: '' }
@@ -261,9 +261,9 @@ points:
 
   - id: p05-stop-rec
     at: { day: 1, minutes: 180 }
-    phase: contain
+    phase: organize
     sound: { se: [notify_news] }
-    text: { ja: '午前3時。全プランを止めるかの判断材料を、経営に出す時間。止めれば顧客の取引も止まる。止めなければ、同じセグメントの五百台が危ない。', en: '' }
+    text: { ja: '午前3時。全プランを止めるかの判断材料を、経営に出す時間。止めれば顧客の取引も止まる。止めなければ、同じセグメントの数百台が危ない。', en: '' }
     voices: [v05-public, v05-coward, v05-ok]
     popular: { choiceId: p05-partial, percent: 61 }
     choices:
@@ -420,9 +420,9 @@ points:
 
   - id: p08-ransom
     at: { day: 1, minutes: 855 }
-    phase: contain
+    phase: investigate
     sound: { se: [mail_arrive] }
-    text: { ja: '午後2時15分。攻撃者からメールが届いた。「顧客情報を預かっている。連絡がなければ公開する」。交渉の窓口を名乗っている。', en: '' }
+    text: { ja: '午後2時15分。攻撃者からメールが届いた。「24時間以内に連絡がなければ、顧客情報をすべて公開する」。交渉の窓口を名乗っている。', en: '' }
     voices: [v08-attacker, v08-public, v08-ok]
     choices:
       - id: p08-negotiate
@@ -476,7 +476,7 @@ points:
 
   - id: p09-facts
     at: { day: 2, minutes: 540 }
-    phase: notify
+    phase: investigate
     sound: { se: [typing] }
     text: { ja: '午前9時。法務と広報が、速報に書く技術的事実を待っている。分かったことと、まだ分からないことが混ざっている。', en: '' }
     voices: [v09-law, v09-ok]
@@ -521,7 +521,7 @@ points:
 
   - id: p10-police
     at: { day: 2, minutes: 780 }
-    phase: notify
+    phase: investigate
     sound: { se: [phone_ring] }
     text: { ja: '午後1時。警察への相談と、証拠の提出。何をどこまで渡すかで、その後の調査が変わる。', en: '' }
     voices: [v10-past, v10-ok]
@@ -564,7 +564,7 @@ points:
 
   - id: p11-teamcare
     at: { day: 2, minutes: 1080 }
-    phase: organize
+    phase: investigate
     sound: { se: [notify_chat] }
     text: { ja: '午後6時。対策本部は二日目の夜。誰も帰っていない。記録係の手が止まり、確認漏れが増えている。', en: '' }
     voices: [v11-flattery, v11-public, v11-ok]
@@ -666,10 +666,10 @@ points:
     at: { day: 4, minutes: 600 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '午前10時。侵入は二か月半前と推定された。だが監査ログの保存は30日で、当時の記録は残っていない。', en: '' }
+    text: { ja: '午前10時。侵入は数か月前と推定された。だが監査ログの保存は30日で、当時の記録は残っていない。', en: '' }
     voices: [v13-expert, v13-boss, v13-ok]
     notable:
-      - { id: note-scope, text: { ja: '侵入は二か月半前と推定。監査ログは30日で、当時の記録は欠損。', en: '' } }
+      - { id: note-scope, text: { ja: '侵入は数か月前と推定。監査ログは30日で、当時の記録は欠損。', en: '' } }
     choices:
       - id: p13-omit
         text: { ja: 'ログの欠損は報告書に書かない。分からないことは書かない。', en: '' }
@@ -737,7 +737,7 @@ points:
           - { id: p14-c-content, points: 8, axis: content, refs: [ppc-report-scope] }
           - { id: p14-c-record, points: 5, axis: record, refs: [jpcert-handling] }
       - id: p14-verify
-        text: { ja: '公開された範囲を技術的に特定し、本人通知と追加の速報を出す。', en: '' }
+        text: { ja: '公開された範囲を技術的に特定し、本人通知と追加の速報の材料を、経営と法務に即日渡す。', en: '' }
         minutes: 180
         category: recover
         points: 100
@@ -839,7 +839,7 @@ points:
 
   - id: p17-internal-comm
     at: { day: 14, minutes: 600 }
-    phase: organize
+    phase: recover
     sound: { se: [notify_chat] }
     text: { ja: '午前10時。社内への説明と、社外に話さない範囲の指示を出す日。現場には、報道と違う情報がすでに流れている。', en: '' }
     voices: [v17-boss, v17-flattery, v17-ok]
@@ -880,7 +880,7 @@ points:
 
   - id: p18-final
     at: { day: 20, minutes: 600 }
-    phase: notify
+    phase: recover
     sound: { se: [typing] }
     text: { ja: '午前10時。確報を出せる状態になった。期限はまだ先だが、件数はまだ動いている。どう出すか。', en: '' }
     voices: [v18-law, v18-boss, v18-ok]
@@ -1146,7 +1146,7 @@ voices:
   - { id: v01-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '怪しかったので、その三台の電源は抜いておきました。これで止まってます。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: 'SOCアナリスト「通信先はまだ生きています。メモリを取るなら今です」。', en: '' }, trigger: { at: point } }
   - { id: v01-after, media: sns, misleading: false, text: { ja: '隔離したところで、顧客は何が起きたか分からないままだ。', en: '' }, trigger: { at: after, choice: p01-triage } }
-  - { id: v02-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '初期化して作り直すのが一番早いですよ。証拠も残りませんから安心です。', en: '' }, trigger: { at: point } }
+  - { id: v02-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '初期化して作り直せば、今夜中に戻せますよ。ログは後からバックアップで追えます。', en: '' }, trigger: { at: point } }
   - { id: v02-ok, media: chat, misleading: false, text: { ja: '法務「証拠を残さないと、後で説明できません」。', en: '' }, trigger: { at: point } }
   - { id: v03-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '経営には、影響が出てから言えばいい。今言っても決められない。', en: '' }, trigger: { at: point } }
   - { id: v03-flattery, media: chat, misleading: true, type: flattery, text: { ja: 'さすが部門長。技術のことは全部任せますよ。', en: '' }, trigger: { at: point } }
@@ -1157,7 +1157,7 @@ voices:
   - { id: v04-ok, media: chat, misleading: false, text: { ja: '人事「交代制にしないと、三日目に人が倒れます」。', en: '' }, trigger: { at: point } }
   - { id: v05-public, media: sns, misleading: true, type: public-opinion, text: { ja: '全停止はやりすぎだ。他社は動いている。顧客が逃げるぞ。', en: '' }, trigger: { at: point } }
   - { id: v05-coward, media: news, misleading: true, type: coward-critique, text: { ja: '止める判断が遅い。部門長は何をしていた。', en: '' }, trigger: { at: point } }
-  - { id: v05-ok, media: chat, misleading: false, text: { ja: '技術責任者「五百台のうち、同じ認証情報を使っているのは八割です」。', en: '' }, trigger: { at: point } }
+  - { id: v05-ok, media: chat, misleading: false, text: { ja: '技術責任者「数百台のうち、同じ認証情報を使っているのは八割です」。', en: '' }, trigger: { at: point } }
   - { id: v05-after, media: sns, misleading: false, text: { ja: '全停止を進言した部門長が、責任を取るのか。', en: '' }, trigger: { at: after, choice: p05-full-rec } }
   - { id: v06-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '弊社の監視サービスを追加すれば、原因はすぐ分かります。今日から契約できます。', en: '' }, trigger: { at: point } }
   - { id: v06-ok, media: chat, misleading: false, text: { ja: '経理「保険の対象になるなら、着手の前に連絡が必要です」。', en: '' }, trigger: { at: point } }
@@ -1182,13 +1182,13 @@ voices:
   - { id: v13-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: 'ログの欠損は、報告書に書かなくていい。', en: '' }, trigger: { at: point } }
   - { id: v13-ok, media: chat, misleading: false, text: { ja: '調査担当「バックアップのテープに、当時の一部が残っています」。', en: '' }, trigger: { at: point } }
   - { id: v14-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '次の公開は、もっと多くの顧客だ。', en: '' }, trigger: { at: point } }
-  - { id: v14-coward, media: news, misleading: true, type: coward-critique, text: { ja: '一部が出た程度で、全部を認めるな。弱みを見せるな。', en: '' }, trigger: { at: point } }
+  - { id: v14-coward, media: news, misleading: true, type: public-opinion, text: { ja: '一部が出た程度で、全部を認めるな。弱みを見せるな。', en: '' }, trigger: { at: point } }
   - { id: v14-ok, media: chat, misleading: false, text: { ja: 'SOC「公開されたファイルの時刻は、隔離の前のものです」。', en: '' }, trigger: { at: point } }
   - { id: v14-after, media: news, misleading: false, text: { ja: '本人への通知が遅い。技術の説明ばかり並べている。', en: '' }, trigger: { at: after, choice: p14-verify } }
   - { id: v15-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '既存の環境をそのまま再起動すれば、半日で戻せます。', en: '' }, trigger: { at: point } }
-  - { id: v15-public, media: sns, misleading: true, type: public-opinion, text: { ja: '十天も止めている。早く戻せ。', en: '' }, trigger: { at: point } }
+  - { id: v15-public, media: sns, misleading: true, type: public-opinion, text: { ja: '十日も止めている。早く戻せ。', en: '' }, trigger: { at: point } }
   - { id: v15-ok, media: chat, misleading: false, text: { ja: '技術責任者「新しい環境で、同じ侵入が起きないか確かめましょう」。', en: '' }, trigger: { at: point } }
-  - { id: v16-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '一週間も止めているのは臆病すぎる。他社ならもう再開している。', en: '' }, trigger: { at: point } }
+  - { id: v16-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '二週間近く止めているのは臆病すぎる。他社ならもう再開している。', en: '' }, trigger: { at: point } }
   - { id: v16-public, media: news, misleading: true, type: public-opinion, text: { ja: '顧客は待ってくれない。再開しないなら解約だ。', en: '' }, trigger: { at: point } }
   - { id: v16-ok, media: chat, misleading: false, text: { ja: 'SOC「未確認の端末は、まだ四十台あります」。', en: '' }, trigger: { at: point } }
   - { id: v16-after, media: sns, misleading: false, text: { ja: '再開が遅い。他社はもう動いている。', en: '' }, trigger: { at: after, choice: p16-gated } }

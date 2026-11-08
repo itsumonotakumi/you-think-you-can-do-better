@@ -85,10 +85,10 @@ describe('本文の時刻と設定値', () => {
 });
 
 describe('ログの保存期間と侵入時期', () => {
-  // 侵入は二か月半前（約75日）。保存期間はそれを下回り、当時の記録が残らない。
+  // 侵入は数か月前。保存期間（30日）はそれを下回り、当時の記録が残らない。
   it('no01 lead の保存期間は侵入時期より短い', () => {
     const p = point(no01Lead, 'p13-retention');
-    expect(p.text.ja).toContain('二か月半前');
+    expect(p.text.ja).toContain('数か月前');
     expect(p.text.ja).toContain('30日');
     expect(p.text.ja).not.toContain('九十日');
     const note = (p.notable ?? []).find((n) => n.id === 'note-scope');
