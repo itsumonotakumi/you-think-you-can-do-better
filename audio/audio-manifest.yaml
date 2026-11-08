@@ -285,3 +285,251 @@
     themeOk: true
     redistribution: embedded-only
   notes: "アプリへの組み込みは可（音源ファイルむき出しでも可）。素材単体の再配布・直リンク・AI学習への利用は禁止。元ファイル名 peta1.mp3"
+# BGM: 甘茶の音楽工房（規約確認 2026-11-08 https://amachamusic.chagasi.com/terms.html）
+- id: title
+  kind: bgm
+  file: bgm/title.mp3
+  loop: true
+  title: "深く暗い井戸（music_fukakukuraiido.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_fukakukuraiido.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: prologue
+  kind: bgm
+  file: bgm/prologue.mp3
+  loop: true
+  title: "静寂Ⅰ（music_seijaku1.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_seijaku1.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: calm
+  kind: bgm
+  file: bgm/calm.mp3
+  loop: true
+  title: "水に沈むオルガン（music_mizunishizumuorgan.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_mizunishizumuorgan.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: tension_low
+  kind: bgm
+  file: bgm/tension_low.mp3
+  loop: true
+  title: "虚しさと星空（music_munashisatohoshizora.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_munashisatohoshizora.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: tension_mid
+  kind: bgm
+  file: bgm/tension_mid.mp3
+  loop: true
+  title: "渦巻き（music_uzumaki.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_uzumaki.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: tension_high
+  kind: bgm
+  file: bgm/tension_high.mp3
+  loop: true
+  title: "ダークマター（music_darkmatter.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_darkmatter.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: night
+  kind: bgm
+  file: bgm/night.mp3
+  loop: true
+  title: "悲しみのテクスチャⅠ（music_kanashiminotexture1.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_kanashiminotexture1.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: press
+  kind: bgm
+  file: bgm/press.mp3
+  loop: true
+  title: "十二の音列（music_juninoonretsu.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_juninoonretsu.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: ending_s
+  kind: bgm
+  file: bgm/ending_s.mp3
+  loop: true
+  title: "フィヨルドの澄んだ風（music_fjordnosundakaze.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_fjordnosundakaze.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: ending_a
+  kind: bgm
+  file: bgm/ending_a.mp3
+  loop: true
+  title: "高原を渡る風（music_kougenwowatarukaze.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_kougenwowatarukaze.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: ending_b
+  kind: bgm
+  file: bgm/ending_b.mp3
+  loop: true
+  title: "夜空に舞う鳥（music_yozoranimautori.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_yozoranimautori.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: ending_c
+  kind: bgm
+  file: bgm/ending_c.mp3
+  loop: true
+  title: "夏の霧（music_natsunokiri.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_natsunokiri.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
+- id: ending_d
+  kind: bgm
+  file: bgm/ending_d.mp3
+  loop: true
+  title: "エレジー・フォー・ストリングス（music_elegyfourstrings.html）"
+  author: 甘茶
+  site: 甘茶の音楽工房
+  url: https://amachamusic.chagasi.com/music_elegyfourstrings.html
+  termsUrl: https://amachamusic.chagasi.com/terms.html
+  termsCheckedAt: 2026-11-08
+  conditions:
+    game: true
+    free: true
+    modify: true
+    creditRequired: false
+    creditText: "甘茶の音楽工房 https://amachamusic.chagasi.com/（任意。サイト名・作曲者名・URLのいずれか一つ）"
+    themeOk: true
+    redistribution: embedded-only
+  notes: "ウェブ・ゲームのBGMとして利用可、商用・非商用可、加工（フェード・テンポ変更等）自由、使用報告不要。音楽だけの販売・2次配布は禁止、直リンク禁止（自サイトに置いて使う）、YouTube Content ID登録・JASRAC等への登録禁止。曲ごとの個別規約なし。AI学習の可否は規約に記載なし。MP3 128kbps"
