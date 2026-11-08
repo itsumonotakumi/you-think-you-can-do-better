@@ -3,6 +3,11 @@ import { parseDocument, LineCounter, isMap, isSeq } from 'yaml';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
+/** YAML 1ファイルの上限（バイト）。 */
+export const MAX_YAML_BYTES = 2 * 1024 * 1024;
+/** アンカーの展開回数の上限（資源枯渇攻撃を防ぐ）。 */
+export const MAX_ALIAS_COUNT = 100;
+
 export interface Location {
   file: string;
   line: number;
@@ -20,9 +25,18 @@ function lineOfNode(node: any, lc: LineCounter): number {
   return lc.linePos(node.range[0]).line;
 }
 
-function register(node: any, value: unknown, file: string, lc: LineCounter): void {
+function register(
+  node: any,
+  value: unknown,
+  file: string,
+  lc: LineCounter,
+  seen: WeakSet<object>,
+): void {
   if (value === null || typeof value !== 'object') return;
   if (!node) return;
+  // YAML のアンカーは循環参照を作れる。訪問済みを覚えて無限再帰を防ぐ。
+  if (seen.has(value)) return;
+  seen.add(value);
   const origin: NodeOrigin = {
     file,
     line: lineOfNode(node, lc),
@@ -40,7 +54,7 @@ function register(node: any, value: unknown, file: string, lc: LineCounter): voi
       if (pair.value) origin.props.set(keyName, lineOfNode(pair.value, lc));
       const child = (value as Record<string, unknown>)[keyName];
       if (pair.value && child !== null && typeof child === 'object') {
-        register(pair.value, child, file, lc);
+        register(pair.value, child, file, lc, seen);
       }
     }
   } else if (isSeq(node)) {
@@ -49,7 +63,7 @@ function register(node: any, value: unknown, file: string, lc: LineCounter): voi
       if (!item) continue;
       origin.items.set(i, lineOfNode(item, lc));
       const child = (value as unknown[])[i];
-      if (child !== null && typeof child === 'object') register(item, child, file, lc);
+      if (child !== null && typeof child === 'object') register(item, child, file, lc, seen);
     }
   }
 }
@@ -70,24 +84,63 @@ export interface ParsedSource {
   file: string;
   data: unknown;
   errors: { line: number; message: string }[];
+  warnings: { line: number; message: string }[];
+}
+
+const decoder = new TextDecoder('utf-8');
+const encoder = new TextEncoder();
+
+function firstLine(message: string): string {
+  return message.split('\n')[0] ?? message;
 }
 
 export function parseYamlText(file: string, text: string): ParsedSource {
+  if (encoder.encode(text).length > MAX_YAML_BYTES) {
+    return {
+      file,
+      data: null,
+      errors: [{ line: 1, message: `ファイルが大きすぎる（上限 ${MAX_YAML_BYTES} バイト）` }],
+      warnings: [],
+    };
+  }
   const lineCounter = new LineCounter();
+  // アンカーの展開上限は toJS 側で効く（既定も 100 だが明示する）。
   const doc = parseDocument(text, { lineCounter });
   const errors = doc.errors.map((e) => ({
     line: e.linePos?.[0]?.line ?? 1,
-    message: e.message.split('\n')[0] ?? e.message,
+    message: firstLine(e.message),
   }));
-  const data = doc.toJS();
-  if (doc.contents) register(doc.contents, data, file, lineCounter);
-  return { file, data, errors };
+  const warnings = doc.warnings.map((w) => ({
+    line: w.linePos?.[0]?.line ?? 1,
+    message: firstLine(w.message),
+  }));
+  let data: unknown = null;
+  try {
+    data = doc.toJS({ maxAliasCount: MAX_ALIAS_COUNT });
+  } catch (error) {
+    errors.push({ line: 1, message: `YAML を展開できない: ${firstLine(error instanceof Error ? error.message : String(error))}` });
+  }
+  if (doc.contents && data !== null) register(doc.contents, data, file, lineCounter, new WeakSet());
+  return { file, data, errors, warnings };
+}
+
+/** 絶対パスの YAML を読む。存在しなければ null。 */
+export function readYamlFile(full: string, displayFile: string): ParsedSource | null {
+  if (!existsSync(full)) return null;
+  const bytes = readFileSync(full);
+  if (bytes.length > MAX_YAML_BYTES) {
+    return {
+      file: displayFile,
+      data: null,
+      errors: [{ line: 1, message: `ファイルが大きすぎる（上限 ${MAX_YAML_BYTES} バイト）` }],
+      warnings: [],
+    };
+  }
+  return parseYamlText(displayFile, decoder.decode(bytes));
 }
 
 export function readYaml(root: string, relativePath: string): ParsedSource | null {
-  const full = join(root, relativePath);
-  if (!existsSync(full)) return null;
-  return parseYamlText(relativePath.replaceAll('\\', '/'), readFileSync(full, 'utf8'));
+  return readYamlFile(join(root, relativePath), relativePath.replaceAll('\\', '/'));
 }
 
 /** テスト・呼び出し側で位置を作るための小さなヘルパー。 */
