@@ -77,7 +77,7 @@ describe('scenario no04-goride lead', () => {
     expect(scenario.id).toBe('no04-goride');
     expect(scenario.languages).toEqual(['ja']);
     expect(scenario.difficulty).toBe(4);
-    expect(scenario.start).toEqual({ day: 0, minutes: 540 });
+    expect(scenario.start).toEqual({ day: 0, minutes: 1290 });
     expect(scenario.roles.lead).toBe(role);
     expect(role.pressEnabled).toBe(true);
     expect(role.estimateMinutes).toBeGreaterThan(0);
