@@ -3,7 +3,7 @@
 # 自社が預かる取引先データと、親会社も被害者という立場の間で判断する。
 # 判断ポイント17、細目は choices[].items と drafts の合計で80以上。
 estimateMinutes: 35
-intro: { ja: 'あなたはコネクトコールのグループ会社、コネクトコール・フィールド株式会社の代表取締役社長。親会社のセンター基盤を借りて、取引先企業の窓口業務と受注処理を請け負っている。専任の情報セキュリティ部署はなく、総務部長が情報管理を兼任し、外部のITベンダーに運用を頼っている。午前10時、親会社の情報システム部長から電話が入る。', en: '' }
+intro: { ja: 'あなたはコネクトコールのグループ会社、コネクトコール・フィールド株式会社の代表取締役社長。親会社のセンター基盤を借りて、取引先企業の窓口業務と受注処理を請け負っている。専任の情報セキュリティ部署はなく、総務部長が情報管理を兼任し、外部のITベンダーに運用を頼っている。午前10時、親会社の情報システム部長・倉橋から電話が入る。主要クライアントの顧客名簿が外部で使われているという指摘だった。', en: '' }
 pressEnabled: true
 cowardVoices:
   '2': v-coward-2
@@ -46,16 +46,14 @@ events:
     voices: [v-ev-news]
     gauges: { flame: 10 }
     sound: { se: [notify_news] }
-    caption: { ja: '「10年気づかなかった」と報道され、取引先が受託先の見直しを始めた。', en: '' }
+    caption: { ja: '続報で、取引先が受託先の見直しを始めたと報じられた。', en: '' }
 points:
   - id: p01-call
     at: { day: 0, minutes: 600 }
     phase: detect
     sound: { se: [phone_ring] }
-    text: { ja: '午前10時。親会社の情報システム部長・倉橋から電話が入る。「グループ共通のセンター基盤で、派遣の保守担当者が10年分の顧客名簿を外部媒体に書き出していた。御社が預かる取引先のデータも、同じ環境にあった」。自社には専任の情報セキュリティ担当がいない。', en: '' }
+    text: { ja: '午前10時。親会社の情報システム部長・倉橋から電話。『主要クライアントから、顧客名簿が外部で使われていると指摘された。グループ共通のセンター基盤が疑われている。御社が預かる取引先のデータも同じ環境にある』。自社には専任の情報セキュリティ担当がいない。', en: '' }
     voices: [v01-parent, v01-public, v01-ok]
-    notable:
-      - { id: note-scale, text: { ja: '自社が預かる取引先データも、親会社のセンター基盤にあった。確認できた範囲では十数社で、調査中の取引先もある。', en: '' } }
     choices:
       - id: p01-wait
         text: { ja: '親会社の調査結果を待ち、自社の取引先には今日は何も伝えない。', en: '' }
@@ -198,6 +196,8 @@ points:
     sound: { se: [phone_ring] }
     text: { ja: '午後2時。自社が預かる取引先は数十社。各社も自社の顧客に説明する立場になる。報道前に個別に伝えるか、親会社の発表を待つか。', en: '' }
     voices: [v04-public, v04-parent, v04-ok]
+    notable:
+      - { id: note-scale, text: { ja: '影響する取引先は確認済み十数社と調査中に分けて把握している。', en: '' } }
     choices:
       - id: p04-wait
         text: { ja: '親会社の発表を待ち、報道が出てからまとめて伝える。', en: '' }
@@ -247,7 +247,7 @@ points:
     voices: [v08-vendor, v08-past, v08-ok]
     choices:
       - id: p08-leave
-        text: { ja: '派遣元に任せ、自社は本人への連絡も処分も関与しない。', en: '' }
+        text: { ja: '派遣元に任せ、自社の取引先データに関わる事実確認も記録の提供も求めない。', en: '' }
         minutes: 45
         category: hurt
         points: -100
@@ -297,7 +297,7 @@ points:
         points: -250
         refs: [no07-ipa-insider]
         gauges: { flame: 10, trust: -20 }
-        setFlags: { hidOwnGap: true }
+        setFlags: { hidOwnGap: true, hidAudit: true }
         delayed:
           - { afterPhases: 2, points: -80, gauges: { flame: 20, trust: -15 }, reason: { ja: '自社の穴を隠したことが報道され、説明責任を問われた。', en: '' } }
         items:
@@ -678,7 +678,7 @@ points:
     voices: [v15-expert, v15-law, v15-ok]
     choices:
       - id: p15-hide
-        text: { ja: '自社部分は公開せず、確報も親会社に任せる。', en: '' }
+        text: { ja: '自社部分は公開せず、確報に自社が報告者として入っているかも確認しない。', en: '' }
         minutes: 60
         category: fatal
         points: -250
@@ -785,7 +785,7 @@ points:
           - { id: p17-b-wording, points: 8, axis: wording, refs: [jpcert-handling] }
           - { id: p17-b-record, points: 8, axis: record, refs: [jpcert-handling] }
       - id: p17-ready
-        text: { ja: '記録を手元に置き、想定問答を親会社と摺り合わせる。最初に取引先とその顧客への謝罪を述べる。', en: '' }
+        text: { ja: '記録を手元に置き、想定問答を親会社とすり合わせる。最初に取引先とその顧客への謝罪を述べる。', en: '' }
         minutes: 150
         category: recover
         points: 120
@@ -1014,24 +1014,24 @@ voices:
   - { id: v06-public, media: sns, misleading: true, type: public-opinion, text: { ja: '悪いのは親会社と派遣元だ。子会社が謝ることはない。', en: '' }, trigger: { at: point } }
   - { id: v06-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「親会社も被害者ですが、自社の委託管理の責任は別に説明が要ります」。', en: '' }, trigger: { at: point } }
   - { id: v06-after, media: sns, misleading: false, text: { ja: '自社の責任まで認めるとは、株主に説明できるのか。', en: '' }, trigger: { at: after, choice: p06-split-own } }
-  - { id: v07-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: 'グループで一本化する。子会社は単独で出さなくていい。', en: '' }, trigger: { at: point } }
-  - { id: v07-law, media: board, misleading: true, type: law-ish, text: { ja: '委託先の事件だから、報告義務は親会社だけです。', en: '' }, trigger: { at: point } }
-  - { id: v07-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「自社が保有する個人データも対象です。速報は今日出せます」。', en: '' }, trigger: { at: point } }
+  - { id: v07-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: 'グループで一本化する。子会社の分は報告に書かなくていい。', en: '' }, trigger: { at: point } }
+  - { id: v07-law, media: board, misleading: true, type: law-ish, text: { ja: '委託先なんだから、うちは何も出さなくていい。取引先への連絡も急がなくていい。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「取引先のデータは、取引先へ速やかに通知すれば当社の報告は免除されます（施行規則第9条）。自社が保有するデータは当社が速報を出します」。', en: '' }, trigger: { at: point } }
   - { id: v07-after, media: news, misleading: false, text: { ja: '件数も分からないのに、子会社が速報を出すのか。', en: '' }, trigger: { at: after, choice: p07-file-joint } }
   - { id: v08-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '本人は弊社で処分します。御社は関わらないほうが角が立ちません。', en: '' }, trigger: { at: point } }
-  - { id: v08-past, media: boss, misleading: true, type: past-success, text: { ja: '前回の横領も内々で片付いた。今回も同じでいい。', en: '' }, trigger: { at: point } }
+  - { id: v08-past, media: boss, misleading: true, type: past-success, text: { ja: '前回の小さなトラブルも内々で片付いた。今回も同じでいい。', en: '' }, trigger: { at: point } }
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「責任分界を文書で残せば、取引先にも説明できます」。', en: '' }, trigger: { at: point } }
   - { id: v08-after, media: vendor, misleading: false, text: { ja: '責任分界を文書で求めるとは、水を差すな。', en: '' }, trigger: { at: after, choice: p08-joint-record } }
   - { id: v09-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: '社内の穴は報告書に書くな。グループの信用に関わる。', en: '' }, trigger: { at: point } }
   - { id: v09-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '点検は弊社に任せてください。問題ありません。', en: '' }, trigger: { at: point } }
   - { id: v09-ok, media: chat, misleading: false, text: { ja: '自社の総務部長「権限の棚卸しをした記録がありません。ここは正直に書くべきです」。', en: '' }, trigger: { at: point } }
   - { id: v09-after, media: news, misleading: false, text: { ja: '自分たちの穴まで公表するとは、正直すぎる。', en: '' }, trigger: { at: after, choice: p09-fix-external } }
-  - { id: v10-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '「親会社の事件です」と言い切れば、角が立ちませんよ。', en: '' }, trigger: { at: point } }
+  - { id: v10-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '「親会社の事件です」と言い切れば、批判は親会社に向きますよ。', en: '' }, trigger: { at: point } }
   - { id: v10-public, media: sns, misleading: true, type: public-opinion, text: { ja: '子会社は関係ないだろ。余計なことを言うと、グループ全体が疑われる。', en: '' }, trigger: { at: point } }
   - { id: v10-ok, media: chat, misleading: false, text: { ja: '広報の藤崎「自社の範囲を答えないと、隠していると取られます」。', en: '' }, trigger: { at: point } }
   - { id: v10-after, media: sns, misleading: false, text: { ja: '子会社が自分から責任を認めるとは、余計なことをした。', en: '' }, trigger: { at: after, choice: p10-own } }
   - { id: v11-public, media: news, misleading: true, type: public-opinion, text: { ja: '説明会を開けば、火に油を注ぐだけだ。', en: '' }, trigger: { at: point } }
-  - { id: v11-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'まだ確定していないのに説明会か。また後で訂正するのか。', en: '' }, trigger: { at: point } }
+  - { id: v11-coward, media: sns, misleading: true, type: public-opinion, text: { ja: 'まだ確定していないのに説明会か。また後で訂正するのか。', en: '' }, trigger: { at: point } }
   - { id: v11-ok, media: chat, misleading: false, text: { ja: '営業部長「取引先は、自社の顧客に何と説明すればいいか困っています」。', en: '' }, trigger: { at: point } }
   - { id: v11-after, media: news, misleading: false, text: { ja: '取引先を集めて、余計に混乱させただけだ。', en: '' }, trigger: { at: after, choice: p11-briefing-support } }
   - { id: v12-public, media: sns, misleading: true, type: public-opinion, text: { ja: '他社はもう動いている。止めているのはうちだけだ。', en: '' }, trigger: { at: point } }
@@ -1047,7 +1047,7 @@ voices:
   - { id: v14-ok, media: chat, misleading: false, text: { ja: '人事・派遣管理部長の久住「該当者だけなら、交代と引き継ぎを回せます」。', en: '' }, trigger: { at: point } }
   - { id: v14-after, media: sns, misleading: false, text: { ja: '残したスタッフがまたやるかもしれない。甘い。', en: '' }, trigger: { at: after, choice: p14-replace-care } }
   - { id: v15-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '報告書を出すと真似されます。伏せたほうが安全です。', en: '' }, trigger: { at: point } }
-  - { id: v15-law, media: news, misleading: true, type: law-ish, text: { ja: '子会社部分は任意です。出さなくても違法ではありません。', en: '' }, trigger: { at: point } }
+  - { id: v15-law, media: board, misleading: true, type: law-ish, text: { ja: '子会社部分は任意です。出さなくても違法ではありません。', en: '' }, trigger: { at: point } }
   - { id: v15-ok, media: chat, misleading: false, text: { ja: '調査委員「攻撃に使える部分だけ伏せれば、公開できます」。', en: '' }, trigger: { at: point } }
   - { id: v15-after, media: news, misleading: false, text: { ja: '今さら報告書を出して、宣伝か。', en: '' }, trigger: { at: after, choice: p15-publish-share } }
   - { id: v16-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: 'グループ共通の仕組みで足りる。子会社で予算を取るな。', en: '' }, trigger: { at: point } }
@@ -1055,7 +1055,7 @@ voices:
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '自社の総務部長「兼任のままでは、次の点検も回りません」。', en: '' }, trigger: { at: point } }
   - { id: v16-after, media: sns, misleading: false, text: { ja: '子会社が独自に予算を取るとは、グループの統制を乱すな。', en: '' }, trigger: { at: after, choice: p16-budget-plan } }
   - { id: v17-flattery, media: chat, misleading: true, type: flattery, text: { ja: '準備なんていりません。社長ならその場で答えられます。', en: '' }, trigger: { at: point } }
-  - { id: v17-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '会見を短く切れば、余計な質問は避けられますよ。', en: '' }, trigger: { at: point } }
+  - { id: v17-coward, media: boss, misleading: true, type: boss-pressure, text: { ja: '会見を短く切れば、余計な質問は避けられますよ。', en: '' }, trigger: { at: point } }
   - { id: v17-ok, media: chat, misleading: false, text: { ja: '広報の藤崎「記録を手元に置いて、事実だけ答えましょう」。', en: '' }, trigger: { at: point } }
   - { id: v17-after, media: news, misleading: false, text: { ja: '台本を読んでいるだけ。誠意がない。', en: '' }, trigger: { at: after, choice: p17-ready } }
   - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「調査中」なんだ。', en: '' }, trigger: { at: manual } }
@@ -1065,4 +1065,4 @@ voices:
   - { id: v-ev-board, media: boss, misleading: false, text: { ja: '親会社の臨時取締役会が開かれた。グループの対応方針が議題になっている。', en: '' }, trigger: { at: manual } }
   - { id: v-ev-staff, media: chat, misleading: false, text: { ja: '現場「交代がなく、休めない。このままだと持たない」。', en: '' }, trigger: { at: manual } }
   - { id: v-ev-training, media: chat, misleading: false, text: { ja: '全社研修の記録では、本人は10年連続で満点だった。', en: '' }, trigger: { at: manual } }
-  - { id: v-ev-news, media: news, misleading: false, text: { ja: '「10年気づかなかった」と報道され、取引先が受託先の見直しを始めた。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-news, media: news, misleading: false, text: { ja: '続報で、取引先が受託先の見直しを始めたと報じられた。', en: '' }, trigger: { at: manual } }

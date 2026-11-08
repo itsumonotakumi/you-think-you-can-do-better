@@ -4,7 +4,7 @@ id: no07-connectcall
 version: '1.0.0'
 status: latest
 published: '2026-11-08'
-sourcePeriod: { ja: '2023年の内部不正事案の構造を参考にしたフィクション', en: '' }
+sourcePeriod: { ja: '2020年代前半の内部不正事案の構造を参考にしたフィクション', en: '' }
 difficulty: 3
 languages: [ja]
 referencesVersion: '2026-11-08'
@@ -56,7 +56,7 @@ press:
         - { id: a-why-none, text: { ja: '確認しておりません。', en: '' }, points: -40 }
         - { id: a-why-agency, text: { ja: '派遣元の管理の問題です。', en: '' }, points: -80 }
         - { id: a-why-design, text: { ja: '管理者権限の棚卸しと、監査ログの保存期間の設計が不十分でした。', en: '' }, points: 40 }
-        - { id: a-why-verify, text: { ja: '権限の棚卸しと監査ログの不足を検証し、報告書で公表します。', en: '' }, points: 80, requiresNote: note-audit }
+        - { id: a-why-verify, text: { ja: '権限の棚卸しと監査ログの不足を検証し、報告書で公表します。', en: '' }, points: 80, requiresNote: note-audit, when: { flags: { hidAudit: false } } }
     - id: q-scale
       seconds: 30
       timeoutPoints: -30
@@ -72,11 +72,11 @@ press:
       answers:
         - { id: a-victims-none, text: { ja: 'クライアントの判断です。', en: '' }, points: -60 }
         - { id: a-victims-share, text: { ja: 'クライアントと費用を分担し、共同の窓口を設けています。', en: '' }, points: 40 }
-        - { id: a-victims-tier, text: { ja: '費用を分担し、被害の重さに応じた段階補償と説明会を用意しています。', en: '' }, points: 80 }
+        - { id: a-victims-tier, text: { ja: '費用を分担し、被害の重さに応じた段階補償と説明会を用意しています。', en: '' }, points: 80, when: { flags: { tieredCompensation: true } } }
     - id: q-training
       seconds: 25
       timeoutPoints: -30
-      text: { ja: '犯人は社内研修で満点だったそうですね。', en: '' }
+      text: { ja: '持ち出したとされる人は社内研修で満点だったそうですね。', en: '' }
       answers:
         - { id: a-training-none, text: { ja: '研修は関係ありません。', en: '' }, points: -40 }
         - { id: a-training-more, text: { ja: '研修をさらに強化します。', en: '' }, points: 10 }
