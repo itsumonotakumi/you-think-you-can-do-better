@@ -8,7 +8,7 @@
   import { ROLES } from '../../engine/types';
   // エンジン本体（src/engine/index.ts）は別担当。未着の間も型検査を通すため解決エラーだけ抑止する。
   // @ts-ignore -- 実装が入れば通常の import として解決される
-  import { startPlay } from '../engine';
+  import { startPlay } from '../../engine';
   import '../styles/base.css';
 
   type Phase = 'loading' | 'ready' | 'error';

@@ -165,8 +165,18 @@ function loadLocales(root: string, issues: Issue[]): Record<string, LocaleData> 
       for (const e of source.errors) issues.push(issue(source.file, e.line, 'C17', `YAML の書式エラー: ${e.message}`));
       const strings = asObject(source.data);
       if (!strings) continue;
-      for (const [key, value] of Object.entries(strings)) {
-        const line = locate(strings, key)?.line ?? 1;
+      // ネストしたキーは "a.b.c" に平坦化する
+      const flat: [string, unknown, number][] = [];
+      const walk = (obj: Record<string, unknown>, prefix: string, parentLine: number): void => {
+        for (const [k, v] of Object.entries(obj)) {
+          const line = locate(obj, k)?.line ?? parentLine;
+          const sub = typeof v === 'object' && v !== null && !Array.isArray(v) ? asObject(v) : null;
+          if (sub) walk(sub, `${prefix}${k}.`, line);
+          else flat.push([`${prefix}${k}`, v, line]);
+        }
+      };
+      walk(strings, '', 1);
+      for (const [key, value, line] of flat) {
         if (typeof value !== 'string') {
           issues.push(issue(source.file, line, 'C17', `UI 文言 ${key} は文字列で書く`));
           continue;

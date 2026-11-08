@@ -1,5 +1,5 @@
 // 記者会見（設計書 5.6・6.8、テスト計画書 5.2）
-import { finalizeBeforeEnding } from "./delayed";
+import { finalizeBeforeEnding } from "./deadlines";
 import type {
   Cue, Flags, PlayState, PressAnswer, PressQuestion, Scenario, StepResult,
 } from "./types";

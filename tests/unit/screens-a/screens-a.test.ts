@@ -18,7 +18,7 @@ const localeSources = import.meta.glob('/locales/*/ui/screens-a.yaml', {
   eager: true,
 }) as Record<string, string>;
 
-const css = readFileSync(new URL('../../../src/app/styles/base.css', import.meta.url), 'utf8') as string;
+const css = readFileSync(new URL('../../../src/app/styles/base.css', import.meta.url).pathname, 'utf8') as string;
 
 const ownScreens = [
   'S01Title',

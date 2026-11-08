@@ -130,7 +130,10 @@ function validTime(value: unknown): boolean {
 function checkGauges(gauge: unknown, onError: (key: string, message: string) => void): void {
   const obj = asObj(gauge);
   for (const key of ['damage', 'flame', 'trust', 'stamina']) {
-    if (!isNum(obj[key])) onError(key, `ゲージ ${key} は数値で書く`);
+    if (obj[key] !== undefined && !isNum(obj[key])) onError(key, `ゲージ ${key} は数値で書く`);
+  }
+  for (const key of Object.keys(obj)) {
+    if (!['damage', 'flame', 'trust', 'stamina'].includes(key)) onError(key, `不明なゲージ ${key}`);
   }
 }
 

@@ -1,6 +1,6 @@
 node_modules
 dist/
-src/data/*.json
+src/data/**/*.json
 test-results/
 playwright-report/
 .worktrees/

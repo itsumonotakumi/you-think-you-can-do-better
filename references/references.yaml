@@ -1,117 +1,117 @@
 # 根拠データ（オーケストレーター作成。内容は公開前に人手で原典確認すること: test-plan 7章）
 # シナリオは refs でこの id を引用するだけ。期限の数値は deadlineHours にだけ書く（C15）
 - id: ppc-report-prelim
-  title: { ja: 個人情報保護法 漏えい等報告（速報）, en: APPI breach report (preliminary) }
-  issuer: { ja: 個人情報保護委員会, en: Personal Information Protection Commission }
+  title: { ja: "個人情報保護法 漏えい等報告（速報）", en: "APPI breach report (preliminary)" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
   version: 2026-11
-  section: { ja: 施行規則第8条第1項。事態を知った後、速やかに（概ね3〜5日以内）, en: Enforcement Rules Art. 8(1). Promptly (roughly 3-5 days) }
-  summary: { ja: 分かっている範囲で早く出し、不明点は調査中と書く。ゲームでは3日を期限とする, en: Report what is known early; mark unknowns as under investigation }
+  section: { ja: "施行規則第8条第1項。事態を知った後、速やかに（概ね3〜5日以内）", en: "Enforcement Rules Art. 8(1). Promptly (roughly 3-5 days)" }
+  summary: { ja: "分かっている範囲で早く出し、不明点は調査中と書く。ゲームでは3日を期限とする", en: "Report what is known early; mark unknowns as under investigation" }
   checkedAt: 2026-11-08
   legalPack: jp
   deadlineHours: 72
 - id: ppc-report-final
-  title: { ja: 個人情報保護法 漏えい等報告（確報）, en: APPI breach report (final) }
-  issuer: { ja: 個人情報保護委員会, en: Personal Information Protection Commission }
+  title: { ja: "個人情報保護法 漏えい等報告（確報）", en: "APPI breach report (final)" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
   version: 2026-11
-  section: { ja: 施行規則第8条第2項。30日以内, en: Enforcement Rules Art. 8(2). Within 30 days }
-  summary: { ja: 確報は30日以内。全項目をそろえる, en: Final report within 30 days with all items }
+  section: { ja: "施行規則第8条第2項。30日以内", en: "Enforcement Rules Art. 8(2). Within 30 days" }
+  summary: { ja: "確報は30日以内。全項目をそろえる", en: "Final report within 30 days with all items" }
   checkedAt: 2026-11-08
   legalPack: jp
   deadlineHours: 720
 - id: ppc-report-final-malicious
-  title: { ja: 個人情報保護法 漏えい等報告（確報・不正の目的）, en: APPI final report (malicious acts) }
-  issuer: { ja: 個人情報保護委員会, en: Personal Information Protection Commission }
+  title: { ja: "個人情報保護法 漏えい等報告（確報・不正の目的）", en: "APPI final report (malicious acts)" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
   version: 2026-11
-  section: { ja: 施行規則第8条第2項。不正の目的をもって行われたおそれがある場合は60日以内, en: Within 60 days if malicious intent is suspected }
-  summary: { ja: 不正アクセス等が疑われるときは確報の期限が60日, en: 60-day deadline when unauthorized access is suspected }
+  section: { ja: "施行規則第8条第2項。不正の目的をもって行われたおそれがある場合は60日以内", en: "Within 60 days if malicious intent is suspected" }
+  summary: { ja: "不正アクセス等が疑われるときは確報の期限が60日", en: "60-day deadline when unauthorized access is suspected" }
   checkedAt: 2026-11-08
   legalPack: jp
   deadlineHours: 1440
 - id: ppc-report-scope
-  title: { ja: 漏えい等報告の対象となる事態, en: Reportable breach events }
-  issuer: { ja: 個人情報保護委員会, en: Personal Information Protection Commission }
+  title: { ja: "漏えい等報告の対象となる事態", en: "Reportable breach events" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
   version: 2026-11
-  section: { ja: 施行規則第7条。要配慮個人情報、財産的被害のおそれ、不正の目的のおそれ、1,000人超, en: Enforcement Rules Art. 7 }
-  summary: { ja: 不正の目的によるおそれがあれば件数に関係なく報告対象。1,000人以下でも報告が必要な場合がある, en: Reportable regardless of count if malicious intent is suspected }
+  section: { ja: "施行規則第7条。要配慮個人情報、財産的被害のおそれ、不正の目的のおそれ、1,000人超", en: "Enforcement Rules Art. 7" }
+  summary: { ja: "不正の目的によるおそれがあれば件数に関係なく報告対象。1,000人以下でも報告が必要な場合がある", en: "Reportable regardless of count if malicious intent is suspected" }
   checkedAt: 2026-11-08
   legalPack: jp
 - id: ppc-notify-person
-  title: { ja: 本人への通知, en: Notification to data subjects }
-  issuer: { ja: 個人情報保護委員会, en: Personal Information Protection Commission }
+  title: { ja: "本人への通知", en: "Notification to data subjects" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
   version: 2026-11
-  section: { ja: 法第26条第2項, en: APPI Art. 26(2) }
-  summary: { ja: 報告対象の事態では、状況に応じて速やかに本人へ通知する。退会者も対象になりうる, en: Notify affected persons promptly, including former members }
+  section: { ja: "法第26条第2項", en: "APPI Art. 26(2)" }
+  summary: { ja: "報告対象の事態では、状況に応じて速やかに本人へ通知する。退会者も対象になりうる", en: "Notify affected persons promptly, including former members" }
   checkedAt: 2026-11-08
   legalPack: jp
 - id: meti-csm-guideline
-  title: { ja: サイバーセキュリティ経営ガイドライン Ver3.0, en: Cyber Security Management Guidelines Ver 3.0 }
-  issuer: { ja: 経済産業省・IPA, en: METI and IPA }
+  title: { ja: "サイバーセキュリティ経営ガイドライン Ver3.0", en: "Cyber Security Management Guidelines Ver 3.0" }
+  issuer: { ja: "経済産業省・IPA", en: "METI and IPA" }
   version: "3.0"
-  section: { ja: 重要10項目（指示7〜9：緊急対応体制、復旧体制、サプライチェーン）, en: Key 10 items (Directives 7-9) }
-  summary: { ja: 経営者が責任者として緊急時の体制と判断に関わる, en: Executives lead incident response structure and decisions }
+  section: { ja: "重要10項目（指示7〜9：緊急対応体制、復旧体制、サプライチェーン）", en: "Key 10 items (Directives 7-9)" }
+  summary: { ja: "経営者が責任者として緊急時の体制と判断に関わる", en: "Executives lead incident response structure and decisions" }
   checkedAt: 2026-11-08
   legalPack: jp
 - id: meti-disclosure-guidance
-  title: { ja: サイバー攻撃被害に係る情報の共有・公表ガイダンス, en: Guidance on sharing and disclosing cyberattack damage information }
-  issuer: { ja: 経済産業省・総務省・警察庁・NISC ほか, en: METI, MIC, NPA, NISC et al. }
+  title: { ja: "サイバー攻撃被害に係る情報の共有・公表ガイダンス", en: "Guidance on sharing and disclosing cyberattack damage information" }
+  issuer: { ja: "経済産業省・総務省・警察庁・NISC ほか", en: "METI, MIC, NPA, NISC et al." }
   version: 2023-03
-  section: { ja: 公表のタイミングと内容, en: Timing and content of disclosure }
-  summary: { ja: 被害者として公表する意義と、公表内容・時期の考え方, en: Why and when victims should disclose }
+  section: { ja: "公表のタイミングと内容", en: "Timing and content of disclosure" }
+  summary: { ja: "被害者として公表する意義と、公表内容・時期の考え方", en: "Why and when victims should disclose" }
   checkedAt: 2026-11-08
   legalPack: jp
 - id: ipa-sme-guideline
-  title: { ja: 中小企業の情報セキュリティ対策ガイドライン, en: Information Security Guidelines for SMEs }
-  issuer: { ja: IPA（情報処理推進機構）, en: IPA }
+  title: { ja: "中小企業の情報セキュリティ対策ガイドライン", en: "Information Security Guidelines for SMEs" }
+  issuer: { ja: "IPA（情報処理推進機構）", en: "IPA" }
   version: "3.1"
-  section: { ja: 付録：インシデント対応の手引き, en: Appendix: incident response handbook }
-  summary: { ja: 予算と人が少なくても、検知・初動・相談先・復旧の順に対応する, en: Even small firms follow detect, respond, consult, recover }
+  section: { ja: "付録：インシデント対応の手引き", en: "Appendix: incident response handbook" }
+  summary: { ja: "予算と人が少なくても、検知・初動・相談先・復旧の順に対応する", en: "Even small firms follow detect, respond, consult, recover" }
   checkedAt: 2026-11-08
   legalPack: jp
 - id: jpcert-handling
-  title: { ja: インシデントハンドリングマニュアル, en: Incident Handling Manual }
-  issuer: { ja: JPCERT/CC, en: JPCERT/CC }
+  title: { ja: "インシデントハンドリングマニュアル", en: "Incident Handling Manual" }
+  issuer: { ja: "JPCERT/CC", en: "JPCERT/CC" }
   version: 2021-11
-  section: { ja: 検知・連絡受付、トリアージ、インシデントレスポンス、報告・公表, en: Detection, triage, response, reporting }
-  summary: { ja: 事実の記録、トリアージ、関係者への連絡の順序, en: Record facts, triage, contact stakeholders in order }
+  section: { ja: "検知・連絡受付、トリアージ、インシデントレスポンス、報告・公表", en: "Detection, triage, response, reporting" }
+  summary: { ja: "事実の記録、トリアージ、関係者への連絡の順序", en: "Record facts, triage, contact stakeholders in order" }
   checkedAt: 2026-11-08
   legalPack: jp
 - id: nist-sp800-61r3
-  title: { ja: NIST SP 800-61 Rev.3 インシデント対応の推奨事項, en: NIST SP 800-61 Rev. 3 Incident Response Recommendations }
-  issuer: { ja: 米国国立標準技術研究所（NIST）, en: NIST }
+  title: { ja: "NIST SP 800-61 Rev.3 インシデント対応の推奨事項", en: "NIST SP 800-61 Rev. 3 Incident Response Recommendations" }
+  issuer: { ja: "米国国立標準技術研究所（NIST）", en: "NIST" }
   version: Rev.3 (2025-04)
-  section: { ja: CSF 2.0 の Detect / Respond / Recover, en: CSF 2.0 Detect / Respond / Recover }
-  summary: { ja: 封じ込め・根絶・復旧の判断と、証拠の保全, en: Containment, eradication, recovery decisions and evidence preservation }
+  section: { ja: "CSF 2.0 の Detect / Respond / Recover", en: "CSF 2.0 Detect / Respond / Recover" }
+  summary: { ja: "封じ込め・根絶・復旧の判断と、証拠の保全", en: "Containment, eradication, recovery decisions and evidence preservation" }
   checkedAt: 2026-11-08
   legalPack: jp
 - id: cissp-cbk-secops
-  title: { ja: CISSP CBK ドメイン7 セキュリティ運用, en: CISSP CBK Domain 7 Security Operations }
-  issuer: { ja: ISC2, en: ISC2 }
-  version: 2024
-  section: { ja: インシデント管理（検知・対応・緩和・報告・復旧・是正・教訓）, en: Incident management steps }
-  summary: { ja: 対応の各段階を順に踏み、最後に教訓をまとめる, en: Follow each step and capture lessons learned }
+  title: { ja: "CISSP CBK ドメイン7 セキュリティ運用", en: "CISSP CBK Domain 7 Security Operations" }
+  issuer: { ja: "ISC2", en: "ISC2" }
+  version: "2024"
+  section: { ja: "インシデント管理（検知・対応・緩和・報告・復旧・是正・教訓）", en: "Incident management steps" }
+  summary: { ja: "対応の各段階を順に踏み、最後に教訓をまとめる", en: "Follow each step and capture lessons learned" }
   checkedAt: 2026-11-08
   legalPack: jp
 - id: npa-consult
-  title: { ja: サイバー事案の警察への通報・相談, en: Reporting cyber incidents to police }
-  issuer: { ja: 警察庁, en: National Police Agency }
+  title: { ja: "サイバー事案の警察への通報・相談", en: "Reporting cyber incidents to police" }
+  issuer: { ja: "警察庁", en: "National Police Agency" }
   version: 2026-11
-  section: { ja: 都道府県警察のサイバー犯罪相談窓口, en: Prefectural cybercrime consultation desks }
-  summary: { ja: ランサムウェアや脅迫を受けたら警察に相談する。身代金の支払いは復号もデータ削除も保証しない, en: Consult police; paying ransom guarantees nothing }
+  section: { ja: "都道府県警察のサイバー犯罪相談窓口", en: "Prefectural cybercrime consultation desks" }
+  summary: { ja: "ランサムウェアや脅迫を受けたら警察に相談する。身代金の支払いは復号もデータ削除も保証しない", en: "Consult police; paying ransom guarantees nothing" }
   checkedAt: 2026-11-08
   legalPack: jp
 - id: mhlw-medical-guideline
-  title: { ja: 医療情報システムの安全管理に関するガイドライン 第6.0版, en: Guidelines for Security of Medical Information Systems 6.0 }
-  issuer: { ja: 厚生労働省, en: Ministry of Health, Labour and Welfare }
+  title: { ja: "医療情報システムの安全管理に関するガイドライン 第6.0版", en: "Guidelines for Security of Medical Information Systems 6.0" }
+  issuer: { ja: "厚生労働省", en: "Ministry of Health, Labour and Welfare" }
   version: "6.0"
-  section: { ja: 非常時（サイバー攻撃時）の業務継続, en: Business continuity during cyberattacks }
-  summary: { ja: 診療を止めない代替手段と、停止の判断を事前に決めておく, en: Prepare alternatives and shutdown criteria in advance }
+  section: { ja: "非常時（サイバー攻撃時）の業務継続", en: "Business continuity during cyberattacks" }
+  summary: { ja: "診療を止めない代替手段と、停止の判断を事前に決めておく", en: "Prepare alternatives and shutdown criteria in advance" }
   checkedAt: 2026-11-08
   legalPack: jp
 - id: meti-trade-secret
-  title: { ja: 秘密情報の保護ハンドブック, en: Handbook for Protecting Confidential Information }
-  issuer: { ja: 経済産業省, en: METI }
-  version: 2024
-  section: { ja: 漏えい時の対応（証拠保全、不正競争防止法）, en: Response to leaks (evidence, Unfair Competition Prevention Act) }
-  summary: { ja: 内部からの持ち出しは証拠保全と法的手続きの順序が重要, en: Preserve evidence before legal steps for insider leaks }
+  title: { ja: "秘密情報の保護ハンドブック", en: "Handbook for Protecting Confidential Information" }
+  issuer: { ja: "経済産業省", en: "METI" }
+  version: "2024"
+  section: { ja: "漏えい時の対応（証拠保全、不正競争防止法）", en: "Response to leaks (evidence, Unfair Competition Prevention Act)" }
+  summary: { ja: "内部からの持ち出しは証拠保全と法的手続きの順序が重要", en: "Preserve evidence before legal steps for insider leaks" }
   checkedAt: 2026-11-08
   legalPack: jp
