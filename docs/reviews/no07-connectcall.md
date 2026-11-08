@@ -1,7 +1,7 @@
 # No.7 コネクトコール 内容レビュー
 
 対象: `scenarios/no07-connectcall/scenario.yaml`, `roles/{executive,officer,lead,analyst}.yaml`（全行）
-レビュー日: 2026-11-08 / 基準: docs/requirements-ja.md, docs/test-plan-ja.md 7・8章, references/references.yaml, src/engine/types.ts
+レビュー日: 2026-11-08 / 基準: docs/plan/requirements-ja.md, docs/plan/test-plan-ja.md 7・8章, references/references.yaml, src/engine/types.ts
 
 ## 総評
 

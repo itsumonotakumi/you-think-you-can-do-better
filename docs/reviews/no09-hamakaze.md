@@ -1,7 +1,7 @@
 # レビュー: No.9 ハマカゼ総合医療センター（no09-hamakaze）
 
 - 対象: `scenarios/no09-hamakaze/scenario.yaml`、`roles/{executive,officer,lead,analyst}.yaml`
-- 基準: docs/requirements-ja.md、docs/test-plan-ja.md 7章・8章、references/references.yaml、src/engine/types.ts
+- 基準: docs/plan/requirements-ja.md、docs/plan/test-plan-ja.md 7章・8章、references/references.yaml、src/engine/types.ts
 - レビュー日: 2026-11-08
 
 ## 総評

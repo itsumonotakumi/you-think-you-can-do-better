@@ -1,7 +1,7 @@
 # No.3 やまびこ商店 内容レビュー
 
 対象: `scenarios/no03-yamabiko/scenario.yaml`、`roles/{executive,officer,lead,analyst}.yaml`
-基準: `docs/requirements-ja.md`、`docs/test-plan-ja.md` 7章・8章、`references/references.yaml`、`src/engine/types.ts`
+基準: `docs/plan/requirements-ja.md`、`docs/plan/test-plan-ja.md` 7章・8章、`references/references.yaml`、`src/engine/types.ts`
 レビュー日: 2026-11-08
 
 ## 📝 総評（3行）
@@ -50,7 +50,7 @@
 | 12 | 中 | officer.yaml:1052 / lead.yaml:1327 | `v12-card` / `v13-card` でカード会社が「書類は最低限で結構です。早く戻したほうが売上は戻りますよ」。漏えい後の加盟店再審査で書類を減らせと言うアクワイアラは現実に無く、罠として不自然（R04）。実在の業種を軽く描く形にもなる | 話者を変える: 「知り合いの店主『審査の書類なんて最低限でいい。うちはそれで通った』」（`media: chat`, `type: past-success`） |
 | 13 | 中 | executive.yaml:555-564 / officer.yaml:593-602 / lead.yaml:805-814 / analyst.yaml:770-779 | 6日目の「以前のバックアップから戻す。設定はそのまま使う」が全ロールで `fatal`（−230〜−250）。要件の致命的区分は「隠蔽・虚偽・証拠を消す初期化・法定報告の怠り・身代金」で、スナップショット取得後の復旧手段の誤りは「信頼を傷つける」の範囲。fatal にすると S ランクと `increase` が閉じる | `category: hurt` / `points: -150` に下げ、`delayed` は現行の −80 を維持。担当者ロールの `a13-restore` も `-150` に |
 | 14 | 中 | officer.yaml:113-122 | `p02-restore-only`「復旧作業だけを頼み、触った範囲と時刻を書面で報告してもらう」が `maintain` +20。スナップショット前の復旧作業は改ざんファイルを上書きする＝証拠消失。書面報告があっても加点対象にならない | `category: hurt` / `points: -60`、items を `p02-b-record: -8 (record)`, `p02-b-order: -8 (order)` に。もしくは文を「復旧は調査の後にすると伝え、触った範囲と時刻だけ先に書面でもらう。」に変えて +20 を維持 |
-| 15 | 中 | scenario.yaml:12 | タイトル「あるのは社長の男だけ」。日本語として意味が通らず、文脈（担当者＝倉庫担当の身内）から「甥」の誤変換と見られる。要件定義書 docs/requirements-ja.md:336,342 にも同じ字があるため上流の誤りの可能性が高い | 「予算も人もない。あるのは社長の甥だけ」に修正し、analyst.yaml:6 の intro を「あなたはやまびこ商店の倉庫・出荷担当で、社長の甥。」にする。要件定義書も合わせて修正 |
+| 15 | 中 | scenario.yaml:12 | タイトル「あるのは社長の男だけ」。日本語として意味が通らず、文脈（担当者＝倉庫担当の身内）から「甥」の誤変換と見られる。要件定義書 docs/plan/requirements-ja.md:336,342 にも同じ字があるため上流の誤りの可能性が高い | 「予算も人もない。あるのは社長の甥だけ」に修正し、analyst.yaml:6 の intro を「あなたはやまびこ商店の倉庫・出荷担当で、社長の甥。」にする。要件定義書も合わせて修正 |
 | 16 | 低 | executive.yaml:981 / officer.yaml:1061 / lead.yaml:1336 | 8日目の再開判断に出る声が「二週間も止めて、臆病すぎる」。停止は0日目からなので8日 | 「一週間以上も止めて、臆病すぎる。」 |
 | 17 | 低 | executive.yaml:415 / officer.yaml:409 / lead.yaml:549 | 速報の判断文が「今日中に出すかどうか」だが、ゲーム内期限は 72h ＝3日目10:00。「今日中」と読むと `p09-wait`（240分）で期限超過する理由が分かりにくい | 「3日目の朝。カード会社の連絡から、まもなく72時間になる。午前中に出すかどうかで迷っている。」 |
 | 18 | 低 | executive.yaml:973 / officer.yaml:1049 / lead.yaml:1324 | `v11-popular`「サイトに短いお詫びだけ出すを選んでいます」が文法的に崩れている | 「他のプレイヤーの多くは『サイトに短いお詫びを出す』を選んでいます。」 |

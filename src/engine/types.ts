@@ -1,5 +1,5 @@
 // 共有契約（Wave0 で固定）。変更はオーケストレーターのみ。
-// 設計書: docs/detailed-design-ja.md 4〜6章, 8〜10章
+// 設計書: docs/plan/detailed-design-ja.md 4〜6章, 8〜10章
 //
 // 【設計書の穴を埋める決め事】
 // - YAML: scenarios/<id>/scenario.yaml（roles 以外）+ scenarios/<id>/roles/<role>.yaml（RoleScript）。

@@ -1,7 +1,7 @@
 # No.6 アマツ重工 レビュー結果
 
 対象: `scenarios/no06-amatsu/scenario.yaml`、`roles/{executive,officer,lead,analyst}.yaml`（2026-11-08 版 1.0.0）
-基準: `docs/requirements-ja.md`（ロール4種・信頼スコア・細目採点・ミスリード・権利配慮）、`docs/test-plan-ja.md` 7章・8章、`references/references.yaml`、`src/engine/types.ts`
+基準: `docs/plan/requirements-ja.md`（ロール4種・信頼スコア・細目採点・ミスリード・権利配慮）、`docs/plan/test-plan-ja.md` 7章・8章、`references/references.yaml`、`src/engine/types.ts`
 
 ## 📝 総評（3行）
 
