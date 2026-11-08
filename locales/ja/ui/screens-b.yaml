@@ -56,6 +56,12 @@ sb:
     noPoint: "いま起きていることはありません。"
     noChoices: "選べる行動はありません。"
     draftPending: "文案を作成してください。"
+    abort:
+      button: "中断してタイトルへ"
+      heading: "タイトルへ戻りますか？"
+      message: "ここまでの進行は保存されています。タイトルへ戻っても「続きから」で再開できます。"
+      confirm: "タイトルへ戻る"
+      cancel: "プレイを続ける"
   situation:
     heading: "状況"
   choices:
@@ -91,6 +97,7 @@ sb:
     notify: "通知：{media}"
     clock: "時刻が{time}に進みました"
     delayed: "遅れて来た影響"
+    history: "字幕の履歴（{count}）"
     se:
       notify_sns: "通知：SNS"
       notify_news: "通知：ニュース"

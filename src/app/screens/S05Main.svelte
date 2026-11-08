@@ -7,10 +7,9 @@
   import { audio } from '../../audio';
   import { t, loc, notice } from '../../i18n';
   import { saveProgress } from '../../storage';
-  import { applyStep, errorMessage, play, scenario, screen, settings } from '../store';
+  import { applyStep, errorMessage, play, resetCaptions, scenario, screen, settings } from '../store';
   import { choiceIndexFromKey, nextFreeNoteId, voiceViews } from '../parts/logic';
   import TopBar from '../parts/TopBar.svelte';
-  import CaptionBar from '../parts/CaptionBar.svelte';
   import Typewriter from '../parts/Typewriter.svelte';
   import ChoiceList from '../parts/ChoiceList.svelte';
   import VoiceList from '../parts/VoiceList.svelte';
@@ -38,8 +37,15 @@
 
   let noteStatus = $state('');
   let voicesNoticeOpen = $state(false);
+  let abortOpen = $state(false);
+  let cancelButton: HTMLButtonElement | null = $state(null);
   let lastPointId = '';
   const noticeKeys = new Set<string>();
+
+  $effect(() => {
+    // 中断の確認は、まず「プレイを続ける」に焦点を置く（誤って中断しないようにする）
+    if (abortOpen) cancelButton?.focus();
+  });
 
   $effect(() => {
     audio.setVolumes({ bgm: $settings.bgmVolume, se: $settings.seVolume, muted: $settings.muted });
@@ -71,6 +77,14 @@
   onMount(() => {
     const handleKey = (event: KeyboardEvent): void => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (abortOpen) {
+        // 確認中は選択肢を選ばせない
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          abortOpen = false;
+        }
+        return;
+      }
       const target = event.target as HTMLElement | null;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA'
         || target.tagName === 'SELECT' || target.isContentEditable)) return;
@@ -128,16 +142,35 @@
     saveProgress(next);
     noteStatus = t('sb.notes.addedAnnounce', { count: next.notes.length });
   }
+
+  /**
+   * 進行は保存したままタイトルへ戻る（行き止まりにしない）。
+   * 保存済みの状態は残すので、タイトルの「続きから」で再開できる。
+   */
+  function abortToTitle(): void {
+    const state = $play;
+    if (state && !state.finished) saveProgress(state);
+    resetCaptions();
+    abortOpen = false;
+    play.set(null);
+    audio.playBgm('title');
+    screen.set('S01');
+  }
 </script>
 
 <section class="main" data-screen="S05Main">
   <h1 class="sr-only">{t('sb.main.title')}</h1>
 
-  {#if $play && $scenario}
-    <TopBar play={$play} scenario={$scenario} />
-  {/if}
-
-  <CaptionBar />
+  <div class="game-bar">
+    <div class="game-bar__actions">
+      <button type="button" class="abort" onclick={() => (abortOpen = true)}>
+        {t('sb.main.abort.button')}
+      </button>
+    </div>
+    {#if $play && $scenario}
+      <TopBar play={$play} scenario={$scenario} />
+    {/if}
+  </div>
 
   <div class="body">
     <div class="primary-col">
@@ -237,6 +270,32 @@
       </section>
     </aside>
   </div>
+
+  {#if abortOpen}
+    <div class="abort-overlay">
+      <div
+        class="abort-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="abort-title"
+        aria-describedby="abort-message"
+      >
+        <h2 id="abort-title">{t('sb.main.abort.heading')}</h2>
+        <p id="abort-message">{t('sb.main.abort.message')}</p>
+        <div class="abort-actions">
+          <button
+            type="button"
+            class="abort-cancel"
+            bind:this={cancelButton}
+            onclick={() => (abortOpen = false)}
+          >{t('sb.main.abort.cancel')}</button>
+          <button type="button" class="abort-confirm" onclick={abortToTitle}>
+            {t('sb.main.abort.confirm')}
+          </button>
+        </div>
+      </div>
+    </div>
+  {/if}
 </section>
 
 <style>
@@ -258,6 +317,81 @@
     display: grid;
     gap: 0.8rem;
     min-width: 0;
+  }
+  .game-bar {
+    display: grid;
+    gap: 0.3rem;
+  }
+  .game-bar__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .abort {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--border, #2a333e);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--muted, #97a2ae);
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .abort:hover {
+    border-color: var(--danger, #e2907f);
+    color: var(--danger, #e2907f);
+  }
+  .abort:focus-visible,
+  .abort-cancel:focus-visible,
+  .abort-confirm:focus-visible {
+    outline: 2px solid var(--focus, #a9d1ff);
+    outline-offset: 2px;
+  }
+  .abort-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.6);
+  }
+  .abort-dialog {
+    width: min(28rem, 100%);
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border, #2a333e);
+    border-radius: 10px;
+    background: var(--panel, #171d25);
+    color: var(--text, #e6eaef);
+  }
+  .abort-dialog h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+  }
+  .abort-dialog p {
+    margin: 0 0 0.9rem;
+    color: var(--muted, #97a2ae);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .abort-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  .abort-cancel,
+  .abort-confirm {
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--border, #2a333e);
+    border-radius: 6px;
+    background: var(--panel-2, #1d2530);
+    color: var(--text, #e6eaef);
+    font: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+  .abort-confirm {
+    border-color: var(--danger, #e2907f);
+    color: var(--danger, #e2907f);
   }
   section.situation,
   section.choices,

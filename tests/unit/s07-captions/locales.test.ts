@@ -13,6 +13,12 @@ const screenSources = import.meta.glob<string>('/src/app/screens/S07Press.svelte
   eager: true,
 }) as Record<string, string>;
 
+const appSources = import.meta.glob<string>('/src/app/App.svelte', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
+
 function flatten(value: unknown, prefix = ''): Record<string, string> {
   const out: Record<string, string> = {};
   if (!value || typeof value !== 'object') return out;
@@ -64,9 +70,10 @@ describe('S07 字幕の文言（screens-c.yaml）', () => {
 });
 
 describe('S07 の字幕の部品', () => {
-  it('S05 と同じ CaptionBar を使う', () => {
-    expect(source).toContain("import CaptionBar from '../parts/CaptionBar.svelte'");
-    expect(source).toContain('<CaptionBar />');
+  it('字幕の表示は共通の親（App）に任せ、画面には置かない', () => {
+    expect(source).not.toContain("import CaptionBar");
+    expect(source).not.toContain('<CaptionBar />');
+    expect(Object.values(appSources)[0] ?? '').toContain('<CaptionBar />');
   });
 
   it('字幕は store の待ち行列へ積む', () => {

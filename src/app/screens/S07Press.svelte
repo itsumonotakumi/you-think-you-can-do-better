@@ -82,7 +82,6 @@
   import { runFxCues } from '../effects';
   import { claimCues } from '../parts/cueMemory';
   import { choiceIndexFromKey, formatClock } from '../parts/logic';
-  import CaptionBar from '../parts/CaptionBar.svelte';
   import '../effects/effects.css';
 
   let busy = $state(false);
@@ -239,8 +238,6 @@
 
 <section class="screen screen--narrow press" data-screen="S07Press">
   <h1 class="sr-only">{t('sc.press.title')}</h1>
-
-  <CaptionBar />
 
   {#if !$play || !$scenario}
     <div class="panel stack">

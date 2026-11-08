@@ -18,13 +18,15 @@
   import { get } from 'svelte/store';
   import { audio } from '../audio';
   import {
-    advanceCaption, captions, cues, enqueueCaptions, errorMessage, play, resetCaptions,
-    screen, settings,
+    advanceCaption, captionHistory, captions, cues, enqueueCaptions, errorMessage, play,
+    resetCaptions, screen, settings,
   } from './store';
   import { runFxCues } from './effects';
   import './effects/effects.css';
   import { claimCaptionCues, claimCues } from './parts/cueMemory';
   import { cueCaptions } from './parts/logic';
+  import { showsCaptions } from './parts/captionScreens';
+  import CaptionBar from './parts/CaptionBar.svelte';
   import { saveProgress } from '../storage';
   import { t } from '../i18n';
   import S01Title from './screens/S01Title.svelte';
@@ -46,6 +48,10 @@
 
   /** 字幕を1件表示しておく時間（ミリ秒） */
   const CAPTION_DISPLAY_MS = 2400;
+
+  // 字幕と履歴は、プレイ中と結果確認の画面でだけ出す（共通の親が1か所で受け持つ）
+  const captionVisible = $derived(showsCaptions($screen));
+  const hasCaptions = $derived($captions.length > 0 || $captionHistory.length > 0);
 
   let systemReduce = $state(false);
   let lastStartedAt = '';
@@ -71,7 +77,9 @@
   });
 
   $effect(() => {
-    // 字幕は待ち行列の先頭から1件ずつ出し、表示し終えたら履歴へ移す
+    // 字幕は待ち行列の先頭から1件ずつ出し、表示し終えたら履歴へ移す。
+    // 出していない画面（タイトルなど）では進めない＝表示していない字幕を消費しない
+    if (!captionVisible) return;
     const head = $captions[0];
     if (!head) return;
     const timer = setTimeout(() => advanceCaption(head.captionId), CAPTION_DISPLAY_MS);
@@ -120,8 +128,18 @@
   </main>
 {:else}
   <svelte:boundary onerror={(error) => toErrorScreen(error)}>
-    <main class="app font-{$settings.fontSize}" class:reduce-motion={$settings.reduceMotion}>
+    <main
+      class="app font-{$settings.fontSize}"
+      class:reduce-motion={$settings.reduceMotion}
+      class:has-captions={captionVisible && hasCaptions}
+    >
       <Current />
+
+      {#if captionVisible && hasCaptions}
+        <div class="caption-host">
+          <CaptionBar />
+        </div>
+      {/if}
     </main>
 
     {#snippet failed(_error, reset)}
@@ -143,3 +161,37 @@
     {/snippet}
   </svelte:boundary>
 {/if}
+
+<style>
+  /* 字幕は画面の下に固定する。どの画面でも同じ位置で読めるようにし、内容を押しのけない */
+  .app.has-captions {
+    padding-bottom: 5.5rem;
+  }
+  .caption-host {
+    position: fixed;
+    inset: auto 0 0.75rem;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    padding: 0 0.75rem;
+    pointer-events: none;
+  }
+  .caption-host :global(.caption-bar) {
+    max-width: 46rem;
+    pointer-events: auto;
+  }
+  @media (max-width: 640px) {
+    .app.has-captions {
+      padding-bottom: 7rem;
+    }
+  }
+  /* エンディングを印刷するときは、画面に固定した字幕を出さない */
+  @media print {
+    .caption-host {
+      display: none;
+    }
+    .app.has-captions {
+      padding-bottom: 0;
+    }
+  }
+</style>

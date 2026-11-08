@@ -1,5 +1,6 @@
 <script lang="ts">
   // 音・出来事の字幕（A05）。ミュートでも何が起きたか分かるようにする。
+  // 表示は App.svelte（共通の親）が行い、どの画面でも同じ部品を使う。
   // 表示待ちは store の captions、表示し終えたものは captionHistory に残す。
   import { t, loc } from '../../i18n';
   import { captionHistory, captions } from '../store';
@@ -32,45 +33,73 @@
   }
 </script>
 
-{#if current}
-  <div class="captions" role="status" aria-live="polite">
-    <p class="caption current">{label(current)}</p>
-  </div>
-{/if}
+<div class="caption-bar" data-caption-bar>
+  {#if current}
+    <div class="captions" role="status" aria-live="polite">
+      <p class="caption current">{label(current)}</p>
+    </div>
+  {/if}
 
-{#if history.length > 0}
-  <ol class="history" aria-live="off">
-    {#each history as caption (caption.captionId)}
-      <li class="caption history-item">{label(caption)}</li>
-    {/each}
-  </ol>
-{/if}
+  {#if history.length > 0}
+    <!-- 履歴は画面をふさがないよう畳んでおく（開けば読める） -->
+    <details class="history-box">
+      <summary class="history-summary">{t('sb.caption.history', { count: history.length })}</summary>
+      <ol class="history" aria-live="off">
+        {#each history as caption (caption.captionId)}
+          <li class="caption history-item">{label(caption)}</li>
+        {/each}
+      </ol>
+    </details>
+  {/if}
+</div>
 
 <style>
+  .caption-bar {
+    display: grid;
+    gap: 0.25rem;
+    width: 100%;
+    min-width: 0;
+  }
   .captions {
     display: grid;
     gap: 0.2rem;
-    margin: 0.4rem 0;
+    margin: 0;
   }
   .caption {
     margin: 0;
     padding: 0.3rem 0.6rem;
-    border-left: 3px solid var(--accent, #d8b26a);
-    background: var(--panel-2, #222731);
-    color: var(--text, #e8e6e1);
+    border-left: 3px solid var(--accent, #7fb2d9);
+    border-radius: 0 6px 6px 0;
+    background: var(--panel-2, #1d2530);
+    color: var(--text, #e6eaef);
     font-size: 0.9rem;
+  }
+  .history-box {
+    padding: 0.15rem 0.35rem 0.3rem;
+    border: 1px solid var(--line, #2a333e);
+    border-radius: 8px;
+    background: var(--panel, #171d25);
+  }
+  .history-summary {
+    color: var(--muted, #97a2ae);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+  .history-summary:focus-visible {
+    outline: 2px solid var(--focus, #a9d1ff);
+    outline-offset: 2px;
   }
   .history {
     display: grid;
     gap: 0.1rem;
-    margin: 0 0 0.4rem;
+    margin: 0.25rem 0 0;
     padding: 0;
     list-style: none;
   }
   .history-item {
-    border-left-color: var(--border, #3a3f4b);
+    border-left-color: var(--line-strong, #3a4654);
     background: none;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted, #97a2ae);
     font-size: 0.75rem;
   }
 </style>

@@ -56,6 +56,12 @@ sb:
     noPoint: "Nothing is happening right now."
     noChoices: "No actions available."
     draftPending: "Draft the statement."
+    abort:
+      button: "Stop and return to title"
+      heading: "Return to the title?"
+      message: "Your progress is saved. You can pick it up again with Continue."
+      confirm: "Return to title"
+      cancel: "Keep playing"
   situation:
     heading: "Situation"
   choices:
@@ -91,6 +97,7 @@ sb:
     notify: "Notification: {media}"
     clock: "Time advanced to {time}"
     delayed: "Delayed impact"
+    history: "Caption history ({count})"
     se:
       notify_sns: "Notification: SNS"
       notify_news: "Notification: news"
