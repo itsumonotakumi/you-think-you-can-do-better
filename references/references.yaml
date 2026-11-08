@@ -147,3 +147,35 @@
   summary: { ja: "退会者や申込み途中の人の本人確認書類も、利用目的に照らして不要になったら消去を検討する。保存する場合も安全管理措置と本人への説明が必要", en: "Identity documents of former and prospective members must also be deleted when no longer needed, with security measures and clear explanation" }
   checkedAt: "2026-11-08"
   legalPack: "jp"
+- id: no06-government-advisory
+  title: { ja: "国家の関与が疑われるIT人材の採用等に係る注意喚起", en: "Advisory on hiring IT personnel suspected of state involvement" }
+  issuer: { ja: "政府（内閣官房・内閣サイバーセキュリティセンターほか）", en: "Cabinet Secretariat, NISC et al." }
+  version: "2025"
+  section: { ja: "リモート採用における本人確認、貸与端末の送付先の確認、発覚後の対応", en: "Identity checks in remote hiring, device shipping address, response after detection" }
+  summary: { ja: "遠隔の面接だけでは本人確認が弱い。対面や複数の手段で本人を確かめ、端末の送付先と連絡手段を確認する", en: "Remote interviews alone are weak verification; confirm identity, device address and contact channels" }
+  checkedAt: 2026-11-08
+  legalPack: jp
+- id: no06-economic-security
+  title: { ja: "経済安全保障推進法（基幹インフラ役務の安定的な提供の確保）", en: "Economic Security Promotion Act" }
+  issuer: { ja: "内閣府", en: "Cabinet Office" }
+  version: "2022"
+  section: { ja: "重要設備の導入時の事前届出、供給網のリスク管理", en: "Prior notification for critical equipment, supply chain risk management" }
+  summary: { ja: "重要インフラ事業者は、調達先や委託先を含む供給網のリスクを把握し、所管官庁と情報を共有する", en: "Critical infrastructure operators assess supply chain risk and share information with authorities" }
+  checkedAt: 2026-11-08
+  legalPack: jp
+- id: no06-ipa-10threats
+  title: { ja: "情報セキュリティ10大脅威", en: "Top 10 Information Security Threats" }
+  issuer: { ja: "IPA（情報処理推進機構）", en: "IPA" }
+  version: "2025"
+  section: { ja: "サプライチェーンや委託先を狙った攻撃、内部不正", en: "Supply chain attacks and insider threats" }
+  summary: { ja: "自社だけでなく、委託先や採用の経路も攻撃の入口になる", en: "Suppliers and hiring channels are also entry points" }
+  checkedAt: 2026-11-08
+  legalPack: jp
+- id: no06-telework-guideline
+  title: { ja: "テレワークの適切な導入及び実施の推進のためのガイドライン", en: "Guidelines for appropriate telework implementation" }
+  issuer: { ja: "厚生労働省", en: "Ministry of Health, Labour and Welfare" }
+  version: "2021"
+  section: { ja: "テレワーク時の情報管理、労働者の健康と安全", en: "Information management and worker health in telework" }
+  summary: { ja: "遠隔勤務の情報管理と、働く人の健康への配慮を両立させる", en: "Balance information control and worker well-being in remote work" }
+  checkedAt: 2026-11-08
+  legalPack: jp
