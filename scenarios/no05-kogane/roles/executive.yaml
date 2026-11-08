@@ -1,7 +1,7 @@
 # No.5 コガネ酒造HD / 経営者ロール
 # 判断ポイント17、細目は choices[].items と drafts の合計で80以上。
 estimateMinutes: 30
-intro: { ja: 'あなたはコガネ酒造ホールディングスの代表取締役社長。月曜の朝7時30分、受注・出荷システムとコールセンターが止まったという電話が入る。年末商戦を前に、あなたの判断が始まる。', en: '' }
+intro: { ja: 'あなたはコガネ酒造ホールディングスの代表取締役社長。朝7時30分、受注・出荷システムとコールセンターが止まったという電話が入る。年末商戦を前に、あなたの判断が始まる。', en: '' }
 pressEnabled: true
 cowardVoices:
   '2': v-coward-2
@@ -36,7 +36,7 @@ points:
     at: { day: 0, minutes: 450 }
     phase: detect
     sound: { se: [phone_ring] }
-    text: { ja: '月曜の朝7時30分。情報システム部長から電話が入る。「受注・出荷システムとコールセンターが止まりました。サーバーに身代金を求める文書があります」。工場は動いているが、出荷の指示が出せない。', en: '' }
+    text: { ja: '朝7時30分。情報システム部長から電話が入る。「受注・出荷システムとコールセンターが止まりました。サーバーに身代金を求める文書があります」。工場は動いているが、出荷の指示が出せない。', en: '' }
     voices: [v01-boss, v01-expert, v01-ok]
     notable:
       - { id: note-first-call, text: { ja: '7時30分、受注・出荷システムとコールセンターが停止。サーバーに身代金要求文。', en: '' } }
@@ -95,7 +95,7 @@ points:
     at: { day: 0, minutes: 540 }
     phase: contain
     sound: { se: [mail_arrive] }
-    text: { ja: '午前9時。攻撃者からの要求文。金銭の支払いと引き換えに復号鍵を渡す、応じなければ持ち出したデータを公開する、と書かれている。警備からは「これは犯罪です」と言われた。', en: '' }
+    text: { ja: '午前9時。攻撃者からの要求文。金銭の支払いと引き換えに復号鍵を渡す、応じなければ持ち出したデータを公開する、と書かれている。法務からは「これは犯罪です」と言われた。', en: '' }
     voices: [v02-public, v02-attacker, v02-bold, v02-ok]
     notable:
       - { id: note-ransom, text: { ja: '身代金の要求文。支払わなければデータを公開すると書かれている。', en: '' } }
@@ -325,21 +325,21 @@ points:
     at: { day: 1, minutes: 540 }
     phase: organize
     sound: { se: [phone_ring] }
-    text: { ja: '火曜の朝9時。警察への相談、保険会社への連絡、外部の調査会社の手配。どれも必要だが、順番を決めなければ動かない。', en: '' }
+    text: { ja: '翌朝9時。保険会社への連絡、外部の調査会社の契約、弁護士の手配。警察には相談済みだが、捜査への協力範囲も決めなければならない。', en: '' }
     voices: [v06-vendor, v06-expert, v06-ok]
     choices:
       - id: p06-vendor
-        text: { ja: '調査を一社に任せ、警察への相談は結果が出てからにする。', en: '' }
+        text: { ja: '調査会社に一任し、保険会社と弁護士への連絡は後回しにする。', en: '' }
         minutes: 60
         category: hurt
         points: -80
-        refs: [npa-consult]
+        refs: [meti-csm-guideline]
         gauges: { trust: -10 }
         items:
-          - { id: p06-a-order, points: -10, axis: order, refs: [npa-consult] }
+          - { id: p06-a-order, points: -10, axis: order, refs: [meti-csm-guideline] }
           - { id: p06-a-content, points: -8, axis: content, refs: [meti-csm-guideline] }
       - id: p06-order
-        text: { ja: '警察、保険会社、調査会社の順に連絡し、対応の記録を残す。', en: '' }
+        text: { ja: '保険会社の窓口、警察の相談窓口、調査会社、弁護士の順に連絡し、対応の記録を残す。', en: '' }
         minutes: 90
         category: maintain
         points: 30
@@ -351,7 +351,7 @@ points:
           - { id: p06-b-record, points: 5, axis: record, refs: [jpcert-handling] }
           - { id: p06-b-time, points: 5, axis: time, refs: [jpcert-handling] }
       - id: p06-order-plan
-        text: { ja: '連絡の順を決めて記録し、あわせて証拠保全の手順を調査会社と文書で合意する。', en: '' }
+        text: { ja: '保険会社、警察、調査会社、弁護士の順に連絡して記録し、証拠保全の手順を調査会社と文書で合意する。', en: '' }
         minutes: 150
         category: recover
         points: 90
@@ -380,11 +380,11 @@ points:
     at: { day: 2, minutes: 600 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '水曜の午前10時。調査会社の報告。侵入口はリモート接続用のVPN機器。バックアップの一部も暗号化されている可能性がある。', en: '' }
+    text: { ja: '二日後の午前10時。調査会社の報告。侵入口は遠隔接続機器で、保守の機会がないまま古い設定が残っていた。バックアップの一部も暗号化されている可能性がある。', en: '' }
     voices: [v07-insider, v07-past, v07-ok]
     notable:
       - { id: note-backup, text: { ja: 'バックアップは三世代のうち二つが暗号化。一つは健全な可能性がある。', en: '' } }
-      - { id: note-vpn, text: { ja: '侵入口はリモート接続用のVPN機器。', en: '' } }
+      - { id: note-vpn, text: { ja: '侵入口は遠隔接続機器で、古い設定が残っていた。', en: '' } }
     choices:
       - id: p07-narrow
         text: { ja: '公表済みの範囲だけを調べ、バックアップの確認は後回しにする。', en: '' }
@@ -422,7 +422,7 @@ points:
           - { id: p07-c-record, points: 8, axis: record, refs: [jpcert-handling] }
           - { id: p07-c-care, points: 8, axis: care, refs: [meti-csm-guideline] }
       - id: p07-rebuild
-        text: { ja: 'バックアップは使わず、すべて新しく作り直す。', en: '' }
+        text: { ja: 'バックアップの確認も調査も打ち切り、ゼロから作り直す。', en: '' }
         minutes: 240
         category: hurt
         points: -120
@@ -437,7 +437,7 @@ points:
     at: { day: 2, minutes: 900 }
     phase: notify
     sound: { se: [typing] }
-    text: { ja: '午後3時。広報が「今夜、第1報を出せます」と言う。被害の全容は分かっていない。年末商戦の取引先は、まだ何も知らない。', en: '' }
+    text: { ja: '午後3時。初日に出した短い告知のあと、まとまった説明はまだ出せていない。広報は「今夜、第1報として詳しい文書を出せます」と言う。取引先には停止の事実しか伝わっていない。', en: '' }
     voices: [v08-coward, v08-popular, v08-flattery, v08-ok]
     popular: { choiceId: p08-wait, percent: 58 }
     choices:
@@ -483,7 +483,7 @@ points:
     at: { day: 2, minutes: 960 }
     phase: notify
     sound: { se: [phone_ring] }
-    text: { ja: '午後4時。法務から「個人情報保護委員会への速報を、いつ出すか」と聞かれた。持ち出された可能性のある顧客名簿の件数は、まだ確定していない。', en: '' }
+    text: { ja: '午後4時。法務から「個人情報保護委員会への速報を、いつ出すか」と聞かれた。持ち出された可能性のある取引先と通販会員の名簿の件数は、まだ確定していない。', en: '' }
     voices: [v09-law, v09-boss, v09-ok]
     choices:
       - id: p09-wait
@@ -525,7 +525,7 @@ points:
     at: { day: 3, minutes: 660 }
     phase: notify
     sound: { se: [phone_ring, notify_news] }
-    text: { ja: '木曜の午前11時。酒店、飲食店、量販店の取引先から「いつ戻るのか」と問い合わせが来ている。営業は、報道より先に説明したいと言う。', en: '' }
+    text: { ja: '三日後の午前11時。酒店、飲食店、量販店の取引先から「いつ戻るのか」と問い合わせが来ている。営業は、報道より先に説明したいと言う。', en: '' }
     voices: [v10-public, v10-vendor, v10-ok]
     choices:
       - id: p10-optimistic
@@ -580,23 +580,24 @@ points:
     at: { day: 4, minutes: 600 }
     phase: notify
     sound: { se: [notify_sns] }
-    text: { ja: '金曜の午前10時。来月発売の新商品の準備が進んでいる。発表は来週。販売会社は「予定どおり発表したい」と言う。', en: '' }
+    text: { ja: '四日後の午前10時。周年記念キャンペーンの準備が進んでいる。告知は来週。販売会社は「予定どおり告知したい」と言う。', en: '' }
     voices: [v11-flattery, v11-bold, v11-ok]
     choices:
       - id: p11-ontime
-        text: { ja: '予定どおり発表し、被害の説明とは切り離す。', en: '' }
+        text: { ja: '予定どおり告知し、被害の説明とは切り離す。', en: '' }
         minutes: 60
         category: hurt
         points: -60
         refs: [meti-disclosure-guidance]
         gauges: { flame: 10, trust: -5 }
+        setFlags: { launchOnTime: true }
         delayed:
-          - { afterPhases: 1, points: -30, gauges: { flame: 10 }, reason: { ja: '被害の説明の最中に新商品の発表が流れ、批判が重なった。', en: '' } }
+          - { afterPhases: 1, points: -30, gauges: { flame: 10 }, reason: { ja: '被害の説明の最中にキャンペーンの告知が流れ、批判が重なった。', en: '' } }
         items:
           - { id: p11-a-order, points: -10, axis: order, refs: [meti-disclosure-guidance] }
           - { id: p11-a-care, points: -8, axis: care, refs: [meti-disclosure-guidance] }
       - id: p11-postpone
-        text: { ja: '発売を一か月延期し、理由を取引先に説明する。', en: '' }
+        text: { ja: 'キャンペーンを一か月延期し、理由を取引先に説明する。', en: '' }
         minutes: 90
         category: maintain
         points: 25
@@ -621,7 +622,7 @@ points:
           - { id: p11-c-content, points: 5, axis: content, refs: [meti-disclosure-guidance] }
           - { id: p11-c-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
       - id: p11-sell
-        text: { ja: '「困難を乗り越えた会社の新商品」として、復旧と合わせて売り出す。', en: '' }
+        text: { ja: '「困難を乗り越えた会社の周年事業」として、復旧と合わせて売り出す。', en: '' }
         minutes: 120
         category: hurt
         points: -80
@@ -635,7 +636,7 @@ points:
     at: { day: 6, minutes: 600 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '日曜の午前10時。復旧の方法を決める。身代金は払わないと決めた。健全なバックアップから戻すか、システムを作り直すか。全面復旧には時間がかかる。', en: '' }
+    text: { ja: '六日後の午前10時。復旧の方法を決める。身代金は払わないと決めた。健全なバックアップから戻すか、システムを作り直すか。全面復旧には時間がかかる。', en: '' }
     voices: [v12-coward, v12-vendor, v12-ok]
     choices:
       - id: p12-rush
@@ -677,10 +678,10 @@ points:
           - { id: p12-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
           - { id: p12-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
       - id: p12-rebuild
-        text: { ja: 'すべて新しく作り直す。復旧は二か月後になる。', en: '' }
+        text: { ja: '作り直す。ただし二か月間の受注停止と、その間の取引先対応は決めない。', en: '' }
         minutes: 120
         category: hurt
-        points: -80
+        points: -50
         refs: [nist-sp800-61r3]
         gauges: { trust: -10, stamina: -10 }
         items:
@@ -691,7 +692,7 @@ points:
     at: { day: 8, minutes: 600 }
     phase: recover
     sound: { se: [notify_sns] }
-    text: { ja: '火曜。受注系が一部戻った。年末商戦の受注が集中する時期で、営業は「全商品で受けたい」と言う。監視はまだ通常に戻っていない。', en: '' }
+    text: { ja: '八日後。受注系が一部戻った。年末商戦の受注が集中する時期で、営業は「全商品で受けたい」と言う。監視はまだ通常に戻っていない。', en: '' }
     voices: [v13-public, v13-coward, v13-ok]
     popular: { choiceId: p13-all, percent: 46 }
     choices:
@@ -749,7 +750,7 @@ points:
     at: { day: 10, minutes: 600 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '木曜。コールセンターの再開のめどが立った。現場は三週連続の対応で疲れている。問い合わせ窓口には、返品と補償の電話が集中している。', en: '' }
+    text: { ja: '十日後。コールセンターの再開のめどが立った。現場は二週目に入った対応で疲れている。問い合わせ窓口には、返品と補償の電話が集中している。', en: '' }
     voices: [v14-flattery, v14-public, v14-ok]
     choices:
       - id: p14-allnight
@@ -803,7 +804,7 @@ points:
     at: { day: 14, minutes: 600 }
     phase: after
     sound: { se: [phone_ring] }
-    text: { ja: '二週間後。決算発表が近い。業績見通しに、今回の停止の影響をどう織り込むか。CFOは「数字が読めない」と言う。', en: '' }
+    text: { ja: '二週間後。主要取引先向けの業績説明会が近い。業績見通しに、今回の停止の影響をどう織り込むか。CFOは「数字が読めない」と言う。', en: '' }
     voices: [v15-law, v15-flattery, v15-ok]
     choices:
       - id: p15-hide
@@ -811,7 +812,7 @@ points:
         minutes: 60
         category: fatal
         points: -250
-        refs: [meti-disclosure-guidance]
+        refs: [meti-disclosure-guidance, no02-timely-disclosure]
         gauges: { flame: 25, trust: -25 }
         setFlags: { falseDisclosure: true }
         delayed:
@@ -846,13 +847,13 @@ points:
           - { id: p15-c-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
 
   - id: p16-final-report
-    at: { day: 24, minutes: 600 }
+    at: { day: 21, minutes: 600 }
     phase: after
     sound: { se: [notify_news] }
-    text: { ja: '三週間後。第三者委員会の調査報告書が完成した。公開範囲を決める。事前の点検で、VPN機器の更新が二年間先送りされていたことも書かれている。', en: '' }
+    text: { ja: '三週間後。調査会社の報告書と、設置した場合は第三者委員会の報告書が完成した。公開範囲を決める。事前の点検で、保守用の遠隔接続機器に見直しの機会がないまま古い設定が残っていたことも書かれている。', en: '' }
     voices: [v16-expert, v16-law, v16-ok]
     notable:
-      - { id: note-precheck, text: { ja: 'VPN機器の更新は二年間先送りされていた。', en: '' } }
+      - { id: note-precheck, text: { ja: '保守用の遠隔接続機器に、見直しの機会がないまま古い設定が残っていた。', en: '' } }
     choices:
       - id: p16-hide
         text: { ja: '報告書は公開しない。攻撃者に利用されるおそれがある。', en: '' }
@@ -960,7 +961,7 @@ drafts:
       - id: leaked
         label: { ja: '漏れた可能性のある項目', en: '' }
         options:
-          - { id: fd-l-specific, text: { ja: '取引先名、担当者名、連絡先、注文履歴を具体的に列挙する', en: '' }, points: 10, axis: content, refs: [ppc-report-prelim] }
+          - { id: fd-l-specific, text: { ja: '取引先の担当者氏名・連絡先・注文履歴と、通販会員の氏名・住所・電話番号を具体的に列挙する', en: '' }, points: 10, axis: content, refs: [ppc-report-prelim] }
           - { id: fd-l-vague, text: { ja: '「顧客情報の一部」とぼかす', en: '' }, points: -10, axis: content, refs: [ppc-report-prelim] }
       - id: action
         label: { ja: '取引先が今すぐすること', en: '' }
@@ -1017,10 +1018,10 @@ drafts:
           - { id: fr-c-cause, text: { ja: '原因と判断の誤りを具体的に書く', en: '' }, points: 10, axis: content, refs: [nist-sp800-61r3] }
           - { id: fr-c-vague, text: { ja: '「外部からの攻撃」とだけ書く', en: '' }, points: -10, axis: content, refs: [nist-sp800-61r3] }
       - id: warning
-        label: { ja: '事前点検の先送り', en: '' }
+        label: { ja: '遠隔接続の点検', en: '' }
         options:
-          - { id: fr-w-include, text: { ja: '機器の更新を二年間先送りした経緯を書く', en: '' }, points: 10, axis: content, refs: [meti-csm-guideline] }
-          - { id: fr-w-omit, text: { ja: '先送りに触れない', en: '' }, points: -15, axis: content, refs: [meti-csm-guideline] }
+          - { id: fr-w-include, text: { ja: '遠隔接続機器の点検の機会がなかった経緯を書く', en: '' }, points: 10, axis: content, refs: [meti-csm-guideline] }
+          - { id: fr-w-omit, text: { ja: '古い設定が残っていたことに触れない', en: '' }, points: -15, axis: content, refs: [meti-csm-guideline] }
       - id: measures
         label: { ja: '再発防止策', en: '' }
         options:
@@ -1053,7 +1054,7 @@ drafts:
           - { id: fr-ad-use, text: { ja: '復旧を宣伝に使う', en: '' }, points: -15, axis: care, refs: [meti-disclosure-guidance] }
 voices:
   - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '朝の定例会議で報告を受けてから動こう。まず状況を整理しろ。', en: '' }, trigger: { at: point } }
-  - { id: v01-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'サーバーは全部止めて電源を抜くのが基本です。証拠も何も要りません。', en: '' }, trigger: { at: point } }
+  - { id: v01-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'まず全台の電源を落として広がりを止めるのが定石です。ログは後からバックアップで復元できます。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: '情報システム部長「身代金の要求文があります。これは犯罪です」。', en: '' }, trigger: { at: point } }
   - { id: v01-after, media: news, misleading: false, text: { ja: 'まだ何も分かっていないのに、取引先に先に伝えるのか。', en: '' }, trigger: { at: after, choice: p01-command-plan } }
   - { id: v02-public, media: sns, misleading: true, type: public-opinion, text: { ja: '身代金を払ってさっさと戻せ。年末商戦が終わるぞ。', en: '' }, trigger: { at: point } }
@@ -1076,8 +1077,8 @@ voices:
   - { id: v05-ok, media: chat, misleading: false, text: { ja: 'グループ会社社長「判断は親会社に合わせます。現場への指示は一本にしてほしい」。', en: '' }, trigger: { at: point } }
   - { id: v05-after, media: news, misleading: false, text: { ja: '文書を作っている間に、現場は待っている。', en: '' }, trigger: { at: after, choice: p05-unify-doc } }
   - { id: v06-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '調査は弊社に一任してください。他社が入ると話がこじれます。', en: '' }, trigger: { at: point } }
-  - { id: v06-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'サーバーは全部初期化すれば済みます。証拠は要りません。', en: '' }, trigger: { at: point } }
-  - { id: v06-ok, media: chat, misleading: false, text: { ja: '法務「警察と保険に先に連絡しましょう。調査会社はその後に」。', en: '' }, trigger: { at: point } }
+  - { id: v06-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '隔離済みのサーバーは初期化して再構築するのが最短です。調査はイメージがなくてもログで十分追えます。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '法務「保険の窓口に先に連絡すると、調査会社の費用の扱いが決まります」。', en: '' }, trigger: { at: point } }
   - { id: v06-after, media: vendor, misleading: false, text: { ja: '警察に話すと、調査の自由がなくなるのでは。', en: '' }, trigger: { at: after, choice: p06-order-plan } }
   - { id: v07-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、本当は十倍の顧客データが漏れてる。今すぐ全部公表しろ。', en: '' }, trigger: { at: point } }
   - { id: v07-past, media: boss, misleading: true, type: past-success, text: { ja: '前回の障害は範囲を絞って収まった。今回も同じでいい。', en: '' }, trigger: { at: point } }
@@ -1092,15 +1093,15 @@ voices:
   - { id: v09-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が確定するまで外には出すな。', en: '' }, trigger: { at: point } }
   - { id: v09-ok, media: chat, misleading: false, text: { ja: '法務「不正の目的のおそれがあれば、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
   - { id: v10-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'とにかく早く戻せ。説明は後でいい。', en: '' }, trigger: { at: point } }
-  - { id: v10-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '再開の見通しは多めに言っておきましょう。数字は後で直せます。', en: '' }, trigger: { at: point } }
+  - { id: v10-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '見通しは最短の日程で伝えましょう。遅れた場合は進捗報告で補えます。', en: '' }, trigger: { at: point } }
   - { id: v10-ok, media: chat, misleading: false, text: { ja: '営業本部長「戻る見通しと、戻らない場合の代替をセットで伝えたい」。', en: '' }, trigger: { at: point } }
   - { id: v10-after, media: news, misleading: false, text: { ja: '代替を用意するとは、戻れない前提か。', en: '' }, trigger: { at: after, choice: p10-honest-alt } }
-  - { id: v11-flattery, media: chat, misleading: true, type: flattery, text: { ja: 'この混乱を吹き飛ばす新商品です。発表すれば話題になります。', en: '' }, trigger: { at: point } }
-  - { id: v11-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '被害の話より新商品の話をしましょう。世論はすぐ忘れます。', en: '' }, trigger: { at: point } }
+  - { id: v11-flattery, media: chat, misleading: true, type: flattery, text: { ja: 'この混乱を吹き飛ばす周年キャンペーンです。告知すれば話題になります。', en: '' }, trigger: { at: point } }
+  - { id: v11-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '被害の話よりキャンペーンの話をしましょう。世論はすぐ忘れます。', en: '' }, trigger: { at: point } }
   - { id: v11-ok, media: chat, misleading: false, text: { ja: '広報「延期するなら、取引先と工場に早く伝える必要があります」。', en: '' }, trigger: { at: point } }
-  - { id: v11-after, media: sns, misleading: false, text: { ja: '発売を延期して、会社は大丈夫なのか。', en: '' }, trigger: { at: after, choice: p11-postpone-plan } }
-  - { id: v12-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '二週間も止めるのは臆病すぎる。他社ならもう再開している。', en: '' }, trigger: { at: point } }
-  - { id: v12-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '弊社の復旧サービスなら三日で戻せます。検証は省略しましょう。', en: '' }, trigger: { at: point } }
+  - { id: v11-after, media: sns, misleading: false, text: { ja: 'キャンペーンを延期して、会社は大丈夫なのか。', en: '' }, trigger: { at: after, choice: p11-postpone-plan } }
+  - { id: v12-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '一週間も止めるのは臆病すぎる。他社ならもう再開している。', en: '' }, trigger: { at: point } }
+  - { id: v12-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '弊社の復旧サービスなら三日で戻せます。検証は再開後に並行してやれば間に合います。', en: '' }, trigger: { at: point } }
   - { id: v12-ok, media: chat, misleading: false, text: { ja: '技術責任者「クリーンな環境から、段階的に戻すのが安全です」。', en: '' }, trigger: { at: point } }
   - { id: v12-after, media: sns, misleading: false, text: { ja: '再開が遅い。他社はもう動いている。', en: '' }, trigger: { at: after, choice: p12-step-verify } }
   - { id: v13-public, media: sns, misleading: true, type: public-opinion, text: { ja: '年末商戦を逃したら、会社がもたない。全部受けろ。', en: '' }, trigger: { at: point } }
@@ -1111,7 +1112,7 @@ voices:
   - { id: v14-public, media: sns, misleading: true, type: public-opinion, text: { ja: '経営者が休んでいる場合か。早く戻せ。', en: '' }, trigger: { at: point } }
   - { id: v14-ok, media: chat, misleading: false, text: { ja: '人事部長「交代を入れてください。このままだと確認漏れが出ます」。', en: '' }, trigger: { at: point } }
   - { id: v14-after, media: sns, misleading: false, text: { ja: '社長が休んでいる間に、注文は他社に流れる。', en: '' }, trigger: { at: after, choice: p14-shift-care } }
-  - { id: v15-law, media: board, misleading: true, type: law-ish, text: { ja: '見通しは良く見せておいて、後で下方修正すればいい。', en: '' }, trigger: { at: point } }
+  - { id: v15-law, media: board, misleading: true, type: law-ish, text: { ja: '業績予想は現時点の合理的な見積もりで出すのが通例です。修正は後から可能です。', en: '' }, trigger: { at: point } }
   - { id: v15-flattery, media: chat, misleading: true, type: flattery, text: { ja: '社長の説明なら、多少の数字のずれは許されます。', en: '' }, trigger: { at: point } }
   - { id: v15-ok, media: chat, misleading: false, text: { ja: 'CFO「影響の幅を正直に出して、前提を添えましょう」。', en: '' }, trigger: { at: point } }
   - { id: v15-after, media: news, misleading: false, text: { ja: '下方修正の可能性を書くなんて、自信がない証拠だ。', en: '' }, trigger: { at: after, choice: p15-honest-plan } }

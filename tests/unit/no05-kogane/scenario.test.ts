@@ -27,7 +27,7 @@ const scenario: Scenario = { ...base, roles: { executive: role } };
 
 // references.yaml は共有ファイルで、素朴な YAML パーサが読み違える行があるため id だけを拾う。
 const refIds = new Set(
-  [...referencesYaml.matchAll(/^\s*- id: (\S+)/gm)].map((m) => m[1] as string),
+  [...referencesYaml.matchAll(/^\s*- id: "?([^"\s]+)"?/gm)].map((m) => m[1] as string),
 );
 
 const choiceItems = role.points.flatMap((p) => p.choices.flatMap((c) => c.items ?? []));
@@ -196,6 +196,21 @@ describe('scenario no05-kogane', () => {
       expect(text.en, 'v1 は英語本文を持たない').toBe('');
       expect(text.ja).not.toMatch(/<[^>]+>|\{@html\}/);
     }
+  });
+
+  it('事実と違う回答が高得点にならないよう、会見の回答に条件が付いている', () => {
+    const press = scenario.press;
+    expect(press).toBeTruthy();
+    const qRansom = press?.questions.find((q) => q.id === 'q-ransom');
+    expect(qRansom).toBeTruthy();
+    const police = qRansom?.answers.find((a) => a.id === 'a-ransom-police');
+    const paid = qRansom?.answers.find((a) => a.id === 'a-ransom-paid');
+    expect(police?.when).toEqual({ flags: { refusedRansom: true } });
+    expect(paid?.when).toEqual({ flags: { paidRansom: true } });
+    // 条件なしで選べる回答は必ず残す
+    expect(qRansom?.answers.some((a) => !a.when && !a.requiresNote)).toBe(true);
+    const pay = role.points.flatMap((p) => p.choices).find((c) => c.id === 'p02-pay');
+    expect(pay?.setFlags?.paidRansom).toBe(true);
   });
 
   it('禁止リストの実在社名・サービス名を含まない', () => {
