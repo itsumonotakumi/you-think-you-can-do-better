@@ -215,7 +215,7 @@ points:
     at: { day: 1, minutes: 480 }
     phase: organize
     sound: { se: [notify_chat] }
-    text: { ja: '午前8時。対策本部の机が並んだ。情報システムは二人しかおらず、一人は育休中だ。誰が指揮を執り、誰が記録し、誰が取引先と連絡するか。まだ決めていない。', en: '' }
+    text: { ja: '午前8時。対策本部の机が並んだ。情報システムは三人いて、一人は育休中だ。動けるのは二人しかいない。誰が指揮を執り、誰が記録し、誰が取引先と連絡するか。まだ決めていない。', en: '' }
     voices: [v04-flattery, v04-public, v04-ok]
     choices:
       - id: p04-solo
@@ -262,7 +262,7 @@ points:
           - { id: p04-d-record, points: -10, axis: record, refs: [jpcert-handling] }
           - { id: p04-d-order, points: -8, axis: order, refs: [cissp-cbk-secops] }
   - id: p05-dfir
-    at: { day: 1, minutes: 750 }
+    at: { day: 1, minutes: 720 }
     phase: organize
     sound: { se: [notify_news] }
     text: { ja: '正午。取引先の工場がラインを止めた。調査は社内だけでは回らない。外部の調査会社と保険会社の窓口から、見積もりの話が来ている。', en: '' }
@@ -1242,7 +1242,7 @@ voices:
   - { id: v09-ok, media: chat, misleading: false, text: { ja: '総務「記入した担当者は育休中ですが、連絡は取れます」。', en: '' }, trigger: { at: point } }
   - { id: v10-law, media: board, misleading: true, type: law-ish, text: { ja: '件数が確定していないなら、速報は出さないほうがいい。訂正のほうが危ない。', en: '' }, trigger: { at: point } }
   - { id: v10-cfo, media: boss, misleading: true, type: boss-pressure, text: { ja: '取引先担当者の名簿まで書くと、取引先との関係が悪くなる。範囲を狭くしてくれ。', en: '' }, trigger: { at: point } }
-  - { id: v10-ok, media: chat, misleading: false, text: { ja: '法務「不正アクセスのおそれがあれば、件数に関係なく報告対象です」。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '法務「報告対象は、要配慮個人情報、財産的被害のおそれ、不正の目的のおそれ、千人超のいずれかです。今回は不正の目的のおそれがあるので、件数に関係なく報告対象です」。', en: '' }, trigger: { at: point } }
   - { id: v11-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '攻撃とは書かず、システム障害で通せ。話が大きくなる。', en: '' }, trigger: { at: point } }
   - { id: v11-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'まだ全容が分かっていないのに公表するのか。余計な混乱を招く。', en: '' }, trigger: { at: point } }
   - { id: v11-ok, media: chat, misleading: false, text: { ja: '広報「発表の技術部分は、あなたのファクトシートだけを使います」。', en: '' }, trigger: { at: point } }

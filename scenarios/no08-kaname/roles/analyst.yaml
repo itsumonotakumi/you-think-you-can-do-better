@@ -95,7 +95,7 @@ points:
           - { id: a01-d-order, points: -3, axis: order, refs: [meti-csm-guideline] }
 
   - id: a02-ransom
-    at: { day: 0, minutes: 1320 }
+    at: { day: 0, minutes: 1305 }
     phase: contain
     sound: { se: [mail_arrive] }
     text: { ja: '午後9時45分。暗号化されたサーバーのデスクトップに、身代金を要求する文書が置かれていた。添付には、取引先に納入している図面の一部らしき画像がある。あなたの業務用メールにも、同じ文面が届いている。', en: '' }
@@ -153,7 +153,7 @@ points:
           - { id: a02-d-record, points: -6, axis: record, refs: [jpcert-handling] }
 
   - id: a03-evidence
-    at: { day: 0, minutes: 1365 }
+    at: { day: 0, minutes: 1335 }
     phase: contain
     sound: { se: [notify_chat] }
     text: { ja: '午後10時15分。現場から「再起動していいか」とチャットが来た。暗号化の前に動いていた不審なプログラムの痕跡は、メモリ上にしか残っていない可能性がある。', en: '' }
@@ -380,7 +380,7 @@ points:
     at: { day: 2, minutes: 540 }
     phase: investigate
     sound: { se: [typing] }
-    text: { ja: '日曜の午前9時。調査を始めた。侵入は三週間前とみられるが、ログの保存期間は30日で、それ以前の記録は残っていない。バックアップのログも一部だけだ。', en: '' }
+    text: { ja: '月曜の午前9時。調査を始めた。侵入は三週間前とみられるが、ログの保存期間は30日で、それ以前の記録は残っていない。バックアップのログも一部だけだ。', en: '' }
     voices: [v07-expert, v07-insider, v07-ok]
     notable:
       - { id: note-scope, text: { ja: '侵入は三週間前。ログの保存期間は30日で、古い記録は復元が必要。', en: '' } }
@@ -548,7 +548,7 @@ points:
     at: { day: 3, minutes: 540 }
     phase: investigate
     sound: { se: [notify_news] }
-    text: { ja: '月曜の午前9時。攻撃者のリークサイトに、少量のサンプルらしきデータが掲載された。掲示板には「中の人だけど、本当は十倍漏れている」という書き込みがある。', en: '' }
+    text: { ja: '火曜の午前9時。攻撃者のリークサイトに、少量のサンプルらしきデータが掲載された。掲示板には「中の人だけど、本当は十倍漏れている」という書き込みがある。', en: '' }
     voices: [v10-insider, v10-popular, v10-ok]
     notable:
       - { id: note-leak, text: { ja: 'リークサイトに少量のサンプルが掲載。掲示板に未確認の書き込み。', en: '' } }
@@ -717,7 +717,7 @@ points:
     at: { day: 4, minutes: 540 }
     phase: organize
     sound: { se: [notify_chat] }
-    text: { ja: '火曜の午前9時。対策本部は三日連続の徹夜。同僚は育休中で、情報システムは自分と課長の二人だけ。あなたはログの見落としを二度している。', en: '' }
+    text: { ja: '水曜の午前9時。対策本部は三日連続の徹夜。同僚は育休中で、動けるのは自分と課長の二人だけ。あなたはログの見落としを二度している。', en: '' }
     voices: [v13-flattery, v13-public, v13-ok]
     choices:
       - id: a13-solo
@@ -772,7 +772,7 @@ points:
     at: { day: 7, minutes: 600 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '金曜の午前10時。復旧の準備。バックアップから戻す前に、侵害に使われた認証情報と同じものが、別のシステムにも残っていないか確認する必要がある。', en: '' }
+    text: { ja: '土曜の午前10時。復旧の準備。バックアップから戻す前に、侵害に使われた認証情報と同じものが、別のシステムにも残っていないか確認する必要がある。', en: '' }
     voices: [v14-coward, v14-past, v14-vendor, v14-ok]
     choices:
       - id: a14-restore
@@ -826,7 +826,7 @@ points:
     at: { day: 8, minutes: 600 }
     phase: recover
     sound: { se: [phone_ring] }
-    text: { ja: '土曜の午前10時。取引先とのVPNを再接続する準備。接続点の設定は、こちらと取引先の両方にある。相手側の更新状況を確認しないまま、つなぐことはできる。', en: '' }
+    text: { ja: '日曜の午前10時。取引先とのVPNを再接続する準備。接続点の設定は、こちらと取引先の両方にある。相手側の更新状況を確認しないまま、つなぐことはできる。', en: '' }
     voices: [v15-boss, v15-public, v15-ok]
     choices:
       - id: a15-quick
@@ -879,7 +879,7 @@ points:
     at: { day: 9, minutes: 900 }
     phase: recover
     sound: { se: [phone_ring] }
-    text: { ja: '日曜の午後3時。取引先から「うちも同じVPN機器を使っている。点検を手伝ってほしい」と連絡が来た。社内には「余計なことをすると責任が広がる」という声もある。', en: '' }
+    text: { ja: '月曜の午後3時。取引先から「うちも同じVPN機器を使っている。点検を手伝ってほしい」と連絡が来た。社内には「余計なことをすると責任が広がる」という声もある。', en: '' }
     voices: [v16-coward, v16-vendor, v16-ok]
     choices:
       - id: a16-refuse
@@ -932,7 +932,7 @@ points:
     at: { day: 12, minutes: 540 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '水曜の午前9時。復旧から数日。監視体制を通常に戻すか、強化を続けるか。深夜のアラートは増えているが、大半は誤検知だ。', en: '' }
+    text: { ja: '木曜の午前9時。復旧から数日。監視体制を通常に戻すか、強化を続けるか。深夜のアラートは増えているが、大半は誤検知だ。', en: '' }
     voices: [v17-public, v17-flattery, v17-ok]
     choices:
       - id: a17-normal
@@ -1041,7 +1041,7 @@ points:
     at: { day: 35, minutes: 600 }
     phase: after
     sound: { se: [notify_sns] }
-    text: { ja: '10日後。業界団体から「同じ手口の注意喚起を出したい。事例を共有してくれないか」と連絡が来た。攻撃者の手口の詳細も求められている。', en: '' }
+    text: { ja: '5日後。業界団体から「同じ手口の注意喚起を出したい。事例を共有してくれないか」と連絡が来た。攻撃者の手口の詳細も求められている。', en: '' }
     voices: [v19-bold, v19-flattery, v19-ok]
     choices:
       - id: a19-full
@@ -1265,7 +1265,7 @@ voices:
   - { id: v10-after, media: news, misleading: false, text: { ja: '掲載されたデータを認めないのか。', en: '' }, trigger: { at: after, choice: a10-verify } }
   - { id: v11-law, media: board, misleading: true, type: law-ish, text: { ja: '千人に満たないから、報告はいらないでしょう。', en: '' }, trigger: { at: point } }
   - { id: v11-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '課長「件数が固まるまで、外に出さないでくれ」。', en: '' }, trigger: { at: point } }
-  - { id: v11-ok, media: chat, misleading: false, text: { ja: '法務「不正の目的のおそれがあれば、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '法務「報告対象は、要配慮個人情報、財産的被害のおそれ、不正の目的のおそれ、千人超のいずれかです。今回は不正の目的のおそれがあるので、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
   - { id: v11-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに報告するのか。数字が動けば訂正だぞ。', en: '' }, trigger: { at: after, choice: a11-file } }
   - { id: v12-public, media: sns, misleading: true, type: public-opinion, text: { ja: '現場は何をしているんだ。説明しろ。', en: '' }, trigger: { at: point } }
   - { id: v12-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '個人アカウントで説明すれば、現場の声として響きます。', en: '' }, trigger: { at: point } }

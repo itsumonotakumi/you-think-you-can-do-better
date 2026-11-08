@@ -16,7 +16,7 @@ deadlines:
     points: -75
     doneFlag: ppcPrelimFiled
   - id: dl-ppc-final
-    ref: ppc-report-final
+    ref: ppc-report-final-malicious
     label: { ja: '本部門分の漏えい等報告（確報）の資料提出', en: '' }
     points: -75
     doneFlag: ppcFinalFiled
@@ -42,10 +42,10 @@ points:
     at: { day: 0, minutes: 1275 }
     phase: detect
     sound: { se: [phone_ring] }
-    text: { ja: '土曜の午後9時15分。夜勤の情報システム課長から電話が入る。「サーバーが暗号化されています。身代金を要求する文書が置かれていました」。受発注システムも止まっている。情報システムは二人しかいない。', en: '' }
+    text: { ja: '土曜の午後9時15分。夜勤の情報システム課長から電話が入る。「サーバーが暗号化されています。身代金を要求する文書が置かれていました」。受発注システムも止まっている。情報システムで動けるのは二人しかいない。', en: '' }
     voices: [v01-ceo, v01-expert, v01-cio]
     notable:
-      - { id: note-first, text: { ja: '土曜21時15分、情報システム課長から第一報。サーバーが暗号化され、受発注システムが停止。情報システムは二人。', en: '' } }
+      - { id: note-first, text: { ja: '土曜21時15分、情報システム課長から第一報。サーバーが暗号化され、受発注システムが停止。情報システムは実質二人。', en: '' } }
     choices:
       - id: p01-wait
         text: { ja: '社長の指示を待ち、月曜の出社まで動かない。', en: '' }
@@ -213,7 +213,7 @@ points:
     at: { day: 1, minutes: 240 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '午前4時。情報システム課長から連絡。「夜勤の若手が、暗号化された端末を一台、初期化して作り直しました。早く戻したかったようです」。調査に必要なログとメモリが、その端末に残っている。', en: '' }
+    text: { ja: '午前4時。情報システム課長から連絡。「夜勤の若手が、暗号化された端末を一台、初期化して作り直そうとしています。早く戻したかったようです」。まだ手を付けておらず、調査に必要なログとメモリはその端末に残っている。', en: '' }
     voices: [v04-field, v04-expert, v04-cio]
     choices:
       - id: p04-wipe
@@ -230,7 +230,7 @@ points:
           - { id: p04-a-record, points: -16, axis: record, refs: [jpcert-handling] }
           - { id: p04-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
       - id: p04-praise
-        text: { ja: '初期化した現場の判断を褒め、同じように復旧を進めさせる。', en: '' }
+        text: { ja: '初期化してでも早く戻そうとした現場の判断を褒め、同じように復旧を進めさせる。', en: '' }
         minutes: 60
         category: hurt
         points: -100
@@ -269,11 +269,11 @@ points:
     at: { day: 1, minutes: 540 }
     phase: organize
     sound: { se: [phone_ring, notify_chat] }
-    text: { ja: '午前9時。営業本部長が血相を変えて入ってくる。「取引先の二社が、今日の昼でラインを止めると言っています」。情報システムは二人しかいない。一人は育休中だ。', en: '' }
+    text: { ja: '午前9時。営業本部長が血相を変えて入ってくる。「取引先の二社が、今日の昼でラインを止めると言っています」。情報システムは三人いて、一人は育休中だ。動けるのは二人しかいない。', en: '' }
     voices: [v05-ceo, v05-sales, v05-pr]
     popular: { choiceId: p05-allnight, percent: 58 }
     notable:
-      - { id: note-line, text: { ja: '月曜9時、取引先二社が同日の昼でラインを止めると連絡してきた。情報システムは実質一人。', en: '' } }
+      - { id: note-line, text: { ja: '月曜9時、取引先二社が同日の昼でラインを止めると連絡してきた。情報システムは実質二人。', en: '' } }
     choices:
       - id: p05-allnight
         text: { ja: '情報システムと生産で、休まずに復旧を進める。', en: '' }
@@ -380,7 +380,7 @@ points:
     at: { day: 2, minutes: 600 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '日曜の午前10時。調査会社の報告。侵入口は、取引先とつながるVPN機器の更新漏れ。半年前、情報システム課長は更新の稟議を出していた。あなたは生産を優先し、先送りを認めていた。', en: '' }
+    text: { ja: '月曜の午前10時。調査会社の報告。侵入口は、取引先とつながるVPN機器の更新漏れ。半年前、情報システム課長は更新の稟議を出していた。あなたは生産を優先し、先送りを認めていた。', en: '' }
     voices: [v07-past, v07-cfo, v07-pr]
     notable:
       - { id: note-scope, text: { ja: '侵入口は取引先とつながるVPN機器の更新漏れ。半年前の更新稟議を、生産優先で先送りしていた。', en: '' } }
@@ -553,7 +553,7 @@ points:
     at: { day: 3, minutes: 600 }
     phase: notify
     sound: { se: [phone_ring] }
-    text: { ja: '月曜の午前10時。法務から、個人情報保護委員会への速報に使う資料を求められた。従業員と取引先担当者の連絡先が漏れた可能性がある。件数はまだ確定していない。期限は近い。', en: '' }
+    text: { ja: '火曜の午前10時。法務から、個人情報保護委員会への速報に使う資料を求められた。従業員と取引先担当者の連絡先が漏れた可能性がある。件数はまだ確定していない。期限は近い。', en: '' }
     voices: [v10-law, v10-ceo, v10-pr]
     choices:
       - id: p10-wait
@@ -663,7 +663,7 @@ points:
     at: { day: 4, minutes: 600 }
     phase: notify
     sound: { se: [mail_arrive] }
-    text: { ja: '火曜の午前10時。取引先担当者の名簿と、こちらの窓口担当者の連絡先が漏れた可能性が高いと分かった。報道が出る前に、各社の調達担当へ何を伝えるか。', en: '' }
+    text: { ja: '水曜の午前10時。取引先担当者の名簿と、こちらの窓口担当者の連絡先が漏れた可能性が高いと分かった。報道が出る前に、各社の調達担当へ何を伝えるか。', en: '' }
     voices: [v12-public, v12-vendor, v12-sales]
     choices:
       - id: p12-generic
@@ -719,7 +719,7 @@ points:
     at: { day: 7, minutes: 600 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '金曜の午前10時。復旧のめどが立った。ただし、戻せるのは一日に一システムずつ。取引先のラインを優先すれば、自社の生産は後回しになる。', en: '' }
+    text: { ja: '土曜の午前10時。復旧のめどが立った。ただし、戻せるのは一日に一システムずつ。取引先のラインを優先すれば、自社の生産は後回しになる。', en: '' }
     voices: [v13-ceo, v13-public, v13-popular, v13-cio]
     popular: { choiceId: p13-rush, percent: 57 }
     choices:
@@ -774,7 +774,7 @@ points:
     at: { day: 10, minutes: 600 }
     phase: recover
     sound: { se: [phone_ring] }
-    text: { ja: '月曜の午前10時。取引先から、止まったラインの減産分について話が来た。金額はまだ見えない。一方で、復旧と再発防止の投資にも金がかかる。', en: '' }
+    text: { ja: '火曜の午前10時。取引先から、止まったラインの減産分について話が来た。金額はまだ見えない。一方で、復旧と再発防止の投資にも金がかかる。', en: '' }
     voices: [v14-cfo, v14-law, v14-sales]
     choices:
       - id: p14-none
@@ -825,7 +825,7 @@ points:
     at: { day: 14, minutes: 600 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '金曜の午前10時。取締役会。復旧は終わった。議題は、再発防止にいくら使うか。VPN機器の入れ替え、全社の多要素認証、取引先との接続点の監視。合計は今年の設備投資計画を超える。', en: '' }
+    text: { ja: '土曜の午前10時。取締役会。復旧は終わった。議題は、再発防止にいくら使うか。VPN機器の入れ替え、全社の多要素認証、取引先との接続点の監視。合計は今年の設備投資計画を超える。', en: '' }
     voices: [v15-cfo, v15-past, v15-cio]
     choices:
       - id: p15-defer
@@ -879,7 +879,7 @@ points:
     at: { day: 16, minutes: 600 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '日曜の午前10時。復旧後の点検が続き、現場は三週間休みなく動いている。情報システムの一人は体調を崩した。外部の運用支援を契約するか、このまま自部門で抱えるか。', en: '' }
+    text: { ja: '月曜の午前10時。復旧後の点検が続き、現場は三週間休みなく動いている。情報システムの一人は体調を崩した。外部の運用支援を契約するか、このまま自部門で抱えるか。', en: '' }
     voices: [v16-field, v16-ceo, v16-hr]
     choices:
       - id: p16-overtime
@@ -1035,7 +1035,7 @@ points:
     at: { day: 32, minutes: 600 }
     phase: after
     sound: { se: [shutter] }
-    text: { ja: '午前10時。記者会見は明日。広報が「想定問答を作りました。質問は、接続を切った判断と、チェックシートと、取引先の補償に集中すると思います」と言う。社長と同席する。', en: '' }
+    text: { ja: '午前10時。記者会見の直前。広報が「想定問答を作りました。質問は、接続を切った判断と、チェックシートと、取引先の補償に集中すると思います」と言う。社長と同席する。', en: '' }
     voices: [v19-flattery, v19-coward, v19-pr]
     choices:
       - id: p19-short
@@ -1190,7 +1190,7 @@ voices:
   - { id: v03-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '社長の談話に「絶対に許さない」を入れましょう。バズりますよ。', en: '' }, trigger: { at: point } }
   - { id: v03-cio, media: chat, misleading: false, text: { ja: '法務「支払っても、図面が消える保証はありません。警察に相談しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v03-after, media: news, misleading: false, text: { ja: '図面が公開されたときの対応を先に出すのは、被害を認めたことになるのでは。', en: '' }, trigger: { at: after, choice: p03-escalate-plan } }
-  - { id: v04-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場の若手が、暗号化された端末を初期化してくれました。これで復旧が早まります。', en: '' }, trigger: { at: point } }
+  - { id: v04-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場の若手が、暗号化された端末を初期化しようとしています。これで復旧が早まります。', en: '' }, trigger: { at: point } }
   - { id: v04-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'ログを残しても読めませんよ。さっさと作り直しましょう。', en: '' }, trigger: { at: point } }
   - { id: v04-cio, media: chat, misleading: false, text: { ja: '情報システム課長「電源を切らずに、ネットワークから切り離せます」。', en: '' }, trigger: { at: point } }
   - { id: v04-after, media: sns, misleading: false, text: { ja: '外部の人間を入れて、中の情報は大丈夫なのか。', en: '' }, trigger: { at: after, choice: p04-isolate-external } }
@@ -1216,7 +1216,7 @@ voices:
   - { id: v09-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに、書面で出すのか。', en: '' }, trigger: { at: after, choice: p09-written-own } }
   - { id: v10-law, media: board, misleading: true, type: law-ish, text: { ja: '千人に満たないから、報告はいらないでしょう。', en: '' }, trigger: { at: point } }
   - { id: v10-ceo, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が固まるまで、外に出さないでくれ。', en: '' }, trigger: { at: point } }
-  - { id: v10-pr, media: chat, misleading: false, text: { ja: '法務「不正の目的のおそれがあれば、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
+  - { id: v10-pr, media: chat, misleading: false, text: { ja: '法務「報告対象は、要配慮個人情報、財産的被害のおそれ、不正の目的のおそれ、千人超のいずれかです。今回は不正の目的のおそれがあるので、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
   - { id: v10-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに報告するのか。数字が動けば訂正だぞ。', en: '' }, trigger: { at: after, choice: p10-file-own } }
   - { id: v11-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '社員に言うと、またSNSに書かれる。黙っていろ。', en: '' }, trigger: { at: point } }
   - { id: v11-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場は気合で乗り切れます。説明より復旧を。', en: '' }, trigger: { at: point } }
