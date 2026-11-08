@@ -3,7 +3,7 @@
 # 専任のセキュリティ部署は無く、経理兼任の総務部長と外部ベンダー、親会社の情報システム部が頼り。
 # 判断ポイント18、細目は choices[].items と drafts の合計で80以上。
 estimateMinutes: 35
-intro: { ja: 'あなたはコガネ酒造ホールディングスのグループ会社、北陸コガネ飲料株式会社の代表取締役社長。月曜の朝、グループ共通の受注・出荷システムが止まった。自社の工場は動いているが、出荷の指示が出せない。専任の情報システム部はなく、経理を兼ねる総務部長と外部ベンダーが頼りだ。得意先の酒店と飲食店は、年末の商品を待っている。7時45分の電話から、あなたの判断が始まる。', en: '' }
+intro: { ja: 'あなたはコガネ酒造ホールディングスのグループ会社、北陸コガネ飲料株式会社の代表取締役社長。朝、グループ共通の受注・出荷システムが止まった。自社の工場は動いているが、出荷の指示が出せない。専任の情報システム部はなく、経理を兼ねる総務部長と外部ベンダーが頼りだ。得意先の酒店と飲食店は、年末の商品を待っている。7時45分の電話から、あなたの判断が始まる。', en: '' }
 pressEnabled: true
 cowardVoices:
   '2': v-coward-2
@@ -102,7 +102,7 @@ points:
     at: { day: 0, minutes: 510 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '8時30分。自社の受注端末は、グループ共通のVPN機器を通っている。切り離せば安全側に寄るが、受注は紙と電話になる。親会社は「まだ原因が分からない」と言う。', en: '' }
+    text: { ja: '8時30分。自社の受注端末は、グループ共通の遠隔接続機器を通っている。切り離せば安全側に寄るが、受注は紙と電話になる。親会社は「まだ原因が分からない」と言う。', en: '' }
     voices: [v02-expert, v02-field, v02-ok]
     choices:
       - id: p02-keep
@@ -119,7 +119,7 @@ points:
           - { id: p02-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
           - { id: p02-a-record, points: -5, axis: record, refs: [jpcert-handling] }
       - id: p02-cut
-        text: { ja: '自社の端末をグループのVPNから切り離し、受注を紙と電話に切り替える。', en: '' }
+        text: { ja: '自社の端末をグループの遠隔接続から切り離し、受注を紙と電話に切り替える。', en: '' }
         minutes: 60
         category: maintain
         points: 20
@@ -245,7 +245,7 @@ points:
           - { id: p04-b-time, points: 5, axis: time, refs: [jpcert-handling] }
           - { id: p04-b-record, points: 5, axis: record, refs: [jpcert-handling] }
       - id: p04-window-plan
-        text: { ja: '窓口を一人に決め、外部ベンダー・保険会社・弁護士への連絡順を決める。社員への説明も同じ日に始める。', en: '' }
+        text: { ja: '窓口を一人に決め、保険会社・警察・外部ベンダー・弁護士への連絡順を決める。社員への説明も同じ日に始める。', en: '' }
         minutes: 120
         category: recover
         points: 100
@@ -330,10 +330,10 @@ points:
     at: { day: 0, minutes: 1020 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '午後5時。自社の得意先名簿（酒店と飲食店の担当者名、注文履歴）が、グループ共通のファイルサーバに置かれていたことが分かった。親会社が示した調査範囲に、自社の名簿を入れるか。', en: '' }
+    text: { ja: '午後5時。自社の取引先名簿（酒店・飲食店・量販店の担当者氏名、連絡先、注文履歴、および通販会員の氏名・住所・電話番号）が、グループ共通のファイルサーバに置かれていたことが分かった。親会社が示した調査範囲に、自社の名簿を入れるか。', en: '' }
     voices: [v06-insider, v06-parent, v06-ok]
     notable:
-      - { id: note-scope, text: { ja: '自社の得意先名簿がグループ共通のファイルサーバに置かれていた。', en: '' } }
+      - { id: note-scope, text: { ja: '自社の取引先名簿がグループ共通のファイルサーバに置かれていた。', en: '' } }
     choices:
       - id: p06-narrow
         text: { ja: '親会社が示した範囲だけを調べ、自社の名簿は含めない。', en: '' }
@@ -343,12 +343,12 @@ points:
         refs: [ppc-report-scope]
         gauges: { damage: 15, trust: -10 }
         delayed:
-          - { afterPhases: 1, points: -40, gauges: { damage: 10, flame: 10 }, reason: { ja: '調べていなかった得意先の名簿が、あとから公開された。', en: '' } }
+          - { afterPhases: 1, points: -40, gauges: { damage: 10, flame: 10 }, reason: { ja: '調べていなかった取引先の名簿が、あとから公開された。', en: '' } }
         items:
           - { id: p06-a-content, points: -10, axis: content, refs: [ppc-report-scope] }
           - { id: p06-a-record, points: -8, axis: record, refs: [nist-sp800-61r3] }
       - id: p06-include
-        text: { ja: '自社の得意先名簿も調査範囲に加え、親会社に伝える。', en: '' }
+        text: { ja: '自社の取引先名簿も調査範囲に加え、親会社に伝える。', en: '' }
         minutes: 90
         category: maintain
         points: 20
@@ -386,11 +386,11 @@ points:
     at: { day: 1, minutes: 540 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '火曜の午前9時。調査の途中経過。侵入口はグループ共通のVPN機器。自社の端末からも不審な通信が出ている。端末を早くきれいにするか、証拠を残すか。', en: '' }
+    text: { ja: '翌朝の午前9時。調査の途中経過（速報）。侵入口はグループ共通の遠隔接続機器の可能性が高い。自社の端末からも不審な通信が出ている。あわせて、グループ共通のバックアップは三世代のうち二つが暗号化され、一つは健全な可能性があると聞いた。端末を早くきれいにするか、証拠を残すか。', en: '' }
     voices: [v07-expert, v07-field, v07-ok]
     notable:
-      - { id: note-backup, text: { ja: 'バックアップは三世代のうち二つが暗号化。一つは健全な可能性がある。', en: '' } }
-      - { id: note-vpn, text: { ja: '侵入口はグループ共通のVPN機器。自社の端末からも不審な通信。', en: '' } }
+      - { id: note-backup, text: { ja: 'グループ共通のバックアップは三世代のうち二つが暗号化。一つは健全な可能性があると聞いた。', en: '' } }
+      - { id: note-vpn, text: { ja: '侵入口はグループ共通の遠隔接続機器の可能性が高い。自社の端末からも不審な通信。', en: '' } }
     choices:
       - id: p07-wipe
         text: { ja: '感染の疑いがある端末を初期化して入れ替える。', en: '' }
@@ -445,7 +445,7 @@ points:
     at: { day: 1, minutes: 900 }
     phase: notify
     sound: { se: [phone_ring] }
-    text: { ja: '午後3時。自社の得意先名簿が対象かもしれない。件数はまだ確定していない。法務から「速報をいつ出すか」と聞かれた。期限は近い。', en: '' }
+    text: { ja: '午後3時。自社の取引先名簿が対象かもしれない。件数はまだ確定していない。法務から「速報をいつ出すか」と聞かれた。期限は近い。', en: '' }
     voices: [v08-boss, v08-law, v08-ok]
     choices:
       - id: p08-wait
@@ -500,7 +500,7 @@ points:
     at: { day: 2, minutes: 600 }
     phase: notify
     sound: { se: [phone_ring, notify_news] }
-    text: { ja: '水曜の午前10時。酒店、飲食店、量販店から「いつ戻るのか」と問い合わせが来ている。報道が出る前に説明するか、報道を待つか。年末商品の注文が動いている。', en: '' }
+    text: { ja: '二日後の午前10時。酒店、飲食店、量販店から「いつ戻るのか」と問い合わせが来ている。報道が出る前に説明するか、報道を待つか。年末商品の注文が動いている。', en: '' }
     voices: [v09-public, v09-coward, v09-ok]
     popular: { choiceId: p09-wait, percent: 58 }
     choices:
@@ -559,11 +559,11 @@ points:
     at: { day: 3, minutes: 660 }
     phase: notify
     sound: { se: [notify_sns] }
-    text: { ja: '木曜の午前11時。社内チャットに「子会社だけ止められている」という書き込みが出た。SNSには、社内らしき写真が流れている。社員は疲れ、何を話してよいか分かっていない。', en: '' }
+    text: { ja: '三日後の午前11時。社内チャットに「子会社だけ止められている」という書き込みが出た。SNSには、社内らしき写真が流れている。社員は疲れ、何を話してよいか分かっていない。', en: '' }
     voices: [v10-gag, v10-flattery, v10-ok]
     choices:
       - id: p10-gag
-        text: { ja: '口外しないよう通達し、SNSの書き込みを監視する。', en: '' }
+        text: { ja: '事実の説明はせず、口外禁止だけを通達する。社員個人のSNSも監視する。', en: '' }
         minutes: 60
         category: hurt
         points: -100
@@ -612,7 +612,7 @@ points:
     at: { day: 4, minutes: 600 }
     phase: recover
     sound: { se: [notify_sns] }
-    text: { ja: '金曜の午前10時。グループの検証は終わっていないが、年末商戦の受注が始まる。自社だけ先に戻せるか。技術は「元の経路には戻せない」と言う。', en: '' }
+    text: { ja: '四日後の午前10時。グループの検証は終わっていないが、年末商戦の受注が始まる。自社だけ先に戻せるか。技術は「元の経路には戻せない」と言う。', en: '' }
     voices: [v11-flattery, v11-public, v11-ok]
     popular: { choiceId: p11-alone, percent: 57 }
     choices:
@@ -669,7 +669,7 @@ points:
     at: { day: 6, minutes: 600 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '日曜の午前10時。紙の受注と出荷が続いている。現場は交代なしで走り、誤出荷が一件出た。応援をどうするか。総務部長は「このままだと確認漏れが増える」と言う。', en: '' }
+    text: { ja: '六日後の午前10時。紙の受注と出荷が続いている。現場は交代なしで走り、誤出荷が一件出た。応援をどうするか。総務部長は「このままだと確認漏れが増える」と言う。', en: '' }
     voices: [v12-field, v12-public, v12-ok]
     choices:
       - id: p12-allnight
@@ -723,19 +723,19 @@ points:
     at: { day: 9, minutes: 600 }
     phase: recover
     sound: { se: [phone_ring] }
-    text: { ja: '火曜の午前10時。止まった間の得意先の損失をどう扱うか。酒店と飲食店からは、年末の売り場が空いたという声が来ている。金額と対象を決める日だ。', en: '' }
+    text: { ja: '九日後の午前10時。止まった間の得意先の損失をどう扱うか。酒店と飲食店からは、年末の売り場が空いたという声が来ている。金額と対象を決める日だ。', en: '' }
     voices: [v13-vendor, v13-law, v13-ok]
     choices:
       - id: p13-none
         text: { ja: '補償はせず、問い合わせには一次対応だけで答える。', en: '' }
         minutes: 60
         category: hurt
-        points: -150
-        refs: [ppc-notify-person]
+        points: -90
+        refs: [meti-csm-guideline]
         gauges: { flame: 20, trust: -15 }
         items:
-          - { id: p13-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
-          - { id: p13-a-care2, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: p13-a-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+          - { id: p13-a-care2, points: -10, axis: care, refs: [meti-csm-guideline] }
       - id: p13-flat
         text: { ja: '得意先に一律の少額見舞金を出す。', en: '' }
         minutes: 120
@@ -773,7 +773,7 @@ points:
     at: { day: 12, minutes: 600 }
     phase: recover
     sound: { se: [mail_arrive] }
-    text: { ja: '金曜の午前10時。サイバー保険の請求。保険会社は「原因」と「記録」の説明を求める。調査会社の報告書はまだ途中で、復旧の費用も固まっていない。', en: '' }
+    text: { ja: '十二日後の午前10時。サイバー保険の請求。保険会社は「原因」と「記録」の説明を求める。調査会社の報告書はまだ途中で、復旧の費用も固まっていない。', en: '' }
     voices: [v14-insurer, v14-law, v14-ok]
     choices:
       - id: p14-fast
@@ -827,7 +827,7 @@ points:
     at: { day: 14, minutes: 600 }
     phase: after
     sound: { se: [phone_ring] }
-    text: { ja: '二週間後。親会社の決算発表が近い。上場企業のグループ会社として、自社の業績見通しも織り込まれる。CFOは「数字が読めない」と言う。', en: '' }
+    text: { ja: '二週間後。親会社の業績説明会が近い。上場企業のグループ会社として、自社の業績見通しも織り込まれる。CFOは「数字が読めない」と言う。', en: '' }
     voices: [v15-law, v15-flattery, v15-ok]
     choices:
       - id: p15-keep
@@ -835,7 +835,7 @@ points:
         minutes: 60
         category: fatal
         points: -250
-        refs: [meti-disclosure-guidance]
+        refs: [meti-disclosure-guidance, no02-timely-disclosure]
         gauges: { flame: 25, trust: -25 }
         setFlags: { falseDisclosure: true }
         delayed:
@@ -869,13 +869,13 @@ points:
           - { id: p15-c-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
 
   - id: p16-report
-    at: { day: 24, minutes: 600 }
+    at: { day: 21, minutes: 600 }
     phase: after
     sound: { se: [notify_news] }
-    text: { ja: '三週間後。グループの調査報告書が完成した。自社部分の公開と、確報の提出を決める。事前の点検で、VPN機器の更新を二年間先送りしていたことと、社内から出ていた指摘も書かれている。', en: '' }
+    text: { ja: '三週間後。グループの調査報告書が完成した。自社部分の公開と、確報の提出を決める。事前の点検で、保守用の遠隔接続機器に見直しの機会がないまま古い設定が残っていたことも書かれている。', en: '' }
     voices: [v16-expert, v16-law, v16-ok]
     notable:
-      - { id: note-precheck, text: { ja: 'VPN機器の更新は二年間先送りされていた。社内から指摘が出ていた。', en: '' } }
+      - { id: note-precheck, text: { ja: '保守用の遠隔接続機器に、見直しの機会がないまま古い設定が残っていた。', en: '' } }
     choices:
       - id: p16-hide
         text: { ja: '自社部分は公開せず、確報も親会社に任せる。', en: '' }
@@ -1084,17 +1084,17 @@ drafts:
       - id: cause
         label: { ja: '原因の書き方', en: '' }
         options:
-          - { id: fr-c-cause, text: { ja: '共通VPNの設定と更新の先送りを具体的に書く', en: '' }, points: 10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: fr-c-cause, text: { ja: '共通の遠隔接続機器に古い設定が残っていた経緯を具体的に書く', en: '' }, points: 10, axis: content, refs: [nist-sp800-61r3] }
           - { id: fr-c-vague, text: { ja: '「外部からの攻撃」とだけ書く', en: '' }, points: -10, axis: content, refs: [nist-sp800-61r3] }
       - id: warning
-        label: { ja: '事前の指摘', en: '' }
+        label: { ja: '点検の記録', en: '' }
         options:
-          - { id: fr-w-include, text: { ja: '二年前の社内指摘と先送りの経緯を書く', en: '' }, points: 10, axis: content, refs: [meti-csm-guideline] }
-          - { id: fr-w-omit, text: { ja: '社内の指摘に触れない', en: '' }, points: -15, axis: content, refs: [meti-csm-guideline] }
+          - { id: fr-w-include, text: { ja: '点検の機会がなかった経緯と、残っていた設定を書く', en: '' }, points: 10, axis: content, refs: [meti-csm-guideline] }
+          - { id: fr-w-omit, text: { ja: '古い設定が残っていたことに触れない', en: '' }, points: -15, axis: content, refs: [meti-csm-guideline] }
       - id: responsibility
         label: { ja: '責任の書き方', en: '' }
         options:
-          - { id: fr-r-own, text: { ja: '上申を止めた自社の責任を書く', en: '' }, points: 8, axis: record, refs: [meti-csm-guideline] }
+          - { id: fr-r-own, text: { ja: '自社の判断と対応の責任を書く', en: '' }, points: 8, axis: record, refs: [meti-csm-guideline] }
           - { id: fr-r-field, text: { ja: '現場の責任として書く', en: '' }, points: -10, axis: wording, refs: [meti-csm-guideline] }
       - id: measures
         label: { ja: '再発防止策', en: '' }
@@ -1131,7 +1131,7 @@ voices:
   - { id: v01-public, media: sns, misleading: true, type: public-opinion, text: { ja: '子会社は関係ないだろ。余計なことを言うと、グループ全体が疑われる。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: '親会社の情報システム部長「まず自社の止まり方を教えてほしい。ログは消さないでくれ」。', en: '' }, trigger: { at: point } }
   - { id: v01-after, media: sns, misleading: false, text: { ja: '親会社の指示を待たずに得意先へ先に言うなんて。出しゃばりだ。', en: '' }, trigger: { at: after, choice: p01-check-notice } }
-  - { id: v02-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '端末は初期化すれば安全です。ログは要りません。', en: '' }, trigger: { at: point } }
+  - { id: v02-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '隔離した端末は初期化して入れ替えるのが最短です。ログは後からでも追えます。', en: '' }, trigger: { at: point } }
   - { id: v02-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '怪しかったので、端末の電源を抜いておきました。これで大丈夫です。', en: '' }, trigger: { at: point } }
   - { id: v02-ok, media: chat, misleading: false, text: { ja: '総務部長「切り離せば、紙と電話の受注に切り替えられます。手順は作ります」。', en: '' }, trigger: { at: point } }
   - { id: v02-after, media: news, misleading: false, text: { ja: '端末を切っただけで、調査もせずに手作業か。', en: '' }, trigger: { at: after, choice: p02-cut-log } }
@@ -1147,11 +1147,11 @@ voices:
   - { id: v05-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: '報告は口頭でいい。書面にすると責任を問われるぞ。', en: '' }, trigger: { at: point } }
   - { id: v05-ok, media: chat, misleading: false, text: { ja: '親会社の情報システム部長「事実と不明点を分けてくれれば、こちらも動ける」。', en: '' }, trigger: { at: point } }
   - { id: v05-after, media: boss, misleading: false, text: { ja: '自社の社員にまで同じ内容を伝えるのか。混乱するだけだ。', en: '' }, trigger: { at: after, choice: p05-written-plan } }
-  - { id: v06-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、得意先の名簿は全部持ち出されている。今すぐ全部公表しろ。', en: '' }, trigger: { at: point } }
-  - { id: v06-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: 'グループの発表は顧客情報だけだ。得意先の名簿まで広げるな。', en: '' }, trigger: { at: point } }
-  - { id: v06-ok, media: chat, misleading: false, text: { ja: '調査担当「共通のファイルサーバに、御社の得意先名簿も置かれています」。', en: '' }, trigger: { at: point } }
+  - { id: v06-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、取引先の名簿は全部持ち出されている。今すぐ全部公表しろ。', en: '' }, trigger: { at: point } }
+  - { id: v06-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: 'グループの発表は顧客情報だけだ。取引先の名簿まで広げるな。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '調査担当「共通のファイルサーバに、御社の取引先名簿も置かれています」。', en: '' }, trigger: { at: point } }
   - { id: v06-after, media: news, misleading: false, text: { ja: '名簿まで調べるのか。余計なことを言うな。', en: '' }, trigger: { at: after, choice: p06-include-plan } }
-  - { id: v07-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'その端末は初期化して入れ替えるのが一番早いです。証拠は要りません。', en: '' }, trigger: { at: point } }
+  - { id: v07-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'その端末は初期化して入れ替えるのが一番早いです。証拠はイメージを取らなくてもログで足ります。', en: '' }, trigger: { at: point } }
   - { id: v07-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場が一台、自宅で調べると持って帰りました。熱心なやつです。', en: '' }, trigger: { at: point } }
   - { id: v07-ok, media: chat, misleading: false, text: { ja: '調査責任者「電源を切らずに切り離せば、ログとメモリを残せます」。', en: '' }, trigger: { at: point } }
   - { id: v07-after, media: boss, misleading: false, text: { ja: '外部の調査会社に金をかけるのか。親会社に任せればいい。', en: '' }, trigger: { at: after, choice: p07-keep-rule } }
