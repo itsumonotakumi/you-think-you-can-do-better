@@ -323,7 +323,14 @@ export function loadProject(options: LoadProjectOptions): Project {
   if (references && Array.isArray(references.data)) {
     for (const ref of references.data) {
       const obj = asObject(ref);
-      if (obj && typeof obj.id === 'string') referencesById.set(obj.id, obj);
+      if (!obj || typeof obj.id !== 'string') continue;
+      // 同じIDは期限の初期化が最初の定義を使うため、検査側も最初を採用して重複をエラーにする
+      if (referencesById.has(obj.id)) {
+        loadIssues.push(issue(references.file, locate(obj, 'id')?.line ?? 1, 'C01',
+          `根拠IDが重複: ${obj.id}`));
+        continue;
+      }
+      referencesById.set(obj.id, obj);
     }
   }
   const locales = loadLocales(root, loadIssues);

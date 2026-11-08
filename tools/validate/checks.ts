@@ -12,7 +12,7 @@ import type { Rank, Reference, RoleId, Scenario } from '../../src/engine/types.t
 import { locate } from './source.ts';
 import { loadProject } from './project.ts';
 import type { Issue, LoadedScenario, Obj, Project } from './project.ts';
-import { simulatePaths } from './paths.ts';
+import { simulatePaths, RANDOM_RUNS_PER_ROLE } from './paths.ts';
 import type { PathSimulation } from './paths.ts';
 
 const PHASE_SET = new Set<string>(PHASES);
@@ -321,7 +321,7 @@ function checkRole(sc: LoadedScenario, role: string, script: Obj, out: Issue[]):
       if (!PHASE_SET.has(p.phase)) add(point, 'phase', `phase が不正: ${p.phase}`);
       checkLocalized(p.text, (m) => add(point, 'text', m));
       if (p.at !== undefined && !validTime(p.at)) add(point, 'at', 'at は { day, minutes }（15分刻み）');
-      if (p.when !== undefined && !isObj(p.when)) add(point, 'when', 'when はオブジェクト');
+      if (p.when !== undefined) checkCondition(p.when, add);
       if (p.voices !== undefined && !Array.isArray(p.voices)) add(point, 'voices', 'voices は配列');
       if (p.notable !== undefined) {
         if (!Array.isArray(p.notable)) add(point, 'notable', 'notable は配列');
@@ -379,6 +379,7 @@ function checkRole(sc: LoadedScenario, role: string, script: Obj, out: Issue[]):
         if (!isStr(e.id)) add(event, 'id', '出来事の id がない');
         if (!validTime(e.at)) add(event, 'at', '出来事の at は { day, minutes }');
         if (e.voices !== undefined && !Array.isArray(e.voices)) add(event, 'voices', 'voices は配列');
+        if (e.when !== undefined) checkCondition(e.when, add);
         if (e.gauges !== undefined) checkGauges(e.gauges, (k, m) => add(e.gauges, k, m));
         if (e.setFlags !== undefined) checkFlags(e.setFlags, (m) => add(event, 'setFlags', m));
         if (e.sound !== undefined) checkSound(e.sound, add);
@@ -400,7 +401,10 @@ function checkTrigger(trigger: unknown, onError: (message: string) => void): voi
     return;
   }
   if (t.flags !== undefined) {
-    if (!isObj(t.flags)) onError('trigger.flags はオブジェクト');
+    if (!isObj(t.flags)) {
+      onError('trigger.flags はオブジェクト');
+      return;
+    }
     for (const [key, value] of Object.entries(t.flags)) {
       if (typeof value !== 'boolean') onError(`trigger.flags.${key} は true/false`);
     }
@@ -437,6 +441,28 @@ function checkFlags(flags: unknown, onError: (message: string) => void): void {
   }
 }
 
+/** 条件（when）。今は flags だけで、旗の値は true/false に限る（エンジンは真偽値で厳密比較する） */
+function checkCondition(
+  condition: unknown,
+  add: (value: unknown, key: string, message: string) => void,
+): void {
+  if (!isObj(condition)) {
+    add(condition, 'when', 'when はオブジェクトで書く');
+    return;
+  }
+  if (condition.flags === undefined) {
+    add(condition, 'when', 'when.flags がない');
+    return;
+  }
+  if (!isObj(condition.flags)) {
+    add(condition, 'when', 'when.flags はオブジェクトで書く');
+    return;
+  }
+  for (const [key, value] of Object.entries(condition.flags)) {
+    if (typeof value !== 'boolean') add(condition, 'when', `when.flags.${key} は true/false`);
+  }
+}
+
 function checkChoice(
   choice: unknown,
   script: Obj,
@@ -466,7 +492,7 @@ function checkChoice(
   }
   if (c.items !== undefined) {
     if (!Array.isArray(c.items)) add(choice, 'items', 'items は配列');
-    else for (const item of c.items) checkDetailItem(item, add, false);
+    else for (const item of c.items) checkDetailItem(item, add, 'choice');
   }
 }
 
@@ -481,23 +507,30 @@ function checkDelayed(delayed: unknown, add: (value: unknown, key: string, messa
 function checkDetailItem(
   item: unknown,
   add: (value: unknown, key: string, message: string) => void,
-  draftItem: boolean,
+  kind: 'choice' | 'item' | 'option',
 ): void {
   const i = asObj(item);
   if (!isStr(i.id)) add(item, 'id', '細目の id がない');
   if (!isNum(i.points)) add(item, 'points', '細目の points は数値');
   if (!AXIS_SET.has(i.axis)) add(item, 'axis', `axis が不正: ${i.axis}`);
   if (!Array.isArray(i.refs)) add(item, 'refs', 'refs は配列');
-  if (draftItem) {
-    if (!isObj(i.when) && !isLocalized(i.text)) add(item, 'when', '文案の部品は when か text が要る');
-    if (i.when !== undefined) {
+  if (kind === 'choice') return;
+
+  if (kind === 'item') {
+    // 自動で決まる部品は、いつ選ばれるかの条件が要る
+    if (!isObj(i.when)) add(item, 'when', '自動の文案の部品は when が要る');
+    else {
       const when = asObj(i.when);
       if (when.withinHours !== undefined && !isNum(when.withinHours)) add(item, 'when', 'withinHours は数値');
       if (when.otherwise !== undefined && typeof when.otherwise !== 'boolean') add(item, 'when', 'otherwise は true/false');
     }
-    if (i.text !== undefined) checkLocalized(i.text, (m) => add(item, 'text', m));
-    if (i.delayed !== undefined) checkDelayed(i.delayed, add);
+  } else if (!isLocalized(i.text)) {
+    // 手動で選ぶ部品は、表示する文言が要る
+    add(item, 'text', '手動の文案の部品は text が要る');
   }
+
+  if (i.text !== undefined) checkLocalized(i.text, (m) => add(item, 'text', m));
+  if (i.delayed !== undefined) checkDelayed(i.delayed, add);
 }
 
 function checkDrafts(drafts: unknown, add: (value: unknown, key: string, message: string) => void): void {
@@ -523,8 +556,8 @@ function checkDrafts(drafts: unknown, add: (value: unknown, key: string, message
       const hasItems = Array.isArray(slot.items);
       const hasOptions = Array.isArray(slot.options);
       if (hasItems === hasOptions) add(slotValue, 'items', 'items と options のどちらか一方を書く');
-      if (hasItems) for (const item of slot.items) checkDetailItem(item, add, true);
-      if (hasOptions) for (const item of slot.options) checkDetailItem(item, add, true);
+      if (hasItems) for (const item of slot.items) checkDetailItem(item, add, 'item');
+      if (hasOptions) for (const item of slot.options) checkDetailItem(item, add, 'option');
     }
   }
 }
@@ -568,7 +601,7 @@ function checkPress(press: unknown, out: Issue[], fallbackFile: string): void {
     if (!Array.isArray(p.extraQuestions)) add(press, 'extraQuestions', 'extraQuestions は配列');
     else for (const extra of p.extraQuestions) {
       const e = asObj(extra);
-      if (!isObj(e.when)) add(extra, 'when', 'when がない');
+      checkCondition(e.when, add);
       checkQuestion(e.question);
     }
   }
@@ -900,7 +933,38 @@ export function checkC14(project: Project): Issue[] {
       }
     }
   }
+
+  // 画面の共通文言と注記は、ja と en のキー集合と空文字を突き合わせる
+  compareLocaleKeys(project, 'strings', 'locales/ja/ui', 'locales/en/ui', out);
+  compareLocaleKeys(project, 'notices', 'locales/ja/notices.yaml', 'locales/en/notices.yaml', out);
   return out;
+}
+
+function compareLocaleKeys(
+  project: Project,
+  kind: 'strings' | 'notices',
+  jaFile: string,
+  enFile: string,
+  out: Issue[],
+): void {
+  const files: Record<string, string> = { ja: jaFile, en: enFile };
+  const data: Record<string, Record<string, string>> = {
+    ja: project.locales.ja?.[kind] ?? {},
+    en: project.locales.en?.[kind] ?? {},
+  };
+  const keys = new Set([...Object.keys(data.ja ?? {}), ...Object.keys(data.en ?? {})]);
+  for (const key of keys) {
+    for (const lang of LANGS) {
+      const strings = data[lang] ?? {};
+      if (!Object.prototype.hasOwnProperty.call(strings, key)) {
+        report(out, files[lang] ?? `locales/${lang}`, null, undefined, 'C14',
+          `文言がない: ${key}（${lang}）`);
+      } else if (!isStr(strings[key])) {
+        report(out, files[lang] ?? `locales/${lang}`, null, undefined, 'C14',
+          `文言が空: ${key}（${lang}）`);
+      }
+    }
+  }
 }
 
 // ---------------- C15 法定期限 ----------------
@@ -1216,7 +1280,9 @@ function simulationFor(
     : [];
   let simulation: PathSimulation;
   try {
-    simulation = simulatePaths(sc.scenario as unknown as Scenario, refs, role as RoleId);
+    simulation = simulatePaths(sc.scenario as unknown as Scenario, refs, role as RoleId, undefined, {
+      randomRuns: RANDOM_RUNS_PER_ROLE,
+    });
   } catch (error) {
     simulation = {
       runs: [],
@@ -1235,14 +1301,11 @@ export function checkC11(project: Project): Issue[] {
       if (!simulation || simulation.runs.length === 0) continue;
       const ranks = new Set(simulation.runs.map((run) => run.rank));
       const file = roleFile(sc, role);
-      if (!ranks.has('S') || !ranks.has('D')) {
-        const missing = (['S', 'A', 'B', 'C', 'D'] as Rank[])
-          .filter((rank) => !ranks.has(rank))
-          .join(', ');
-        report(out, file, script, 'points', 'C11', `到達できないランクがある: ${missing}`);
-      }
-      if (!(['A', 'B', 'C'] as Rank[]).some((rank) => ranks.has(rank))) {
-        report(out, file, script, 'points', 'C11', 'A/B/C のいずれにも到達しない（警告）', 'warning');
+      // S と D は必須。A・B・C はシナリオ側の調整が別途必要なため警告にする
+      for (const rank of RANKS as Rank[]) {
+        if (ranks.has(rank)) continue;
+        const severity: Severity = rank === 'S' || rank === 'D' ? 'error' : 'warning';
+        report(out, file, script, 'points', 'C11', `到達できないランクがある: ${rank}`, severity);
       }
     }
   }
@@ -1342,7 +1405,6 @@ export interface ValidateOptions {
 
 export function validateProject(options: ValidateOptions): ValidationResult {
   const project = loadProject(options);
-  // シナリオが1本も無いときは、検査対象が無いので通す（空の出力を作る）。
-  if (project.scenarios.length === 0) return { errors: [], warnings: [] };
+  // シナリオが0件でも読み込みエラーと共通データ（根拠・文言・音素材）の検査は返す
   return runChecks(project);
 }
