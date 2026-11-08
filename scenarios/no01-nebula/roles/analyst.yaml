@@ -12,12 +12,12 @@ deadlines:
   - id: dl-prelim-material
     ref: ppc-report-prelim
     label: { ja: '一次報告と速報の材料提出', en: '' }
-    points: -100
+    points: -40
     doneFlag: prelimMaterialsSent
   - id: dl-final-material
     ref: ppc-report-final-malicious
     label: { ja: '確報の材料提出', en: '' }
-    points: -150
+    points: -60
     doneFlag: finalMaterialsSent
 events:
   - id: ev-a-night
@@ -51,47 +51,47 @@ points:
         text: { ja: '危険なので、そのサーバーの電源を抜いて止める。', en: '' }
         minutes: 15
         category: hurt
-        points: -80
+        points: -30
         refs: [nist-sp800-61r3]
         gauges: { damage: -10, stamina: -5 }
         items:
-          - { id: a01-a-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
-          - { id: a01-a-content, points: -8, axis: content, refs: [jpcert-handling] }
-          - { id: a01-a-time, points: 3, axis: time, refs: [nist-sp800-61r3] }
+          - { id: a01-a-record, points: -7, axis: record, refs: [nist-sp800-61r3] }
+          - { id: a01-a-content, points: -6, axis: content, refs: [jpcert-handling] }
+          - { id: a01-a-time, points: 2, axis: time, refs: [nist-sp800-61r3] }
       - id: a01-observe
         text: { ja: '誤検知かもしれない。朝までアラートの推移を見てから動く。', en: '' }
         minutes: 60
         category: hurt
-        points: -100
+        points: -30
         refs: [jpcert-handling]
         gauges: { damage: 10, flame: 5, trust: -5 }
         coward: true
         items:
-          - { id: a01-b-time, points: -10, axis: time, refs: [jpcert-handling] }
-          - { id: a01-b-record, points: -8, axis: record, refs: [jpcert-handling] }
+          - { id: a01-b-time, points: -7, axis: time, refs: [jpcert-handling] }
+          - { id: a01-b-record, points: -6, axis: record, refs: [jpcert-handling] }
       - id: a01-isolate
         text: { ja: '対象サーバーをネットワークから隔離し、メモリとディスクの保全を始める。検知時刻と操作を記録する。', en: '' }
         minutes: 30
         category: maintain
-        points: 25
+        points: 30
         refs: [nist-sp800-61r3, jpcert-handling]
         gauges: { damage: -5, trust: 5, stamina: -5 }
         setFlags: { isolateStart: true }
         items:
-          - { id: a01-c-time, points: 5, axis: time, refs: [jpcert-handling] }
-          - { id: a01-c-order, points: 5, axis: order, refs: [nist-sp800-61r3] }
-          - { id: a01-c-record, points: 5, axis: record, refs: [jpcert-handling] }
-          - { id: a01-c-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a01-c-time, points: 4, axis: time, refs: [jpcert-handling] }
+          - { id: a01-c-order, points: 4, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a01-c-record, points: 4, axis: record, refs: [jpcert-handling] }
+          - { id: a01-c-content, points: 4, axis: content, refs: [nist-sp800-61r3] }
       - id: a01-vendor-first
         text: { ja: '監視サービスのベンダーに一次切り分けを依頼し、結果を待つ。', en: '' }
         minutes: 90
         category: hurt
-        points: -50
+        points: -30
         refs: [meti-csm-guideline]
         gauges: { damage: 5, trust: -5 }
         items:
-          - { id: a01-d-time, points: -8, axis: time, refs: [jpcert-handling] }
-          - { id: a01-d-order, points: -5, axis: order, refs: [meti-csm-guideline] }
+          - { id: a01-d-time, points: -6, axis: time, refs: [jpcert-handling] }
+          - { id: a01-d-order, points: -3, axis: order, refs: [meti-csm-guideline] }
 
   - id: a02-same-credential
     at: { day: 0, minutes: 1215 }
@@ -105,39 +105,39 @@ points:
         text: { ja: '隔離した一台だけを止め、ほかは監視を強めて様子を見る。', en: '' }
         minutes: 60
         category: hurt
-        points: -120
+        points: -30
         refs: [nist-sp800-61r3]
         gauges: { damage: 15, flame: 5 }
         delayed:
-          - { afterPhases: 1, points: -60, gauges: { damage: 15, trust: -10 }, reason: { ja: '止めなかったサーバーでも、同じ認証情報を使った不正な通信が続いた。', en: '' } }
+          - { afterPhases: 1, points: -18, gauges: { damage: 15, trust: -10 }, reason: { ja: '止めなかったサーバーでも、同じ認証情報を使った不正な通信が続いた。', en: '' } }
         items:
-          - { id: a02-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
-          - { id: a02-a-record, points: 3, axis: record, refs: [jpcert-handling] }
-          - { id: a02-a-time, points: -8, axis: time, refs: [nist-sp800-61r3] }
+          - { id: a02-a-content, points: -7, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a02-a-record, points: 2, axis: record, refs: [jpcert-handling] }
+          - { id: a02-a-time, points: -6, axis: time, refs: [nist-sp800-61r3] }
       - id: a02-all
         text: { ja: '影響しうる全サーバーの認証情報を無効化し、順次隔離する。顧客への影響は運用部と調整する。', en: '' }
         minutes: 120
         category: maintain
-        points: 25
+        points: 30
         refs: [nist-sp800-61r3, meti-csm-guideline]
         gauges: { damage: -20, flame: 10, stamina: -10 }
         setFlags: { contained: true }
         items:
-          - { id: a02-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
-          - { id: a02-b-order, points: 8, axis: order, refs: [meti-csm-guideline] }
-          - { id: a02-b-time, points: 5, axis: time, refs: [nist-sp800-61r3] }
-          - { id: a02-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: a02-b-content, points: 6, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a02-b-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+          - { id: a02-b-time, points: 4, axis: time, refs: [nist-sp800-61r3] }
+          - { id: a02-b-care, points: 4, axis: care, refs: [meti-csm-guideline] }
       - id: a02-ignore
         text: { ja: '監視ツールの誤検知としてアラートを閉じる。', en: '' }
         minutes: 15
         category: hurt
-        points: -150
+        points: -30
         refs: [jpcert-handling]
         gauges: { damage: 20, trust: -10 }
         coward: true
         items:
-          - { id: a02-c-content, points: -15, axis: content, refs: [jpcert-handling] }
-          - { id: a02-c-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a02-c-content, points: -10, axis: content, refs: [jpcert-handling] }
+          - { id: a02-c-record, points: -7, axis: record, refs: [jpcert-handling] }
 
   - id: a03-evidence
     at: { day: 0, minutes: 1245 }
@@ -150,14 +150,14 @@ points:
         text: { ja: '再起動して、様子を見る。', en: '' }
         minutes: 30
         category: hurt
-        points: -100
+        points: -30
         refs: [nist-sp800-61r3]
         gauges: { damage: 10, trust: -5 }
         delayed:
-          - { afterPhases: 1, points: -30, gauges: { damage: 10 }, reason: { ja: '再起動でメモリ上の痕跡が消え、侵入の手口が分からなくなった。', en: '' } }
+          - { afterPhases: 1, points: -9, gauges: { damage: 10 }, reason: { ja: '再起動でメモリ上の痕跡が消え、侵入の手口が分からなくなった。', en: '' } }
         items:
-          - { id: a03-a-record, points: -12, axis: record, refs: [nist-sp800-61r3] }
-          - { id: a03-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a03-a-record, points: -8, axis: record, refs: [nist-sp800-61r3] }
+          - { id: a03-a-content, points: -7, axis: content, refs: [nist-sp800-61r3] }
       - id: a03-image
         text: { ja: 'メモリとディスクのイメージを取得し、ハッシュと取得時刻を記録してから隔離を続ける。', en: '' }
         minutes: 90
@@ -167,32 +167,32 @@ points:
         gauges: { damage: -10, trust: 5, stamina: -10 }
         detail: forensic-plan
         items:
-          - { id: a03-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
-          - { id: a03-b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
-          - { id: a03-b-time, points: 5, axis: time, refs: [jpcert-handling] }
-          - { id: a03-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a03-b-order, points: 6, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a03-b-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a03-b-time, points: 4, axis: time, refs: [jpcert-handling] }
+          - { id: a03-b-content, points: 4, axis: content, refs: [nist-sp800-61r3] }
       - id: a03-delete
         text: { ja: '不審なファイルを削除し、サーバーをきれいにしてから返す。', en: '' }
         minutes: 45
         category: fatal
-        points: -250
+        points: -200
         refs: [nist-sp800-61r3, jpcert-handling]
         gauges: { damage: 10, flame: 15, trust: -20 }
         setFlags: { destroyedEvidence: true }
         items:
-          - { id: a03-c-record, points: -20, axis: record, refs: [jpcert-handling] }
-          - { id: a03-c-content, points: -15, axis: content, refs: [nist-sp800-61r3] }
-          - { id: a03-c-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a03-c-record, points: -14, axis: record, refs: [jpcert-handling] }
+          - { id: a03-c-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a03-c-wording, points: -7, axis: wording, refs: [meti-disclosure-guidance] }
       - id: a03-copy
         text: { ja: '不審なファイルだけをUSBメモリにコピーし、元のファイルは消す。', en: '' }
         minutes: 45
         category: hurt
-        points: -120
+        points: -30
         refs: [cissp-cbk-secops]
         gauges: { damage: 5, trust: -10 }
         items:
-          - { id: a03-d-record, points: -12, axis: record, refs: [cissp-cbk-secops] }
-          - { id: a03-d-order, points: -8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a03-d-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a03-d-order, points: -6, axis: order, refs: [nist-sp800-61r3] }
 
   - id: a04-first-report
     at: { day: 0, minutes: 1305 }
@@ -205,13 +205,13 @@ points:
         text: { ja: '全容が分かってから報告する。', en: '' }
         minutes: 120
         category: hurt
-        points: -100
+        points: -30
         refs: [jpcert-handling]
         gauges: { flame: 10, trust: -10, damage: 5 }
         coward: true
         items:
-          - { id: a04-a-time, points: -10, axis: time, refs: [jpcert-handling] }
-          - { id: a04-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+          - { id: a04-a-time, points: -7, axis: time, refs: [jpcert-handling] }
+          - { id: a04-a-record, points: -6, axis: record, refs: [jpcert-handling] }
       - id: a04-report
         text: { ja: '30分以内に、分かったこと・不明点・次にやることを分けて一次報告する。', en: '' }
         minutes: 45
@@ -222,33 +222,33 @@ points:
         detail: incident-note
         setFlags: { firstReport: true, prelimMaterialsSent: true }
         items:
-          - { id: a04-b-time, points: 8, axis: time, refs: [jpcert-handling] }
-          - { id: a04-b-order, points: 5, axis: order, refs: [cissp-cbk-secops] }
-          - { id: a04-b-record, points: 5, axis: record, refs: [jpcert-handling] }
-          - { id: a04-b-content, points: 5, axis: content, refs: [cissp-cbk-secops] }
+          - { id: a04-b-time, points: 6, axis: time, refs: [jpcert-handling] }
+          - { id: a04-b-order, points: 4, axis: order, refs: [cissp-cbk-secops] }
+          - { id: a04-b-record, points: 4, axis: record, refs: [jpcert-handling] }
+          - { id: a04-b-content, points: 4, axis: content, refs: [cissp-cbk-secops] }
       - id: a04-sns
         text: { ja: '個人のSNSに「大変なことになっている」と投稿して、社内に知らせる。', en: '' }
         minutes: 15
         category: hurt
-        points: -120
+        points: -30
         refs: [meti-disclosure-guidance]
         gauges: { flame: 15, trust: -10 }
         delayed:
-          - { afterPhases: 1, points: -40, gauges: { flame: 15, trust: -10 }, reason: { ja: '担当者の投稿が特定され、会社の説明と食い違った。', en: '' } }
+          - { afterPhases: 1, points: -12, gauges: { flame: 15, trust: -10 }, reason: { ja: '担当者の投稿が特定され、会社の説明と食い違った。', en: '' } }
         items:
-          - { id: a04-c-wording, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a04-c-record, points: -10, axis: record, refs: [jpcert-handling] }
-          - { id: a04-c-care, points: -5, axis: care, refs: [meti-csm-guideline] }
+          - { id: a04-c-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a04-c-record, points: -7, axis: record, refs: [jpcert-handling] }
+          - { id: a04-c-care, points: -3, axis: care, refs: [meti-csm-guideline] }
       - id: a04-oral
         text: { ja: '口頭で軽く伝え、書面は後回しにする。', en: '' }
         minutes: 30
         category: hurt
-        points: -60
+        points: -30
         refs: [jpcert-handling]
         gauges: { trust: -5 }
         items:
-          - { id: a04-d-record, points: -10, axis: record, refs: [jpcert-handling] }
-          - { id: a04-d-order, points: -5, axis: order, refs: [jpcert-handling] }
+          - { id: a04-d-record, points: -7, axis: record, refs: [jpcert-handling] }
+          - { id: a04-d-order, points: -3, axis: order, refs: [jpcert-handling] }
 
   - id: a05-keys
     at: { day: 0, minutes: 1335 }
@@ -261,47 +261,47 @@ points:
         text: { ja: '影響が確認できるまで、キーは有効のままにする。', en: '' }
         minutes: 60
         category: hurt
-        points: -120
+        points: -30
         refs: [nist-sp800-61r3]
         gauges: { damage: 15, trust: -10 }
         delayed:
-          - { afterPhases: 1, points: -50, gauges: { damage: 20, flame: 10 }, reason: { ja: '止めなかったキーで、外部から顧客データへのアクセスが続いた。', en: '' } }
+          - { afterPhases: 1, points: -15, gauges: { damage: 20, flame: 10 }, reason: { ja: '止めなかったキーで、外部から顧客データへのアクセスが続いた。', en: '' } }
         items:
-          - { id: a05-a-content, points: -12, axis: content, refs: [nist-sp800-61r3] }
-          - { id: a05-a-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a05-a-content, points: -8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a05-a-record, points: -7, axis: record, refs: [jpcert-handling] }
       - id: a05-rotate
         text: { ja: '侵害されたキーを失効させ、顧客ごとに新キーを発行して切替手順を案内する。', en: '' }
         minutes: 120
         category: maintain
-        points: 25
+        points: 30
         refs: [nist-sp800-61r3, meti-csm-guideline]
         gauges: { damage: -15, trust: 5, stamina: -10 }
         setFlags: { keysRotated: true }
         items:
-          - { id: a05-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
-          - { id: a05-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
-          - { id: a05-b-care, points: 8, axis: care, refs: [meti-csm-guideline] }
-          - { id: a05-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a05-b-order, points: 6, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a05-b-content, points: 6, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a05-b-care, points: 6, axis: care, refs: [meti-csm-guideline] }
+          - { id: a05-b-record, points: 4, axis: record, refs: [jpcert-handling] }
       - id: a05-all-rotate
         text: { ja: '全キーを一斉に失効させ、再発行は顧客に任せる。', en: '' }
         minutes: 60
         category: hurt
-        points: -50
+        points: -30
         refs: [meti-csm-guideline]
         gauges: { damage: -10, flame: 10, trust: -10 }
         items:
-          - { id: a05-c-care, points: -10, axis: care, refs: [meti-csm-guideline] }
-          - { id: a05-c-order, points: -8, axis: order, refs: [meti-csm-guideline] }
+          - { id: a05-c-care, points: -7, axis: care, refs: [meti-csm-guideline] }
+          - { id: a05-c-order, points: -6, axis: order, refs: [meti-csm-guideline] }
       - id: a05-share-key
         text: { ja: '調査を急ぐため、新しい共通キーを担当者全員に配る。', en: '' }
         minutes: 30
         category: hurt
-        points: -100
+        points: -30
         refs: [cissp-cbk-secops]
         gauges: { damage: 10, trust: -10 }
         items:
-          - { id: a05-d-content, points: -12, axis: content, refs: [cissp-cbk-secops] }
-          - { id: a05-d-record, points: -10, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a05-d-content, points: -8, axis: content, refs: [cissp-cbk-secops] }
+          - { id: a05-d-record, points: -7, axis: record, refs: [cissp-cbk-secops] }
 
   - id: a06-logs
     at: { day: 1, minutes: 360 }
@@ -316,13 +316,13 @@ points:
         text: { ja: 'ログがないので、侵入経路の調査は打ち切る。', en: '' }
         minutes: 60
         category: hurt
-        points: -120
+        points: -30
         refs: [nist-sp800-61r3]
         gauges: { damage: 10, trust: -10 }
         coward: true
         items:
-          - { id: a06-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
-          - { id: a06-a-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a06-a-content, points: -7, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a06-a-record, points: -7, axis: record, refs: [jpcert-handling] }
       - id: a06-piecing
         text: { ja: '残ったログ、バックアップ、監視装置、変更履歴を突き合わせ、分かる範囲と不明点を分けて記録する。', en: '' }
         minutes: 240
@@ -331,32 +331,32 @@ points:
         refs: [nist-sp800-61r3, cissp-cbk-secops]
         gauges: { damage: -10, trust: 5, stamina: -15 }
         items:
-          - { id: a06-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
-          - { id: a06-b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
-          - { id: a06-b-time, points: 8, axis: time, refs: [jpcert-handling] }
-          - { id: a06-b-order, points: 5, axis: order, refs: [cissp-cbk-secops] }
-          - { id: a06-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a06-b-content, points: 6, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a06-b-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a06-b-time, points: 6, axis: time, refs: [jpcert-handling] }
+          - { id: a06-b-order, points: 4, axis: order, refs: [cissp-cbk-secops] }
+          - { id: a06-b-wording, points: 4, axis: wording, refs: [meti-disclosure-guidance] }
       - id: a06-assume
         text: { ja: 'おそらくVPN機器の脆弱性だろうと断定し、公表文の材料に書く。', en: '' }
         minutes: 60
         category: hurt
-        points: -100
+        points: -30
         refs: [meti-disclosure-guidance]
         gauges: { flame: 10, trust: -10 }
         items:
-          - { id: a06-c-wording, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a06-c-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a06-c-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a06-c-content, points: -7, axis: content, refs: [nist-sp800-61r3] }
       - id: a06-fake
         text: { ja: 'SNSに「内部犯の可能性がある」と書き込む。', en: '' }
         minutes: 30
         category: hurt
-        points: -150
+        points: -30
         refs: [meti-disclosure-guidance]
         gauges: { flame: 20, trust: -15 }
         items:
-          - { id: a06-d-wording, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a06-d-record, points: -12, axis: record, refs: [jpcert-handling] }
-          - { id: a06-d-care, points: -8, axis: care, refs: [meti-csm-guideline] }
+          - { id: a06-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a06-d-record, points: -8, axis: record, refs: [jpcert-handling] }
+          - { id: a06-d-care, points: -6, axis: care, refs: [meti-csm-guideline] }
 
   - id: a07-ransom
     at: { day: 1, minutes: 840 }
@@ -369,14 +369,14 @@ points:
         text: { ja: '自分で返信して、公開を止める交渉をする。', en: '' }
         minutes: 60
         category: hurt
-        points: -100
+        points: -30
         refs: [npa-consult]
         gauges: { flame: 10, trust: -10 }
         delayed:
-          - { afterPhases: 1, points: -40, gauges: { flame: 15 }, reason: { ja: '返信で担当者の存在が伝わり、要求額が上がった。', en: '' } }
+          - { afterPhases: 1, points: -12, gauges: { flame: 15 }, reason: { ja: '返信で担当者の存在が伝わり、要求額が上がった。', en: '' } }
         items:
-          - { id: a07-a-order, points: -10, axis: order, refs: [npa-consult] }
-          - { id: a07-a-record, points: -8, axis: record, refs: [npa-consult] }
+          - { id: a07-a-order, points: -7, axis: order, refs: [npa-consult] }
+          - { id: a07-a-record, points: -6, axis: record, refs: [npa-consult] }
       - id: a07-preserve
         text: { ja: '返信せず、メール本文・ヘッダ・受信時刻を保全し、CSIRTと警察の相談窓口へ渡す。', en: '' }
         minutes: 90
@@ -386,32 +386,32 @@ points:
         gauges: { flame: -5, trust: 5, stamina: -5 }
         setFlags: { ransomPreserved: true }
         items:
-          - { id: a07-b-record, points: 8, axis: record, refs: [jpcert-handling] }
-          - { id: a07-b-order, points: 8, axis: order, refs: [npa-consult] }
-          - { id: a07-b-time, points: 5, axis: time, refs: [jpcert-handling] }
-          - { id: a07-b-care, points: 5, axis: care, refs: [npa-consult] }
+          - { id: a07-b-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: a07-b-order, points: 6, axis: order, refs: [npa-consult] }
+          - { id: a07-b-time, points: 4, axis: time, refs: [jpcert-handling] }
+          - { id: a07-b-care, points: 4, axis: care, refs: [npa-consult] }
       - id: a07-delete
         text: { ja: '気持ちが悪いので、要求メールを削除する。', en: '' }
         minutes: 15
         category: fatal
-        points: -250
+        points: -200
         refs: [jpcert-handling]
         gauges: { flame: 15, trust: -20 }
         setFlags: { destroyedEvidence: true }
         items:
-          - { id: a07-c-record, points: -20, axis: record, refs: [jpcert-handling] }
-          - { id: a07-c-content, points: -15, axis: content, refs: [npa-consult] }
+          - { id: a07-c-record, points: -14, axis: record, refs: [jpcert-handling] }
+          - { id: a07-c-content, points: -10, axis: content, refs: [npa-consult] }
       - id: a07-post
         text: { ja: '要求文をそのままSNSに公開して、注意を呼びかける。', en: '' }
         minutes: 30
         category: hurt
-        points: -120
+        points: -30
         refs: [meti-disclosure-guidance]
         gauges: { flame: 20, trust: -10 }
         items:
-          - { id: a07-d-wording, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a07-d-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
-          - { id: a07-d-record, points: -8, axis: record, refs: [jpcert-handling] }
+          - { id: a07-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a07-d-care, points: -7, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: a07-d-record, points: -6, axis: record, refs: [jpcert-handling] }
 
   - id: a08-my-warning
     at: { day: 2, minutes: 540 }
@@ -426,16 +426,16 @@ points:
         text: { ja: '自分のメールは調査資料から外す。', en: '' }
         minutes: 30
         category: fatal
-        points: -250
+        points: -200
         refs: [meti-csm-guideline]
         gauges: { flame: 25, trust: -25 }
         setFlags: { hidWarning: true }
         delayed:
-          - { afterPhases: 2, points: -100, gauges: { flame: 20, trust: -15 }, reason: { ja: '担当者が自分の指摘を隠したことが報道され、説明責任を問われた。', en: '' } }
+          - { afterPhases: 2, points: -30, gauges: { flame: 20, trust: -15 }, reason: { ja: '担当者が自分の指摘を隠したことが報道され、説明責任を問われた。', en: '' } }
         items:
-          - { id: a08-a-record, points: -20, axis: record, refs: [meti-csm-guideline] }
-          - { id: a08-a-content, points: -15, axis: content, refs: [meti-csm-guideline] }
-          - { id: a08-a-care, points: -10, axis: care, refs: [jpcert-handling] }
+          - { id: a08-a-record, points: -14, axis: record, refs: [meti-csm-guideline] }
+          - { id: a08-a-content, points: -10, axis: content, refs: [meti-csm-guideline] }
+          - { id: a08-a-care, points: -7, axis: care, refs: [jpcert-handling] }
       - id: a08-submit
         text: { ja: 'メールを調査資料に含め、当時の経緯を正直に書く。', en: '' }
         minutes: 60
@@ -445,33 +445,33 @@ points:
         gauges: { flame: -5, trust: 10, stamina: -5 }
         setFlags: { ownWarningSubmitted: true }
         items:
-          - { id: a08-b-record, points: 8, axis: record, refs: [jpcert-handling] }
-          - { id: a08-b-content, points: 8, axis: content, refs: [meti-csm-guideline] }
-          - { id: a08-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a08-b-order, points: 5, axis: order, refs: [jpcert-handling] }
+          - { id: a08-b-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: a08-b-content, points: 6, axis: content, refs: [meti-csm-guideline] }
+          - { id: a08-b-wording, points: 4, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a08-b-order, points: 4, axis: order, refs: [jpcert-handling] }
       - id: a08-submit-detail
         text: { ja: '調査資料に含めたうえで、自分が押し切らなかった点も書き、再発防止の担当として手を挙げる。', en: '' }
         minutes: 90
         category: recover
-        points: 100
+        points: 150
         refs: [meti-csm-guideline, cissp-cbk-secops]
         gauges: { flame: -10, trust: 15, stamina: -10 }
         setFlags: { ownWarningSubmitted: true, ownWarningOwned: true }
         items:
-          - { id: a08-c-record, points: 10, axis: record, refs: [jpcert-handling] }
-          - { id: a08-c-content, points: 8, axis: content, refs: [meti-csm-guideline] }
-          - { id: a08-c-care, points: 8, axis: care, refs: [cissp-cbk-secops] }
-          - { id: a08-c-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a08-c-record, points: 7, axis: record, refs: [jpcert-handling] }
+          - { id: a08-c-content, points: 6, axis: content, refs: [meti-csm-guideline] }
+          - { id: a08-c-care, points: 6, axis: care, refs: [cissp-cbk-secops] }
+          - { id: a08-c-wording, points: 4, axis: wording, refs: [meti-disclosure-guidance] }
       - id: a08-blame
         text: { ja: '「上の判断で止められた」とだけ書き、自分は悪くない形にする。', en: '' }
         minutes: 45
         category: hurt
-        points: -80
+        points: -30
         refs: [meti-csm-guideline]
         gauges: { flame: 10, trust: -10 }
         items:
-          - { id: a08-d-wording, points: -10, axis: wording, refs: [meti-csm-guideline] }
-          - { id: a08-d-care, points: -8, axis: care, refs: [jpcert-handling] }
+          - { id: a08-d-wording, points: -7, axis: wording, refs: [meti-csm-guideline] }
+          - { id: a08-d-care, points: -6, axis: care, refs: [jpcert-handling] }
 
   - id: a09-leak-site
     at: { day: 2, minutes: 780 }
@@ -484,14 +484,14 @@ points:
         text: { ja: '掲示板とSNSの書き込みを全部追い、一つずつ反論する。', en: '' }
         minutes: 180
         category: hurt
-        points: -100
+        points: -30
         refs: [meti-disclosure-guidance]
         gauges: { flame: 10, stamina: -10 }
         delayed:
-          - { afterPhases: 1, points: -30, gauges: { flame: 10 }, reason: { ja: '未確認の書き込みに反論したことで、かえって注目が集まった。', en: '' } }
+          - { afterPhases: 1, points: -9, gauges: { flame: 10 }, reason: { ja: '未確認の書き込みに反論したことで、かえって注目が集まった。', en: '' } }
         items:
-          - { id: a09-a-time, points: -10, axis: time, refs: [meti-disclosure-guidance] }
-          - { id: a09-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a09-a-time, points: -7, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: a09-a-wording, points: -7, axis: wording, refs: [meti-disclosure-guidance] }
       - id: a09-verify
         text: { ja: '掲載ファイルを保全してハッシュを記録し、自社データと照合した結果だけを報告する。', en: '' }
         minutes: 180
@@ -500,33 +500,33 @@ points:
         refs: [jpcert-handling, nist-sp800-61r3]
         gauges: { flame: -5, trust: 5, stamina: -10 }
         items:
-          - { id: a09-b-content, points: 8, axis: content, refs: [jpcert-handling] }
-          - { id: a09-b-record, points: 8, axis: record, refs: [nist-sp800-61r3] }
-          - { id: a09-b-order, points: 5, axis: order, refs: [jpcert-handling] }
-          - { id: a09-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
-          - { id: a09-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a09-b-content, points: 6, axis: content, refs: [jpcert-handling] }
+          - { id: a09-b-record, points: 6, axis: record, refs: [nist-sp800-61r3] }
+          - { id: a09-b-order, points: 4, axis: order, refs: [jpcert-handling] }
+          - { id: a09-b-care, points: 4, axis: care, refs: [meti-csm-guideline] }
+          - { id: a09-b-wording, points: 4, axis: wording, refs: [meti-disclosure-guidance] }
       - id: a09-buy
         text: { ja: '攻撃者に接触して、公開されたデータを買い取る。', en: '' }
         minutes: 90
         category: fatal
-        points: -250
+        points: -200
         refs: [npa-consult]
         gauges: { flame: 20, trust: -20 }
         setFlags: { paidAttacker: true }
         items:
-          - { id: a09-c-record, points: -20, axis: record, refs: [npa-consult] }
-          - { id: a09-c-content, points: -10, axis: content, refs: [npa-consult] }
+          - { id: a09-c-record, points: -14, axis: record, refs: [npa-consult] }
+          - { id: a09-c-content, points: -7, axis: content, refs: [npa-consult] }
       - id: a09-ignore
         text: { ja: '掲示板の書き込みは無視して、何もしない。', en: '' }
         minutes: 15
         category: hurt
-        points: -80
+        points: -30
         refs: [jpcert-handling]
         gauges: { damage: 5, flame: 5 }
         coward: true
         items:
-          - { id: a09-d-content, points: -10, axis: content, refs: [jpcert-handling] }
-          - { id: a09-d-time, points: -8, axis: time, refs: [jpcert-handling] }
+          - { id: a09-d-content, points: -7, axis: content, refs: [jpcert-handling] }
+          - { id: a09-d-time, points: -6, axis: time, refs: [jpcert-handling] }
 
   - id: a10-vendor
     at: { day: 3, minutes: 600 }
@@ -539,45 +539,45 @@ points:
         text: { ja: 'ベンダーの説明をそのまま受け入れ、調査を任せる。', en: '' }
         minutes: 60
         category: hurt
-        points: -100
+        points: -30
         refs: [meti-csm-guideline]
         gauges: { flame: 5, trust: -10 }
         items:
-          - { id: a10-a-content, points: -12, axis: content, refs: [meti-csm-guideline] }
-          - { id: a10-a-order, points: -8, axis: order, refs: [meti-csm-guideline] }
+          - { id: a10-a-content, points: -8, axis: content, refs: [meti-csm-guideline] }
+          - { id: a10-a-order, points: -6, axis: order, refs: [meti-csm-guideline] }
       - id: a10-joint
         text: { ja: '自社のログと侵害指標を整理して渡し、共同調査と原因の断定回避を上に進言する。', en: '' }
         minutes: 120
         category: maintain
-        points: 25
+        points: 30
         refs: [meti-csm-guideline, cissp-cbk-secops]
         gauges: { trust: 5, stamina: -10 }
         items:
-          - { id: a10-b-order, points: 8, axis: order, refs: [meti-csm-guideline] }
-          - { id: a10-b-content, points: 8, axis: content, refs: [cissp-cbk-secops] }
-          - { id: a10-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a10-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a10-b-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+          - { id: a10-b-content, points: 6, axis: content, refs: [cissp-cbk-secops] }
+          - { id: a10-b-wording, points: 4, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a10-b-record, points: 4, axis: record, refs: [jpcert-handling] }
       - id: a10-blame
         text: { ja: 'SNSで「ベンダーの製品が原因」と断定して書き込む。', en: '' }
         minutes: 30
         category: hurt
-        points: -150
+        points: -30
         refs: [meti-disclosure-guidance]
         gauges: { flame: 25, trust: -15 }
         items:
-          - { id: a10-c-wording, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a10-c-care, points: -10, axis: care, refs: [meti-csm-guideline] }
-          - { id: a10-c-content, points: -10, axis: content, refs: [cissp-cbk-secops] }
+          - { id: a10-c-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a10-c-care, points: -7, axis: care, refs: [meti-csm-guideline] }
+          - { id: a10-c-content, points: -7, axis: content, refs: [cissp-cbk-secops] }
       - id: a10-hide-ioc
         text: { ja: '調査を急ぐため、侵害指標を外部の掲示板に共有して助力を求める。', en: '' }
         minutes: 45
         category: hurt
-        points: -120
+        points: -30
         refs: [meti-trade-secret]
         gauges: { flame: 10, trust: -10 }
         items:
-          - { id: a10-d-order, points: -10, axis: order, refs: [meti-trade-secret] }
-          - { id: a10-d-record, points: -8, axis: record, refs: [jpcert-handling] }
+          - { id: a10-d-order, points: -7, axis: order, refs: [meti-trade-secret] }
+          - { id: a10-d-record, points: -6, axis: record, refs: [jpcert-handling] }
 
   - id: a11-fatigue
     at: { day: 4, minutes: 540 }
@@ -590,14 +590,14 @@ points:
         text: { ja: '自分が最後までやる。他の人に渡すと分からなくなる。', en: '' }
         minutes: 120
         category: hurt
-        points: -60
+        points: -30
         refs: [ipa-sme-guideline]
         gauges: { stamina: -20, damage: 10, trust: -5 }
         delayed:
-          - { afterPhases: 2, points: -40, gauges: { stamina: -15, damage: 10 }, reason: { ja: '疲労から確認漏れが起き、調査結果のやり直しになった。', en: '' } }
+          - { afterPhases: 2, points: -12, gauges: { stamina: -15, damage: 10 }, reason: { ja: '疲労から確認漏れが起き、調査結果のやり直しになった。', en: '' } }
         items:
-          - { id: a11-a-care, points: -10, axis: care, refs: [ipa-sme-guideline] }
-          - { id: a11-a-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a11-a-care, points: -7, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a11-a-record, points: -6, axis: record, refs: [cissp-cbk-secops] }
       - id: a11-shift
         text: { ja: '調査状態と未確認事項を引き継ぎ書にまとめ、半日交代にする。', en: '' }
         minutes: 90
@@ -606,34 +606,34 @@ points:
         refs: [ipa-sme-guideline, cissp-cbk-secops]
         gauges: { stamina: 10, trust: 5, damage: -5 }
         items:
-          - { id: a11-b-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
-          - { id: a11-b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
-          - { id: a11-b-order, points: 5, axis: order, refs: [cissp-cbk-secops] }
-          - { id: a11-b-content, points: 5, axis: content, refs: [ipa-sme-guideline] }
+          - { id: a11-b-care, points: 6, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a11-b-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a11-b-order, points: 4, axis: order, refs: [cissp-cbk-secops] }
+          - { id: a11-b-content, points: 4, axis: content, refs: [ipa-sme-guideline] }
       - id: a11-shift-plan
         text: { ja: '引き継ぎ書に加え、見落としを防ぐ確認チェックリストを作り、全員で使う。', en: '' }
         minutes: 150
         category: recover
-        points: 100
+        points: 150
         refs: [ipa-sme-guideline, cissp-cbk-secops]
         gauges: { stamina: 15, trust: 10, flame: -5 }
         setFlags: { handoverDoc: true }
         items:
-          - { id: a11-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
-          - { id: a11-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
-          - { id: a11-c-order, points: 8, axis: order, refs: [cissp-cbk-secops] }
-          - { id: a11-c-content, points: 5, axis: content, refs: [ipa-sme-guideline] }
+          - { id: a11-c-care, points: 6, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a11-c-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a11-c-order, points: 6, axis: order, refs: [cissp-cbk-secops] }
+          - { id: a11-c-content, points: 4, axis: content, refs: [ipa-sme-guideline] }
       - id: a11-silent
         text: { ja: '疲れていることを隠して、いつも通りに装う。', en: '' }
         minutes: 30
         category: hurt
-        points: -80
+        points: -30
         refs: [ipa-sme-guideline]
         gauges: { stamina: -15, damage: 10 }
         coward: true
         items:
-          - { id: a11-d-care, points: -10, axis: care, refs: [ipa-sme-guideline] }
-          - { id: a11-d-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a11-d-care, points: -7, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a11-d-record, points: -6, axis: record, refs: [cissp-cbk-secops] }
 
   - id: a12-pr
     at: { day: 4, minutes: 900 }
@@ -646,12 +646,12 @@ points:
         text: { ja: '「VPN機器の脆弱性が原因」と断定して渡す。', en: '' }
         minutes: 30
         category: hurt
-        points: -100
+        points: -30
         refs: [meti-disclosure-guidance]
         gauges: { flame: 10, trust: -10 }
         items:
-          - { id: a12-a-wording, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a12-a-content, points: -10, axis: content, refs: [cissp-cbk-secops] }
+          - { id: a12-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a12-a-content, points: -7, axis: content, refs: [cissp-cbk-secops] }
       - id: a12-facts
         text: { ja: '確認できた事実、未確認の点、次に分かる予定を分けて渡す。', en: '' }
         minutes: 90
@@ -661,31 +661,31 @@ points:
         gauges: { trust: 5, stamina: -5 }
         setFlags: { prelimMaterialsSent: true }
         items:
-          - { id: a12-b-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
-          - { id: a12-b-wording, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a12-b-order, points: 5, axis: order, refs: [jpcert-handling] }
-          - { id: a12-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a12-b-content, points: 6, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: a12-b-wording, points: 6, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a12-b-order, points: 4, axis: order, refs: [jpcert-handling] }
+          - { id: a12-b-record, points: 4, axis: record, refs: [jpcert-handling] }
       - id: a12-refuse
         text: { ja: '「技術のことは分かりません」と丸投げする。', en: '' }
         minutes: 15
         category: hurt
-        points: -60
+        points: -30
         refs: [meti-csm-guideline]
         gauges: { trust: -5 }
         items:
-          - { id: a12-c-care, points: -8, axis: care, refs: [meti-csm-guideline] }
-          - { id: a12-c-order, points: -8, axis: order, refs: [jpcert-handling] }
+          - { id: a12-c-care, points: -6, axis: care, refs: [meti-csm-guideline] }
+          - { id: a12-c-order, points: -6, axis: order, refs: [jpcert-handling] }
       - id: a12-leak-draft
         text: { ja: '公表前の文案を、知人の技術者に相談する。', en: '' }
         minutes: 30
         category: hurt
-        points: -150
+        points: -30
         refs: [meti-trade-secret]
         gauges: { flame: 10, trust: -10 }
         items:
-          - { id: a12-d-record, points: -15, axis: record, refs: [meti-trade-secret] }
-          - { id: a12-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a12-d-care, points: -8, axis: care, refs: [meti-csm-guideline] }
+          - { id: a12-d-record, points: -10, axis: record, refs: [meti-trade-secret] }
+          - { id: a12-d-wording, points: -7, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a12-d-care, points: -6, axis: care, refs: [meti-csm-guideline] }
 
   - id: a13-personal
     at: { day: 5, minutes: 660 }
@@ -698,14 +698,14 @@ points:
         text: { ja: '個人SNSで会社を擁護する長文を投稿する。', en: '' }
         minutes: 30
         category: hurt
-        points: -120
+        points: -30
         refs: [meti-disclosure-guidance]
         gauges: { flame: 15, trust: -10 }
         delayed:
-          - { afterPhases: 1, points: -40, gauges: { flame: 10, trust: -10 }, reason: { ja: '個人の投稿が公式発表と食い違い、説明が分裂した。', en: '' } }
+          - { afterPhases: 1, points: -12, gauges: { flame: 10, trust: -10 }, reason: { ja: '個人の投稿が公式発表と食い違い、説明が分裂した。', en: '' } }
         items:
-          - { id: a13-a-wording, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a13-a-order, points: -10, axis: order, refs: [meti-csm-guideline] }
+          - { id: a13-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a13-a-order, points: -7, axis: order, refs: [meti-csm-guideline] }
       - id: a13-forward
         text: { ja: '取材依頼を広報に回し、個人の意見は述べない。', en: '' }
         minutes: 45
@@ -714,34 +714,34 @@ points:
         refs: [meti-csm-guideline, meti-disclosure-guidance]
         gauges: { trust: 5 }
         items:
-          - { id: a13-b-order, points: 8, axis: order, refs: [meti-csm-guideline] }
-          - { id: a13-b-wording, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a13-b-record, points: 5, axis: record, refs: [jpcert-handling] }
-          - { id: a13-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: a13-b-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+          - { id: a13-b-wording, points: 6, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a13-b-record, points: 4, axis: record, refs: [jpcert-handling] }
+          - { id: a13-b-care, points: 4, axis: care, refs: [meti-csm-guideline] }
       - id: a13-anon
         text: { ja: '匿名アカウントで、社内の詳しい事情を漏らす。', en: '' }
         minutes: 30
         category: fatal
-        points: -250
+        points: -200
         refs: [meti-trade-secret]
         gauges: { flame: 25, trust: -25 }
         setFlags: { leakedInternals: true }
         items:
-          - { id: a13-c-record, points: -20, axis: record, refs: [meti-trade-secret] }
-          - { id: a13-c-care, points: -15, axis: care, refs: [meti-csm-guideline] }
-          - { id: a13-c-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a13-c-record, points: -14, axis: record, refs: [meti-trade-secret] }
+          - { id: a13-c-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+          - { id: a13-c-wording, points: -7, axis: wording, refs: [meti-disclosure-guidance] }
       - id: a13-ad-flag
         text: { ja: '広報に広告の停止と注意喚起への差し替えを進言し、問い合わせ窓口を一本化する。', en: '' }
         minutes: 90
         category: recover
-        points: 80
+        points: 120
         refs: [meti-disclosure-guidance, ppc-notify-person]
         gauges: { flame: -10, trust: 10, stamina: -5 }
         items:
-          - { id: a13-d-order, points: 8, axis: order, refs: [meti-disclosure-guidance] }
-          - { id: a13-d-care, points: 8, axis: care, refs: [ppc-notify-person] }
-          - { id: a13-d-wording, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a13-d-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a13-d-order, points: 6, axis: order, refs: [meti-disclosure-guidance] }
+          - { id: a13-d-care, points: 6, axis: care, refs: [ppc-notify-person] }
+          - { id: a13-d-wording, points: 6, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a13-d-record, points: 4, axis: record, refs: [jpcert-handling] }
 
   - id: a14-leak
     at: { day: 6, minutes: 480 }
@@ -756,47 +756,47 @@ points:
         text: { ja: '「確認中」を続け、公開された事実を認めない。', en: '' }
         minutes: 120
         category: hurt
-        points: -120
+        points: -30
         refs: [meti-disclosure-guidance]
         gauges: { flame: 20, trust: -15 }
         coward: true
         items:
-          - { id: a14-a-content, points: -10, axis: content, refs: [meti-disclosure-guidance] }
-          - { id: a14-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a14-a-content, points: -7, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: a14-a-wording, points: -7, axis: wording, refs: [meti-disclosure-guidance] }
       - id: a14-verify
         text: { ja: '公開データを保全し、照合結果（一致・不一致・古いバックアップの可能性）を整理してCSIRTと法務に渡す。', en: '' }
         minutes: 180
         category: recover
-        points: 80
+        points: 120
         refs: [jpcert-handling, ppc-notify-person]
         gauges: { flame: -10, trust: 10, stamina: -15 }
         setFlags: { leakVerified: true }
         items:
-          - { id: a14-b-content, points: 8, axis: content, refs: [jpcert-handling] }
-          - { id: a14-b-record, points: 8, axis: record, refs: [nist-sp800-61r3] }
-          - { id: a14-b-order, points: 8, axis: order, refs: [ppc-notify-person] }
-          - { id: a14-b-care, points: 5, axis: care, refs: [ppc-notify-person] }
-          - { id: a14-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a14-b-content, points: 6, axis: content, refs: [jpcert-handling] }
+          - { id: a14-b-record, points: 6, axis: record, refs: [nist-sp800-61r3] }
+          - { id: a14-b-order, points: 6, axis: order, refs: [ppc-notify-person] }
+          - { id: a14-b-care, points: 4, axis: care, refs: [ppc-notify-person] }
+          - { id: a14-b-wording, points: 4, axis: wording, refs: [meti-disclosure-guidance] }
       - id: a14-contact
         text: { ja: '該当しそうな顧客に、個別にDMで連絡する。', en: '' }
         minutes: 90
         category: hurt
-        points: -80
+        points: -30
         refs: [ppc-notify-person]
         gauges: { flame: 5, trust: -5 }
         items:
-          - { id: a14-c-order, points: -10, axis: order, refs: [ppc-notify-person] }
-          - { id: a14-c-care, points: -8, axis: care, refs: [ppc-notify-person] }
+          - { id: a14-c-order, points: -7, axis: order, refs: [ppc-notify-person] }
+          - { id: a14-c-care, points: -6, axis: care, refs: [ppc-notify-person] }
       - id: a14-delete
         text: { ja: '公開されたデータを削除するよう、攻撃者に要求する。', en: '' }
         minutes: 45
         category: hurt
-        points: -100
+        points: -30
         refs: [npa-consult]
         gauges: { flame: 5, trust: -5 }
         items:
-          - { id: a14-d-order, points: -10, axis: order, refs: [npa-consult] }
-          - { id: a14-d-record, points: -8, axis: record, refs: [jpcert-handling] }
+          - { id: a14-d-order, points: -7, axis: order, refs: [npa-consult] }
+          - { id: a14-d-record, points: -6, axis: record, refs: [jpcert-handling] }
 
   - id: a15-restore
     at: { day: 9, minutes: 600 }
@@ -809,48 +809,48 @@ points:
         text: { ja: 'バックアップから一気に戻して、復旧を急ぐ。', en: '' }
         minutes: 120
         category: hurt
-        points: -120
+        points: -30
         refs: [nist-sp800-61r3]
         gauges: { damage: 15, trust: -10 }
         delayed:
-          - { afterPhases: 1, points: -60, gauges: { damage: 15, trust: -15 }, reason: { ja: '戻した環境に古い認証情報が残り、再び不審な通信が起きた。', en: '' } }
+          - { afterPhases: 1, points: -18, gauges: { damage: 15, trust: -15 }, reason: { ja: '戻した環境に古い認証情報が残り、再び不審な通信が起きた。', en: '' } }
         items:
-          - { id: a15-a-content, points: -12, axis: content, refs: [nist-sp800-61r3] }
-          - { id: a15-a-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a15-a-content, points: -8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a15-a-record, points: -7, axis: record, refs: [jpcert-handling] }
       - id: a15-verify
         text: { ja: '侵害に使われた認証情報と永続化の仕掛けを洗い出し、クリーンな環境で検証してから段階的に戻す。', en: '' }
         minutes: 300
         category: recover
-        points: 100
+        points: 150
         refs: [nist-sp800-61r3, cissp-cbk-secops]
         gauges: { damage: -15, trust: 10, stamina: -15 }
         setFlags: { cleanRestore: true }
         items:
-          - { id: a15-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
-          - { id: a15-b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
-          - { id: a15-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
-          - { id: a15-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
-          - { id: a15-b-time, points: 5, axis: time, refs: [jpcert-handling] }
+          - { id: a15-b-content, points: 6, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a15-b-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a15-b-order, points: 6, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a15-b-care, points: 4, axis: care, refs: [meti-csm-guideline] }
+          - { id: a15-b-time, points: 4, axis: time, refs: [jpcert-handling] }
       - id: a15-partial
         text: { ja: '重要な顧客のシステムだけ、先に戻す。', en: '' }
         minutes: 120
         category: hurt
-        points: -80
+        points: -30
         refs: [nist-sp800-61r3]
         gauges: { damage: 10, trust: -5 }
         items:
-          - { id: a15-c-order, points: -8, axis: order, refs: [nist-sp800-61r3] }
-          - { id: a15-c-content, points: -8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a15-c-order, points: -6, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a15-c-content, points: -6, axis: content, refs: [nist-sp800-61r3] }
       - id: a15-newkeys
         text: { ja: '全認証情報を作り直さず、パスワード変更だけで戻す。', en: '' }
         minutes: 60
         category: hurt
-        points: -100
+        points: -30
         refs: [cissp-cbk-secops]
         gauges: { damage: 10, trust: -5 }
         items:
-          - { id: a15-d-record, points: -10, axis: record, refs: [cissp-cbk-secops] }
-          - { id: a15-d-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a15-d-record, points: -7, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a15-d-content, points: -7, axis: content, refs: [nist-sp800-61r3] }
 
   - id: a16-monitor
     at: { day: 12, minutes: 540 }
@@ -863,14 +863,14 @@ points:
         text: { ja: '通常の監視体制に戻す。', en: '' }
         minutes: 60
         category: hurt
-        points: -100
+        points: -30
         refs: [nist-sp800-61r3]
         gauges: { damage: 10, trust: -5 }
         delayed:
-          - { afterPhases: 1, points: -50, gauges: { damage: 15, trust: -10 }, reason: { ja: '監視を緩めた直後に、別のサーバーで不審な通信を見逃した。', en: '' } }
+          - { afterPhases: 1, points: -15, gauges: { damage: 15, trust: -10 }, reason: { ja: '監視を緩めた直後に、別のサーバーで不審な通信を見逃した。', en: '' } }
         items:
-          - { id: a16-a-care, points: -10, axis: care, refs: [nist-sp800-61r3] }
-          - { id: a16-a-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a16-a-care, points: -7, axis: care, refs: [nist-sp800-61r3] }
+          - { id: a16-a-record, points: -6, axis: record, refs: [cissp-cbk-secops] }
       - id: a16-continue
         text: { ja: '二週間は強化監視を続け、誤検知の理由も記録する。', en: '' }
         minutes: 90
@@ -879,33 +879,33 @@ points:
         refs: [nist-sp800-61r3, cissp-cbk-secops]
         gauges: { damage: -5, trust: 5, stamina: -10 }
         items:
-          - { id: a16-b-care, points: 8, axis: care, refs: [nist-sp800-61r3] }
-          - { id: a16-b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
-          - { id: a16-b-order, points: 5, axis: order, refs: [cissp-cbk-secops] }
-          - { id: a16-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a16-b-care, points: 6, axis: care, refs: [nist-sp800-61r3] }
+          - { id: a16-b-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a16-b-order, points: 4, axis: order, refs: [cissp-cbk-secops] }
+          - { id: a16-b-content, points: 4, axis: content, refs: [nist-sp800-61r3] }
       - id: a16-rule
         text: { ja: '検知ルールを追加し、再発の兆候を経営に週次で報告する。', en: '' }
         minutes: 150
         category: recover
-        points: 100
+        points: 150
         refs: [nist-sp800-61r3, meti-csm-guideline]
         gauges: { damage: -10, trust: 10, stamina: -10 }
         setFlags: { monitorImproved: true }
         items:
-          - { id: a16-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
-          - { id: a16-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
-          - { id: a16-c-care, points: 8, axis: care, refs: [meti-csm-guideline] }
-          - { id: a16-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: a16-c-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a16-c-content, points: 6, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a16-c-care, points: 6, axis: care, refs: [meti-csm-guideline] }
+          - { id: a16-c-order, points: 4, axis: order, refs: [meti-csm-guideline] }
       - id: a16-off
         text: { ja: 'アラートがうるさいので、通知を切る。', en: '' }
         minutes: 15
         category: hurt
-        points: -150
+        points: -30
         refs: [nist-sp800-61r3]
         gauges: { damage: 20, trust: -15 }
         items:
-          - { id: a16-d-record, points: -15, axis: record, refs: [nist-sp800-61r3] }
-          - { id: a16-d-care, points: -10, axis: care, refs: [cissp-cbk-secops] }
+          - { id: a16-d-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
+          - { id: a16-d-care, points: -7, axis: care, refs: [cissp-cbk-secops] }
 
   - id: a17-timeline
     at: { day: 30, minutes: 600 }
@@ -918,48 +918,48 @@ points:
         text: { ja: '都合のよい記録だけを出す。', en: '' }
         minutes: 60
         category: fatal
-        points: -250
+        points: -200
         refs: [meti-csm-guideline]
         gauges: { flame: 20, trust: -25 }
         setFlags: { hidRecords: true }
         items:
-          - { id: a17-a-record, points: -20, axis: record, refs: [meti-csm-guideline] }
-          - { id: a17-a-content, points: -15, axis: content, refs: [cissp-cbk-secops] }
-          - { id: a17-a-care, points: -10, axis: care, refs: [jpcert-handling] }
+          - { id: a17-a-record, points: -14, axis: record, refs: [meti-csm-guideline] }
+          - { id: a17-a-content, points: -10, axis: content, refs: [cissp-cbk-secops] }
+          - { id: a17-a-care, points: -7, axis: care, refs: [jpcert-handling] }
       - id: a17-full
         text: { ja: '見落としを含む全記録と、そのときの判断理由を出す。', en: '' }
         minutes: 180
         category: recover
-        points: 100
+        points: 150
         refs: [cissp-cbk-secops, jpcert-handling]
         gauges: { flame: -10, trust: 15, stamina: -10 }
         setFlags: { fullTimeline: true, finalMaterialsSent: true }
         items:
-          - { id: a17-b-record, points: 10, axis: record, refs: [cissp-cbk-secops] }
-          - { id: a17-b-content, points: 8, axis: content, refs: [jpcert-handling] }
-          - { id: a17-b-care, points: 8, axis: care, refs: [cissp-cbk-secops] }
-          - { id: a17-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a17-b-order, points: 5, axis: order, refs: [jpcert-handling] }
+          - { id: a17-b-record, points: 7, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a17-b-content, points: 6, axis: content, refs: [jpcert-handling] }
+          - { id: a17-b-care, points: 6, axis: care, refs: [cissp-cbk-secops] }
+          - { id: a17-b-wording, points: 4, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a17-b-order, points: 4, axis: order, refs: [jpcert-handling] }
       - id: a17-lost
         text: { ja: '「ログが残っていない」と答える。', en: '' }
         minutes: 30
         category: hurt
-        points: -120
+        points: -30
         refs: [jpcert-handling]
         gauges: { flame: 10, trust: -15 }
         items:
-          - { id: a17-c-record, points: -15, axis: record, refs: [jpcert-handling] }
-          - { id: a17-c-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a17-c-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a17-c-wording, points: -7, axis: wording, refs: [meti-disclosure-guidance] }
       - id: a17-memory
         text: { ja: '記憶だけで時系列を作る。', en: '' }
         minutes: 45
         category: hurt
-        points: -80
+        points: -30
         refs: [cissp-cbk-secops]
         gauges: { trust: -10 }
         items:
-          - { id: a17-d-record, points: -10, axis: record, refs: [cissp-cbk-secops] }
-          - { id: a17-d-order, points: -8, axis: order, refs: [jpcert-handling] }
+          - { id: a17-d-record, points: -7, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a17-d-order, points: -6, axis: order, refs: [jpcert-handling] }
 
   - id: a18-share
     at: { day: 35, minutes: 600 }
@@ -972,47 +972,47 @@ points:
         text: { ja: '侵入経路と回避方法の詳細まで話す。', en: '' }
         minutes: 90
         category: hurt
-        points: -120
+        points: -30
         refs: [meti-trade-secret]
         gauges: { flame: 10, trust: -10 }
         items:
-          - { id: a18-a-content, points: -12, axis: content, refs: [meti-trade-secret] }
-          - { id: a18-a-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: a18-a-content, points: -8, axis: content, refs: [meti-trade-secret] }
+          - { id: a18-a-care, points: -7, axis: care, refs: [meti-disclosure-guidance] }
       - id: a18-sanitized
         text: { ja: '検知から初動の判断を、攻撃に使える詳細を伏せて共有する。', en: '' }
         minutes: 180
         category: increase
-        points: 300
+        points: 400
         fatalAlternate: 80
         refs: [cissp-cbk-secops, meti-disclosure-guidance]
         gauges: { flame: -10, trust: 20, stamina: -10 }
         setFlags: { industryShare: true }
         items:
-          - { id: a18-b-content, points: 8, axis: content, refs: [cissp-cbk-secops] }
-          - { id: a18-b-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
-          - { id: a18-b-record, points: 8, axis: record, refs: [jpcert-handling] }
-          - { id: a18-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: a18-b-order, points: 5, axis: order, refs: [cissp-cbk-secops] }
+          - { id: a18-b-content, points: 6, axis: content, refs: [cissp-cbk-secops] }
+          - { id: a18-b-care, points: 6, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: a18-b-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: a18-b-wording, points: 4, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a18-b-order, points: 4, axis: order, refs: [cissp-cbk-secops] }
       - id: a18-refuse
         text: { ja: '何も話さない。', en: '' }
         minutes: 15
         category: hurt
-        points: -40
+        points: -30
         refs: [cissp-cbk-secops]
         gauges: { trust: -5 }
         items:
-          - { id: a18-c-content, points: -8, axis: content, refs: [cissp-cbk-secops] }
-          - { id: a18-c-care, points: -5, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: a18-c-content, points: -6, axis: content, refs: [cissp-cbk-secops] }
+          - { id: a18-c-care, points: -3, axis: care, refs: [meti-disclosure-guidance] }
       - id: a18-pr
         text: { ja: '広報に丸投げし、自分の判断は話さない。', en: '' }
         minutes: 30
         category: maintain
-        points: 10
+        points: 15
         refs: [meti-disclosure-guidance]
         gauges: { trust: 0 }
         items:
-          - { id: a18-d-record, points: 3, axis: record, refs: [jpcert-handling] }
-          - { id: a18-d-order, points: 3, axis: order, refs: [meti-disclosure-guidance] }
+          - { id: a18-d-record, points: 2, axis: record, refs: [jpcert-handling] }
+          - { id: a18-d-order, points: 2, axis: order, refs: [meti-disclosure-guidance] }
 
 drafts:
   incident-note:
@@ -1021,76 +1021,76 @@ drafts:
       - id: detected
         label: { ja: '検知時刻の書き方', en: '' }
         options:
-          - { id: in-t-split, text: { ja: '検知した時刻と、確認した時刻を分けて書く', en: '' }, points: 5, axis: time, refs: [jpcert-handling] }
-          - { id: in-t-vague, text: { ja: '「夜」とだけ書く', en: '' }, points: -8, axis: time, refs: [jpcert-handling] }
+          - { id: in-t-split, text: { ja: '検知した時刻と、確認した時刻を分けて書く', en: '' }, points: 4, axis: time, refs: [jpcert-handling] }
+          - { id: in-t-vague, text: { ja: '「夜」とだけ書く', en: '' }, points: -6, axis: time, refs: [jpcert-handling] }
       - id: scope
         label: { ja: '影響範囲', en: '' }
         options:
-          - { id: in-s-known, text: { ja: '分かった範囲と、まだ分からない範囲を分けて書く', en: '' }, points: 8, axis: content, refs: [cissp-cbk-secops] }
-          - { id: in-s-all, text: { ja: '「全顧客が対象」と断定する', en: '' }, points: -15, axis: content, refs: [ppc-report-scope] }
+          - { id: in-s-known, text: { ja: '分かった範囲と、まだ分からない範囲を分けて書く', en: '' }, points: 6, axis: content, refs: [cissp-cbk-secops] }
+          - { id: in-s-all, text: { ja: '「全顧客が対象」と断定する', en: '' }, points: -10, axis: content, refs: [ppc-report-scope] }
       - id: done
         label: { ja: '実施したこと', en: '' }
         options:
-          - { id: in-d-list, text: { ja: '隔離した機器、止めたアカウント、保全したログを列挙する', en: '' }, points: 8, axis: order, refs: [nist-sp800-61r3] }
-          - { id: in-d-summary, text: { ja: '「初動対応済み」とだけ書く', en: '' }, points: -10, axis: content, refs: [jpcert-handling] }
+          - { id: in-d-list, text: { ja: '隔離した機器、止めたアカウント、保全したログを列挙する', en: '' }, points: 6, axis: order, refs: [nist-sp800-61r3] }
+          - { id: in-d-summary, text: { ja: '「初動対応済み」とだけ書く', en: '' }, points: -7, axis: content, refs: [jpcert-handling] }
       - id: evidence
         label: { ja: '証拠の扱い', en: '' }
         options:
-          - { id: in-e-chain, text: { ja: '保全したデータのハッシュと保管場所を書く', en: '' }, points: 8, axis: record, refs: [cissp-cbk-secops] }
-          - { id: in-e-none, text: { ja: '証拠のことは書かない', en: '' }, points: -10, axis: record, refs: [nist-sp800-61r3] }
+          - { id: in-e-chain, text: { ja: '保全したデータのハッシュと保管場所を書く', en: '' }, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: in-e-none, text: { ja: '証拠のことは書かない', en: '' }, points: -7, axis: record, refs: [nist-sp800-61r3] }
       - id: uncertain
         label: { ja: '未確認事項', en: '' }
         options:
-          - { id: in-u-explicit, text: { ja: '未確認事項と、確認する期限を書く', en: '' }, points: 8, axis: content, refs: [meti-disclosure-guidance] }
-          - { id: in-u-omit, text: { ja: '未確認事項には触れない', en: '' }, points: -8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: in-u-explicit, text: { ja: '未確認事項と、確認する期限を書く', en: '' }, points: 6, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: in-u-omit, text: { ja: '未確認事項には触れない', en: '' }, points: -6, axis: content, refs: [meti-disclosure-guidance] }
       - id: next
         label: { ja: '次の連絡', en: '' }
         options:
-          - { id: in-n-scheduled, text: { ja: '次に報告する時刻と相手を書く', en: '' }, points: 5, axis: order, refs: [jpcert-handling] }
-          - { id: in-n-none, text: { ja: '次の連絡予定を書かない', en: '' }, points: -5, axis: order, refs: [jpcert-handling] }
+          - { id: in-n-scheduled, text: { ja: '次に報告する時刻と相手を書く', en: '' }, points: 4, axis: order, refs: [jpcert-handling] }
+          - { id: in-n-none, text: { ja: '次の連絡予定を書かない', en: '' }, points: -3, axis: order, refs: [jpcert-handling] }
       - id: sns
         label: { ja: '外部への発信', en: '' }
         options:
-          - { id: in-x-none, text: { ja: '個人のSNSには書かない', en: '' }, points: 8, axis: wording, refs: [meti-csm-guideline] }
-          - { id: in-x-vague, text: { ja: '個人のSNSに「調査中」と書く', en: '' }, points: -12, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: in-x-none, text: { ja: '個人のSNSには書かない', en: '' }, points: 6, axis: wording, refs: [meti-csm-guideline] }
+          - { id: in-x-vague, text: { ja: '個人のSNSに「調査中」と書く', en: '' }, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
       - id: version
         label: { ja: '版の管理', en: '' }
         options:
-          - { id: in-v-versioned, text: { ja: '版番号と更新時刻を書く', en: '' }, points: 5, axis: record, refs: [cissp-cbk-secops] }
-          - { id: in-v-plain, text: { ja: '版を書かない', en: '' }, points: -5, axis: record, refs: [cissp-cbk-secops] }
+          - { id: in-v-versioned, text: { ja: '版番号と更新時刻を書く', en: '' }, points: 4, axis: record, refs: [cissp-cbk-secops] }
+          - { id: in-v-plain, text: { ja: '版を書かない', en: '' }, points: -3, axis: record, refs: [cissp-cbk-secops] }
   forensic-plan:
     title: { ja: '証拠保全の手順', en: '' }
     slots:
       - id: order
         label: { ja: '保全の順序', en: '' }
         options:
-          - { id: fp-o-memory, text: { ja: 'メモリ、ディスク、ネットワークログの順に保全する', en: '' }, points: 10, axis: order, refs: [nist-sp800-61r3] }
-          - { id: fp-o-disk, text: { ja: 'ディスクだけをイメージする', en: '' }, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: fp-o-memory, text: { ja: 'メモリ、ディスク、ネットワークログの順に保全する', en: '' }, points: 7, axis: order, refs: [nist-sp800-61r3] }
+          - { id: fp-o-disk, text: { ja: 'ディスクだけをイメージする', en: '' }, points: -7, axis: content, refs: [nist-sp800-61r3] }
       - id: hash
         label: { ja: '完全性の担保', en: '' }
         options:
-          - { id: fp-h-hash, text: { ja: '取得時にハッシュ値を計算し、記録と照合する', en: '' }, points: 10, axis: record, refs: [cissp-cbk-secops] }
-          - { id: fp-h-none, text: { ja: 'ハッシュは取らない', en: '' }, points: -15, axis: record, refs: [cissp-cbk-secops] }
+          - { id: fp-h-hash, text: { ja: '取得時にハッシュ値を計算し、記録と照合する', en: '' }, points: 7, axis: record, refs: [cissp-cbk-secops] }
+          - { id: fp-h-none, text: { ja: 'ハッシュは取らない', en: '' }, points: -10, axis: record, refs: [cissp-cbk-secops] }
       - id: who
         label: { ja: '実施者と立会い', en: '' }
         options:
-          - { id: fp-w-two, text: { ja: '実施者と立会人を記録に残す', en: '' }, points: 8, axis: record, refs: [cissp-cbk-secops] }
-          - { id: fp-w-solo, text: { ja: '一人で実施し、記録しない', en: '' }, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: fp-w-two, text: { ja: '実施者と立会人を記録に残す', en: '' }, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: fp-w-solo, text: { ja: '一人で実施し、記録しない', en: '' }, points: -7, axis: record, refs: [jpcert-handling] }
       - id: store
         label: { ja: '保管場所', en: '' }
         options:
-          - { id: fp-s-locked, text: { ja: '書き込み不可の媒体に保存し、施錠した場所で管理する', en: '' }, points: 8, axis: order, refs: [cissp-cbk-secops] }
-          - { id: fp-s-desk, text: { ja: '作業用の共有フォルダに置く', en: '' }, points: -12, axis: order, refs: [cissp-cbk-secops] }
+          - { id: fp-s-locked, text: { ja: '書き込み不可の媒体に保存し、施錠した場所で管理する', en: '' }, points: 6, axis: order, refs: [cissp-cbk-secops] }
+          - { id: fp-s-desk, text: { ja: '作業用の共有フォルダに置く', en: '' }, points: -8, axis: order, refs: [cissp-cbk-secops] }
       - id: copy
         label: { ja: '調査用コピー', en: '' }
         options:
-          - { id: fp-c-copy, text: { ja: '原本と調査用コピーを分け、コピーだけを解析する', en: '' }, points: 8, axis: content, refs: [nist-sp800-61r3] }
-          - { id: fp-c-original, text: { ja: '原本を直接開いて解析する', en: '' }, points: -10, axis: record, refs: [nist-sp800-61r3] }
+          - { id: fp-c-copy, text: { ja: '原本と調査用コピーを分け、コピーだけを解析する', en: '' }, points: 6, axis: content, refs: [nist-sp800-61r3] }
+          - { id: fp-c-original, text: { ja: '原本を直接開いて解析する', en: '' }, points: -7, axis: record, refs: [nist-sp800-61r3] }
       - id: notify
         label: { ja: '現場への説明', en: '' }
         options:
-          - { id: fp-n-explain, text: { ja: '保全の理由と、再起動しない理由を現場に説明する', en: '' }, points: 8, axis: care, refs: [ipa-sme-guideline] }
-          - { id: fp-n-silent, text: { ja: '何も説明せず端末を回収する', en: '' }, points: -10, axis: care, refs: [ipa-sme-guideline] }
+          - { id: fp-n-explain, text: { ja: '保全の理由と、再起動しない理由を現場に説明する', en: '' }, points: 6, axis: care, refs: [ipa-sme-guideline] }
+          - { id: fp-n-silent, text: { ja: '何も説明せず端末を回収する', en: '' }, points: -7, axis: care, refs: [ipa-sme-guideline] }
 voices:
   - { id: v01-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: 'まず監視ベンダーに確認しましょう。誤検知かもしれません。', en: '' }, trigger: { at: point } }
   - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '今夜はもう上がれ。明日の定例会議で報告してくれ。', en: '' }, trigger: { at: point } }
