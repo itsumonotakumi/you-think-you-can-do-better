@@ -1,0 +1,643 @@
+/*
+  全体の見た目。暗めで落ち着いた業務画面風。
+  外部フォントは読み込まない（OS のフォントだけを使う）。
+  文字サイズは .font-small / .font-medium / .font-large の3段階。
+*/
+
+:root {
+  color-scheme: dark;
+
+  --bg: #0e1115;
+  --bg-soft: #131820;
+  --panel: #171d25;
+  --panel-hover: #1d2530;
+  --line: #2a333e;
+  --line-strong: #3a4654;
+  --text: #e6eaef;
+  --text-soft: #c3cbd4;
+  --muted: #97a2ae;
+  --accent: #7fb2d9;
+  --accent-strong: #9cc8ef;
+  --accent-dim: rgba(127, 178, 217, 0.14);
+  --danger: #e2907f;
+  --danger-dim: rgba(226, 144, 127, 0.12);
+  --warn: #d9b26a;
+  --ok: #8fbf9f;
+  --focus: #a9d1ff;
+  --radius: 10px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+    "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+  line-height: 1.75;
+  -webkit-text-size-adjust: 100%;
+}
+
+::selection {
+  background: var(--accent-dim);
+}
+
+/* ---- 文字サイズ3段階 ---- */
+.app {
+  min-height: 100vh;
+  font-size: 16px;
+}
+.app.font-small {
+  font-size: 14px;
+}
+.app.font-medium {
+  font-size: 16px;
+}
+.app.font-large {
+  font-size: 19px;
+}
+
+/* ---- フォーカスを必ず見えるように ---- */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---- 画面の枠 ---- */
+.screen {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 2.5em 1.5em 4em;
+}
+.screen--narrow {
+  max-width: 680px;
+}
+
+.screen-head {
+  margin-bottom: 1.5em;
+}
+.screen-head h1 {
+  margin: 0 0 0.3em;
+  font-size: 1.75em;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+.eyebrow {
+  margin: 0 0 0.4em;
+  color: var(--accent);
+  font-size: 0.8em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lead {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: 0.85em;
+}
+.hint {
+  margin: 0.4em 0 0;
+  color: var(--muted);
+  font-size: 0.85em;
+}
+.error-text {
+  margin: 0.5em 0;
+  color: var(--danger);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- 並べ方 ---- */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75em;
+  align-items: center;
+}
+.row--center {
+  justify-content: center;
+}
+.row--between {
+  justify-content: space-between;
+}
+.row--tight {
+  gap: 0.5em;
+}
+
+.panel {
+  margin: 1.25em 0;
+  padding: 1.25em 1.35em;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.panel h2 {
+  margin: 0 0 0.5em;
+  font-size: 1.1em;
+}
+.panel p {
+  margin: 0.35em 0;
+}
+
+/* ---- ボタン ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: 2.75em;
+  padding: 0.55em 1.15em;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.btn:hover {
+  background: var(--panel-hover);
+  border-color: var(--accent);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0b1015;
+  font-weight: 700;
+}
+.btn--primary:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+.btn--ghost {
+  background: transparent;
+}
+.btn--danger {
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.btn--danger:hover {
+  background: var(--danger-dim);
+}
+.btn--wide {
+  width: 100%;
+}
+.btn--small {
+  min-height: 2.2em;
+  padding: 0.35em 0.8em;
+  font-size: 0.85em;
+}
+.btn.is-active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent-strong);
+}
+
+/* ---- 注記 ---- */
+.notice {
+  margin: 1em 0;
+  padding: 0.85em 1em;
+  border-left: 3px solid var(--line-strong);
+  background: var(--bg-soft);
+  color: var(--text-soft);
+  font-size: 0.9em;
+  border-radius: 0 6px 6px 0;
+}
+.notice--info {
+  border-left-color: var(--accent);
+}
+.notice--warn {
+  border-left-color: var(--warn);
+  background: rgba(217, 178, 106, 0.08);
+}
+.notice-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+.notice-stack .notice {
+  margin: 0;
+}
+
+.footer-note {
+  margin-top: 2.5em;
+  color: var(--muted);
+  font-size: 0.85em;
+  text-align: center;
+}
+
+/* ---- タイトル ---- */
+.title-screen {
+  padding-top: 4em;
+}
+.title-hero {
+  margin-bottom: 2em;
+  text-align: center;
+}
+.title-name {
+  margin: 0.15em 0 0.4em;
+  font-size: 2.15em;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+}
+.title-sub {
+  margin: 0 auto;
+  max-width: 34em;
+  color: var(--text-soft);
+}
+.lang-switch {
+  display: flex;
+  justify-content: center;
+  gap: 0.5em;
+  margin-bottom: 1.5em;
+}
+.lang-switch .btn {
+  min-height: 2.2em;
+  padding: 0.3em 0.9em;
+  font-size: 0.85em;
+}
+
+/* ---- 入力 ---- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+}
+.field-label {
+  font-weight: 600;
+}
+.textarea,
+.input,
+.select {
+  width: 100%;
+  padding: 0.6em 0.7em;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--bg-soft);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.6;
+}
+.textarea {
+  resize: vertical;
+  min-height: 7em;
+}
+.input--num {
+  width: 8em;
+}
+.counter {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8em;
+  text-align: right;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  cursor: pointer;
+}
+.check input {
+  width: 1.15em;
+  height: 1.15em;
+  accent-color: var(--accent);
+}
+
+/* ---- シナリオ一覧 ---- */
+.scenario-list,
+.role-list {
+  display: grid;
+  gap: 1em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.scenario-list {
+  grid-template-columns: repeat(auto-fill, minmax(17em, 1fr));
+}
+.scenario-card,
+.role-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+  padding: 1.1em 1.2em;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.scenario-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+.scenario-card__title {
+  margin: 0;
+  font-size: 1.15em;
+  line-height: 1.35;
+}
+.scenario-card__tagline {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.92em;
+}
+.scenario-card__foot {
+  margin: 0;
+}
+.badge {
+  display: inline-block;
+  padding: 0.1em 0.6em;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--text-soft);
+  font-size: 0.72em;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.badge--latest {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+  background: var(--accent-dim);
+}
+.badge--retired {
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.meta {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  font-size: 0.88em;
+}
+.meta__row {
+  display: flex;
+  gap: 0.75em;
+}
+.meta dt {
+  flex: 0 0 6.5em;
+  color: var(--muted);
+}
+.meta dd {
+  margin: 0;
+  color: var(--text-soft);
+}
+.meta__num {
+  margin-left: 0.4em;
+  font-size: 0.85em;
+}
+.stars {
+  color: var(--warn);
+  letter-spacing: 0.08em;
+}
+.record-muted {
+  color: var(--muted);
+}
+.record-best {
+  margin: 0;
+  color: var(--accent-strong);
+  font-size: 0.85em;
+}
+
+/* ---- ロール ---- */
+.role-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45em;
+  flex: 1;
+}
+.role-card__title {
+  margin: 0;
+  font-size: 1.15em;
+}
+.role-card__intro {
+  margin: 0;
+  color: var(--text-soft);
+}
+.role-card__info {
+  margin: 0;
+  font-size: 0.9em;
+  color: var(--text-soft);
+}
+.role-card__meta {
+  margin: 0;
+}
+.tag {
+  display: inline-block;
+  margin-right: 0.4em;
+  padding: 0 0.5em;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  color: var(--muted);
+  font-size: 0.75em;
+}
+
+/* ---- 設定 ---- */
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15em;
+}
+.setting {
+  display: grid;
+  gap: 0.35em;
+}
+.setting__label {
+  font-weight: 600;
+}
+.setting__control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75em;
+}
+.setting__control .select {
+  max-width: 18em;
+}
+.value {
+  color: var(--accent-strong);
+  font-weight: 400;
+  font-size: 0.9em;
+}
+.range {
+  flex: 1 1 12em;
+  min-width: 8em;
+  accent-color: var(--accent);
+}
+.dialog {
+  padding: 1em 1.1em;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  background: var(--danger-dim);
+}
+.dialog p {
+  margin: 0 0 0.75em;
+}
+
+/* ---- クレジット ---- */
+.credit-author {
+  margin: 0;
+  font-size: 1.15em;
+}
+.credit-group {
+  margin-top: 0.75em;
+}
+.credit-group h3 {
+  margin: 0 0 0.4em;
+  color: var(--accent);
+  font-size: 0.95em;
+  letter-spacing: 0.06em;
+}
+.credit-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.credit-item {
+  padding: 0.7em 0;
+  border-top: 1px solid var(--line);
+}
+.credit-title {
+  margin: 0 0 0.2em;
+  font-weight: 600;
+}
+.credit-meta {
+  margin: 0;
+  font-size: 0.82em;
+}
+.credit-meta__row {
+  display: flex;
+  gap: 0.6em;
+}
+.credit-meta dt {
+  flex: 0 0 7em;
+  color: var(--muted);
+}
+.credit-meta dd {
+  margin: 0;
+  color: var(--text-soft);
+}
+.credit-required {
+  margin: 0.4em 0 0;
+  color: var(--text-soft);
+  font-size: 0.82em;
+}
+.link-text {
+  word-break: break-all;
+}
+
+/* ---- エラー ---- */
+.error-box {
+  margin: 1em 0 1.5em;
+  padding: 1.1em 1.2em;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  background: var(--danger-dim);
+}
+.error-box p {
+  margin: 0.3em 0;
+}
+
+/* ---- スマートフォン（幅640px未満） ---- */
+@media (max-width: 640px) {
+  .screen {
+    padding: 1.5em 1em 3em;
+  }
+  .title-screen {
+    padding-top: 2.5em;
+  }
+  .title-name {
+    font-size: 1.65em;
+  }
+  .screen-head h1 {
+    font-size: 1.45em;
+  }
+  .scenario-list {
+    grid-template-columns: 1fr;
+  }
+  .row--between {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  .row--between .btn {
+    width: 100%;
+  }
+  .meta__row,
+  .credit-meta__row {
+    flex-direction: column;
+    gap: 0;
+  }
+  .meta dt,
+  .credit-meta dt {
+    flex: none;
+  }
+  .setting__control .select {
+    max-width: none;
+    width: 100%;
+  }
+  .btn--small {
+    width: 100%;
+  }
+}
+
+/* ---- 演出を減らす（設定・OS の両方） ---- */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

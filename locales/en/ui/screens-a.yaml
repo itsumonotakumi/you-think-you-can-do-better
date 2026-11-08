@@ -1,0 +1,126 @@
+# Screens S01-S04, S10, S11, error screen (English)
+# Keys start with sa. {name} is replaced by t() vars.
+
+sa.common.back: Back
+sa.common.settings: Settings
+sa.common.credits: Credits
+sa.common.language: Language
+sa.common.optional: Optional
+sa.common.loading: Loading...
+sa.common.retry: Try again
+
+# --- S01 Title ---
+sa.title.product: You Think You Can Do Better?
+sa.title.tagline: An incident response simulator
+sa.title.sub: Everyone has an opinion during an incident. What if you were the one in charge?
+sa.title.start: Start
+sa.title.continue: Continue
+sa.title.resumeTarget: "Continue: {scenario} / {role}"
+sa.title.about: About this tool
+sa.title.soundNotice: Sound is on. You can change the volume in Settings.
+sa.title.langJa: 日本語
+sa.title.langEn: English
+sa.title.credit: Created by Itsumono Takumi
+
+# --- S02 Prologue ---
+sa.prologue.title: Prologue
+sa.prologue.lead: First, remember where you stood when the incident was reported.
+sa.prologue.prompt: What did you post when this incident was reported?
+sa.prologue.placeholder: "Example: Too slow. Who is going to take responsibility?"
+sa.prologue.counter: "{n} / 200 characters"
+sa.prologue.hours: How many hours until the disclosure?
+sa.prologue.hoursUnit: hours
+sa.prologue.hoursHint: Optional. You can leave it blank.
+sa.prologue.hoursInvalid: Enter a whole number from 0 to 720.
+sa.prologue.begin: Start
+sa.prologue.noPlay: The play is not ready. Please return to the title screen.
+
+# --- S03 Scenario select ---
+sa.scenarios.title: Choose a scenario
+sa.scenarios.lead: Pick a scenario. Status, difficulty, and the period of the source incident are good guides.
+sa.scenarios.status.latest: Latest
+sa.scenarios.status.standard: Standard
+sa.scenarios.status.retired: Retired
+sa.scenarios.difficulty: Difficulty
+sa.scenarios.difficultyValue: "{n} / 5"
+sa.scenarios.period: Source period
+sa.scenarios.first: First play
+sa.scenarios.firstValue: "{rank} / {score} pts"
+sa.scenarios.bestN: "Best (play {n}): {rank} / {score} pts"
+sa.scenarios.noRecord: Not played yet
+sa.scenarios.select: Choose this scenario
+sa.scenarios.empty: No scenarios are available.
+sa.scenarios.loadError: Could not load the scenario list.
+sa.scenarios.minutes: About {n} min
+sa.scenarios.roles: "{n} roles"
+
+# --- S04 Role select ---
+sa.roles.title: Choose a role
+sa.roles.lead: Your position changes what you can see and what you can do.
+sa.roles.next: "Next: play {n}"
+sa.roles.estimate: "Estimated time: about {n} min"
+sa.roles.info: What you can see
+sa.roles.role.executive: Executive
+sa.roles.role.officer: Head of IT
+sa.roles.role.lead: Incident response lead
+sa.roles.role.analyst: Security analyst
+sa.roles.info.executive: Board decisions and press conferences. Details from the field are hard to see.
+sa.roles.info.officer: Internal coordination with legal and communications, within budget and authority.
+sa.roles.info.lead: Field response, log investigation, containment. Always short on time.
+sa.roles.info.analyst: Monitoring, detection, technical investigation. Following the whole attack.
+sa.roles.choose: Start with this role
+sa.roles.loadError: Could not load the scenario.
+sa.roles.startError: Could not start the play. Please try again.
+
+# --- S10 Settings ---
+sa.settings.title: Settings
+sa.settings.lead: Changes are saved automatically.
+sa.settings.language: Language
+sa.settings.fontSize: Text size
+sa.settings.fontSmall: Small
+sa.settings.fontMedium: Medium
+sa.settings.fontLarge: Large
+sa.settings.bgm: BGM volume
+sa.settings.se: Sound effect volume
+sa.settings.muted: Mute
+sa.settings.reduceMotion: Reduce motion
+sa.settings.reduceMotionHint: Stops shaking, flashes, fast-forward, and typing effects. Only color and weight changes remain.
+sa.settings.pressTime: Press conference time limit
+sa.settings.pressTime1: Normal
+sa.settings.pressTime15: 1.5x
+sa.settings.pressTime2: 2x
+sa.settings.data: Saved data
+sa.settings.clear: Delete saved data
+sa.settings.clearConfirm: Delete saved data? Your play counts and first-play records will also be deleted.
+sa.settings.clearYes: Delete
+sa.settings.clearNo: Cancel
+sa.settings.cleared: Saved data was deleted.
+sa.settings.audioError: Could not load the audio. You can keep playing without sound.
+sa.settings.memoryOnly: This environment cannot save data. You can still play.
+sa.settings.previewSe: Preview a sound effect
+sa.settings.previewBgm: Preview the BGM
+
+# --- S11 Credits ---
+sa.credits.title: Credits
+sa.credits.createdBy: Created by
+sa.credits.author: Itsumono Takumi
+sa.credits.audio: Audio
+sa.credits.audioEmpty: No audio assets are registered yet.
+sa.credits.kind.bgm: BGM
+sa.credits.kind.se: Sound effects
+sa.credits.kind.ambience: Ambience
+sa.credits.authorLabel: Author
+sa.credits.site: Site
+sa.credits.terms: Terms of use
+sa.credits.checked: Terms checked on
+sa.credits.licenseNote: Audio assets are not covered by this work's license and follow each provider's terms. Redistributing the assets on their own is prohibited.
+sa.credits.loadError: Could not load the credits.
+sa.credits.thanks: Thank you for playing.
+
+# --- Error screen ---
+sa.error.title: Something went wrong
+sa.error.default: An unexpected error occurred.
+sa.error.detail: Details
+sa.error.continue: Continue
+sa.error.home: Back to title
+sa.error.noProgress: There is no saved play to resume.

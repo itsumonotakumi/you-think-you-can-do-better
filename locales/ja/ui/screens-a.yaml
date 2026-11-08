@@ -1,0 +1,126 @@
+# 画面 S01〜S04, S10, S11, エラー画面の文言（日本語）
+# キーは sa. で始まる。値の {name} は t() の vars で置き換える。
+
+sa.common.back: 戻る
+sa.common.settings: 設定
+sa.common.credits: クレジット
+sa.common.language: 言語
+sa.common.optional: 任意
+sa.common.loading: 読み込み中…
+sa.common.retry: もう一度試す
+
+# --- S01 タイトル ---
+sa.title.product: じゃ、あなたがやってみてよ
+sa.title.tagline: インシデント対応シミュレーター
+sa.title.sub: 事件のとき、外野は好きなことを言う。では、あなたが担当だったら。
+sa.title.start: はじめる
+sa.title.continue: 続きから
+sa.title.resumeTarget: "続きから：{scenario} / {role}"
+sa.title.about: このツールについて
+sa.title.soundNotice: 音が出ます。設定で音量を変えられます。
+sa.title.langJa: 日本語
+sa.title.langEn: English
+sa.title.credit: 制作：いつもの匠
+
+# --- S02 プロローグ ---
+sa.prologue.title: プロローグ
+sa.prologue.lead: まず、事件が報じられたときの自分を思い出してください。
+sa.prologue.prompt: この事件が報じられたとき、あなたは何と書き込みましたか。
+sa.prologue.placeholder: 例：対応が遅すぎる。誰が責任を取るのか。
+sa.prologue.counter: "{n} / 200字"
+sa.prologue.hours: 公表まで何時間かかると思いますか
+sa.prologue.hoursUnit: 時間
+sa.prologue.hoursHint: 任意です。空欄のままでも始められます。
+sa.prologue.hoursInvalid: 0〜720の整数で入力してください。
+sa.prologue.begin: はじめる
+sa.prologue.noPlay: プレイの準備ができていません。タイトルに戻ってください。
+
+# --- S03 シナリオ選択 ---
+sa.scenarios.title: シナリオを選ぶ
+sa.scenarios.lead: 遊ぶシナリオを選んでください。区分・難しさ・元事件の時期を目安にどうぞ。
+sa.scenarios.status.latest: 最新
+sa.scenarios.status.standard: 定番
+sa.scenarios.status.retired: 引退
+sa.scenarios.difficulty: 難しさ
+sa.scenarios.difficultyValue: "{n} / 5"
+sa.scenarios.period: 元事件の時期
+sa.scenarios.first: 初回
+sa.scenarios.firstValue: "{rank} / {score}点"
+sa.scenarios.bestN: "最高（{n}回目）：{rank} / {score}点"
+sa.scenarios.noRecord: 未プレイ
+sa.scenarios.select: このシナリオを選ぶ
+sa.scenarios.empty: 遊べるシナリオがありません。
+sa.scenarios.loadError: シナリオ一覧を読み込めませんでした。
+sa.scenarios.minutes: 約{n}分
+sa.scenarios.roles: ロール{n}種
+
+# --- S04 ロール選択 ---
+sa.roles.title: ロールを選ぶ
+sa.roles.lead: 立場によって、見える情報と選べる行動が変わります。
+sa.roles.next: "次は {n}回目"
+sa.roles.estimate: 所要時間の目安：約{n}分
+sa.roles.info: 見える情報
+sa.roles.role.executive: 経営者
+sa.roles.role.officer: 情報システム部門責任者
+sa.roles.role.lead: インシデント対応リード
+sa.roles.role.analyst: セキュリティアナリスト
+sa.roles.info.executive: 経営判断、取締役会、記者会見。現場の詳細は見えにくい。
+sa.roles.info.officer: 社内調整、法務・広報との連携。予算と権限の範囲で動く。
+sa.roles.info.lead: 現場の対応、ログ調査、封じ込め。時間に追われる。
+sa.roles.info.analyst: 監視、検知、技術調査。攻撃の全体像を追う。
+sa.roles.choose: このロールで始める
+sa.roles.loadError: シナリオを読み込めませんでした。
+sa.roles.startError: プレイを開始できませんでした。もう一度試してください。
+
+# --- S10 設定 ---
+sa.settings.title: 設定
+sa.settings.lead: 変更は自動で保存されます。
+sa.settings.language: 言語
+sa.settings.fontSize: 文字サイズ
+sa.settings.fontSmall: 小
+sa.settings.fontMedium: 中
+sa.settings.fontLarge: 大
+sa.settings.bgm: BGMの音量
+sa.settings.se: 効果音の音量
+sa.settings.muted: ミュート
+sa.settings.reduceMotion: 演出を減らす
+sa.settings.reduceMotionHint: 揺れ・フラッシュ・早送り・タイプ表示を止め、色と太字の変化だけにします。
+sa.settings.pressTime: 記者会見の制限時間
+sa.settings.pressTime1: 標準
+sa.settings.pressTime15: 1.5倍
+sa.settings.pressTime2: 2倍
+sa.settings.data: 保存データ
+sa.settings.clear: 保存データを消去
+sa.settings.clearConfirm: 保存データを消去しますか？プレイ回数と初回記録も消えます。
+sa.settings.clearYes: 消去する
+sa.settings.clearNo: やめる
+sa.settings.cleared: 保存データを消去しました。
+sa.settings.audioError: 音を読み込めませんでした。音なしで続けられます。
+sa.settings.memoryOnly: この環境では保存できません。遊ぶことはできます。
+sa.settings.previewSe: 効果音を試聴する
+sa.settings.previewBgm: BGMを試聴する
+
+# --- S11 クレジット ---
+sa.credits.title: クレジット
+sa.credits.createdBy: 制作
+sa.credits.author: いつもの匠
+sa.credits.audio: 音素材
+sa.credits.audioEmpty: 音素材はまだ登録されていません。
+sa.credits.kind.bgm: BGM
+sa.credits.kind.se: 効果音
+sa.credits.kind.ambience: 環境音
+sa.credits.authorLabel: 作者
+sa.credits.site: 配布サイト
+sa.credits.terms: 利用規約
+sa.credits.checked: 規約の確認日
+sa.credits.licenseNote: 音声素材は本作のライセンスの対象外です。各配布元の利用規約に従います。素材単体の再配布は禁止します。
+sa.credits.loadError: クレジットを読み込めませんでした。
+sa.credits.thanks: 遊んでくれてありがとうございました。
+
+# --- エラー画面 ---
+sa.error.title: 問題が発生しました
+sa.error.default: 予期しないエラーが発生しました。
+sa.error.detail: 詳細
+sa.error.continue: 続きから
+sa.error.home: タイトルへ
+sa.error.noProgress: 続きから再開できるデータがありません。
