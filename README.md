@@ -1,4 +1,4 @@
-# インシデントシミュレーター「じゃ、あなたがやってみてよ」
+# インシデントレスポンスシミュレーター「じゃ、あなたがやってみてよ」
 
 **You Think You Can Do Better?** — An incident-response simulator.
 
