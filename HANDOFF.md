@@ -1,6 +1,6 @@
 # HANDOFF
 
-最終更新: 2026-11-08（Wave3 完了 / Wave4 実行中）
+最終更新: 2026-11-08（Wave7 完了：全40ロール / 最終検査中）
 
 ## 体制
 - オーケストレーター: Claude Opus 5.5（計画・契約・マージ判断）
@@ -33,12 +33,17 @@
   - 結合後: シナリオ10本（経営者ロール）、単体 552件、E2E 12件すべて合格
   - Actions を SHA 固定、Dependabot 追加（オーケストレーター）
   - Codex 品質検査: エンジン・検査12件（高6）、画面10件（高2）→ `.worktrees/_prompts/codex-q1.md` / `codex-q2.md`
-- Wave4 🔄 8並列: fix-engine / fix-validate / fix-ui-resume / fix-ui-main / No.2 officer・lead・analyst / No.3 officer
-- 残り: No.3〜No.10 の残りロール（23本）、S07 での字幕表示、CI に E2E を追加、英語本文、音声素材
+- Wave4 ✅ fix-engine / fix-validate（経路検査をシード付き乱数で2000本に拡張、全ランク到達を警告で確認）/ fix-ui-resume / fix-ui-main / No.2 3ロール / No.3 officer
+- Wave5 ✅ ランク到達の調整（4ロール）/ No.3〜No.5 のロール7本。CI に E2E（main 反映時）を追加
+- Wave6 ✅ No.5〜No.8 のロール8本 / Wave7 ✅ No.8〜No.10 のロール8本
+  - 結合後: 10シナリオ×4ロール=40ロール、validate 警告0、単体 916件、E2E 12件、dist 2.9MB
+- 最終検査 🔄 脆弱性の再検査2本・S07 字幕（OpenCode）、修正の再確認・シナリオ内容（Codex）
+- 残り: 英語本文（v1 は日本語のみ）、音声素材、references の原典確認、内容レビュー（人）、push と Pages 配信
 - 簡略化: シナリオの版が変わった時は「はじめから」のみ（旧版の続きは作らない）
 - Wave4〜: No.2〜No.10 の残りロール、英語本文、音声素材
 
 ## 運用メモ
+- 注意: エージェントが worktree の外（main の作業ツリー）に書いたことが1回あった（r05-officer）。共通指示に禁止を追記済み。マージ前に main で `git status` を確認する
 - エージェントの指示書: `.worktrees/_prompts/*.md`（共通部分 `_common.md`）、ログ: `.worktrees/_logs/`
 - 実行: `tools/dev/run-agent.sh <name> <prompt>` → `agent/<name>` ブランチに自動コミット → Haiku が main に --no-ff マージ
 - 指示書は bash で生成する（zsh は変数の単語分割をしない）
