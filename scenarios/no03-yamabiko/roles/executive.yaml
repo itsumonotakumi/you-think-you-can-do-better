@@ -963,7 +963,7 @@ voices:
   - { id: v08-after, media: vendor, misleading: false, text: { ja: '制作会社「削除の確認書まで出せと言うのか」。', en: '' }, trigger: { at: after, choice: p08-remove-verify } }
   - { id: v09-law, media: board, misleading: true, type: law-ish, text: { ja: '12人の店に報告義務はない。カード会社に任せておけ。', en: '' }, trigger: { at: point } }
   - { id: v09-tax, media: chat, misleading: true, type: boss-pressure, text: { ja: '税理士「数字が固まるまで、外には出さないほうがいい」。', en: '' }, trigger: { at: point } }
-  - { id: v09-ok, media: chat, misleading: false, text: { ja: '専門家「カード情報が入る可能性があるなら、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '専門家「カード情報が漏れたおそれ（財産的被害）があるなら、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
   - { id: v09-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに報告するのか。説明が二転三転するぞ。', en: '' }, trigger: { at: after, choice: p09-file-notice } }
   - { id: v10-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'まだ何も言ってこない。問い合わせの電話も来てないぞ。', en: '' }, trigger: { at: point } }
   - { id: v10-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'メールなんか送ったら、全員に知られる。静かに返金で済ませろ。', en: '' }, trigger: { at: point } }

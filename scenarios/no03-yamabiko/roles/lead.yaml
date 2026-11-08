@@ -16,7 +16,7 @@ deadlines:
     points: -60
     doneFlag: ppcPrelimFiled
   - id: dl-ppc-final
-    ref: ppc-report-final
+    ref: ppc-report-final-malicious
     label: { ja: '個人情報保護委員会への確報', en: '' }
     points: -60
     doneFlag: ppcFinalFiled
@@ -1035,7 +1035,7 @@ points:
     at: { day: 29, minutes: 600 }
     phase: after
     sound: { se: [notify_news] }
-    text: { ja: '29日目の午前10時。調査の報告書ができた。確報の期限も近い。公開する範囲と、何を次に残すかを決める。書くのは店だが、構成を作るのはあなたの仕事だ。', en: '' }
+    text: { ja: '29日目の午前10時。調査の報告書ができた。確報の期限はまだ先だが、出す内容は今週のうちに決めたい。公開する範囲と、何を次に残すかを決める。書くのは店だが、構成を作るのはあなたの仕事だ。', en: '' }
     voices: [v19-expert, v19-law, v19-ok]
     choices:
       - id: p19-publish
@@ -1043,7 +1043,7 @@ points:
         minutes: 240
         category: recover
         points: 150
-        refs: [meti-disclosure-guidance, ppc-report-final]
+        refs: [meti-disclosure-guidance, ppc-report-final-malicious]
         gauges: { flame: -10, trust: 12, stamina: -10 }
         setFlags: { reportPublished: true, ppcFinalFiled: true }
         detail: final-report
@@ -1056,7 +1056,7 @@ points:
         minutes: 180
         category: maintain
         points: 30
-        refs: [meti-disclosure-guidance, ppc-report-final]
+        refs: [meti-disclosure-guidance, ppc-report-final-malicious]
         gauges: { trust: 5, stamina: -10 }
         setFlags: { reportPublished: true, ppcFinalFiled: true }
         detail: final-report
