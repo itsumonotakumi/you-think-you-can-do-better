@@ -3,7 +3,7 @@
 # 視点: 専任のセキュリティ部署がない会社で、兼任チームを束ねる執行役員セキュリティ責任者。
 #       技術の事実を経営の言葉に訳し、証拠を守り、外部の専門家と経営の間をつなぐのが仕事。
 estimateMinutes: 45
-intro: { ja: 'あなたはゴーライドの執行役員セキュリティ責任者、八木慎一。専任のセキュリティ部はなく、情シスと運用の兼任メンバーを束ねている。午前9時の電話から、あなたの四週間が始まる。', en: '' }
+intro: { ja: 'あなたはゴーライドの執行役員セキュリティ責任者、八木慎一。専任のセキュリティ部はなく、情シスと運用の兼任メンバーを束ねている。午後9時30分の電話から、あなたの四週間が始まる。', en: '' }
 pressEnabled: true
 cowardVoices:
   '2': v-coward-2
@@ -40,13 +40,13 @@ events:
     caption: { ja: '本人確認の委託先から、調査の進捗を尋ねるメールが届いた。', en: '' }
 points:
   - id: p01-alert
-    at: { day: 0, minutes: 540 }
+    at: { day: 0, minutes: 1290 }
     phase: detect
     sound: { se: [phone_ring] }
-    text: { ja: '午前9時。役員会議の最中に、運用本部長の国枝から電話が入る。「アプリのデータベースに外部からアクセスされた形跡があります。免許証の画像が持ち出された可能性があります」。監視のアラートは三件。同じ踏み台から本人確認システムへも通信している。', en: '' }
+    text: { ja: '午後9時30分。役員会議の最中に、運用本部長の国枝から電話が入る。「アプリのデータベースに外部からアクセスされた形跡があります。免許証の画像は本人確認の委託先のストレージにあり、APIの鍵で参照しています。持ち出された可能性があります」。監視のアラートは三件。同じ踏み台から本人確認システムへも通信している。', en: '' }
     voices: [v01-boss, v01-field, v01-ok]
     notable:
-      - { id: note-first-call, text: { ja: '午前9時、アプリのデータベースへの不正アクセスを検知。免許証画像が対象の可能性。', en: '' } }
+      - { id: note-first-call, text: { ja: '午後9時30分、アプリのデータベースへの不正アクセスを検知。委託先のストレージにある免許証画像が対象の可能性。', en: '' } }
     choices:
       - id: p01-wait
         text: { ja: '誤検知の可能性が高いと判断し、役員会議が終わるまで待つ。', en: '' }
@@ -98,10 +98,10 @@ points:
           - { id: p01-d-record, points: 8, axis: record, refs: [jpcert-handling] }
 
   - id: p02-keys
-    at: { day: 0, minutes: 630 }
+    at: { day: 0, minutes: 1350 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '午前10時30分。免許証画像は、本人確認の委託先が預かるストレージにある。APIの鍵は三本。止めれば新規申込みが止まり、止めなければ画像がさらに抜かれる。', en: '' }
+    text: { ja: '午後10時30分。免許証画像は、本人確認の委託先が預かるストレージにある。APIの鍵は三本。止めれば新規申込みが止まり、止めなければ画像がさらに抜かれる。', en: '' }
     voices: [v02-vendor, v02-public, v02-ok]
     choices:
       - id: p02-partial
@@ -152,10 +152,10 @@ points:
           - { id: p02-d-record, points: 5, axis: record, refs: [cissp-cbk-secops] }
 
   - id: p03-command
-    at: { day: 0, minutes: 750 }
+    at: { day: 0, minutes: 1410 }
     phase: organize
     sound: { se: [notify_chat] }
-    text: { ja: '午後0時30分。対策本部を立ち上げる。専任のセキュリティ部はない。情シス兼任が三人、運用が二人、法務と広報が各一人。誰が指揮し、誰が記録し、誰が外部と連絡するか。', en: '' }
+    text: { ja: '午後11時30分。対策本部を立ち上げる。専任のセキュリティ部はない。情シス兼任が四人、運用が二人、法務と広報が各一人。誰が指揮し、誰が記録し、誰が外部と連絡するか。', en: '' }
     voices: [v03-flattery, v03-public, v03-ok]
     choices:
       - id: p03-solo
@@ -203,10 +203,10 @@ points:
           - { id: p03-d-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
 
   - id: p04-evidence
-    at: { day: 0, minutes: 900 }
+    at: { day: 1, minutes: 180 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '午後3時。現場から「早く初期化して作り直したい」と声が上がる。サーバーのメモリには実行中の不審なプログラムが残り、ディスクには踏み台に使われた形跡がある。ログの保存は九十日。', en: '' }
+    text: { ja: '午前3時。現場から「早く初期化して作り直したい」と声が上がる。サーバーのメモリには実行中の不審なプログラムが残り、ディスクには踏み台に使われた形跡がある。ログの保存は九十日。', en: '' }
     voices: [v04-expert, v04-field, v04-ok]
     choices:
       - id: p04-wipe
@@ -259,10 +259,10 @@ points:
           - { id: p04-d-order, points: 5, axis: order, refs: [nist-sp800-61r3] }
 
   - id: p05-stop
-    at: { day: 0, minutes: 1080 }
+    at: { day: 1, minutes: 525 }
     phase: contain
     sound: { se: [notify_news] }
-    text: { ja: '午後6時。予約と解錠は動いている。止めれば全国の車が借りられない。止めなければ、同じ踏み台から画像が抜かれ続ける。決めるのは経営。あなたは材料を出す。', en: '' }
+    text: { ja: '午前8時45分。予約と解錠は動いている。9時に経営が停止を判断する。あなたは材料を出す。', en: '' }
     voices: [v05-public, v05-coward, v05-ok]
     popular: { choiceId: p05-partial, percent: 61 }
     choices:
@@ -314,13 +314,13 @@ points:
           - { id: p05-d-order, points: 8, axis: order, refs: [meti-csm-guideline] }
 
   - id: p06-retention
-    at: { day: 0, minutes: 1140 }
+    at: { day: 1, minutes: 960 }
     phase: organize
     sound: { se: [notify_chat] }
-    text: { ja: '午後7時。対策本部の夜。過去の会議録が出てきた。「退会した人の免許証画像は、戻ってきたときに本人確認が楽なので残す」。決めたのは経営会議で、あなたも同席していた。保存の根拠は、もう利用目的と説明できない。', en: '' }
+    text: { ja: '午後4時。2023年の経営会議の議事録が出てきた。提案はグループ会社の社長、決裁は榊原社長、あなたも同席していた。「再入会キャンペーンの審査を早くするため、退会者の免許証画像も残す」。保存の根拠は、もう利用目的と説明できない。', en: '' }
     voices: [v06-boss, v06-insider, v06-ok]
     notable:
-      - { id: note-retention, text: { ja: '退会者・申込み途中の免許証画像も保存する方針が、過去の経営会議で決まっていた。', en: '' } }
+      - { id: note-retention, text: { ja: '退会者・申込み途中の免許証画像も保存する方針が、2023年の経営会議で決まっていた。', en: '' } }
     choices:
       - id: p06-hide
         text: { ja: '議事録の存在は調査の対象から外し、保存方針も「運用の誤り」として説明する。', en: '' }
@@ -348,7 +348,7 @@ points:
           - { id: p06-b-content, points: -10, axis: content, refs: [meti-csm-guideline] }
           - { id: p06-b-record, points: -8, axis: record, refs: [meti-csm-guideline] }
       - id: p06-audit
-        text: { ja: '保存方針を認め、全保存データを棚卸しして不要な画像を削除し、方針を経営に報告する。', en: '' }
+        text: { ja: '保存方針を認め、新しい保存を止める。既存の画像は保全したまま一覧にし、削除は調査完了後に記録を残して行うと経営に報告する。', en: '' }
         minutes: 120
         category: maintain
         points: 30
@@ -360,7 +360,7 @@ points:
           - { id: p06-c-record, points: 8, axis: record, refs: [meti-csm-guideline] }
           - { id: p06-c-care, points: 5, axis: care, refs: [ppc-notify-person] }
       - id: p06-audit-explain
-        text: { ja: '棚卸しと削除に加え、保存の経緯と見直しを公表文に書ける形にまとめ、対象者への説明も準備する。', en: '' }
+        text: { ja: '棚卸しと新規保存の停止に加え、保全した画像の一覧と、削除の時期・記録の残し方を公表文に書ける形にまとめ、対象者への説明も準備する。', en: '' }
         minutes: 180
         category: recover
         points: 120
@@ -374,20 +374,21 @@ points:
           - { id: p06-d-time, points: 5, axis: time, refs: [meti-csm-guideline] }
 
   - id: p07-first-report
-    at: { day: 0, minutes: 1260 }
+    at: { day: 1, minutes: 1020 }
     phase: notify
     sound: { se: [typing] }
-    text: { ja: '午後9時。第1報の技術ファクトシートを作る時間。法務と広報が待っている。分かったことと、まだ分からないことが混ざっている。', en: '' }
+    text: { ja: '午後5時。第1報の技術ファクトシートを作る時間。法務と広報が待っている。分かったことと、まだ分からないことが混ざっている。', en: '' }
     voices: [v07-law, v07-boss, v07-ok]
     choices:
       - id: p07-wait
         text: { ja: '全容が分かってから出す。今日は技術の確認に集中する。', en: '' }
-        minutes: 120
+        minutes: 480
         category: hurt
         points: -120
         refs: [ppc-report-prelim]
         gauges: { flame: 10, trust: -10 }
         coward: true
+        detail: first-report
         items:
           - { id: p07-a-time, points: -10, axis: time, refs: [ppc-report-prelim] }
           - { id: p07-a-content, points: -10, axis: content, refs: [ppc-report-prelim] }
@@ -418,10 +419,10 @@ points:
           - { id: p07-c-record, points: 8, axis: record, refs: [jpcert-handling] }
 
   - id: p08-dfir
-    at: { day: 1, minutes: 540 }
+    at: { day: 2, minutes: 540 }
     phase: investigate
     sound: { se: [mail_arrive] }
-    text: { ja: '翌朝9時。外部の調査会社と、保険会社の紹介窓口から見積もりが届いた。社内だけで調べるか、外を入れるか。契約と守秘義務の確認が先になる。', en: '' }
+    text: { ja: '2日目午前9時。外部の調査会社と、保険会社の紹介窓口から見積もりが届いた。社内だけで調べるか、外を入れるか。契約と守秘義務の確認が先になる。', en: '' }
     voices: [v08-vendor, v08-past, v08-ok]
     choices:
       - id: p08-self
@@ -473,7 +474,7 @@ points:
     at: { day: 2, minutes: 600 }
     phase: notify
     sound: { se: [phone_ring] }
-    text: { ja: '午前10時。個人情報保護委員会への速報を出すか。件数はまだ確定していない。不正アクセスが疑われる以上、期限は短い。法務は「書面で出す準備はできている」と言う。', en: '' }
+    text: { ja: '午前10時。個人情報保護委員会への速報を出すか。件数はまだ確定していない。不正アクセスが疑われる以上、件数に関係なく報告対象だ。速報は概ね3〜5日以内。法務は「書面で出す準備はできている」と言う。', en: '' }
     voices: [v09-law, v09-boss, v09-ok]
     popular: { choiceId: p09-wait, percent: 58 }
     choices:
@@ -705,6 +706,49 @@ points:
           - { id: p13-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
           - { id: p13-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
           - { id: p13-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+
+  - id: p13b-third-report
+    at: { day: 4, minutes: 480 }
+    phase: notify
+    sound: { se: [typing] }
+    text: { ja: '4日目午前8時。第3報を出す日。前回から件数が動き、法人契約のドライバーの分が加わった。調査はまだ続いている。どこまでを「確認」と書き、どこからを「可能性」と書くか。', en: '' }
+    voices: [v13b-boss, v13b-public, v13b-ok]
+    notable:
+      - { id: note-third-report, text: { ja: '第3報で件数を更新。増えた分は法人契約のドライバー。確定分と推定分を分けて書く。', en: '' } }
+    choices:
+      - id: p13b-wait
+        text: { ja: '件数が固まるまで第3報を出さず、第4報でまとめて出す。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -100
+        refs: [ppc-report-prelim]
+        gauges: { flame: 15, trust: -10 }
+        coward: true
+        items:
+          - { id: p13b-a-time, points: -10, axis: time, refs: [ppc-report-prelim] }
+          - { id: p13b-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: p13b-update
+        text: { ja: '確定した件数と内訳を出し、増えた分は「確認中」と「可能性」を分けて書く。前回との差も明記する。', en: '' }
+        minutes: 180
+        category: recover
+        points: 100
+        refs: [ppc-report-prelim, meti-disclosure-guidance]
+        gauges: { flame: -10, trust: 10, stamina: -10 }
+        setFlags: { thirdReport: true }
+        items:
+          - { id: p13b-b-wording, points: 10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p13b-b-content, points: 8, axis: content, refs: [ppc-report-prelim] }
+          - { id: p13b-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: p13b-range
+        text: { ja: '件数は幅のある概数で書き、内訳は次回に回す。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [ppc-report-prelim]
+        gauges: { flame: 5, trust: 3 }
+        items:
+          - { id: p13b-c-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p13b-c-content, points: -8, axis: content, refs: [ppc-report-prelim] }
 
   - id: p14-pressprep
     at: { day: 4, minutes: 600 }
@@ -1098,7 +1142,7 @@ drafts:
         label: { ja: '対象', en: '' }
         options:
           - { id: nm-target-all, text: { ja: '退会者と申込み途中の人を含む', en: '' }, points: 10, axis: content, refs: [ppc-notify-person] }
-          - { id: nm-target-current, text: { ja: '現会員のみ', en: '' }, points: -10, axis: content, refs: [ppc-notify-person] }
+          - { id: nm-target-current, text: { ja: '現会員のみ', en: '' }, points: -20, axis: content, refs: [ppc-notify-person], delayed: { afterPhases: 1, points: -15, reason: { ja: '退会者から「通知が来ていない」と相談が相次いだ。', en: '' } } }
       - id: action
         label: { ja: '利用者がすること', en: '' }
         options:
@@ -1179,12 +1223,12 @@ voices:
   - { id: v03-flattery, media: chat, misleading: true, type: flattery, text: { ja: '八木さんが全部見れば早いですよ。任せておけば間違いない。', en: '' }, trigger: { at: point } }
   - { id: v03-public, media: sns, misleading: true, type: public-opinion, text: { ja: '体制の話をしている場合か。早く原因を調べろ。', en: '' }, trigger: { at: point } }
   - { id: v03-ok, media: chat, misleading: false, text: { ja: '記録係を決めないと、判断の時刻が残りません。', en: '' }, trigger: { at: point } }
-  - { id: v04-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '初期化して作り直すのが一番早いですよ。証拠も残りませんから安心です。', en: '' }, trigger: { at: point } }
+  - { id: v04-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '初期化して作り直せば、仕込まれたものは確実に消えます。一番早くて確実です。', en: '' }, trigger: { at: point } }
   - { id: v04-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '危なそうなので、電源を抜いておきました。', en: '' }, trigger: { at: point } }
   - { id: v04-ok, media: chat, misleading: false, text: { ja: '法務「証拠を残さないと、後で説明できません」。', en: '' }, trigger: { at: point } }
   - { id: v04-after, media: board, misleading: false, text: { ja: '証拠を残すことに時間を使うより、復旧を急ぐべきだ。', en: '' }, trigger: { at: after, choice: p04-image-chain } }
   - { id: v05-public, media: sns, misleading: true, type: public-opinion, text: { ja: '全停止はやりすぎだ。他社は動いている。顧客が逃げるぞ。', en: '' }, trigger: { at: point } }
-  - { id: v05-coward, media: news, misleading: true, type: coward-critique, text: { ja: '止める判断が遅い。部門長は何をしていた。', en: '' }, trigger: { at: point } }
+  - { id: v05-coward, media: news, misleading: true, type: coward-critique, text: { ja: '全停止なんて臆病すぎる。他社は止めずに直している。', en: '' }, trigger: { at: point } }
   - { id: v05-ok, media: chat, misleading: false, text: { ja: '技術責任者「同じ認証情報を使うサーバーは、まだ八台あります」。', en: '' }, trigger: { at: point } }
   - { id: v05-after, media: sns, misleading: false, text: { ja: '全停止を進言した部門長が、責任を取るのか。', en: '' }, trigger: { at: after, choice: p05-recommend-plan } }
   - { id: v06-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '議事録は調査の対象から外していい。今は目の前の復旧だ。', en: '' }, trigger: { at: point } }
@@ -1213,15 +1257,18 @@ voices:
   - { id: v13-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: 'すでに公表した範囲だけ調べればいい。', en: '' }, trigger: { at: point } }
   - { id: v13-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '数百万件と言えば株価がまた下がります。概数でいいでしょう。', en: '' }, trigger: { at: point } }
   - { id: v13-ok, media: chat, misleading: false, text: { ja: '調査担当「退会者の画像が残っていた事実は、調査の中心です」。', en: '' }, trigger: { at: point } }
+  - { id: v13b-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が増えると、また株価が下がる。第3報は次回にまとめよう。', en: '' }, trigger: { at: point } }
+  - { id: v13b-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'また数字が変わるのか。もう何も信じられない。', en: '' }, trigger: { at: point } }
+  - { id: v13b-ok, media: chat, misleading: false, text: { ja: '広報「前回との差と、確定・推定の区別を書けば、訂正は避けられます」。', en: '' }, trigger: { at: point } }
   - { id: v14-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '会見で「絶対に許さない」と言えば、支持が集まりますよ。', en: '' }, trigger: { at: point } }
   - { id: v14-flattery, media: chat, misleading: true, type: flattery, text: { ja: 'さすが部門長。技術の説明は全部任せますよ。', en: '' }, trigger: { at: point } }
   - { id: v14-ok, media: chat, misleading: false, text: { ja: '広報「数字と日付は、記録と一致させましょう」。', en: '' }, trigger: { at: point } }
   - { id: v15-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '次の公開は、もっと多くの顧客だ。', en: '' }, trigger: { at: point } }
-  - { id: v15-coward, media: news, misleading: true, type: coward-critique, text: { ja: '一部が出た程度で、全部を認めるな。弱みを見せるな。', en: '' }, trigger: { at: point } }
+  - { id: v15-coward, media: news, misleading: true, type: bold-buzz, text: { ja: '一部が出た程度で、全部を認めるな。弱みを見せるな。', en: '' }, trigger: { at: point } }
   - { id: v15-ok, media: chat, misleading: false, text: { ja: '調査担当「公開されたファイルの時刻は、隔離の前のものです」。', en: '' }, trigger: { at: point } }
   - { id: v15-after, media: news, misleading: false, text: { ja: '一部が出ただけで全部を認める。弱みを見せすぎだ。', en: '' }, trigger: { at: after, choice: p15-support } }
   - { id: v16-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '既存の環境をそのまま再起動すれば、半日で戻せます。', en: '' }, trigger: { at: point } }
-  - { id: v16-public, media: sns, misleading: true, type: public-opinion, text: { ja: '十天も止めている。早く戻せ。', en: '' }, trigger: { at: point } }
+  - { id: v16-public, media: sns, misleading: true, type: public-opinion, text: { ja: '六日も止めている。早く戻せ。', en: '' }, trigger: { at: point } }
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '技術責任者「新しい環境で、同じ侵入が起きないか確かめましょう」。', en: '' }, trigger: { at: point } }
   - { id: v17-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '一週間も止めているのは臆病すぎる。他社ならもう再開している。', en: '' }, trigger: { at: point } }
   - { id: v17-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '明日から連休だ。今日中に戻せ。', en: '' }, trigger: { at: point } }

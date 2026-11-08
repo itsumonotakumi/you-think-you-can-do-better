@@ -1,9 +1,9 @@
 # No.4 ゴーライド / セキュリティ担当者ロール
 # 見えるのは、監視画面のアラート、ログ、端末、現場からのチャット。
-# 専任のSOCはなく、情報システム部セキュリティ課の四人で回している。
-# 判断ポイント18、細目は choices[].items と drafts の合計で80以上。
+# 専任のSOCはなく、情報システム部の兼任四人で回している。
+# 判断ポイント19、細目は choices[].items と drafts の合計で80以上。
 estimateMinutes: 35
-intro: { ja: 'あなたはゴーライドの情報システム部セキュリティ課の担当者。課は四人で、上は執行役員の八木さん。監視画面のアラート、ログ、現場からのチャットが、あなたの持ち場だ。', en: '' }
+intro: { ja: 'あなたはゴーライドの情報システム部の担当者。セキュリティは兼任で、同じ兼任の仲間は三人。合わせて四人で回している。上は執行役員の八木さん。監視画面のアラート、ログ、現場からのチャットが、あなたの持ち場だ。', en: '' }
 pressEnabled: true
 cowardVoices:
   '2': v-coward-2
@@ -22,7 +22,7 @@ deadlines:
     doneFlag: finalReportReady
 events:
   - id: ev-night
-    at: { day: 1, minutes: 120 }
+    at: { day: 1, minutes: 60 }
     voices: [v-ev-night]
     gauges: { stamina: -5 }
     sound: { se: [notify_chat] }
@@ -41,13 +41,13 @@ events:
     caption: { ja: '主要な取引先から、調査状況の説明を求められている。', en: '' }
 points:
   - id: a01-first-alert
-    at: { day: 0, minutes: 540 }
+    at: { day: 0, minutes: 1290 }
     phase: detect
     sound: { se: [notify_chat] }
-    text: { ja: '午前9時。会員データベースへの大量の読み出しを検知した。同じ時刻、管理画面へのログイン失敗が三百件を超えている。まだ原因は分からない。', en: '' }
+    text: { ja: '午後9時30分。会員データベースへの大量の読み出しを検知した。同じ時刻、管理画面へのログイン失敗が三百件を超えている。まだ原因は分からない。', en: '' }
     voices: [v01-field, v01-boss, v01-ok]
     notable:
-      - { id: note-first-call, text: { ja: '午前9時、会員データベースへの大量の読み出しと、管理画面へのログイン失敗多発を検知。原因は不明。', en: '' } }
+      - { id: note-first-call, text: { ja: '午後9時30分、会員データベースへの大量の読み出しと、管理画面へのログイン失敗多発を検知。原因は不明。', en: '' } }
     choices:
       - id: a01-poweroff
         text: { ja: '危険なので、そのサーバーの電源を抜いて止める。', en: '' }
@@ -98,10 +98,10 @@ points:
           - { id: a01-e-order, points: 5, axis: order, refs: [jpcert-handling] }
           - { id: a01-e-time, points: 5, axis: time, refs: [jpcert-handling] }
   - id: a02-duplicate
-    at: { day: 0, minutes: 585 }
+    at: { day: 0, minutes: 1335 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '午前9時45分。同じサービスアカウントを使う五台のサーバーで、同じ読み出しが続いている。予約と解錠は止まっていない。', en: '' }
+    text: { ja: '午後10時15分。同じサービスアカウントを使う五台のサーバーで、同じ読み出しが続いている。予約と解錠は止まっていない。', en: '' }
     voices: [v02-public, v02-past, v02-popular, v02-ok]
     popular: { choiceId: a02-one, percent: 58 }
     choices:
@@ -146,18 +146,20 @@ points:
       - id: a02-partial
         text: { ja: '影響する機能だけを止め、利用者に停止の理由を告知する。', en: '' }
         minutes: 90
-        category: maintain
-        points: 20
+        category: hurt
+        points: -60
         refs: [meti-disclosure-guidance]
         gauges: { damage: -3, flame: 5, trust: 3 }
+        delayed:
+          - { afterPhases: 1, points: -30, reason: { ja: '同じアカウントで、止めていない機能から読み出しが続いた。', en: '' } }
         items:
           - { id: a02-e-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: a02-e-care, points: 5, axis: care, refs: [ppc-notify-person] }
   - id: a03-evidence
-    at: { day: 0, minutes: 630 }
+    at: { day: 0, minutes: 1410 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '午前10時30分。切り離したサーバーの前に立っている。再起動すれば消えるものがあり、ディスクを外せば止まっているものが残る。', en: '' }
+    text: { ja: '午後11時30分。切り離したサーバーの前に立っている。再起動すれば消えるものがあり、ディスクを外せば止まっているものが残る。', en: '' }
     voices: [v03-expert, v03-field, v03-ok]
     choices:
       - id: a03-reboot
@@ -208,10 +210,10 @@ points:
           - { id: a03-d-order, points: -8, axis: order, refs: [jpcert-handling] }
 
   - id: a04-first-report
-    at: { day: 0, minutes: 720 }
+    at: { day: 1, minutes: 120 }
     phase: organize
     sound: { se: [phone_ring] }
-    text: { ja: '正午。八木さんに何を伝えるか。分かったこと、分かっていないこと、次にやることが、まだ頭の中で混ざっている。', en: '' }
+    text: { ja: '午前2時。八木さんに何を伝えるか。分かったこと、分かっていないこと、次にやることが、まだ頭の中で混ざっている。', en: '' }
     voices: [v04-boss, v04-bold, v04-ok]
     choices:
       - id: a04-wait
@@ -275,10 +277,10 @@ points:
           - { id: a04-f-order, points: -10, axis: order, refs: [meti-csm-guideline] }
           - { id: a04-f-care, points: -8, axis: care, refs: [meti-csm-guideline] }
   - id: a05-credentials
-    at: { day: 0, minutes: 810 }
+    at: { day: 1, minutes: 240 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '午後1時30分。読み出しに使われたサービスアカウントの権限は、アプリ全体に及ぶ。同じ認証情報が、別の三つのシステムにも残っている。', en: '' }
+    text: { ja: '午前4時。読み出しに使われたサービスアカウントの権限は、アプリ全体に及ぶ。同じ認証情報が、別の三つのシステムにも残っている。', en: '' }
     voices: [v05-vendor, v05-law, v05-ok]
     choices:
       - id: a05-keep
@@ -326,10 +328,10 @@ points:
           - { id: a05-e-order, points: 5, axis: order, refs: [cissp-cbk-secops] }
           - { id: a05-e-record, points: 5, axis: record, refs: [jpcert-handling] }
   - id: a06-logs
-    at: { day: 0, minutes: 930 }
+    at: { day: 1, minutes: 480 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '午後3時30分。侵入に使われたアカウントの操作ログの一部が消えている。プロキシとWAFの記録は残っている。', en: '' }
+    text: { ja: '午前8時。侵入に使われたアカウントの操作ログの一部が消えている。プロキシとWAFの記録は残っている。', en: '' }
     voices: [v06-expert, v06-insider, v06-ok]
     choices:
       - id: a06-giveup
@@ -381,7 +383,7 @@ points:
     at: { day: 1, minutes: 540 }
     phase: investigate
     sound: { se: [mail_arrive] }
-    text: { ja: '午前9時。VPN機器のベンダーが「製品に問題はない。運用の問題だ」と言う。ログを求めると「社内規定で出せない」と返ってきた。', en: '' }
+    text: { ja: '午前9時。本人確認システムの委託先が「製品に問題はない。運用の問題だ」と言う。ログを求めると「社内規定で出せない」と返ってきた。', en: '' }
     voices: [v07-vendor, v07-law, v07-ok]
     choices:
       - id: a07-accept
@@ -409,7 +411,7 @@ points:
           - { id: a07-b-wording, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: a07-b-record, points: 5, axis: record, refs: [jpcert-handling] }
       - id: a07-blame
-        text: { ja: 'SNSで「VPN機器の脆弱性が原因」と断定して書き込む。', en: '' }
+        text: { ja: 'SNSで「委託先のAPIの脆弱性が原因」と断定して書き込む。', en: '' }
         minutes: 30
         category: hurt
         points: -120
@@ -541,11 +543,11 @@ points:
     at: { day: 2, minutes: 840 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '午後2時。会員データベースを調べると、退会した人と申込み途中の人の免許証画像も残っていた。保存方針は、五年前に決まったまま更新されていない。', en: '' }
+    text: { ja: '午後2時。本人確認の委託先のストレージを調べると、退会した人と申込み途中の人の免許証画像も残っていた。保存方針は、三年前に決まったまま更新されていない。', en: '' }
     voices: [v10-past, v10-expert, v10-popular, v10-ok]
     notable:
-      - { id: note-scope, text: { ja: '退会者と申込み途中の人の免許証画像も保存されていた。保存方針は五年前のまま。', en: '' } }
-      - { id: note-retention, text: { ja: '保存方針を決めた五年前の議事録は、総務の保管庫に残っている。', en: '' } }
+      - { id: note-scope, text: { ja: '退会者と申込み途中の人の免許証画像も保存されていた。保存方針は三年前のまま。', en: '' } }
+      - { id: note-retention, text: { ja: '保存方針を決めた三年前の議事録は、総務の保管庫に残っている。', en: '' } }
     choices:
       - id: a10-current
         text: { ja: '現会員だけを調べて、範囲を広げない。', en: '' }
@@ -592,11 +594,50 @@ points:
         items:
           - { id: a10-e-content, points: 5, axis: content, refs: [no04-ppc-guideline-general] }
           - { id: a10-e-order, points: 5, axis: order, refs: [jpcert-handling] }
+  - id: a11b-mail-auth
+    at: { day: 2, minutes: 960 }
+    phase: notify
+    sound: { se: [mail_arrive] }
+    text: { ja: '午後4時。本人通知メールの準備。送信元のドメインと、なりすましを防ぐ認証設定（SPF/DKIM）を確認する。当社を名乗る偽メールの通報窓口も要る。', en: '' }
+    voices: [v11b-vendor, v11b-public, v11b-ok]
+    choices:
+      - id: a11b-body
+        text: { ja: '本文だけを作り、送信元のドメインと認証設定は広報に任せる。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -60
+        refs: [ppc-notify-person]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: a11b-a-order, points: -10, axis: order, refs: [ppc-notify-person] }
+          - { id: a11b-a-care, points: -8, axis: care, refs: [ppc-notify-person] }
+      - id: a11b-auth
+        text: { ja: '公式ドメインから送り、SPFとDKIMの設定を確認してから送る。偽メールの通報窓口を案内に載せる。', en: '' }
+        minutes: 150
+        category: recover
+        points: 100
+        refs: [ppc-notify-person, jpcert-handling]
+        gauges: { flame: -10, trust: 10, stamina: -10 }
+        setFlags: { mailAuthChecked: true }
+        items:
+          - { id: a11b-b-order, points: 10, axis: order, refs: [ppc-notify-person] }
+          - { id: a11b-b-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: a11b-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: a11b-vendor-domain
+        text: { ja: '本人確認の委託先のドメインから送れば、設定の確認は要らない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ppc-notify-person]
+        gauges: { flame: 15, trust: -15 }
+        items:
+          - { id: a11b-c-order, points: -12, axis: order, refs: [ppc-notify-person] }
+          - { id: a11b-c-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
   - id: a11-prelim
     at: { day: 2, minutes: 1260 }
     phase: notify
     sound: { se: [phone_ring] }
-    text: { ja: '午後9時。八木さんから「速報の材料を、明日の朝までに」と言われた。事態を知ってから、まもなく三日になる。', en: '' }
+    text: { ja: '午後9時。八木さんから「速報の材料を、明日の朝までに」と言われた。事態を知ってから、まもなく二日になる。', en: '' }
     voices: [v11-boss, v11-law, v11-ok]
     choices:
       - id: a11-wait
@@ -652,11 +693,11 @@ points:
     at: { day: 3, minutes: 600 }
     phase: notify
     sound: { se: [typing] }
-    text: { ja: '午前10時。広報の桜庭さんから「公表文の技術的な部分を見てほしい。原因は何と書くか」と依頼が来た。速報の扱いも、まだ議論の途中だ。', en: '' }
+    text: { ja: '午前10時。広報の桜庭さんから「公表文の技術的な部分を見てほしい。原因は何と書くか」と依頼が来た。速報は昨夜、分かっている範囲で提出した。次は公表文だ。', en: '' }
     voices: [v12-bold, v12-boss, v12-ok]
     choices:
       - id: a12-guess
-        text: { ja: '「VPN機器の脆弱性が原因」と断定して渡す。', en: '' }
+        text: { ja: '「委託先のAPIの脆弱性が原因」と断定して渡す。', en: '' }
         minutes: 30
         category: hurt
         points: -90
@@ -704,16 +745,16 @@ points:
           - { id: a12-d-care, points: -5, axis: care, refs: [meti-csm-guideline] }
 
   - id: a13-leak
-    at: { day: 4, minutes: 540 }
+    at: { day: 5, minutes: 420 }
     phase: notify
     sound: { se: [notify_news] }
-    text: { ja: '午前9時。ダークウェブで、免許証画像が売られているという情報が入った。真偽はまだ分からない。掲示板には「中の人だけど、実際は十倍」とある。', en: '' }
+    text: { ja: '午前7時。ダークウェブで、免許証画像が売られているという情報が入った。真偽はまだ分からない。掲示板には「中の人だけど、実際は十倍」とある。', en: '' }
     voices: [v13-attacker, v13-coward, v13-ok]
     notable:
       - { id: note-leak, text: { ja: 'ダークウェブで免許証画像が売られているという情報。真偽と件数は未確認。', en: '' } }
     choices:
       - id: a13-deny
-        text: { ja: '「確認中」を続け、公開された事実を認めない。', en: '' }
+        text: { ja: '情報を得たことを伏せ、照合もしないまま「確認中」とだけ答え続ける。', en: '' }
         minutes: 120
         category: hurt
         points: -100
@@ -849,11 +890,13 @@ points:
       - id: a15-off
         text: { ja: 'アラートがうるさいので、通知を切る。', en: '' }
         minutes: 15
-        category: fatal
-        points: -250
+        category: hurt
+        points: -150
         refs: [nist-sp800-61r3]
         gauges: { damage: 20, trust: -15 }
         setFlags: { alertDisabled: true }
+        delayed:
+          - { afterPhases: 1, points: -60, reason: { ja: '切った通知の中に、再侵入の兆候があった。', en: '' } }
         items:
           - { id: a15-c-record, points: -15, axis: record, refs: [nist-sp800-61r3] }
           - { id: a15-c-care, points: -12, axis: care, refs: [cissp-cbk-secops] }
@@ -997,7 +1040,7 @@ points:
           - { id: a18-a-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
           - { id: a18-a-record, points: -5, axis: record, refs: [cissp-cbk-secops] }
       - id: a18-share
-        text: { ja: '検知から初動の判断を、攻撃に使える詳細を伏せて共有する。', en: '' }
+        text: { ja: '八木さんと広報・法務の承認を取り、検知から初動の判断を、攻撃に使える詳細を伏せて共有する。', en: '' }
         minutes: 180
         category: increase
         points: 300
@@ -1116,7 +1159,7 @@ drafts:
         label: { ja: '出す時刻', en: '' }
         auto: true
         items:
-          - { id: pm-t-48h, when: { withinHours: 48 }, points: 10, axis: time, refs: [ppc-report-prelim] }
+          - { id: pm-t-64h, when: { withinHours: 64 }, points: 10, axis: time, refs: [ppc-report-prelim] }
           - { id: pm-t-72h, when: { withinHours: 72 }, points: 3, axis: time, refs: [ppc-report-prelim] }
           - { id: pm-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [ppc-report-prelim] }
       - id: scope
@@ -1173,7 +1216,10 @@ drafts:
           - { id: pm-n-none, text: { ja: '次回の予定を書かない', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance] }
 voices:
   - { id: v01-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場「危なそうだったので、そのサーバーの電源を抜いておきました。もう止まりましたよね」。', en: '' }, trigger: { at: point } }
-  - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '八木さん「朝会が終わるまで、外には出さないでくれ。まだ何も分かっていない」。', en: '' }, trigger: { at: point } }
+  - { id: v11b-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '通知メールは委託先から送れば早いですよ。認証の設定は後でいい。', en: '' }, trigger: { at: point } }
+  - { id: v11b-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'またメールが来るのか。どうせ偽物だと思う。', en: '' }, trigger: { at: point } }
+  - { id: v11b-ok, media: chat, misleading: false, text: { ja: '認証の担当「SPFとDKIMの設定は、今日中に確認できます」。', en: '' }, trigger: { at: point } }
+  - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '運用部長「明日の朝会が終わるまで、外には出さないでくれ。まだ何も分かっていない」。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: '監視の同僚「まず読み出し元のアドレスと、使われたアカウントを特定しよう」。', en: '' }, trigger: { at: point } }
   - { id: v02-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'アプリを止めるな。通勤で使っているんだ。', en: '' }, trigger: { at: point } }
   - { id: v02-past, media: boss, misleading: true, type: past-success, text: { ja: '前の障害は一台止めて収まった。今回も同じでいい。', en: '' }, trigger: { at: point } }
@@ -1211,9 +1257,9 @@ voices:
   - { id: v12-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '早く結論を出せ。広報が待っている。', en: '' }, trigger: { at: point } }
   - { id: v12-ok, media: chat, misleading: false, text: { ja: '広報「確認できたことと、まだ分からないことを分けて書けないか」。', en: '' }, trigger: { at: point } }
   - { id: v13-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '次の公開は、もっと多くの免許証だ。', en: '' }, trigger: { at: point } }
-  - { id: v13-coward, media: news, misleading: true, type: coward-critique, text: { ja: '一部が売られている程度で、全部を認めるのか。弱みを見せるな。', en: '' }, trigger: { at: point } }
+  - { id: v13-coward, media: news, misleading: true, type: bold-buzz, text: { ja: '一部が売られている程度で、全部を認めるのか。弱みを見せるな。', en: '' }, trigger: { at: point } }
   - { id: v13-ok, media: chat, misleading: false, text: { ja: '照合すれば、公開されたデータが自社のものかは分かります。', en: '' }, trigger: { at: point } }
-  - { id: v14-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'もう一週間も止めている。早く戻せ。', en: '' }, trigger: { at: point } }
+  - { id: v14-coward, media: sns, misleading: true, type: public-opinion, text: { ja: 'もう一週間も止めている。早く戻せ。', en: '' }, trigger: { at: point } }
   - { id: v14-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '検証に時間をかけると、復旧費用が増えますよ。', en: '' }, trigger: { at: point } }
   - { id: v14-ok, media: chat, misleading: false, text: { ja: '調査会社「クリーンな環境で検証してから、段階的に戻しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v15-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'もう終わっただろう。監視コストを下げろ。', en: '' }, trigger: { at: point } }
@@ -1222,7 +1268,7 @@ voices:
   - { id: v16-law, media: board, misleading: true, type: law-ish, text: { ja: '自分の不利になる記録は出さなくても、委員会は分かりません。', en: '' }, trigger: { at: point } }
   - { id: v16-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '都合の悪いところは省け。', en: '' }, trigger: { at: point } }
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '事実と判断を分けて、見落としも含めて出しましょう。', en: '' }, trigger: { at: point } }
-  - { id: v17-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '今さら議事録を出して、責任逃れに見える。', en: '' }, trigger: { at: point } }
+  - { id: v17-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '今さら議事録を出して、責任逃れに見える。', en: '' }, trigger: { at: point } }
   - { id: v17-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '確報に議事録まで付けると、攻撃者に手の内が分かります。', en: '' }, trigger: { at: point } }
   - { id: v17-ok, media: chat, misleading: false, text: { ja: '法務「確報の期限は、不正の目的のおそれがある場合で六十日です」。', en: '' }, trigger: { at: point } }
   - { id: v18-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '攻撃者の手口を全部話せば、注目されますよ。', en: '' }, trigger: { at: point } }

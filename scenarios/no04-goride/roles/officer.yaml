@@ -4,7 +4,7 @@
 # 親会社（上場企業の子会社）への報告、店舗と法人契約の業務継続、部下を守る判断を扱う。
 # 判断ポイント16、細目は choices[].items と drafts の合計で80以上。
 estimateMinutes: 35
-intro: { ja: 'あなたはゴーライドの執行役員で、グループ会社ゴーライド・モビリティサービスの代表取締役社長を兼務している。レンタカー店舗と法人向けの長期貸出を預かり、グループ共通の予約アプリを使っている。専任のセキュリティ部署はない。情報システムは経理部の兼任が二人で、技術の調査は外部に頼るしかない。午前9時15分、店舗から電話が入る。', en: '' }
+intro: { ja: 'あなたはゴーライドの執行役員で、グループ会社ゴーライド・モビリティサービスの代表取締役社長を兼務している。レンタカー店舗と法人向けの長期貸出を預かり、グループ共通の予約アプリを使っている。専任のセキュリティ部署はない。情報システムは経理部の兼任が二人で、技術の調査は外部に頼るしかない。午後9時30分、店舗から電話が入る。', en: '' }
 pressEnabled: true
 cowardVoices:
   '2': v-coward-2
@@ -37,13 +37,13 @@ events:
     caption: { ja: '店舗スタッフの疲労が限界に近づいている。', en: '' }
 points:
   - id: o01-group-call
-    at: { day: 0, minutes: 555 }
+    at: { day: 0, minutes: 1290 }
     phase: detect
     sound: { se: [phone_ring] }
-    text: { ja: '午前9時15分。本社の役員会議に入った直後、店舗運用部長から電話が入る。「グループ共通の予約アプリのデータベースに、外部からアクセスされた形跡があります。店舗で預かった免許証の画像も、同じ場所に保存されていました」。自社に専任のセキュリティ部署はない。', en: '' }
+    text: { ja: '午後9時30分。本社の役員会議に入った直後、店舗運用部長から電話が入る。「グループ共通の予約アプリのデータベースに、外部からアクセスされた形跡があります。店舗で預かった免許証の画像も、本人確認の委託先の同じストレージに保存されていました」。自社に専任のセキュリティ部署はない。', en: '' }
     voices: [v01-parent, v01-public, v01-ok]
     notable:
-      - { id: note-first-call, text: { ja: '午前9時15分、グループ共通アプリへの不正アクセスを把握。店舗で預かった免許証画像も同じ保存場所にあった。', en: '' } }
+      - { id: note-first-call, text: { ja: '午後9時30分、グループ共通アプリへの不正アクセスを把握。店舗で預かった免許証画像も委託先の同じ保存場所にあった。', en: '' } }
     choices:
       - id: o01-wait
         text: { ja: '本社の指示を待ち、店舗の営業は通常どおり続ける。', en: '' }
@@ -84,10 +84,10 @@ points:
           - { id: o01-c-care, points: -5, axis: care, refs: [ipa-sme-guideline] }
 
   - id: o02-store-stop
-    at: { day: 0, minutes: 660 }
+    at: { day: 1, minutes: 540 }
     phase: contain
     sound: { se: [notify_sns] }
-    text: { ja: '午前11時。店舗では免許証の原本をスキャンして返却している。グループのアプリはまだ動いている。自社の店舗だけでも貸出を止めるか。止めれば、法人契約の車が全国で動かなくなる。', en: '' }
+    text: { ja: '午前9時。店舗では免許証の原本をスキャンして返却している。グループのアプリはまだ動いている。自社の店舗だけでも貸出を止めるか。止めれば、法人契約の車が全国で動かなくなる。', en: '' }
     voices: [v02-flattery, v02-public, v02-expert, v02-ok]
     popular: { choiceId: o02-partial, percent: 45 }
     choices:
@@ -130,10 +130,10 @@ points:
           - { id: o02-c-order, points: 5, axis: order, refs: [nist-sp800-61r3] }
 
   - id: o03-evidence
-    at: { day: 0, minutes: 840 }
+    at: { day: 1, minutes: 780 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '午後2時。グループの調査担当から「店舗のスキャン画像の原本は、自社のファイルサーバーにも残っています。消しますか」と聞かれた。消せば被害は減るが、何が漏れたか分からなくなる。', en: '' }
+    text: { ja: '午後1時。グループの調査担当から「店舗のスキャン画像の原本は、自社のファイルサーバーにも残っています。消しますか」と聞かれた。消せば被害は減るが、何が漏れたか分からなくなる。', en: '' }
     voices: [v03-expert, v03-field, v03-ok]
     choices:
       - id: o03-delete
@@ -177,10 +177,10 @@ points:
           - { id: o03-c-care, points: 5, axis: care, refs: [meti-csm-guideline] }
 
   - id: o04-parent-report
-    at: { day: 1, minutes: 510 }
+    at: { day: 2, minutes: 510 }
     phase: organize
     sound: { se: [phone_ring] }
-    text: { ja: '翌朝8時30分。本社の社長（榊原）から電話。「上場している親会社に、今日の午前中に第一報を出す。子会社の分も含める。君のところの数字は」。件数はまだ確定していない。', en: '' }
+    text: { ja: '2日目午前8時30分。本社の社長（榊原）から電話。「上場している親会社に、今日の午前中に第一報を出す。子会社の分も含める。君のところの数字は」。件数はまだ確定していない。', en: '' }
     voices: [v04-parent, v04-coward, v04-ok]
     choices:
       - id: o04-wait
@@ -222,13 +222,13 @@ points:
           - { id: o04-c-order, points: 5, axis: order, refs: [no02-timely-disclosure] }
 
   - id: o05-retention-own
-    at: { day: 1, minutes: 780 }
+    at: { day: 2, minutes: 780 }
     phase: organize
     sound: { se: [notify_chat] }
-    text: { ja: '午後1時。本社から「退会者や申込み途中の人の免許証画像を、なぜ残していたのか」と聞かれた。2023年の会議で「再入会のときに本人確認が楽になる」と提案したのは、あなただった。', en: '' }
+    text: { ja: '午後1時。本社から「退会者や申込み途中の人の免許証画像を、なぜ残していたのか」と聞かれた。2023年の経営会議で「再入会キャンペーンの審査を早くするため」と提案したのは、あなただった。決裁したのは榊原社長だ。', en: '' }
     voices: [v05-insider, v05-boss, v05-ok]
     notable:
-      - { id: note-retention, text: { ja: '退会者・申込み途中の人の免許証画像も保存する方針が、2023年の会議で決まっていた。提案したのは自分。', en: '' } }
+      - { id: note-retention, text: { ja: '退会者・申込み途中の人の免許証画像も保存する方針が、2023年の経営会議で決まっていた。提案したのは自分。', en: '' } }
     choices:
       - id: o05-hide
         text: { ja: '自分の提案だったことは伏せ、「現場の運用の誤り」として説明する。', en: '' }
@@ -245,7 +245,7 @@ points:
           - { id: o05-a-content, points: -15, axis: content, refs: [meti-csm-guideline] }
           - { id: o05-a-care, points: -10, axis: care, refs: [meti-csm-guideline] }
       - id: o05-explain
-        text: { ja: '自分が提案したことと、見直さなかったことを説明する。保存方針の棚卸しと、退会者分の削除を始める。', en: '' }
+        text: { ja: '保存方針が誰の提案で、どの会議で、どう決まり、なぜ見直されなかったかを組織の判断として説明する。新しい保存は止め、既存の画像は保全したまま一覧にし、削除は調査完了後に記録を残して行う。', en: '' }
         minutes: 150
         category: recover
         points: 120
@@ -270,10 +270,10 @@ points:
           - { id: o05-c-care, points: -5, axis: care, refs: [ppc-notify-person] }
 
   - id: o06-scope
-    at: { day: 2, minutes: 540 }
+    at: { day: 2, minutes: 900 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '2日目午前9時。調査会社の報告。漏えたのはグループ共通のアカウント情報と免許証画像。自社の法人契約のドライバーと、店舗で一度だけ借りた人の分も含まれる可能性がある。', en: '' }
+    text: { ja: '2日目午後3時。調査会社の報告。漏えいしたのはグループ共通のアカウント情報と免許証画像。自社の法人契約のドライバーと、店舗で一度だけ借りた人の分も含まれる可能性がある。', en: '' }
     voices: [v06-vendor, v06-past, v06-ok]
     notable:
       - { id: note-scope, text: { ja: '自社の法人契約ドライバーと店舗の対面貸出の免許証画像も、同じ保存場所にあった。', en: '' } }
@@ -316,10 +316,10 @@ points:
           - { id: o06-c-time, points: 5, axis: time, refs: [jpcert-handling] }
 
   - id: o07-clients
-    at: { day: 2, minutes: 900 }
+    at: { day: 3, minutes: 540 }
     phase: notify
     sound: { se: [phone_ring] }
-    text: { ja: '午後3時。法人契約の配送会社から「うちのドライバーの免許証は大丈夫か」と電話が入った。報道はまだ出ていない。先に個別に伝えるか、報道を待ってまとめて伝えるか。', en: '' }
+    text: { ja: '3日目午前9時。法人契約の配送会社から「うちのドライバーの免許証は大丈夫か」と電話が入った。法人ドライバーの画像が含まれることは、まだ報じられていない。先に個別に伝えるか、報道を待ってまとめて伝えるか。', en: '' }
     voices: [v07-sales, v07-public, v07-ok]
     popular: { choiceId: o07-wait, percent: 56 }
     choices:
@@ -361,10 +361,10 @@ points:
           - { id: o07-c-content, points: -5, axis: content, refs: [meti-csm-guideline] }
 
   - id: o08-prelim
-    at: { day: 2, minutes: 960 }
+    at: { day: 3, minutes: 780 }
     phase: notify
     sound: { se: [typing] }
-    text: { ja: '午後4時。速報の期限が明日の朝に迫っている。本社は「グループで一本化する」と言う。自社の顧客分をどう出すか。', en: '' }
+    text: { ja: '3日目午後1時。速報の期限が今夜に迫っている。本社は「グループで一本化する」と言う。自社の顧客分をどう出すか。', en: '' }
     voices: [v08-parent, v08-law, v08-ok]
     popular: { choiceId: o08-leave, percent: 61 }
     choices:
@@ -456,7 +456,7 @@ points:
     at: { day: 4, minutes: 600 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '4日目午前10時。店舗は通常営業に戻ったが、スタッフは3日連続で問い合わせ対応に追われている。店舗から「このままだと、確認漏れが出ます」と声が上がった。', en: '' }
+    text: { ja: '4日目午前10時。店舗の貸出は止めたままだが、スタッフは3日連続で問い合わせと代替車の手配に追われている。店舗から「このままだと、確認漏れが出ます」と声が上がった。', en: '' }
     voices: [v10-flattery, v10-public, v10-ok]
     choices:
       - id: o10-allnight
@@ -496,16 +496,16 @@ points:
           - { id: o10-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
 
   - id: o11-darkweb
-    at: { day: 6, minutes: 480 }
+    at: { day: 5, minutes: 600 }
     phase: notify
     sound: { se: [notify_news] }
-    text: { ja: '6日目午前8時。ダークウェブで、自社の店舗で撮影した免許証画像が売られているという情報が入った。真偽はまだ分からない。', en: '' }
+    text: { ja: '5日目午前10時。ダークウェブで、自社の店舗で撮影した免許証画像が売られているという情報が入った。真偽はまだ分からない。', en: '' }
     voices: [v11-attacker, v11-coward, v11-ok]
     notable:
       - { id: note-leak, text: { ja: 'ダークウェブで自社の店舗の免許証画像が売られているという情報。真偽は未確認。', en: '' } }
     choices:
       - id: o11-deny
-        text: { ja: '「確認中」を続け、公開された事実を認めない。', en: '' }
+        text: { ja: '情報を得たことを伏せ、照合もしないまま「確認中」とだけ答え続ける。', en: '' }
         minutes: 120
         category: hurt
         points: -150
@@ -656,7 +656,7 @@ points:
           - { id: o14-b-record, points: 8, axis: record, refs: [meti-csm-guideline] }
           - { id: o14-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
       - id: o14-own
-        text: { ja: '事実に加え、2023年に自分が保存を提案し、見直さなかった責任を明言する。', en: '' }
+        text: { ja: '事実に加え、2023年の会議で保存方針がどう決まり、なぜ見直されなかったかを組織の判断として説明する。自分の関与も明言する。', en: '' }
         minutes: 120
         category: recover
         points: 120
@@ -870,7 +870,7 @@ drafts:
       - id: cause
         label: { ja: '侵入経路の書き方', en: '' }
         options:
-          - { id: of-c-cause, text: { ja: 'グループ共通アプリの設定の不備を具体的に書く', en: '' }, points: 10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: of-c-cause, text: { ja: '本人確認の委託先のAPIの設定の不備を具体的に書く', en: '' }, points: 10, axis: content, refs: [nist-sp800-61r3] }
           - { id: of-c-vague, text: { ja: '「外部からの攻撃」とだけ書く', en: '' }, points: -10, axis: content, refs: [nist-sp800-61r3] }
       - id: measures
         label: { ja: '再発防止策', en: '' }
@@ -904,19 +904,19 @@ drafts:
           - { id: of-rec-none, text: { ja: '記録を残さない', en: '' }, points: -8, axis: record, refs: [jpcert-handling] }
 voices:
   - { id: v01-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: 'グループの発表に任せろ。子会社が出しゃばると、説明が二つに割れる。', en: '' }, trigger: { at: point } }
-  - { id: v01-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'また個人情報か。店舗を止めろ、早く。', en: '' }, trigger: { at: point } }
+  - { id: v01-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'また個人情報か。子会社は本社の発表を待てばいい。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: '店舗運用部長「まず、どの画像が残っているか確認します。消さずに置いておきます」。', en: '' }, trigger: { at: point } }
   - { id: v01-after, media: sns, misleading: false, text: { ja: '子会社が勝手に動くなんて。本社の指示を待て。', en: '' }, trigger: { at: after, choice: o01-own } }
-  - { id: v02-flattery, media: chat, misleading: true, type: flattery, text: { ja: '法人契約の車を止めたら、明日の配送が止まります。今のままで回っていますよ。', en: '' }, trigger: { at: point } }
+  - { id: v02-flattery, media: chat, misleading: true, type: boss-pressure, text: { ja: '法人契約の車を止めたら、明日の配送が止まります。今のままで回っていますよ。', en: '' }, trigger: { at: point } }
   - { id: v02-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'レンタカーを止めるな。今週末に使うんだ。', en: '' }, trigger: { at: point } }
-  - { id: v02-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '画像の取り込みだけ止めれば十分です。店舗は全部閉める必要はありません。', en: '' }, trigger: { at: point } }
+  - { id: v02-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'グループの封じ込めは本社がやります。子会社の店舗まで止める必要はありません。', en: '' }, trigger: { at: point } }
   - { id: v02-ok, media: chat, misleading: false, text: { ja: '店舗運用部長「取り込みだけ止めれば、対面の貸出は続けられます」。', en: '' }, trigger: { at: point } }
   - { id: v02-after, media: sns, misleading: false, text: { ja: '止めたのは分かるが、代替の車はいつ来るんだ。', en: '' }, trigger: { at: after, choice: o02-stop-all } }
   - { id: v03-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '消せば漏えいの範囲が狭まります。まず消しましょう。', en: '' }, trigger: { at: point } }
   - { id: v03-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '危なそうだったので、共有フォルダごと消しておきました。これで安全です。', en: '' }, trigger: { at: point } }
   - { id: v03-ok, media: chat, misleading: false, text: { ja: '外部の調査会社「削除する前に、対象の一覧と保存場所を記録してください」。', en: '' }, trigger: { at: point } }
   - { id: v04-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が固まるまで、子会社の名前は出さないでくれ。', en: '' }, trigger: { at: point } }
-  - { id: v04-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'まだ分かっていないのに書面を出すと、あとで訂正だらけになる。', en: '' }, trigger: { at: point } }
+  - { id: v04-coward, media: sns, misleading: true, type: boss-pressure, text: { ja: 'まだ分かっていないのに書面を出すと、あとで訂正だらけになる。', en: '' }, trigger: { at: point } }
   - { id: v04-ok, media: chat, misleading: false, text: { ja: '法務「分かった事実と不明点を分けて書けば、訂正は最小で済みます」。', en: '' }, trigger: { at: point } }
   - { id: v04-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに、子会社が書面を出すのか。', en: '' }, trigger: { at: after, choice: o04-written } }
   - { id: v05-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、退会者の画像は十万枚単位で残ってる。全部公表しろ。', en: '' }, trigger: { at: point } }
@@ -926,25 +926,25 @@ voices:
   - { id: v06-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: 'うちの本人確認システムは別です。調べる必要はないでしょう。', en: '' }, trigger: { at: point } }
   - { id: v06-past, media: boss, misleading: true, type: past-success, text: { ja: '前の障害は範囲を絞って収まった。今回も同じでいい。', en: '' }, trigger: { at: point } }
   - { id: v06-ok, media: chat, misleading: false, text: { ja: '調査責任者「店舗の対面貸出と法人契約の免許証も、同じ保存場所です」。', en: '' }, trigger: { at: point } }
-  - { id: v07-sales, media: chat, misleading: true, type: flattery, text: { ja: '先に言うと、取引を止められますよ。報道を待てば、こちらから言わなくて済みます。', en: '' }, trigger: { at: point } }
-  - { id: v07-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'ニュースで知るのは嫌だ。先に言え。', en: '' }, trigger: { at: point } }
+  - { id: v07-sales, media: chat, misleading: true, type: vendor-interest, text: { ja: '先に言うと、取引を止められますよ。報道を待てば、こちらから言わなくて済みます。', en: '' }, trigger: { at: point } }
+  - { id: v07-public, media: sns, misleading: true, type: public-opinion, text: { ja: '報道が出る前に騒ぐと、余計に不安が広がる。', en: '' }, trigger: { at: point } }
   - { id: v07-ok, media: chat, misleading: false, text: { ja: '営業部長「先に言えば、代替の車を手配できます」。', en: '' }, trigger: { at: point } }
   - { id: v08-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: 'グループの発表に任せろ。子会社が単独で出すと、数字が食い違う。', en: '' }, trigger: { at: point } }
-  - { id: v08-law, media: board, misleading: true, type: law-ish, text: { ja: '子会社の顧客は数千人だから、報告はいらないでしょ。', en: '' }, trigger: { at: point } }
+  - { id: v08-law, media: board, misleading: true, type: law-ish, text: { ja: '子会社の分は数百人だから、うちの報告はいらないでしょ。', en: '' }, trigger: { at: point } }
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '法務「グループと連名にして、自社の範囲を明記すれば一本化できます」。', en: '' }, trigger: { at: point } }
   - { id: v08-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに、子会社が名前を出すのか。', en: '' }, trigger: { at: after, choice: o08-joint-notice } }
-  - { id: v09-marketing, media: chat, misleading: true, type: flattery, text: { ja: '退会者に連絡すると、また問い合わせが増えますよ。今の会員だけで十分です。', en: '' }, trigger: { at: point } }
-  - { id: v09-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'メールが来ても、偽物だと思う。電話で説明してほしい。', en: '' }, trigger: { at: point } }
+  - { id: v09-marketing, media: chat, misleading: true, type: boss-pressure, text: { ja: '退会者に連絡すると、また問い合わせが増えますよ。今の会員だけで十分です。', en: '' }, trigger: { at: point } }
+  - { id: v09-public, media: sns, misleading: true, type: public-opinion, text: { ja: '退会した人にまで送ると、迷惑メール扱いされるだけだ。', en: '' }, trigger: { at: point } }
   - { id: v09-ok, media: chat, misleading: false, text: { ja: '顧客対応「法人契約のドライバーは、会社を通さないと連絡できません」。', en: '' }, trigger: { at: point } }
   - { id: v09-after, media: sns, misleading: false, text: { ja: '通知が多すぎて、どれが本物か分からない。', en: '' }, trigger: { at: after, choice: o09-all-plus } }
   - { id: v10-flattery, media: chat, misleading: true, type: flattery, text: { ja: '社長が店舗を回れば、現場も頑張りますよ。寝ずにやりましょう。', en: '' }, trigger: { at: point } }
   - { id: v10-public, media: sns, misleading: true, type: public-opinion, text: { ja: '経営者が休んでいる場合か。早く普通に戻せ。', en: '' }, trigger: { at: point } }
   - { id: v10-ok, media: chat, misleading: false, text: { ja: '店舗運用部長「交代を入れてください。研修中のスタッフも動かせます」。', en: '' }, trigger: { at: point } }
   - { id: v11-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '次の公開は、法人契約のドライバーの免許証だ。', en: '' }, trigger: { at: point } }
-  - { id: v11-coward, media: news, misleading: true, type: coward-critique, text: { ja: '一部が売られている程度で、全部を認めるのか。弱みを見せるな。', en: '' }, trigger: { at: point } }
+  - { id: v11-coward, media: news, misleading: true, type: bold-buzz, text: { ja: '一部が売られている程度で、全部を認めるのか。弱みを見せるな。', en: '' }, trigger: { at: point } }
   - { id: v11-ok, media: chat, misleading: false, text: { ja: '窓口「公開された画像について、顧客から電話が来ています」。', en: '' }, trigger: { at: point } }
   - { id: v11-after, media: sns, misleading: false, text: { ja: '見舞金が少ない。これで済むと思うな。', en: '' }, trigger: { at: after, choice: o11-support } }
-  - { id: v12-sales, media: chat, misleading: true, type: flattery, text: { ja: '自社だけ先に戻せば、週末の売上は守れます。本社も分かってくれますよ。', en: '' }, trigger: { at: point } }
+  - { id: v12-sales, media: chat, misleading: true, type: boss-pressure, text: { ja: '自社だけ先に戻せば、週末の売上は守れます。本社も分かってくれますよ。', en: '' }, trigger: { at: point } }
   - { id: v12-public, media: sns, misleading: true, type: public-opinion, text: { ja: '一週間も止めて、いい加減にしろ。他社は動いている。', en: '' }, trigger: { at: point } }
   - { id: v12-ok, media: chat, misleading: false, text: { ja: '情報システム担当（兼任）「クリーンな環境から、店舗ごとに段階的に戻せます」。', en: '' }, trigger: { at: point } }
   - { id: v12-after, media: news, misleading: false, text: { ja: '再開が遅い。他社はとっくに動いている。', en: '' }, trigger: { at: after, choice: o12-verified } }
@@ -959,7 +959,7 @@ voices:
   - { id: v15-law, media: board, misleading: true, type: law-ish, text: { ja: '任意の報告書です。出さなくても違法ではありません。', en: '' }, trigger: { at: point } }
   - { id: v15-ok, media: chat, misleading: false, text: { ja: '調査委員「攻撃に使える部分だけ伏せれば、公開できます」。', en: '' }, trigger: { at: point } }
   - { id: v15-after, media: news, misleading: false, text: { ja: '今さら報告書を出して、宣伝か。', en: '' }, trigger: { at: after, choice: o15-share } }
-  - { id: v16-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '辞めれば済むと思っているのか。逃げるな。', en: '' }, trigger: { at: point } }
+  - { id: v16-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '責任者は辞めるのが筋だ。残るのは保身だ。', en: '' }, trigger: { at: point } }
   - { id: v16-flattery, media: chat, misleading: true, type: flattery, text: { ja: '辞任会見をすれば、会社は守れますよ。社長の責任は重いですから。', en: '' }, trigger: { at: point } }
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '本社の社長「残って改革をやるなら、グループ全体の保存ルールを任せる」。', en: '' }, trigger: { at: point } }
   - { id: v16-after, media: news, misleading: false, text: { ja: '残って改革と言っても、説得力がない。', en: '' }, trigger: { at: after, choice: o16-group-rule } }

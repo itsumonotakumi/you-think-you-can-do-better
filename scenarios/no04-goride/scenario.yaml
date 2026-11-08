@@ -4,7 +4,7 @@ id: no04-goride
 version: '1.0.0'
 status: latest
 published: '2026-11-08'
-sourcePeriod: { ja: '2026年秋の事件の構造を参考にしたフィクション', en: '' }
+sourcePeriod: { ja: '本人確認書類の漏えい事件いくつかの構造を参考にしたフィクション', en: '' }
 difficulty: 4
 languages: [ja]
 referencesVersion: '2026-11-08'
@@ -34,7 +34,7 @@ company:
     - id: legal
       name: { ja: '瀬川 律子', en: '' }
       title: { ja: '法務部長', en: '' }
-start: { day: 0, minutes: 540 }
+start: { day: 0, minutes: 1290 }
 initialGauges: { damage: 20, flame: 0, trust: 70, stamina: 100 }
 audio:
   bgmDefault: tension_low
@@ -55,11 +55,12 @@ press:
       answers:
         - { id: a-retention-vague, text: { ja: '確認しておりません。', en: '' }, points: -30 }
         - { id: a-retention-admit, text: { ja: '保存方針が残っていました。見直しが遅れました。', en: '' }, points: 30 }
-        - { id: a-retention-own, text: { ja: '保存方針を決めたのは経営です。対象者への説明と削除を進めます。', en: '' }, points: 80, requiresNote: note-retention }
+        # 議事録を隠した展開では、この回答は自分の説明と食い違う（嘘になる）ので出さない。
+        - { id: a-retention-own, text: { ja: '保存方針を決めたのは経営です。対象者への説明と削除を進めます。', en: '' }, points: 80, requiresNote: note-retention, when: { flags: { hidRetention: false } } }
     - id: q-delay
       seconds: 25
       timeoutPoints: -30
-      text: { ja: '午前9時に検知して、なぜ公表はその日の午後になったのですか。', en: '' }
+      text: { ja: '夜に検知して、なぜ公表は翌日の夕方になったのですか。', en: '' }
       answers:
         - { id: a-delay-fast, text: { ja: 'できるだけ早く出しました。', en: '' }, points: -30 }
         - { id: a-delay-admit, text: { ja: '初動の確認に時間がかかりました。', en: '' }, points: 30 }
