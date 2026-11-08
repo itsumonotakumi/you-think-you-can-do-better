@@ -195,3 +195,27 @@
   summary: { ja: "派遣元と派遣先は、それぞれの立場で個人情報の管理と指揮命令の範囲を明確にする", en: "Both the agency and the client must clarify data management and the scope of direction" }
   checkedAt: 2026-11-08
   legalPack: jp
+- id: no10-ai-guideline
+  title: { ja: "AI事業者ガイドライン", en: "AI Guidelines for Business" }
+  issuer: { ja: "総務省・経済産業省", en: "MIC and METI" }
+  version: "1.0"
+  section: { ja: "AIの利活用におけるリスク管理と、人間による判断の位置づけ", en: "Risk management for AI use and human oversight" }
+  summary: { ja: "AIを使う側も、用途とリスクに応じたルール、入力情報の管理、人間による確認を持つ", en: "Users of AI set rules by use and risk, manage inputs, and keep human oversight" }
+  checkedAt: 2026-11-08
+  legalPack: jp
+- id: no10-ipa-genai
+  title: { ja: "テキスト生成AIの導入・運用ガイドライン", en: "Guidelines for introducing and operating text generative AI" }
+  issuer: { ja: "IPA（情報処理推進機構）", en: "IPA" }
+  version: "2024"
+  section: { ja: "利用ルールの策定、入力してよい情報の整理、社内環境の整備", en: "Usage rules, input classification, internal environment" }
+  summary: { ja: "禁止一辺倒ではなく、入力してよい情報を決め、管理された環境と教育を用意する", en: "Rather than a blanket ban, define allowed inputs and provide a managed environment and training" }
+  checkedAt: 2026-11-08
+  legalPack: jp
+- id: no10-ppc-genai
+  title: { ja: "生成AIサービスの利用に関する注意喚起", en: "Alert on the use of generative AI services" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
+  version: "2024"
+  section: { ja: "生成AIに個人データを入力する場合の留意点", en: "Points to note when entering personal data into generative AI" }
+  summary: { ja: "個人データを生成AIに入力するときは、利用目的、事業者の取扱い、本人への説明を確認する", en: "Before entering personal data, check purposes, provider handling, and explanation to data subjects" }
+  checkedAt: 2026-11-08
+  legalPack: jp
