@@ -1,5 +1,6 @@
 <script module lang="ts">
   import type { PlayState as SavedPlayState, Scenario as LoadedScenario } from '../../engine/types';
+  import { versionChanged } from '../parts/logic';
 
   export type ResumeScreen = 'S05' | 'S06' | 'S07' | 'S08';
 
@@ -17,10 +18,8 @@
     return scenario.audio.bgmByPhase?.[state.phase] ?? scenario.audio.bgmDefault;
   }
 
-  /** 保存された版と読み込んだシナリオの版が違うか */
-  export function versionChanged(saved: SavedPlayState, scenario: LoadedScenario): boolean {
-    return saved.scenarioVersion !== scenario.version;
-  }
+  // 版の確認はエラー画面でも使うため logic.ts に置き、ここからは再公開する
+  export { versionChanged };
 </script>
 
 <script lang="ts">

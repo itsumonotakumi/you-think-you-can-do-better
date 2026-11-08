@@ -264,8 +264,19 @@ function isPrologue(v: unknown): v is PlayState['prologue'] {
     && (v.predictedHours === null || isNum(v.predictedHours));
 }
 
+/** 文案のキーは YAML の draft 名（英小文字・数字・ハイフン）。危険キーは別途 isSafeKey で弾く */
+const DRAFT_KEY = /^[a-z0-9-]+$/;
+/** フラグのキーは camelCase と `ev:<id>`。記号入りの危険キーは通さない */
+const FLAG_KEY = /^[A-Za-z0-9_:-]+$/;
+
+function isPendingDraft(v: unknown): v is string | null {
+  if (v === null) return true;
+  return typeof v === 'string' && DRAFT_KEY.test(v) && isSafeKey(v);
+}
+
 function isFlags(v: unknown): v is Flags {
-  return isRecord(v) && Object.values(v).every((value) => typeof value === 'boolean');
+  return isRecord(v) && Object.entries(v).every(([key, value]) =>
+    isSafeKey(key) && FLAG_KEY.test(key) && typeof value === 'boolean');
 }
 
 function isChoiceRecord(v: unknown): boolean {
@@ -349,7 +360,7 @@ function isPlayState(v: unknown): v is PlayState {
   if (!(v.press === null || isPressState(v.press))) return false;
   if (!isPrologue(v.prologue)) return false;
   if (typeof v.startedAt !== 'string') return false;
-  if (!(v.pendingDraft === null || typeof v.pendingDraft === 'string')) return false;
+  if (!isPendingDraft(v.pendingDraft)) return false;
   if (typeof v.finished !== 'boolean') return false;
   return true;
 }

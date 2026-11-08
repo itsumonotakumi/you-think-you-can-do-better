@@ -1,8 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { setLang, t } from '../../i18n';
+  import {
+    setLang, setPendingNotice, t, versionChangedNotice,
+  } from '../../i18n';
   import { loadScenario } from '../../data/loader';
-  import { loadProgress } from '../../storage';
+  import { loadProgress, saveProgress } from '../../storage';
+  import { versionChanged } from '../parts/logic';
+  import { resumeScreen } from './S01Title.svelte';
   import { errorMessage, play, scenario, screen, selectedScenarioId, settings } from '../store';
   import type { PlayState } from '../../engine/types';
   import '../styles/base.css';
@@ -36,10 +40,20 @@
     fail = '';
     try {
       const sc = await loadScenario(progress.scenarioId);
+
+      if (versionChanged(progress, sc)) {
+        // 版が変わった続きは再開できない。S01 と同じく、保存を消して選び直してもらう
+        saveProgress(null);
+        progress = null;
+        setPendingNotice(versionChangedNotice($settings.lang));
+        screen.set('S03');
+        return;
+      }
+
       scenario.set(sc);
       play.set(progress);
       selectedScenarioId.set(progress.scenarioId);
-      screen.set('S05');
+      screen.set(resumeScreen(progress));
     } catch {
       fail = ui.loadError;
     } finally {
