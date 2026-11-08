@@ -1039,7 +1039,7 @@ voices:
   - { id: v05-after, media: news, misleading: false, text: { ja: 'すぐ白状するのか。顧客は離れるぞ。', en: '' }, trigger: { at: after, choice: p05-visit } }
   - { id: v06-law, media: board, misleading: true, type: law-ish, text: { ja: '数百件なら報告はいらない。様子を見よう。', en: '' }, trigger: { at: point } }
   - { id: v06-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が確定するまで外に出さない。余計な混乱を招く。', en: '' }, trigger: { at: point } }
-  - { id: v06-ok, media: chat, misleading: false, text: { ja: '法務「個人データの漏えいのおそれがあれば、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '法務「報告の対象は、要配慮個人情報・財産的被害のおそれ・不正の目的のおそれ・千人超の四つです。氏名・連絡先・契約条件が外部AIに渡った今回、財産的被害のおそれがあるので、千人未満でも速報が要ります」。', en: '' }, trigger: { at: point } }
   - { id: v06-after, media: news, misleading: false, text: { ja: 'まだ確定していないのに報告するのか。後で訂正するのか。', en: '' }, trigger: { at: after, choice: p06-notify } }
   - { id: v07-public, media: sns, misleading: true, type: public-opinion, text: { ja: '他社はすぐ出している。今夜出さないと、遅いと言われるぞ。', en: '' }, trigger: { at: point } }
   - { id: v07-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '調査が終わるまで黙っているのが一番安全です。下手に出すと、攻撃に使われます。', en: '' }, trigger: { at: point } }

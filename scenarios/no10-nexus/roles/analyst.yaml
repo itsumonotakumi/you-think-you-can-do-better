@@ -1442,7 +1442,7 @@ voices:
   - { id: va09-after, media: news, misleading: false, text: { ja: 'すぐ白状するのか。顧客は離れるぞ。', en: '' }, trigger: { at: after, choice: an09-escalate-plus } }
   - { id: va10-law, media: board, misleading: true, type: law-ish, text: { ja: '数百件なら報告はいらない。様子を見よう。', en: '' }, trigger: { at: point } }
   - { id: va10-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が確定するまで外に出さない。余計な混乱を招く。', en: '' }, trigger: { at: point } }
-  - { id: va10-ok, media: chat, misleading: false, text: { ja: '法務「個人データの漏えいのおそれがあれば、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
+  - { id: va10-ok, media: chat, misleading: false, text: { ja: '法務「報告の対象は、要配慮個人情報・財産的被害のおそれ・不正の目的のおそれ・千人超の四つです。氏名・連絡先・契約条件が外部AIに渡った今回、財産的被害のおそれがあるので、千人未満でも速報が要ります」。', en: '' }, trigger: { at: point } }
   - { id: va10-after, media: news, misleading: false, text: { ja: 'まだ確定していないのに報告するのか。後で訂正するのか。', en: '' }, trigger: { at: after, choice: an10-materials-plus } }
   - { id: va11-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '早く結論を出せ。広報が待っている。', en: '' }, trigger: { at: point } }
   - { id: va11-law, media: board, misleading: true, type: law-ish, text: { ja: '技術的な詳細は書かないほうが、後の責任を避けられます。', en: '' }, trigger: { at: point } }
