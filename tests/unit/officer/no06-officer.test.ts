@@ -180,6 +180,42 @@ describe('no06-amatsu / officer', () => {
     }
   });
 
+  it('社長への報告書の時刻スロットは、24時間を超えてからでも加点が残る', () => {
+    const timing = role.drafts?.['board-report']?.slots.find((s) => s.id === 'timing');
+    const hours = (timing?.items ?? []).map((item) => item.when?.withinHours);
+    expect(hours).toContain(30);
+    expect(hours).toContain(48);
+    // 判断ポイント p04 は開始から24時間15分後に開く
+    const p04 = role.points.find((p) => p.id === 'p04-board-report');
+    expect(p04?.at).toEqual({ day: 1, minutes: 540 });
+  });
+
+  it('なりすましの発覚は Day 5、送付先の住所は Day 2 に揃えている', () => {
+    const p07 = role.points.find((p) => p.id === 'p07-impersonated');
+    expect(p07?.at).toEqual({ day: 5, minutes: 900 });
+    const p06 = role.points.find((p) => p.id === 'p06-applicant-report');
+    const notes = new Set((p06?.notable ?? []).map((n) => n.id));
+    expect(notes.has('note-address')).toBe(true);
+    const text = JSON.stringify(role);
+    expect(text).not.toContain('某国内');
+    expect(text).not.toContain('貸された');
+    expect(text).not.toContain('面接四回');
+    expect(text).not.toContain('四十名全員');
+  });
+
+  it('名簿を丸ごと渡す選択は致命的ではなく、国籍による選別は致命的のまま', () => {
+    expect(choiceById.get('p13-all')?.category).toBe('hurt');
+    expect(choiceById.get('p13-all')?.points).toBe(-60);
+    expect(choiceById.get('p13-all')?.refs).toContain('no04-ppc-guideline-general');
+    for (const id of ['p05-foreign', 'p10-list', 'p17-origin']) {
+      const c = choiceById.get(id);
+      expect(c?.category).toBe('fatal');
+      expect(c?.refs).toContain('no06-equal-treatment');
+    }
+    const fatals = role.points.flatMap((p) => p.choices).filter((c) => c.category === 'fatal');
+    expect(fatals.length).toBeLessThanOrEqual(10);
+  });
+
   it('S・A・B・C・D のすべてに到達でき、致命的な失点では S にならない', () => {
     const simulation = simulatePaths(scenario, refs, 'officer', undefined, { randomRuns: 300 });
     expect(simulation.failures).toEqual([]);

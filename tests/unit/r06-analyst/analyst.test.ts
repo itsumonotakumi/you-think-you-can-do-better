@@ -247,6 +247,37 @@ describe('no06-amatsu / analyst', () => {
       const setBy = choices.filter((c) => c.setFlags?.[deadline.doneFlag]);
       expect(setBy.length, `${deadline.id} の doneFlag を立てる選択肢がない`).toBeGreaterThanOrEqual(1);
     }
+    const prelim = deadlines.find((d) => d.ref === 'ppc-report-prelim');
+    const final = deadlines.find((d) => d.ref === 'ppc-report-final-malicious');
+    expect(prelim?.points).toBe(-150);
+    expect(final?.points).toBe(-100);
+    // 速報の旗は会見の条件でも使うため、共通の名前で立てる
+    const filed = choices.find((c) => c.id === 'a11-file');
+    expect(filed?.setFlags?.ppcPrelimFiled).toBe(true);
+  });
+
+  it('二台目を記録に残さない選択は致命的で、都合のよい記録は減点に留める', () => {
+    const hide = choiceById.get('a13-hide');
+    expect(hide?.category).toBe('fatal');
+    expect(hide?.points).toBe(-200);
+    expect(hide?.setFlags?.hidFacts).toBe(true);
+    const personal = choiceById.get('a17-personal');
+    expect(personal?.category).toBe('hurt');
+    expect(personal?.points).toBe(-120);
+    const lost = choiceById.get('a18-lost');
+    expect(lost?.points).toBe(-100);
+  });
+
+  it('週刊誌の出来事と住所の場面が他ロールと揃っている', () => {
+    expect(role.events?.some((e) => e.id === 'ev-news')).toBe(true);
+    const a10 = role.points.find((p) => p.id === 'a10-address');
+    expect(a10?.at).toEqual({ day: 2, minutes: 780 });
+    const a14 = role.points.find((p) => p.id === 'a14-weekly');
+    expect(a14?.at).toEqual({ day: 4, minutes: 840 });
+    const text = JSON.stringify(role);
+    expect(text).not.toContain('某国内');
+    expect(text).not.toContain('共同オフィス');
+    expect(text).not.toContain('面接4回');
   });
 
   it('文案作成が3種類以上あり、スロットは items か options の片方だけを持つ', () => {
@@ -272,6 +303,8 @@ describe('no06-amatsu / analyst', () => {
         q.answers.map((a) => a.requiresNote).filter((id): id is string => typeof id === 'string'),
       ),
     );
+    // 担当者ロールは最終面接の評価シートを見られないため、note-interview は対象外
+    required.delete('note-interview');
     for (const id of required) expect(notes.has(id), `記録 ${id} が取れない`).toBe(true);
   });
 

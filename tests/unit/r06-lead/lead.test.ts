@@ -175,6 +175,27 @@ describe('scenario no06-amatsu / lead', () => {
     for (const key of ['hours', 'hour', 'deadlineHours']) {
       for (const d of deadlines) expect(Object.prototype.hasOwnProperty.call(d, key)).toBe(false);
     }
+    const prelim = deadlines.find((d) => d.ref === 'ppc-report-prelim');
+    const final = deadlines.find((d) => d.ref === 'ppc-report-final-malicious');
+    expect(prelim?.points).toBe(-150);
+    expect(final?.points).toBe(-100);
+  });
+
+  it('報告書を出さない選択は致命的ではなく、減点は抑えられている', () => {
+    const hide = choiceById.get('p18-hide');
+    expect(hide?.category).toBe('hurt');
+    expect(hide?.points).toBe(-150);
+    const increase = role.points.flatMap((p) => p.choices).filter((c) => c.category === 'increase');
+    expect(increase.length).toBe(1);
+  });
+
+  it('なりすましの発覚は Day 5 に揃え、住所の国は断定しない', () => {
+    const p17 = role.points.find((p) => p.id === 'p17-person');
+    expect(p17?.at).toEqual({ day: 5, minutes: 1020 });
+    const text = JSON.stringify(role);
+    expect(text).not.toContain('某国内');
+    expect(text).not.toContain('貸された');
+    expect(text).not.toContain('十天');
   });
 
   it('文案は技術ファクトシートと復旧計画を持ち、自動部品に条件がある', () => {

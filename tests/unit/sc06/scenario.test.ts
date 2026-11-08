@@ -84,6 +84,8 @@ describe('scenario no06-amatsu', () => {
       'no06-economic-security',
       'no06-ipa-10threats',
       'no06-telework-guideline',
+      'no06-equal-treatment',
+      'no06-defense-report',
     ]) {
       expect(refIds.has(id), `根拠 ${id} がない`).toBe(true);
     }
@@ -178,6 +180,56 @@ describe('scenario no06-amatsu', () => {
     }
     const needsNote = (press?.questions ?? []).some((q) => q.answers.some((a) => !!a.requiresNote));
     expect(needsNote).toBe(true);
+  });
+
+  it('会見の回答は、旗の条件なしで選べるものを各質問に1つ残す', () => {
+    const press = scenario.press;
+    expect(press).toBeTruthy();
+    for (const q of press?.questions ?? []) {
+      const always = q.answers.filter((a) => !a.when && !a.requiresNote);
+      expect(always.length, `${q.id} に条件なしの回答がない`).toBeGreaterThanOrEqual(1);
+    }
+    // やっていないことを「やった」と答えられないよう、条件付きの回答がある
+    const conditioned = (press?.questions ?? []).flatMap((q) => q.answers).filter((a) => a.when);
+    expect(conditioned.length).toBeGreaterThanOrEqual(2);
+    const people = press?.questions.find((q) => q.id === 'q-people');
+    const before = people?.answers.find((a) => a.id === 'a-people-before');
+    expect(before?.when).toEqual({ flags: { employeeCare: true } });
+    const authority = press?.questions.find((q) => q.id === 'q-authority');
+    const split = authority?.answers.find((a) => a.id === 'a-authority-split');
+    expect(split?.when).toEqual({ flags: { ppcPrelimFiled: true } });
+  });
+
+  it('速報の期限は -150 で、遅れると選んだ失点と合わせて重くなる', () => {
+    const prelim = (role.deadlines ?? []).find((d) => d.ref === 'ppc-report-prelim');
+    expect(prelim?.points).toBe(-150);
+    const wait = role.points.flatMap((p) => p.choices).find((c) => c.id === 'p05-wait');
+    expect(wait?.points).toBeLessThanOrEqual(-150);
+  });
+
+  it('どの判断にも維持の選択肢があり、減点は一律でない', () => {
+    for (const point of role.points) {
+      expect(
+        point.choices.some((c) => c.category === 'maintain'),
+        `${point.id} に maintain がない`,
+      ).toBe(true);
+    }
+    const hurt = role.points.flatMap((p) => p.choices).filter((c) => c.category === 'hurt');
+    expect(new Set(hurt.map((c) => c.points)).size).toBeGreaterThanOrEqual(5);
+    const increase = role.points.flatMap((p) => p.choices).filter((c) => c.category === 'increase');
+    expect(increase.length).toBe(1);
+  });
+
+  it('時系列と設定がロール間で揃っている', () => {
+    const at = (id: string) => role.points.find((p) => p.id === id)?.at;
+    // 本人からの返送依頼は Day 1 の朝
+    expect(at('p06-contact')).toEqual({ day: 1, minutes: 450 });
+    // なりすましの発覚は Day 5
+    expect(at('p14-person')).toEqual({ day: 5, minutes: 900 });
+    const text = JSON.stringify(role);
+    expect(text).not.toContain('某国内');
+    expect(text).not.toContain('貸された');
+    expect(text).not.toContain('面接四回');
   });
 
   it('文言は日本語のみで、HTMLを含まない', () => {

@@ -10,14 +10,14 @@ languages: [ja]
 referencesVersion: '2026-11-08'
 legalPack: jp
 title: { ja: '今年いちばん優秀な新人は、存在しなかった', en: '' }
-tagline: { ja: '遠隔の面接を四回通った新人は、端末が届いた朝に消えた。何をどこまで話すかで、会社の信用が決まる。', en: '' }
+tagline: { ja: '遠隔の面接を三回通った新人は、端末が届いた朝に消えた。何をどこまで話すかで、会社の信用が決まる。', en: '' }
 company:
   name: { ja: 'アマツ重工株式会社', en: '' }
   industry: { ja: '防衛・重要インフラ向け機器の製造', en: '' }
   size: { ja: '従業員4,800名、非上場。防衛関連の主要取引先と長期契約', en: '' }
   people:
     - id: ceo
-      name: { ja: '真壁 隆司', en: '' }
+      name: { ja: '氷室 隆司', en: '' }
       title: { ja: '代表取締役社長', en: '' }
     - id: ciso
       name: { ja: '芹沢 みなみ', en: '' }
@@ -29,7 +29,7 @@ company:
       name: { ja: '柏木 慎', en: '' }
       title: { ja: '広報部長', en: '' }
     - id: legal
-      name: { ja: '苅田 伸', en: '' }
+      name: { ja: '袖山 伸', en: '' }
       title: { ja: '法務部長', en: '' }
     - id: ops
       name: { ja: '東 康平', en: '' }
@@ -55,15 +55,15 @@ press:
       answers:
         - { id: a-hiring-none, text: { ja: '確認しておりません。', en: '' }, points: -30 }
         - { id: a-hiring-fact, text: { ja: '遠隔の面接だけで、対面の本人確認をしていませんでした。', en: '' }, points: 30 }
-        - { id: a-hiring-own, text: { ja: '採用時の本人確認と、端末の送付先の確認を怠りました。責任は経営にあります。再発防止策とあわせて公表します。', en: '' }, points: 80, requiresNote: note-hiring }
+        - { id: a-hiring-own, text: { ja: '採用時の本人確認と、端末の送付先の確認を怠りました。再発防止策とあわせて公表します。', en: '' }, points: 80, requiresNote: note-hiring }
     - id: q-authority
       seconds: 30
       timeoutPoints: -30
       text: { ja: '所管官庁への報告と公表のあいだに、なぜ時間がかかったのですか。', en: '' }
       answers:
         - { id: a-authority-fast, text: { ja: 'できるだけ早く出しました。', en: '' }, points: -30 }
-        - { id: a-authority-split, text: { ja: '報告を先にし、事実の確認を待って公表しました。順序の判断は説明できます。', en: '' }, points: 30 }
-        - { id: a-authority-verify, text: { ja: '初動の判断が遅れた理由を検証し、再発防止策とともに公表します。', en: '' }, points: 80, requiresNote: note-scope }
+        - { id: a-authority-split, text: { ja: '速報を先に出し、事実の確認を待って公表しました。順序の判断は説明できます。', en: '' }, points: 30, when: { flags: { ppcPrelimFiled: true } } }
+        - { id: a-authority-verify, text: { ja: '初動の判断を検証し、確認できた事実と再発防止策を公表します。', en: '' }, points: 80, requiresNote: note-scope }
     - id: q-national
       seconds: 35
       timeoutPoints: -30
@@ -79,15 +79,15 @@ press:
       answers:
         - { id: a-people-news, text: { ja: '報道で知ってもらいました。', en: '' }, points: -100 }
         - { id: a-people-after, text: { ja: '報道のあとに説明しました。', en: '' }, points: -30 }
-        - { id: a-people-before, text: { ja: '公表の前に、取引先へは個別に、社員へは説明会と相談窓口で伝えました。', en: '' }, points: 80, requiresNote: note-address }
+        - { id: a-people-before, text: { ja: '公表の前に、社員へは説明会と相談窓口で伝えました。', en: '' }, points: 80, requiresNote: note-address, when: { flags: { employeeCare: true } } }
     - id: q-irony
       seconds: 30
       timeoutPoints: -30
-      text: { ja: '最終面接で「即戦力」と書いたのは、社長ですね。', en: '' }
+      text: { ja: '最終面接で「即戦力」と評価した採用を、どう振り返りますか。', en: '' }
       answers:
         - { id: a-irony-avoid, text: { ja: '記憶にありません。', en: '' }, points: -100 }
-        - { id: a-irony-admit, text: { ja: '私が書きました。採用の判断も私です。', en: '' }, points: 30 }
-        - { id: a-irony-own, text: { ja: '私が書きました。言葉だけで人を見た結果です。採用の責任は経営にあります。', en: '' }, points: 80, requiresNote: note-interview }
+        - { id: a-irony-admit, text: { ja: '採用の判断を誤りました。人ではなく、言葉で選んだ結果です。', en: '' }, points: 30 }
+        - { id: a-irony-own, text: { ja: '採用の判断を誤りました。言葉だけで人を見た結果です。責任の所在を明らかにし、再発防止策とあわせて公表します。', en: '' }, points: 80, requiresNote: note-interview }
   extraQuestions:
     - when: { flags: { hidHiring: true } }
       question:
