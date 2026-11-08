@@ -1,5 +1,5 @@
 // scenarios フォルダの不在・0件はエラー。0件でも共通データは検査する。
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { renameSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { createProject } from '../validate/helpers.ts';
@@ -9,6 +9,7 @@ import { buildData } from '../../../tools/build-data/build.ts';
 const cleanups: (() => void)[] = [];
 
 afterEach(() => {
+  vi.unstubAllEnvs();
   for (const cleanup of cleanups.splice(0)) cleanup();
 });
 
@@ -34,6 +35,7 @@ describe('scenarios の不在・0件', () => {
   });
 
   it('0件でも references・locales・audio の誤りを報告する', () => {
+    vi.stubEnv('YTCDB_AUDIO', ''); // CI の optional 指定に左右されないように
     const project = createProject((files) => {
       files.references[1]!.deadlineHours = -1;
       delete files.notices.ja.criminal;
