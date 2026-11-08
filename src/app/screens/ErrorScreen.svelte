@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { setLang, t } from '../../i18n';
   import { loadScenario } from '../../data/loader';
   import { loadProgress } from '../../storage';
@@ -9,6 +10,11 @@
   let progress = $state<PlayState | null>(loadProgress());
   let resuming = $state(false);
   let fail = $state('');
+
+  // この画面が出る直前に App が進行中プレイを保存している。開いた時点でも読み直す
+  onMount(() => {
+    progress = loadProgress();
+  });
 
   const ui = $derived.by(() => {
     setLang($settings.lang);

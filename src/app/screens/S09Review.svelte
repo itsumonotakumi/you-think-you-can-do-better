@@ -20,13 +20,17 @@
   export function publicationHours(state: PlayState, scenario: Scenario): number | null {
     const role = scenario.roles[state.role];
     if (!role) return null;
-    for (const record of state.history) {
-      const point = role.points.find((item) => item.id === record.pointId);
+    const history = Array.isArray(state.history) ? state.history : [];
+    for (const record of history) {
+      if (!record || typeof record !== 'object') continue;
+      const point = role.points?.find((item) => item.id === record.pointId);
       if (!point || point.phase !== 'notify') continue;
-      const choice = point.choices.find((item) => item.id === record.choiceId);
+      const choice = point.choices?.find((item) => item.id === record.choiceId);
       if (!choice) continue;
-      const minutes = (record.at.day - scenario.start.day) * 1440
-        + (record.at.minutes - scenario.start.minutes) + choice.minutes;
+      const at = record.at;
+      if (!at || typeof at.day !== 'number' || typeof at.minutes !== 'number') continue;
+      const minutes = (at.day - scenario.start.day) * 1440
+        + (at.minutes - scenario.start.minutes) + choice.minutes;
       return Math.max(0, minutes) / 60;
     }
     return null;
@@ -53,8 +57,17 @@
   let refsError = $state(false);
 
   const role = $derived($play && $scenario ? $scenario.roles[$play.role] : undefined);
-  const report = $derived($play && $scenario ? buildReport($play, $scenario) : null);
+  // 保存が壊れていても振り返り画面を落とさない（組めなければ「データなし」表示へ）
+  const report = $derived.by(() => {
+    if (!$play || !$scenario) return null;
+    try {
+      return buildReport($play, $scenario);
+    } catch {
+      return null;
+    }
+  });
   const prologue = $derived($play?.prologue ?? null);
+  const prologueComment = $derived(typeof prologue?.comment === 'string' ? prologue.comment : '');
   const publishedHours = $derived($play && $scenario ? publicationHours($play, $scenario) : null);
   const elapsedHours = $derived(
     $play && $scenario ? Math.max(0, minutesBetween($scenario.start, $play.clock)) / 60 : 0,
@@ -86,7 +99,11 @@
       .then((list) => {
         if (cancelled) return;
         const map: Record<string, Reference> = {};
-        for (const ref of list) map[ref.id] = ref;
+        for (const ref of list) {
+          // JSON のキーをそのまま代入しない（プロトタイプ汚染を防ぐ）
+          if (ref.id === '__proto__' || ref.id === 'constructor' || ref.id === 'prototype') continue;
+          map[ref.id] = ref;
+        }
         refs = map;
       })
       .catch(() => {
@@ -101,7 +118,7 @@
   });
 
   function refOf(id: string): Reference | null {
-    return refs[id] ?? null;
+    return Object.hasOwn(refs, id) ? refs[id] ?? null : null;
   }
 
   function pointOf(id: string): DecisionPoint | null {
@@ -322,8 +339,8 @@
     <section class="panel" aria-labelledby="review-prologue-heading">
       <h2 id="review-prologue-heading">{t('sc.ending.prologueHeading')}</h2>
       <p class="label">{t('sc.ending.prologueComment')}</p>
-      {#if prologue && prologue.comment.trim() !== ''}
-        <blockquote class="quote">{prologue.comment}</blockquote>
+      {#if prologueComment.trim() !== ''}
+        <blockquote class="quote">{prologueComment}</blockquote>
       {:else}
         <p class="muted">{t('sc.ending.prologueEmpty')}</p>
       {/if}
