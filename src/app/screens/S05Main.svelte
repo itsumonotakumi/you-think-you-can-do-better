@@ -1,16 +1,14 @@
 <script lang="ts">
   // S05 本編: 上部バー、状況、選択肢、世間の声、記録
-  import { onMount, untrack } from 'svelte';
+  // 演出キュー（audio.runCues() と runFxCues()）と字幕は App.svelte で一元処理する
+  import { onMount } from 'svelte';
   import type { Localized } from '../../engine/types';
   import { addNote, choose, currentPoint, startPress } from '../../engine';
   import { audio } from '../../audio';
   import { t, loc, notice } from '../../i18n';
   import { saveProgress } from '../../storage';
-  import { applyStep, cues, errorMessage, play, scenario, screen, settings } from '../store';
-  import { runFxCues } from '../effects';
-  import type { ShownCaption } from '../parts/logic';
-  import { choiceIndexFromKey, cueCaptions, voiceViews } from '../parts/logic';
-  import { claimCues } from '../parts/cueMemory';
+  import { applyStep, errorMessage, play, scenario, screen, settings } from '../store';
+  import { choiceIndexFromKey, nextFreeNoteId, voiceViews } from '../parts/logic';
   import TopBar from '../parts/TopBar.svelte';
   import CaptionBar from '../parts/CaptionBar.svelte';
   import Typewriter from '../parts/Typewriter.svelte';
@@ -20,8 +18,6 @@
 
   let busy = $state(false);
   let tab = $state<'voices' | 'notes'>('voices');
-  let captions = $state<ShownCaption[]>([]);
-  let captionSeq = 0;
 
   const point = $derived($play && $scenario ? currentPoint($play, $scenario) : null);
   const draftPending = $derived(Boolean($play?.pendingDraft));
@@ -34,32 +30,16 @@
   const addedNotableIds = $derived(
     point?.notable && $play
       ? point.notable
-        .filter((n) => $play!.notes.some((note) => note.id === `n:${point?.id}:${n.id}`))
+        .filter((n) => $play!.notes.some((note) => note.id === n.id))
         .map((n) => n.id)
       : [],
   );
+  const hasAttackerVoice = $derived(voices.some((voice) => voice.media === 'attacker'));
 
   let noteStatus = $state('');
   let voicesNoticeOpen = $state(false);
-  let systemReduce = $state(false);
   let lastPointId = '';
   const noticeKeys = new Set<string>();
-
-  $effect(() => {
-    const list = $cues;
-    if (!list || list.length === 0) return;
-    // 画面を開き直したときに、同じキューを鳴らし直さない
-    if (!claimCues(list)) return;
-    audio.runCues(list);
-    runFxCues(list, $settings.reduceMotion || systemReduce);
-    const items = cueCaptions(list);
-    if (items.length === 0) return;
-    const prev = untrack(() => captions);
-    captions = [
-      ...prev,
-      ...items.map((item) => ({ ...item, captionId: ++captionSeq })),
-    ].slice(-3);
-  });
 
   $effect(() => {
     audio.setVolumes({ bgm: $settings.bgmVolume, se: $settings.seVolume, muted: $settings.muted });
@@ -89,13 +69,6 @@
   });
 
   onMount(() => {
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    systemReduce = motionQuery.matches;
-    const handleMotion = (event: MediaQueryListEvent): void => {
-      systemReduce = event.matches;
-    };
-    motionQuery.addEventListener('change', handleMotion);
-
     const handleKey = (event: KeyboardEvent): void => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
       const target = event.target as HTMLElement | null;
@@ -110,10 +83,7 @@
       select(choice.id);
     };
     window.addEventListener('keydown', handleKey);
-    return () => {
-      window.removeEventListener('keydown', handleKey);
-      motionQuery.removeEventListener('change', handleMotion);
-    };
+    return () => window.removeEventListener('keydown', handleKey);
   });
 
   function select(choiceId: string): void {
@@ -140,11 +110,10 @@
 
   function addNotable(item: { id: string; text: Localized }): void {
     const state = $play;
-    const currentPointId = point?.id ?? 'unknown';
     if (!state) return;
-    const id = `n:${currentPointId}:${item.id}`;
-    if (state.notes.some((n) => n.id === id)) return;
-    const next = addNote(state, { id, text: item.text, at: state.clock });
+    // 会見の requiresNote と照合するため、シナリオの id をそのまま記録IDにする
+    if (state.notes.some((note) => note.id === item.id)) return;
+    const next = addNote(state, { id: item.id, text: item.text, at: state.clock });
     play.set(next);
     saveProgress(next);
     noteStatus = t('sb.notes.addedAnnounce', { count: next.notes.length });
@@ -153,7 +122,7 @@
   function addFree(text: string): void {
     const state = $play;
     if (!state) return;
-    const id = `f:${state.notes.length}:${state.clock.day}:${state.clock.minutes}`;
+    const id = nextFreeNoteId(state.notes);
     const next = addNote(state, { id, text, at: state.clock });
     play.set(next);
     saveProgress(next);
@@ -168,7 +137,7 @@
     <TopBar play={$play} scenario={$scenario} />
   {/if}
 
-  <CaptionBar {captions} />
+  <CaptionBar />
 
   <div class="body">
     <div class="primary-col">
@@ -240,6 +209,11 @@
           <div class="notice" role="note">
             <p>{notice('voices')}</p>
             <button type="button" onclick={() => (voicesNoticeOpen = false)}>{t('sb.notice.close')}</button>
+          </div>
+        {/if}
+        {#if hasAttackerVoice}
+          <div class="notice notice--criminal" role="note">
+            <p>{notice('criminal')}</p>
           </div>
         {/if}
         <VoiceList {voices} />
@@ -357,6 +331,9 @@
   .notice p {
     margin: 0 0 0.35rem;
     line-height: 1.6;
+  }
+  .notice--criminal {
+    border-left-color: var(--danger, #d46a6a);
   }
   .notice button {
     padding: 0.25rem 0.5rem;

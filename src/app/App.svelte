@@ -16,7 +16,15 @@
   // 画面ルーター（オーケストレーター所有）
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
-  import { errorMessage, play, screen, settings } from './store';
+  import { audio } from '../audio';
+  import {
+    advanceCaption, captions, cues, enqueueCaptions, errorMessage, play, resetCaptions,
+    screen, settings,
+  } from './store';
+  import { runFxCues } from './effects';
+  import './effects/effects.css';
+  import { claimCaptionCues, claimCues } from './parts/cueMemory';
+  import { cueCaptions } from './parts/logic';
   import { saveProgress } from '../storage';
   import { t } from '../i18n';
   import S01Title from './screens/S01Title.svelte';
@@ -35,6 +43,40 @@
   const screens = { S01: S01Title, S02: S02Prologue, S03: S03ScenarioSelect, S04: S04RoleSelect, S05: S05Main,
     S06: S06Draft, S07: S07Press, S08: S08Ending, S09: S09Review, S10: S10Settings, S11: S11Credits, error: ErrorScreen };
   const Current = $derived(screens[$screen]);
+
+  /** 字幕を1件表示しておく時間（ミリ秒） */
+  const CAPTION_DISPLAY_MS = 2400;
+
+  let systemReduce = $state(false);
+  let lastStartedAt = '';
+
+  $effect(() => {
+    // 新しいプレイでは、前のプレイの字幕を持ち越さない
+    const startedAt = $play?.startedAt ?? '';
+    if (!startedAt || startedAt === lastStartedAt) return;
+    lastStartedAt = startedAt;
+    resetCaptions();
+  });
+
+  $effect(() => {
+    // 演出キューは遷移先の画面に関係なく、ここで一度だけ処理する（設計書 10章）
+    const list = $cues;
+    if (!list || list.length === 0) return;
+    if (claimCues(list)) {
+      audio.runCues(list);
+      runFxCues(list, $settings.reduceMotion || systemReduce);
+    }
+    // 会見画面などが先に音を処理しても、字幕だけは必ず作る
+    if (claimCaptionCues(list)) enqueueCaptions(cueCaptions(list));
+  });
+
+  $effect(() => {
+    // 字幕は待ち行列の先頭から1件ずつ出し、表示し終えたら履歴へ移す
+    const head = $captions[0];
+    if (!head) return;
+    const timer = setTimeout(() => advanceCaption(head.captionId), CAPTION_DISPLAY_MS);
+    return () => clearTimeout(timer);
+  });
 
   /** 予期しない例外: 進行中のプレイを保存してからエラー画面へ移す（設計書 13章） */
   function toErrorScreen(reason: unknown): void {
@@ -55,11 +97,19 @@
     const onRejection = (event: PromiseRejectionEvent): void => {
       toErrorScreen(event.reason);
     };
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    systemReduce = motionQuery.matches;
+    const handleMotion = (event: MediaQueryListEvent): void => {
+      systemReduce = event.matches;
+    };
+    motionQuery.addEventListener('change', handleMotion);
+
     window.addEventListener('error', onError);
     window.addEventListener('unhandledrejection', onRejection);
     return () => {
       window.removeEventListener('error', onError);
       window.removeEventListener('unhandledrejection', onRejection);
+      motionQuery.removeEventListener('change', handleMotion);
     };
   });
 </script>

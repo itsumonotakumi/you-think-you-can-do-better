@@ -183,6 +183,37 @@ export function cueCaptions(cues: Cue[]): CueCaption[] {
 
 export type ShownCaption = CueCaption & { captionId: number };
 
+/** 字幕の履歴に残す件数 */
+export const CAPTION_HISTORY_LIMIT = 20;
+
+/** 演出キューの字幕に、表示用の連番を振る */
+export function withCaptionIds(items: CueCaption[], startId: number): ShownCaption[] {
+  return items.map((item, index) => ({ ...item, captionId: startId + index }));
+}
+
+/** 待ち行列の先頭が指定の字幕なら、履歴の先頭へ移す（先頭でなければ何もしない） */
+export function shiftCaption(
+  queue: ShownCaption[],
+  captionId: number,
+  history: ShownCaption[],
+): { queue: ShownCaption[]; history: ShownCaption[] } {
+  const head = queue[0];
+  if (!head || head.captionId !== captionId) return { queue, history };
+  return {
+    queue: queue.slice(1),
+    history: [head, ...history].slice(0, CAPTION_HISTORY_LIMIT),
+  };
+}
+
+// ---------------- 記録のID ----------------
+
+/** 自由記述の記録ID。既存と重ならない free-<連番> を返す */
+export function nextFreeNoteId(notes: { id: string }[]): string {
+  let n = 1;
+  while (notes.some((note) => note.id === `free-${n}`)) n += 1;
+  return `free-${n}`;
+}
+
 // ---------------- 文案作成（S06） ----------------
 
 export function draftFor(state: PlayState, scenario: Scenario): Draft | null {

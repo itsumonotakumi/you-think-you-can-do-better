@@ -7,6 +7,7 @@
   import { saveProgress } from '../../storage';
   import { applyStep, errorMessage, play, scenario, screen, settings } from '../store';
   import { composeDraft, draftComplete, draftFor, initialSelections } from '../parts/logic';
+  import CaptionBar from '../parts/CaptionBar.svelte';
   import DraftSlots from '../parts/DraftSlots.svelte';
   import Typewriter from '../parts/Typewriter.svelte';
 
@@ -66,6 +67,8 @@
 
 <section class="draft" data-screen="S06Draft">
   <h1>{t('sb.draft.heading')}</h1>
+
+  <CaptionBar />
 
   {#if draft}
     <p class="title">{loc(draft.title)}</p>
