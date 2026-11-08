@@ -16,7 +16,7 @@ deadlines:
     points: -150
     doneFlag: subPpcPrelimFiled
   - id: dl-sub-ppc-final
-    ref: ppc-report-final
+    ref: ppc-report-final-malicious
     label: { ja: '自社分の漏えい等報告（確報）', en: '' }
     points: -150
     doneFlag: subPpcFinalFiled
