@@ -1,0 +1,7 @@
+# Fixed notices (design doc ch.9). Scenario text cannot override them.
+criminal: In a cyberattack, the criminals who carry it out are the ones at fault. This tool is not meant to blame the companies or people who were attacked.
+fiction: This story is fiction. It has no connection to any real organization or person.
+score: A high score in this simulator does not mean your real-world response would be correct. The scoring is only a guide for learning.
+purpose: This is a tool for learning about incident response, building interest in it, and understanding the criticism and responses that occur during an incident. It is not intended to criticize any real company.
+voices: The criticism shown in the game recreates reactions that commonly occur during real incidents. It does not represent the views of the creators.
+replay: Scores naturally improve with repeated play. There is no second chance in a real incident.

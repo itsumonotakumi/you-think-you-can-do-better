@@ -1,0 +1,88 @@
+# Shared UI strings (design doc ch.9). Keys start with "common.".
+common.start: Start
+common.continue: Continue
+common.restart: Start over
+common.back: Back
+common.next: Next
+common.confirm: Confirm
+common.cancel: Cancel
+common.ok: OK
+common.settings: Settings
+common.credits: Credits
+common.close: Close
+common.untranslated: Untranslated
+common.saveDisabledNotice: Saving is unavailable. Continuing in no-save mode.
+common.saveFailed: Could not save
+common.loadFailed: Could not load
+common.loading: Loading
+common.retry: Try again
+common.title: Title
+common.playCount: "Play {n}"
+common.firstRecord: First result
+common.bestRecord: Best result
+common.noRecord: No record
+common.rank: Rank
+common.rawScore: Raw score
+common.officialScore: Official score
+common.multiplier: Multiplier
+common.sales: Sales outlook in six months
+common.review: Review
+common.ending: Ending
+common.print: Print
+common.language: Language
+common.fontSize: Text size
+common.bgmVolume: BGM volume
+common.seVolume: Sound effects volume
+common.mute: Mute
+common.reduceMotion: Reduce motion
+common.pressTimeScale: Press conference time extension
+common.clearData: Clear saved data
+common.clearConfirm: Play counts and first-time results will also be deleted. Clear all saved data?
+common.audioLoadFailed: Could not load audio
+common.error: Something went wrong
+common.backToTitle: Back to title
+common.resume: Resume
+common.time: Time
+common.day: "Day {day}"
+common.remaining: "{time} left"
+common.hours: "{n} h"
+common.minutes: "{n} min"
+common.deadline: Deadline
+common.voices: Public voices
+common.notes: Notes
+common.note: Add a note
+common.difficulty: Difficulty
+common.sourcePeriod: Source period
+common.estimateMinutes: Estimated time
+common.minutesEstimate: "About {n} min"
+common.roleSelect: Choose a role
+common.scenarioSelect: Choose a scenario
+common.story: Story
+common.prologueComment: Critical comment
+common.prologuePredictedHours: Expected hours until disclosure
+common.draft: Draft
+common.press: Press conference
+common.choice: Choices
+common.policyPoints: Policy points
+common.itemPoints: Detail points
+common.gauge.damage: Damage
+common.gauge.flame: Backlash
+common.gauge.trust: Trust
+common.gauge.stamina: Stamina
+common.gauge.coward: Cowardice
+common.role.executive: Executive
+common.role.officer: Officer
+common.role.lead: Team lead
+common.role.analyst: Analyst
+common.phase.detect: Detection
+common.phase.contain: Containment
+common.phase.organize: Organization
+common.phase.investigate: Investigation
+common.phase.notify: Notification
+common.phase.recover: Recovery
+common.phase.after: Aftermath
+common.rank.S: S
+common.rank.A: A
+common.rank.B: B
+common.rank.C: C
+common.rank.D: D
