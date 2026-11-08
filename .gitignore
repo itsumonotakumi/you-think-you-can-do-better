@@ -1,0 +1,8 @@
+node_modules
+dist/
+src/data/*.json
+test-results/
+playwright-report/
+.worktrees/
+*.log
+.DS_Store
