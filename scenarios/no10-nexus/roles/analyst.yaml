@@ -1,0 +1,1495 @@
+# No.10 ネクサス半導体 / セキュリティ担当者ロール
+# 見えるのは、生成AIの管理画面の入力履歴、端末のログ、現場からのチャット。
+# 専任のセキュリティ部署はなく、情報システム部の担当者が兼務している。
+# 判断ポイント20、細目は choices[].items と drafts の合計で80以上。
+estimateMinutes: 45
+intro: { ja: 'あなたはネクサス半導体の情報システム部で、セキュリティを兼務する担当者。専任のSOCはなく、外部の相談窓口と契約している。生成AIの入力履歴に、装置制御のソースコードらしき文字列が見つかった。あなたに見えるのは、ログと現場の声だけだ。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': va-coward-2
+  '3': va-coward-3
+  '4': va-coward-4
+deadlines:
+  - id: dl-prelim-material
+    ref: ppc-report-prelim
+    label: { ja: '個人情報保護委員会への速報の材料提出', en: '' }
+    points: -100
+    doneFlag: prelimMaterialsSent
+  - id: dl-final-material
+    ref: ppc-report-final-malicious
+    label: { ja: '個人情報保護委員会への確報の材料提出', en: '' }
+    points: -80
+    doneFlag: finalMaterialsSent
+events:
+  - id: ev-an-sns
+    at: { day: 2, minutes: 1140 }
+    voices: [va-ev-sns]
+    gauges: { flame: 5 }
+    sound: { se: [notify_sns] }
+    caption: { ja: '社内の出来事が、SNSで「うちの会社も同じかも」と書かれ始めた。', en: '' }
+  - id: ev-an-board
+    at: { day: 4, minutes: 900 }
+    voices: [va-ev-board]
+    gauges: { flame: 5 }
+    sound: { se: [notify_chat] }
+    caption: { ja: '社内掲示板に、現場からの書き込みが増えている。', en: '' }
+  - id: ev-an-customer
+    at: { day: 6, minutes: 600 }
+    voices: [va-ev-customer]
+    gauges: { flame: 5 }
+    sound: { se: [phone_ring] }
+    caption: { ja: '大口顧客から、技術的な説明を求める連絡が入った。', en: '' }
+points:
+  - id: an01-input-alert
+    at: { day: 0, minutes: 570 }
+    phase: detect
+    sound: { se: [notify_chat] }
+    text: { ja: '午前9時30分。生成AIの管理画面を定期確認すると、装置制御のソースコードらしき文字列が入力履歴に残っていた。誰が入れたか、いつからかは分からない。現場は「業務で使っているだけ」と言っている。', en: '' }
+    voices: [va01-boss, va01-vendor, va01-field, va01-ok]
+    notable:
+      - { id: note-ai-log, text: { ja: '生成AIの入力履歴に、装置制御のソースコードらしき文字列があった。', en: '' } }
+    choices:
+      - id: an01-delete
+        text: { ja: '履歴を消して、再発防止の設定だけ入れる。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [jpcert-handling, meti-trade-secret]
+        gauges: { flame: 15, trust: -20, damage: 10 }
+        setFlags: { deletedLogs: true }
+        delayed:
+          - { afterPhases: 2, points: -60, gauges: { flame: 15, trust: -10 }, reason: { ja: '入力履歴を消したことが調査で分かり、隠蔽と批判された。', en: '' } }
+        items:
+          - { id: an01-a-record, points: -20, axis: record, refs: [jpcert-handling] }
+          - { id: an01-a-content, points: -15, axis: content, refs: [meti-trade-secret] }
+          - { id: an01-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: an01-wait
+        text: { ja: '誤検知かもしれないので、夕方まで様子を見る。', en: '' }
+        minutes: 240
+        category: hurt
+        points: -60
+        refs: [jpcert-handling]
+        gauges: { damage: 10, flame: 5, trust: -5 }
+        coward: true
+        delayed:
+          - { afterPhases: 1, points: -10, gauges: { damage: 5 }, reason: { ja: '様子を見ている間に、同じ入力が別の部署でも続いた。', en: '' } }
+        items:
+          - { id: an01-b-time, points: -8, axis: time, refs: [jpcert-handling] }
+          - { id: an01-b-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: an01-preserve
+        text: { ja: '入力履歴と管理画面のスクリーンショットを保全し、検知時刻と操作を記録してCISOに一次報告する。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 10
+        refs: [jpcert-handling, cissp-cbk-secops]
+        gauges: { flame: -5, trust: 5, stamina: -5 }
+        setFlags: { evidenceKept: true, commandStarted: true }
+        items:
+          - { id: an01-c-time, points: 3, axis: time, refs: [jpcert-handling] }
+          - { id: an01-c-record, points: 3, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an01-c-order, points: 2, axis: order, refs: [jpcert-handling] }
+          - { id: an01-c-content, points: 2, axis: content, refs: [meti-trade-secret] }
+      - id: an01-ask
+        text: { ja: '入力した本人をすぐ呼び出して、理由を問いただす。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -30
+        refs: [meti-csm-guideline]
+        gauges: { trust: -5, stamina: -5 }
+        items:
+          - { id: an01-d-care, points: -7, axis: care, refs: [meti-csm-guideline] }
+          - { id: an01-d-order, points: -5, axis: order, refs: [jpcert-handling] }
+
+  - id: an02-scope
+    at: { day: 0, minutes: 660 }
+    phase: detect
+    sound: { se: [typing] }
+    text: { ja: '午前11時。管理画面から、三週間で412人が生成AIを使い、入力は数千件あると分かった。全部を見るか、目立つものだけ見るか。現場からは「調査で止めないでほしい」と言われている。', en: '' }
+    voices: [va02-law, va02-field, va02-popular, va02-ok]
+    popular: { choiceId: an02-sample, percent: 58 }
+    notable:
+      - { id: note-scope, text: { ja: '三週間で412人が利用。入力は数千件あり、全件の確認が必要。', en: '' } }
+    choices:
+      - id: an02-sample
+        text: { ja: '目立つ数件だけ確認して、調査を終える。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -80
+        refs: [meti-trade-secret]
+        gauges: { damage: 15, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -15, gauges: { damage: 10, trust: -5 }, reason: { ja: '目立つ数件だけの調査では、別の部署の入力が見つからなかった。', en: '' } }
+        items:
+          - { id: an02-a-content, points: -10, axis: content, refs: [meti-trade-secret] }
+          - { id: an02-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: an02-all
+        text: { ja: '全件を抽出し、機密区分と照合する。', en: '' }
+        minutes: 180
+        category: maintain
+        points: 10
+        refs: [meti-trade-secret, jpcert-handling]
+        gauges: { damage: -10, stamina: -10 }
+        items:
+          - { id: an02-b-content, points: 5, axis: content, refs: [meti-trade-secret] }
+          - { id: an02-b-record, points: 3, axis: record, refs: [jpcert-handling] }
+      - id: an02-classify
+        text: { ja: '全件を顧客の契約情報・ソースコード・個人情報の三区分で分類し、外部専門家と法務に評価を依頼する。', en: '' }
+        minutes: 240
+        category: recover
+        points: 80
+        refs: [meti-trade-secret, ppc-report-scope]
+        gauges: { damage: -15, trust: 10, stamina: -15 }
+        setFlags: { classified: true }
+        detail: triage-sheet
+        items:
+          - { id: an02-c-content, points: 6, axis: content, refs: [meti-trade-secret] }
+          - { id: an02-c-order, points: 5, axis: order, refs: [ppc-report-scope] }
+          - { id: an02-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: an02-c-care, points: 3, axis: care, refs: [meti-csm-guideline] }
+      - id: an02-delete
+        text: { ja: '確認したログは消す。残すと後で不利になる。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [jpcert-handling]
+        gauges: { flame: 15, trust: -20, damage: 10 }
+        setFlags: { deletedLogs: true }
+        delayed:
+          - { afterPhases: 2, points: -80, gauges: { flame: 15, trust: -15 }, reason: { ja: 'ログを消したことが調査で分かり、隠蔽と批判された。', en: '' } }
+        items:
+          - { id: an02-d-record, points: -20, axis: record, refs: [jpcert-handling] }
+          - { id: an02-d-content, points: -15, axis: content, refs: [meti-trade-secret] }
+          - { id: an02-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+
+  - id: an03-link
+    at: { day: 0, minutes: 780 }
+    phase: contain
+    sound: { se: [notify_chat] }
+    text: { ja: '午後1時。入力履歴の共有リンクが、部署の共有フォルダに残っていた。リンクを知っていれば、誰でも同じ内容を見られる。アクセスログはまだ取っていない。', en: '' }
+    voices: [va03-boss, va03-coward, va03-ok]
+    choices:
+      - id: an03-oral
+        text: { ja: 'リンクを知っている人に、口頭で「見るな」と伝える。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -30
+        refs: [meti-trade-secret]
+        gauges: { trust: -5 }
+        items:
+          - { id: an03-a-order, points: -7, axis: order, refs: [meti-trade-secret] }
+          - { id: an03-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: an03-stop
+        text: { ja: 'リンクを停止し、アクセスログを保全して、閲覧した人を確認する。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 10
+        refs: [meti-trade-secret, jpcert-handling]
+        gauges: { damage: -10, trust: 5, stamina: -5 }
+        setFlags: { linkStopped: true }
+        items:
+          - { id: an03-b-order, points: 4, axis: order, refs: [meti-trade-secret] }
+          - { id: an03-b-record, points: 4, axis: record, refs: [jpcert-handling] }
+          - { id: an03-b-content, points: 2, axis: content, refs: [meti-trade-secret] }
+      - id: an03-stop-plus
+        text: { ja: 'リンクを停止して閲覧者を確認し、閲覧した人への事情聴取と再発防止の案内をCISOに上申する。', en: '' }
+        minutes: 150
+        category: recover
+        points: 70
+        refs: [meti-trade-secret, meti-csm-guideline]
+        gauges: { damage: -15, trust: 10, stamina: -10 }
+        setFlags: { linkStopped: true }
+        items:
+          - { id: an03-c-order, points: 4, axis: order, refs: [meti-trade-secret] }
+          - { id: an03-c-record, points: 4, axis: record, refs: [jpcert-handling] }
+          - { id: an03-c-care, points: 4, axis: care, refs: [meti-csm-guideline] }
+          - { id: an03-c-content, points: 2, axis: content, refs: [meti-trade-secret] }
+      - id: an03-ignore
+        text: { ja: 'リンクのことは、把握していないことにする。', en: '' }
+        minutes: 15
+        category: fatal
+        points: -200
+        refs: [meti-trade-secret]
+        gauges: { flame: 15, trust: -20 }
+        setFlags: { hidLink: true }
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { flame: 10, trust: -10 }, reason: { ja: '共有リンクを放置したことが分かり、隠蔽と受け取られた。', en: '' } }
+        items:
+          - { id: an03-d-record, points: -14, axis: record, refs: [meti-trade-secret] }
+          - { id: an03-d-content, points: -10, axis: content, refs: [meti-trade-secret] }
+
+  - id: an04-endpoint
+    at: { day: 0, minutes: 900 }
+    phase: contain
+    sound: { se: [notify_chat] }
+    text: { ja: '午後3時。入力に使われた端末の一つが、私物のノートPCだった。会社の管理外だが、業務の資料が入っている。端末をどうするか。', en: '' }
+    voices: [va04-field, va04-expert, va04-boss, va04-ok]
+    notable:
+      - { id: note-forensic, text: { ja: '入力に使われた私物端末があり、メモリとディスクの保全が必要。', en: '' } }
+    choices:
+      - id: an04-poweroff
+        text: { ja: '危険なので、電源を抜いて隔離する。', en: '' }
+        minutes: 15
+        category: hurt
+        points: -30
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 5, trust: -5 }
+        items:
+          - { id: an04-a-record, points: -8, axis: record, refs: [nist-sp800-61r3] }
+          - { id: an04-a-content, points: -6, axis: content, refs: [nist-sp800-61r3] }
+          - { id: an04-a-time, points: 2, axis: time, refs: [jpcert-handling] }
+      - id: an04-isolate
+        text: { ja: '本人の同意を得てネットワークから隔離し、メモリとディスクの保全を始める。検知時刻と操作を記録する。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 10
+        refs: [nist-sp800-61r3, jpcert-handling]
+        gauges: { damage: -10, trust: 5, stamina: -10 }
+        setFlags: { evidenceKept: true }
+        detail: forensic-plan
+        items:
+          - { id: an04-b-order, points: 4, axis: order, refs: [nist-sp800-61r3] }
+          - { id: an04-b-record, points: 4, axis: record, refs: [jpcert-handling] }
+          - { id: an04-b-time, points: 2, axis: time, refs: [jpcert-handling] }
+          - { id: an04-b-content, points: 2, axis: content, refs: [nist-sp800-61r3] }
+      - id: an04-initialize
+        text: { ja: '端末を初期化して、きれいにしてから返す。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -250
+        refs: [nist-sp800-61r3]
+        gauges: { flame: 15, trust: -20 }
+        setFlags: { destroyedEvidence: true }
+        items:
+          - { id: an04-c-record, points: -20, axis: record, refs: [nist-sp800-61r3] }
+          - { id: an04-c-content, points: -15, axis: content, refs: [nist-sp800-61r3] }
+          - { id: an04-c-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: an04-continue
+        text: { ja: '私物端末なので、本人に使い続けてもらう。', en: '' }
+        minutes: 15
+        category: hurt
+        points: -60
+        refs: [no10-ai-guideline]
+        gauges: { damage: 15, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -12, gauges: { damage: 10 }, reason: { ja: '使い続けた端末から、同じ顧客情報が再度入力された。', en: '' } }
+        items:
+          - { id: an04-d-content, points: -10, axis: content, refs: [no10-ai-guideline] }
+          - { id: an04-d-record, points: -8, axis: record, refs: [jpcert-handling] }
+
+  - id: an05-employee
+    at: { day: 0, minutes: 1020 }
+    phase: contain
+    sound: { se: [notify_chat] }
+    text: { ja: '午後5時。入力していたのは、先月の業務改善表彰を受けた主任エンジニアだった。本人は「効率化のためで、悪意はありません」と話している。入力履歴には上司の名前も多い。', en: '' }
+    voices: [va05-boss, va05-coward, va05-insider, va05-ok]
+    notable:
+      - { id: note-employee-intent, text: { ja: '入力したのは業務改善で表彰された主任。悪意はなく、上司の名前もログに多い。', en: '' } }
+    choices:
+      - id: an05-scold
+        text: { ja: '本人を呼んで問い詰め、名前を社内に晒す。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [meti-csm-guideline]
+        gauges: { flame: 10, trust: -15 }
+        items:
+          - { id: an05-a-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+          - { id: an05-a-order, points: -8, axis: order, refs: [jpcert-handling] }
+      - id: an05-hear
+        text: { ja: '事実確認のヒアリングを行い、処分は人事とCISOの判断として記録を渡す。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 10
+        refs: [meti-trade-secret]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: an05-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: an05-b-record, points: 5, axis: record, refs: [meti-trade-secret] }
+      - id: an05-hear-plus
+        text: { ja: '本人の意図と業務上の困りごとを聞き、再発防止の材料として匿名化して上申する。', en: '' }
+        minutes: 180
+        category: recover
+        points: 70
+        refs: [meti-trade-secret, no10-ai-guideline]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        setFlags: { selfReportSafe: true }
+        items:
+          - { id: an05-c-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: an05-c-content, points: 5, axis: content, refs: [no10-ai-guideline] }
+          - { id: an05-c-record, points: 3, axis: record, refs: [meti-trade-secret] }
+      - id: an05-hide
+        text: { ja: '自分の関与を隠すため、ヒアリング記録を残さない。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -200
+        refs: [meti-csm-guideline]
+        gauges: { flame: 20, trust: -20 }
+        setFlags: { hidOwnRecord: true }
+        items:
+          - { id: an05-d-record, points: -14, axis: record, refs: [meti-csm-guideline] }
+          - { id: an05-d-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+
+  - id: an06-first-report
+    at: { day: 0, minutes: 1140 }
+    phase: organize
+    sound: { se: [typing] }
+    text: { ja: '午後7時。CISOへの一次報告の時間。まだ影響範囲は分かっていない。個人のSNSには「うちの会社やばい」と書きたい気持ちもある。', en: '' }
+    voices: [va06-boss, va06-bold, va06-ok]
+    choices:
+      - id: an06-wait
+        text: { ja: '全容が分かってから報告する。', en: '' }
+        minutes: 180
+        category: hurt
+        points: -100
+        refs: [jpcert-handling]
+        gauges: { flame: 10, trust: -10, damage: 5 }
+        coward: true
+        setFlags: { delayedReport: true }
+        items:
+          - { id: an06-a-time, points: -10, axis: time, refs: [jpcert-handling] }
+          - { id: an06-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: an06-report
+        text: { ja: '30分以内に、分かったこと・不明点・次にやることを分けて一次報告する。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 10
+        refs: [jpcert-handling, cissp-cbk-secops]
+        gauges: { trust: 5, stamina: -5 }
+        detail: incident-note
+        setFlags: { firstReport: true }
+        items:
+          - { id: an06-b-time, points: 4, axis: time, refs: [jpcert-handling] }
+          - { id: an06-b-order, points: 3, axis: order, refs: [cissp-cbk-secops] }
+          - { id: an06-b-record, points: 3, axis: record, refs: [jpcert-handling] }
+          - { id: an06-b-content, points: 2, axis: content, refs: [cissp-cbk-secops] }
+      - id: an06-report-plus
+        text: { ja: '一次報告に加え、速報に使う材料と本人通知の段取りまで整理して渡す。', en: '' }
+        minutes: 90
+        category: recover
+        points: 80
+        refs: [jpcert-handling, ppc-report-prelim]
+        gauges: { flame: -5, trust: 12, stamina: -10 }
+        detail: incident-note
+        setFlags: { firstReport: true, prelimMaterialsSent: true }
+        items:
+          - { id: an06-c-time, points: 4, axis: time, refs: [jpcert-handling] }
+          - { id: an06-c-order, points: 4, axis: order, refs: [ppc-report-prelim] }
+          - { id: an06-c-record, points: 4, axis: record, refs: [jpcert-handling] }
+          - { id: an06-c-content, points: 2, axis: content, refs: [cissp-cbk-secops] }
+      - id: an06-sns
+        text: { ja: '個人のSNSに「大変なことになっている」と投稿する。', en: '' }
+        minutes: 15
+        category: fatal
+        points: -200
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 20, trust: -20 }
+        setFlags: { leakedInternals: true }
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { flame: 10, trust: -10 }, reason: { ja: '担当者の投稿が特定され、会社の説明と食い違った。', en: '' } }
+        items:
+          - { id: an06-d-record, points: -14, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: an06-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: an06-d-care, points: -7, axis: care, refs: [meti-csm-guideline] }
+
+  - id: an07-vendor
+    at: { day: 0, minutes: 1260 }
+    phase: investigate
+    sound: { se: [mail_arrive] }
+    text: { ja: '午後9時。AI事業者に問い合わせると「学習には使いません。削除もできます」と口頭で答えた。契約書と管理画面の設定は、まだ確認していない。', en: '' }
+    voices: [va07-vendor, va07-law, va07-ok]
+    choices:
+      - id: an07-trust
+        text: { ja: '口頭の説明を信じ、削除を待つ。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -60
+        refs: [meti-trade-secret]
+        gauges: { damage: 10, trust: -5 }
+        items:
+          - { id: an07-a-content, points: -10, axis: content, refs: [no10-ai-guideline] }
+          - { id: an07-a-record, points: -8, axis: record, refs: [meti-trade-secret] }
+      - id: an07-check
+        text: { ja: '契約と管理画面の設定を確認し、学習に使わない設定と削除依頼を書面で行う。', en: '' }
+        minutes: 150
+        category: maintain
+        points: 10
+        refs: [no10-ai-guideline, meti-trade-secret]
+        gauges: { damage: -10, stamina: -10 }
+        setFlags: { vendorChecked: true }
+        items:
+          - { id: an07-b-content, points: 5, axis: content, refs: [no10-ai-guideline] }
+          - { id: an07-b-record, points: 5, axis: record, refs: [meti-trade-secret] }
+      - id: an07-check-plus
+        text: { ja: '設定を確認して削除を書面で依頼し、削除完了の証跡と契約改定の必要性を法務に上申する。', en: '' }
+        minutes: 240
+        category: recover
+        points: 80
+        refs: [no10-ai-guideline, meti-trade-secret]
+        gauges: { damage: -15, trust: 10, stamina: -15 }
+        setFlags: { vendorVerified: true }
+        items:
+          - { id: an07-c-content, points: 5, axis: content, refs: [no10-ai-guideline] }
+          - { id: an07-c-record, points: 5, axis: record, refs: [meti-trade-secret] }
+          - { id: an07-c-order, points: 5, axis: order, refs: [no10-ai-guideline] }
+          - { id: an07-c-care, points: 3, axis: care, refs: [meti-csm-guideline] }
+      - id: an07-wipe
+        text: { ja: '利用規約を読まずに「全部消せ」とだけ伝える。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -30
+        refs: [meti-trade-secret]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: an07-d-wording, points: -10, axis: wording, refs: [no10-ai-guideline] }
+          - { id: an07-d-record, points: -8, axis: record, refs: [meti-trade-secret] }
+
+  - id: an08-expert
+    at: { day: 1, minutes: 540 }
+    phase: investigate
+    sound: { se: [phone_ring] }
+    text: { ja: '午前9時。外部のセキュリティ専門家に相談するか。予算はない。CISOは「まず自分たちでできることをやってくれ」と言っている。', en: '' }
+    voices: [va08-boss, va08-expert, va08-coward, va08-ok]
+    choices:
+      - id: an08-none
+        text: { ja: '相談せず、自分たちだけで調査を続ける。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -60
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -10, damage: 5 }
+        coward: true
+        delayed:
+          - { afterPhases: 1, points: -12, gauges: { damage: 10 }, reason: { ja: '相談しなかったことで、調査の抜けが後から見つかった。', en: '' } }
+        items:
+          - { id: an08-a-time, points: -8, axis: time, refs: [ipa-sme-guideline] }
+          - { id: an08-a-content, points: -6, axis: content, refs: [jpcert-handling] }
+      - id: an08-call
+        text: { ja: '外部の相談窓口に連絡し、分かった範囲とログを渡す。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 10
+        refs: [ipa-sme-guideline, jpcert-handling]
+        gauges: { damage: -10, trust: 5, stamina: -5 }
+        items:
+          - { id: an08-b-order, points: 4, axis: order, refs: [ipa-sme-guideline] }
+          - { id: an08-b-record, points: 4, axis: record, refs: [jpcert-handling] }
+          - { id: an08-b-content, points: 2, axis: content, refs: [ipa-sme-guideline] }
+      - id: an08-call-plus
+        text: { ja: '相談に加え、調査範囲と証拠保全の手順を合意し、費用見積をCISOに上申する。', en: '' }
+        minutes: 180
+        category: recover
+        points: 70
+        refs: [ipa-sme-guideline, cissp-cbk-secops]
+        gauges: { damage: -15, trust: 10, stamina: -10 }
+        setFlags: { expertEngaged: true }
+        items:
+          - { id: an08-c-order, points: 4, axis: order, refs: [ipa-sme-guideline] }
+          - { id: an08-c-record, points: 4, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an08-c-content, points: 4, axis: content, refs: [jpcert-handling] }
+          - { id: an08-c-care, points: 3, axis: care, refs: [meti-csm-guideline] }
+      - id: an08-friend
+        text: { ja: '知人の技術者に、個人的に相談する。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -30
+        refs: [meti-trade-secret]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: an08-d-record, points: -10, axis: record, refs: [meti-trade-secret] }
+          - { id: an08-d-care, points: -7, axis: care, refs: [meti-csm-guideline] }
+
+  - id: an09-customer
+    at: { day: 1, minutes: 840 }
+    phase: notify
+    sound: { se: [phone_ring] }
+    text: { ja: '午後2時。入力された中に、大口顧客の製造プロセスの条件表が含まれていた。NDAを結んでいる。顧客に直接連絡する権限は、あなたにはない。', en: '' }
+    voices: [va09-past, va09-law, va09-ok]
+    notable:
+      - { id: note-customer-process, text: { ja: '大口顧客の製造プロセスの条件表が、入力に含まれていた。NDAの対象。', en: '' } }
+    choices:
+      - id: an09-direct
+        text: { ja: '顧客の担当者に直接メールして謝る。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -80
+        refs: [meti-trade-secret]
+        gauges: { flame: 10, trust: -15 }
+        items:
+          - { id: an09-a-order, points: -10, axis: order, refs: [meti-trade-secret] }
+          - { id: an09-a-care, points: -8, axis: care, refs: [meti-csm-guideline] }
+      - id: an09-escalate
+        text: { ja: '該当データを特定し、影響範囲と事実を整理して営業・法務・CISOに渡す。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 10
+        refs: [meti-trade-secret, meti-csm-guideline]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: an09-b-content, points: 5, axis: content, refs: [meti-trade-secret] }
+          - { id: an09-b-order, points: 4, axis: order, refs: [meti-csm-guideline] }
+          - { id: an09-b-record, points: 3, axis: record, refs: [jpcert-handling] }
+      - id: an09-escalate-plus
+        text: { ja: '事実の整理に加え、顧客説明用の技術資料と想定問答を作り、当日中の連絡を上申する。', en: '' }
+        minutes: 210
+        category: recover
+        points: 150
+        refs: [meti-trade-secret, meti-disclosure-guidance]
+        gauges: { flame: -10, trust: 15, stamina: -15 }
+        setFlags: { customerMaterials: true }
+        items:
+          - { id: an09-c-content, points: 15, axis: content, refs: [meti-trade-secret] }
+          - { id: an09-c-order, points: 15, axis: order, refs: [meti-csm-guideline] }
+          - { id: an09-c-care, points: 15, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: an09-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: an09-hide
+        text: { ja: '顧客には言わず、報道されるまで待つ。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -100
+        refs: [meti-trade-secret]
+        gauges: { flame: 15, trust: -15, damage: 10 }
+        coward: true
+        delayed:
+          - { afterPhases: 2, points: -20, gauges: { flame: 10, trust: -10 }, reason: { ja: '顧客に伝えないまま報道され、説明の順序が問われた。', en: '' } }
+        items:
+          - { id: an09-d-time, points: -10, axis: time, refs: [meti-trade-secret] }
+          - { id: an09-d-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: an09-d-record, points: -8, axis: record, refs: [meti-trade-secret] }
+
+  - id: an10-ppc
+    at: { day: 1, minutes: 1080 }
+    phase: notify
+    sound: { se: [phone_ring] }
+    text: { ja: '午後6時。会議の文字起こしに、顧客担当者の氏名・連絡先・契約条件が含まれていた。個人情報保護委員会への速報に使う材料を、あなたが作ることになった。提出はCISOが行う。', en: '' }
+    voices: [va10-law, va10-boss, va10-ok]
+    notable:
+      - { id: note-prelim-material, text: { ja: '速報の材料は、分かった範囲で作り、不明点は調査中と書く。', en: '' } }
+    choices:
+      - id: an10-wait
+        text: { ja: '件数が確定するまで、材料を作らない。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -100
+        refs: [ppc-report-prelim]
+        gauges: { flame: 15, trust: -10, damage: 10 }
+        coward: true
+        setFlags: { delayedReport: true }
+        delayed:
+          - { afterPhases: 1, points: -15, gauges: { flame: 10 }, reason: { ja: '速報の材料が遅れ、期限直前に慌てて作ることになった。', en: '' } }
+        items:
+          - { id: an10-a-time, points: -10, axis: time, refs: [ppc-report-prelim] }
+          - { id: an10-a-record, points: -8, axis: record, refs: [ppc-report-prelim] }
+      - id: an10-materials
+        text: { ja: '分かっている範囲で材料を作り、不明点を調査中と明記してCISOに提出する。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 10
+        refs: [ppc-report-prelim]
+        gauges: { trust: 5, stamina: -10 }
+        setFlags: { prelimMaterialsSent: true }
+        items:
+          - { id: an10-b-content, points: 5, axis: content, refs: [ppc-report-prelim] }
+          - { id: an10-b-time, points: 3, axis: time, refs: [ppc-report-prelim] }
+          - { id: an10-b-record, points: 3, axis: record, refs: [ppc-report-prelim] }
+      - id: an10-materials-plus
+        text: { ja: '材料に加え、本人通知の対象と通知文の案まで作り、顧客経由で届ける段取りを上申する。', en: '' }
+        minutes: 210
+        category: recover
+        points: 150
+        refs: [ppc-report-prelim, ppc-notify-person]
+        gauges: { flame: -5, trust: 12, stamina: -12 }
+        setFlags: { prelimMaterialsSent: true, personNotified: true }
+        items:
+          - { id: an10-c-content, points: 15, axis: content, refs: [ppc-report-prelim] }
+          - { id: an10-c-time, points: 15, axis: time, refs: [ppc-report-prelim] }
+          - { id: an10-c-care, points: 15, axis: care, refs: [ppc-notify-person] }
+          - { id: an10-c-record, points: 5, axis: record, refs: [ppc-report-prelim] }
+      - id: an10-none
+        text: { ja: '個人情報ではないと判断して、材料を作らない。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -200
+        refs: [ppc-report-scope]
+        gauges: { flame: 10, trust: -15 }
+        setFlags: { hidPpc: true }
+        items:
+          - { id: an10-d-content, points: -10, axis: content, refs: [ppc-report-scope] }
+          - { id: an10-d-wording, points: -10, axis: wording, refs: [ppc-report-scope] }
+          - { id: an10-d-record, points: -8, axis: record, refs: [ppc-report-prelim] }
+
+  - id: an11-release-support
+    at: { day: 2, minutes: 600 }
+    phase: notify
+    sound: { se: [typing] }
+    text: { ja: '午前10時。広報が「今夜、第1報を出したい。技術的な部分を確認してほしい」と言ってきた。原因はまだ断定できない。', en: '' }
+    voices: [va11-boss, va11-law, va11-ok]
+    choices:
+      - id: an11-guess
+        text: { ja: '「AI事業者の脆弱性が原因」と断定して渡す。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -60
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: an11-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: an11-a-content, points: -7, axis: content, refs: [cissp-cbk-secops] }
+      - id: an11-facts
+        text: { ja: '確認できた事実、未確認の点、次に分かる予定を分けて渡す。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 10
+        refs: [meti-disclosure-guidance, jpcert-handling]
+        gauges: { trust: 5, stamina: -5 }
+        detail: tech-brief
+        setFlags: { techBriefSent: true }
+        items:
+          - { id: an11-b-content, points: 5, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: an11-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: an11-b-order, points: 3, axis: order, refs: [jpcert-handling] }
+          - { id: an11-b-record, points: 3, axis: record, refs: [jpcert-handling] }
+      - id: an11-facts-plus
+        text: { ja: '事実の整理に加え、入力項目の具体名、削除の証跡、再開条件まで一枚にまとめて渡す。', en: '' }
+        minutes: 180
+        category: recover
+        points: 80
+        refs: [meti-disclosure-guidance, no10-ai-guideline]
+        gauges: { flame: -5, trust: 12, stamina: -10 }
+        detail: tech-brief
+        setFlags: { techBriefSent: true }
+        items:
+          - { id: an11-c-content, points: 5, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: an11-c-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: an11-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: an11-c-order, points: 3, axis: order, refs: [jpcert-handling] }
+      - id: an11-refuse
+        text: { ja: '「技術のことは分かりません」と丸投げする。', en: '' }
+        minutes: 15
+        category: hurt
+        points: -30
+        refs: [meti-csm-guideline]
+        gauges: { trust: -5 }
+        coward: true
+        items:
+          - { id: an11-d-care, points: -6, axis: care, refs: [meti-csm-guideline] }
+          - { id: an11-d-order, points: -6, axis: order, refs: [jpcert-handling] }
+
+  - id: an12-internal
+    at: { day: 2, minutes: 900 }
+    phase: notify
+    sound: { se: [notify_chat] }
+    text: { ja: '午後3時。社内への説明をどうするか。現場には「何が起きたか分からない」という不安が広がっている。入力した社員の名前を聞きたがる人もいる。', en: '' }
+    voices: [va12-boss, va12-field, va12-ok]
+    choices:
+      - id: an12-none
+        text: { ja: '社内には何も伝えない。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -60
+        refs: [meti-csm-guideline]
+        gauges: { flame: 10, trust: -10 }
+        coward: true
+        items:
+          - { id: an12-a-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+          - { id: an12-a-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: an12-facts
+        text: { ja: '事実と再発防止を伝える案を作り、人事・広報と調整する。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 10
+        refs: [meti-csm-guideline]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: an12-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: an12-b-content, points: 3, axis: content, refs: [meti-disclosure-guidance] }
+      - id: an12-dialogue
+        text: { ja: '事実と再発防止を伝え、質問と不安を受け止める場を設ける。匿名の相談窓口も作る。', en: '' }
+        minutes: 180
+        category: recover
+        points: 70
+        refs: [meti-csm-guideline, no10-ai-guideline]
+        gauges: { flame: -10, trust: 12, stamina: -10 }
+        setFlags: { internalDialogue: true }
+        items:
+          - { id: an12-c-care, points: 6, axis: care, refs: [meti-csm-guideline] }
+          - { id: an12-c-order, points: 5, axis: order, refs: [no10-ai-guideline] }
+          - { id: an12-c-content, points: 3, axis: content, refs: [meti-disclosure-guidance] }
+      - id: an12-shame
+        text: { ja: '入力した社員の名前を、社内掲示板に書く。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -200
+        refs: [meti-csm-guideline]
+        gauges: { flame: 15, trust: -20 }
+        setFlags: { blamedEmployee: true }
+        items:
+          - { id: an12-d-care, points: -15, axis: care, refs: [meti-csm-guideline] }
+          - { id: an12-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+
+  - id: an13-policy
+    at: { day: 3, minutes: 570 }
+    phase: notify
+    sound: { se: [notify_news] }
+    text: { ja: '午前9時30分。経営会議に出す判断材料を作る。生成AIを全面禁止するか、管理された環境で使い続けるか。あなたに決める権限はない。', en: '' }
+    voices: [va13-boss, va13-popular, va13-bold, va13-ok]
+    choices:
+      - id: an13-ban
+        text: { ja: '全面禁止を前提に資料を作る。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -30
+        refs: [no10-ai-guideline]
+        gauges: { flame: -5, trust: -5 }
+        delayed:
+          - { afterPhases: 2, points: -15, gauges: { damage: 10 }, reason: { ja: '全面禁止のあと、私物端末での隠れ利用が増えた。', en: '' } }
+        items:
+          - { id: an13-a-content, points: -10, axis: content, refs: [no10-ai-guideline] }
+          - { id: an13-a-order, points: -5, axis: order, refs: [no10-ipa-genai] }
+      - id: an13-managed
+        text: { ja: '管理された環境での利用を前提に、入力制限・監査ログ・教育の案を作る。', en: '' }
+        minutes: 180
+        category: maintain
+        points: 10
+        refs: [no10-ai-guideline, no10-ipa-genai]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: an13-b-content, points: 5, axis: content, refs: [no10-ai-guideline] }
+          - { id: an13-b-order, points: 3, axis: order, refs: [no10-ipa-genai] }
+      - id: an13-enforce
+        text: { ja: '機密区分ごとの入力可否表と技術的強制の設計、再開条件まで示す。', en: '' }
+        minutes: 240
+        category: recover
+        points: 150
+        refs: [no10-ai-guideline, no10-ipa-genai]
+        gauges: { flame: -10, trust: 15, stamina: -15 }
+        setFlags: { managedAI: true }
+        items:
+          - { id: an13-c-content, points: 15, axis: content, refs: [no10-ai-guideline] }
+          - { id: an13-c-order, points: 15, axis: order, refs: [no10-ipa-genai] }
+          - { id: an13-c-record, points: 15, axis: record, refs: [meti-csm-guideline] }
+          - { id: an13-c-care, points: 5, axis: care, refs: [no10-ipa-genai] }
+      - id: an13-nothing
+        text: { ja: '「現場の判断で気をつける」でよいと資料に書く。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -60
+        refs: [no10-ai-guideline]
+        gauges: { damage: 10, trust: -10 }
+        items:
+          - { id: an13-d-content, points: -10, axis: content, refs: [no10-ai-guideline] }
+          - { id: an13-d-wording, points: -8, axis: wording, refs: [no10-ipa-genai] }
+
+  - id: an14-private
+    at: { day: 3, minutes: 900 }
+    phase: notify
+    sound: { se: [notify_chat] }
+    text: { ja: '午後3時。私物のスマホのAIアプリで、同じ顧客情報を入力した社員がいることが分かった。会社の管理外で、ログは残っていない。', en: '' }
+    voices: [va14-law, va14-coward, va14-ok]
+    choices:
+      - id: an14-search
+        text: { ja: '全員の私物端末を検査する。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -60
+        refs: [no10-ai-guideline]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: an14-a-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+          - { id: an14-a-order, points: -8, axis: order, refs: [no10-ai-guideline] }
+      - id: an14-report
+        text: { ja: '匿名の自己申告を募り、申告者を不利益に扱わないと明言する。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 10
+        refs: [no10-ai-guideline]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: an14-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: an14-b-wording, points: 3, axis: wording, refs: [no10-ai-guideline] }
+      - id: an14-improve
+        text: { ja: '匿名で実態を調べ、業務で使いたくなる理由を潰す改善案を上申する。', en: '' }
+        minutes: 240
+        category: recover
+        points: 70
+        refs: [no10-ai-guideline, no10-ipa-genai]
+        gauges: { flame: -5, trust: 12, stamina: -10 }
+        setFlags: { selfReportSafe: true }
+        items:
+          - { id: an14-c-care, points: 6, axis: care, refs: [meti-csm-guideline] }
+          - { id: an14-c-content, points: 5, axis: content, refs: [no10-ai-guideline] }
+          - { id: an14-c-order, points: 5, axis: order, refs: [no10-ipa-genai] }
+      - id: an14-ignore
+        text: { ja: '私物の利用は、把握していないことにする。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [no10-ai-guideline]
+        gauges: { damage: 15, trust: -10 }
+        coward: true
+        delayed:
+          - { afterPhases: 1, points: -15, gauges: { damage: 10, trust: -5 }, reason: { ja: '私物端末の利用を放置したことで、別の顧客情報も入力されていた。', en: '' } }
+        items:
+          - { id: an14-d-record, points: -10, axis: record, refs: [no10-ai-guideline] }
+          - { id: an14-d-content, points: -10, axis: content, refs: [no10-ppc-genai] }
+
+  - id: an15-punish
+    at: { day: 4, minutes: 540 }
+    phase: notify
+    sound: { se: [notify_chat] }
+    text: { ja: '午前9時。人事から処分案の相談が来た。入力した主任を懲戒解雇にするか、注意指導にするか。あなたは事実を渡す立場で、決める権限はない。', en: '' }
+    voices: [va15-boss, va15-coward, va15-ok]
+    choices:
+      - id: an15-fire
+        text: { ja: '「懲戒解雇が妥当」と強く進言する。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -60
+        refs: [meti-csm-guideline]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: an15-a-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+          - { id: an15-a-order, points: -8, axis: order, refs: [meti-trade-secret] }
+      - id: an15-facts
+        text: { ja: '事実と本人の意図、再発防止への協力意思を整理して人事に渡す。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 10
+        refs: [meti-trade-secret]
+        gauges: { trust: 5 }
+        items:
+          - { id: an15-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: an15-b-record, points: 5, axis: record, refs: [meti-trade-secret] }
+      - id: an15-involve
+        text: { ja: '処分より再発防止を優先する理由と、本人をルール作りに加える案を上申する。', en: '' }
+        minutes: 150
+        category: recover
+        points: 70
+        refs: [meti-trade-secret, no10-ai-guideline]
+        gauges: { flame: -10, trust: 15 }
+        setFlags: { employeeProtected: true }
+        items:
+          - { id: an15-c-care, points: 6, axis: care, refs: [meti-csm-guideline] }
+          - { id: an15-c-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: an15-c-record, points: 3, axis: record, refs: [meti-trade-secret] }
+      - id: an15-list
+        text: { ja: '関与した社員全員の名前をリスト化して人事に渡す。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [meti-csm-guideline]
+        gauges: { flame: 10, trust: -15 }
+        setFlags: { blamedEmployee: true }
+        items:
+          - { id: an15-d-care, points: -12, axis: care, refs: [meti-csm-guideline] }
+          - { id: an15-d-record, points: -8, axis: record, refs: [meti-trade-secret] }
+
+  - id: an16-audit
+    at: { day: 7, minutes: 600 }
+    phase: recover
+    sound: { se: [phone_ring] }
+    text: { ja: '午前10時。大口顧客の監査が始まった。保全したログと時系列の提出を求められている。未確認の点もまだ多い。', en: '' }
+    voices: [va16-vendor, va16-law, va16-ok]
+    choices:
+      - id: an16-favorable
+        text: { ja: '都合のよいログだけを出す。', en: '' }
+        minutes: 90
+        category: fatal
+        points: -200
+        refs: [meti-trade-secret]
+        gauges: { flame: 20, trust: -20 }
+        setFlags: { hidRecords: true }
+        items:
+          - { id: an16-a-record, points: -14, axis: record, refs: [meti-trade-secret] }
+          - { id: an16-a-content, points: -10, axis: content, refs: [cissp-cbk-secops] }
+          - { id: an16-a-care, points: -7, axis: care, refs: [meti-csm-guideline] }
+      - id: an16-facts
+        text: { ja: '保全したログと時系列、未確認点を整理して監査に出す。', en: '' }
+        minutes: 180
+        category: maintain
+        points: 10
+        refs: [meti-trade-secret, cissp-cbk-secops]
+        gauges: { trust: 5, stamina: -10 }
+        detail: audit-pack
+        items:
+          - { id: an16-b-record, points: 5, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an16-b-content, points: 5, axis: content, refs: [meti-trade-secret] }
+          - { id: an16-b-order, points: 3, axis: order, refs: [jpcert-handling] }
+      - id: an16-open
+        text: { ja: '入力から削除依頼までの経緯を再現できる証跡を整え、再発防止の技術資料も出す。', en: '' }
+        minutes: 240
+        category: recover
+        points: 150
+        refs: [meti-trade-secret, meti-disclosure-guidance]
+        gauges: { flame: -10, trust: 15, stamina: -15 }
+        detail: audit-pack
+        setFlags: { auditAccepted: true }
+        items:
+          - { id: an16-c-record, points: 15, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an16-c-content, points: 15, axis: content, refs: [meti-trade-secret] }
+          - { id: an16-c-care, points: 15, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: an16-c-order, points: 5, axis: order, refs: [jpcert-handling] }
+      - id: an16-lost
+        text: { ja: '「ログはもう残っていない」と答える。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [jpcert-handling]
+        gauges: { flame: 10, trust: -15 }
+        items:
+          - { id: an16-d-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: an16-d-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+
+  - id: an17-press-prep
+    at: { day: 10, minutes: 540 }
+    phase: recover
+    sound: { se: [shutter] }
+    text: { ja: '午前9時。記者会見の技術質問への備えを頼まれた。会見に出るのは経営陣だが、答えられるようにするのはあなたの仕事だ。', en: '' }
+    voices: [va17-flattery, va17-expert, va17-public, va17-coward, va17-ok]
+    choices:
+      - id: an17-skip
+        text: { ja: '技術質問には答えないよう進言する。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -30
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -10 }
+        coward: true
+        delayed:
+          - { afterPhases: 1, points: -10, gauges: { flame: 10 }, reason: { ja: '技術質問に答えられず、会見後に追加の説明を求められた。', en: '' } }
+        items:
+          - { id: an17-a-care, points: -8, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: an17-a-wording, points: -6, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: an17-facts
+        text: { ja: '想定問答の技術部分を作り、事実と未確認を分けて答える準備をする。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 10
+        refs: [jpcert-handling, meti-disclosure-guidance]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: an17-b-wording, points: 5, axis: wording, refs: [jpcert-handling] }
+          - { id: an17-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: an17-b-content, points: 3, axis: content, refs: [meti-disclosure-guidance] }
+      - id: an17-ready
+        text: { ja: '入力項目・削除の証跡・再開条件を一枚にまとめ、記録から答えられるようにする。', en: '' }
+        minutes: 180
+        category: recover
+        points: 70
+        refs: [meti-csm-guideline, jpcert-handling]
+        gauges: { flame: -10, trust: 12, stamina: -10 }
+        setFlags: { pressReady: true }
+        items:
+          - { id: an17-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: an17-c-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: an17-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: an17-c-wording, points: 3, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: an17-deny
+        text: { ja: '会見で「漏えいはない」と答えるよう進言する。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -250
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 30, trust: -25 }
+        setFlags: { deniedLeak: true }
+        delayed:
+          - { afterPhases: 1, points: -60, gauges: { flame: 15, trust: -15 }, reason: { ja: '「漏えいはない」という説明が公開された情報と食い違い、訂正を重ねた。', en: '' } }
+        items:
+          - { id: an17-d-wording, points: -20, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: an17-d-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: an17-d-record, points: -10, axis: record, refs: [jpcert-handling] }
+
+  - id: an18-restart
+    at: { day: 14, minutes: 540 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: '午前9時。生成AIの利用を再開する条件を決める。現場からは「もう使えないと仕事にならない」という声が出ている。あなたは技術条件を設計する立場だ。', en: '' }
+    voices: [va18-coward, va18-vendor, va18-ok]
+    choices:
+      - id: an18-same
+        text: { ja: '何も変えずに再開する。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [no10-ai-guideline]
+        gauges: { damage: 15, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -18, gauges: { damage: 15, trust: -10 }, reason: { ja: '再開した環境で、入力制限が効かず同じ情報が入力された。', en: '' } }
+        items:
+          - { id: an18-a-content, points: -10, axis: content, refs: [no10-ai-guideline] }
+          - { id: an18-a-order, points: -8, axis: order, refs: [no10-ipa-genai] }
+      - id: an18-guide
+        text: { ja: 'ガイドラインを配って再開する。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 10
+        refs: [no10-ai-guideline]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: an18-b-content, points: 5, axis: content, refs: [no10-ai-guideline] }
+          - { id: an18-b-order, points: 3, axis: order, refs: [no10-ipa-genai] }
+      - id: an18-staged
+        text: { ja: '入力制限の技術的強制、監査ログ、研修、段階的な再開を検証してから戻す。', en: '' }
+        minutes: 240
+        category: recover
+        points: 80
+        refs: [no10-ai-guideline, no10-ipa-genai]
+        gauges: { damage: -15, trust: 15, stamina: -15 }
+        detail: restart-check
+        setFlags: { managedAI: true, verifiedResume: true }
+        items:
+          - { id: an18-c-content, points: 5, axis: content, refs: [no10-ai-guideline] }
+          - { id: an18-c-order, points: 5, axis: order, refs: [no10-ipa-genai] }
+          - { id: an18-c-record, points: 5, axis: record, refs: [meti-csm-guideline] }
+          - { id: an18-c-care, points: 3, axis: care, refs: [no10-ipa-genai] }
+      - id: an18-never
+        text: { ja: '再開しない。他社が使っていても、うちは使わない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -60
+        refs: [no10-ai-guideline]
+        gauges: { trust: -5, stamina: 5 }
+        items:
+          - { id: an18-d-content, points: -8, axis: content, refs: [no10-ai-guideline] }
+          - { id: an18-d-order, points: -5, axis: order, refs: [no10-ipa-genai] }
+
+  - id: an19-final-report
+    at: { day: 21, minutes: 600 }
+    phase: after
+    sound: { se: [notify_news] }
+    text: { ja: '午前10時。第三者検証の結果が出た。個人情報保護委員会への確報と、顧客への報告書に使う材料をまとめる。未解決の課題も残っている。', en: '' }
+    voices: [va19-expert, va19-law, va19-ok]
+    notable:
+      - { id: note-final-material, text: { ja: '確報の材料には、未解決の課題と再発防止の進捗も含める。', en: '' } }
+    choices:
+      - id: an19-hide
+        text: { ja: '確報の材料を出さない。', en: '' }
+        minutes: 90
+        category: fatal
+        points: -200
+        refs: [ppc-report-final-malicious]
+        gauges: { flame: 15, trust: -15 }
+        items:
+          - { id: an19-a-content, points: -12, axis: content, refs: [ppc-report-final-malicious] }
+          - { id: an19-a-record, points: -10, axis: record, refs: [meti-disclosure-guidance] }
+      - id: an19-min
+        text: { ja: '指摘された範囲だけの材料を出す。', en: '' }
+        minutes: 150
+        category: maintain
+        points: 10
+        refs: [ppc-report-final-malicious]
+        gauges: { trust: 5, stamina: -10 }
+        setFlags: { finalMaterialsSent: true }
+        items:
+          - { id: an19-b-content, points: 5, axis: content, refs: [ppc-report-final-malicious] }
+          - { id: an19-b-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
+      - id: an19-open
+        text: { ja: '全項目と未解決の課題、再発防止の進捗をまとめて提出する。', en: '' }
+        minutes: 240
+        category: recover
+        points: 150
+        refs: [ppc-report-final-malicious, meti-disclosure-guidance]
+        gauges: { flame: -10, trust: 15, stamina: -15 }
+        setFlags: { finalMaterialsSent: true, fullDisclosure: true }
+        items:
+          - { id: an19-c-content, points: 15, axis: content, refs: [ppc-report-final-malicious] }
+          - { id: an19-c-record, points: 15, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: an19-c-care, points: 10, axis: care, refs: [ppc-notify-person] }
+          - { id: an19-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: an19-memory
+        text: { ja: '記憶で時系列を作る。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -60
+        refs: [cissp-cbk-secops]
+        gauges: { trust: -10 }
+        items:
+          - { id: an19-d-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an19-d-order, points: -6, axis: order, refs: [jpcert-handling] }
+
+  - id: an20-share
+    at: { day: 30, minutes: 540 }
+    phase: after
+    sound: { se: [notify_chat] }
+    text: { ja: '午前9時。再発防止の教育をどう続けるか。実際に起きたことを教材にできる。現場は「また研修か」と言っている。', en: '' }
+    voices: [va20-coward, va20-popular, va20-ok]
+    choices:
+      - id: an20-once
+        text: { ja: '研修を一度だけ実施して終わる。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 10
+        refs: [no10-ipa-genai]
+        gauges: { stamina: 5 }
+        delayed:
+          - { afterPhases: 1, points: -8, gauges: { damage: 5 }, reason: { ja: '一度だけの研修では、同じ入力が再び起きた。', en: '' } }
+        items:
+          - { id: an20-a-content, points: -5, axis: content, refs: [no10-ipa-genai] }
+          - { id: an20-a-record, points: -3, axis: record, refs: [meti-csm-guideline] }
+      - id: an20-yearly
+        text: { ja: '年次の研修と理解度テストを続ける。', en: '' }
+        minutes: 180
+        category: maintain
+        points: 20
+        refs: [no10-ipa-genai, meti-csm-guideline]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: an20-b-content, points: 5, axis: content, refs: [no10-ipa-genai] }
+          - { id: an20-b-record, points: 3, axis: record, refs: [meti-csm-guideline] }
+      - id: an20-share
+        text: { ja: '実際に起きたことを匿名化して教材化し、社内と業界に共有する。', en: '' }
+        minutes: 240
+        category: increase
+        points: 300
+        fatalAlternate: 50
+        refs: [no10-ipa-genai, meti-disclosure-guidance]
+        gauges: { flame: -5, trust: 20, stamina: -10 }
+        setFlags: { industryShare: true, lessonsShared: true }
+        items:
+          - { id: an20-c-content, points: 5, axis: content, refs: [no10-ipa-genai] }
+          - { id: an20-c-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: an20-c-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: an20-c-order, points: 3, axis: order, refs: [no10-ipa-genai] }
+      - id: an20-form
+        text: { ja: '研修は形式だけにして、現場の負担を減らす。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -60
+        refs: [no10-ipa-genai]
+        gauges: { trust: -5 }
+        items:
+          - { id: an20-d-content, points: -10, axis: content, refs: [no10-ipa-genai] }
+          - { id: an20-d-care, points: -5, axis: care, refs: [meti-csm-guideline] }
+
+drafts:
+  incident-note:
+    title: { ja: '一次報告メモ', en: '' }
+    slots:
+      - id: detected
+        label: { ja: '検知時刻の書き方', en: '' }
+        options:
+          - { id: in-t-split, text: { ja: '検知した時刻と、確認した時刻を分けて書く', en: '' }, points: 4, axis: time, refs: [jpcert-handling] }
+          - { id: in-t-vague, text: { ja: '「夜」とだけ書く', en: '' }, points: -6, axis: time, refs: [jpcert-handling] }
+      - id: scope
+        label: { ja: '影響範囲', en: '' }
+        options:
+          - { id: in-s-known, text: { ja: '分かった範囲と、まだ分からない範囲を分けて書く', en: '' }, points: 6, axis: content, refs: [cissp-cbk-secops] }
+          - { id: in-s-all, text: { ja: '「全社員が対象」と断定する', en: '' }, points: -10, axis: content, refs: [ppc-report-scope] }
+      - id: done
+        label: { ja: '実施したこと', en: '' }
+        options:
+          - { id: in-d-list, text: { ja: '保全した履歴、止めたリンク、隔離した端末を列挙する', en: '' }, points: 6, axis: order, refs: [jpcert-handling] }
+          - { id: in-d-summary, text: { ja: '「初動対応済み」とだけ書く', en: '' }, points: -7, axis: content, refs: [jpcert-handling] }
+      - id: evidence
+        label: { ja: '証拠の扱い', en: '' }
+        options:
+          - { id: in-e-chain, text: { ja: '保全したデータのハッシュと保管場所を書く', en: '' }, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: in-e-none, text: { ja: '証拠のことは書かない', en: '' }, points: -7, axis: record, refs: [nist-sp800-61r3] }
+      - id: uncertain
+        label: { ja: '未確認事項', en: '' }
+        options:
+          - { id: in-u-explicit, text: { ja: '未確認事項と、確認する期限を書く', en: '' }, points: 6, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: in-u-omit, text: { ja: '未確認事項には触れない', en: '' }, points: -6, axis: content, refs: [meti-disclosure-guidance] }
+      - id: next
+        label: { ja: '次の連絡', en: '' }
+        options:
+          - { id: in-n-scheduled, text: { ja: '次に報告する時刻と相手を書く', en: '' }, points: 4, axis: order, refs: [jpcert-handling] }
+          - { id: in-n-none, text: { ja: '次の連絡予定を書かない', en: '' }, points: -3, axis: order, refs: [jpcert-handling] }
+      - id: sns
+        label: { ja: '外部への発信', en: '' }
+        options:
+          - { id: in-x-none, text: { ja: '個人のSNSには書かない', en: '' }, points: 6, axis: wording, refs: [meti-csm-guideline] }
+          - { id: in-x-vague, text: { ja: '個人のSNSに「調査中」と書く', en: '' }, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: version
+        label: { ja: '版の管理', en: '' }
+        options:
+          - { id: in-v-versioned, text: { ja: '版番号と更新時刻を書く', en: '' }, points: 4, axis: record, refs: [cissp-cbk-secops] }
+          - { id: in-v-plain, text: { ja: '版を書かない', en: '' }, points: -3, axis: record, refs: [cissp-cbk-secops] }
+  triage-sheet:
+    title: { ja: '入力履歴の分類表', en: '' }
+    slots:
+      - id: range
+        label: { ja: '確認する範囲', en: '' }
+        options:
+          - { id: tr-r-all, text: { ja: '三週間の全件を対象にする', en: '' }, points: 6, axis: content, refs: [meti-trade-secret] }
+          - { id: tr-r-sample, text: { ja: '目立つ数件だけを対象にする', en: '' }, points: -10, axis: content, refs: [meti-trade-secret] }
+      - id: classify
+        label: { ja: '分類の単位', en: '' }
+        options:
+          - { id: tr-c-three, text: { ja: '顧客の契約情報、ソースコード、個人情報の三区分で分類する', en: '' }, points: 7, axis: content, refs: [ppc-report-scope] }
+          - { id: tr-c-one, text: { ja: 'すべて「機密」として一括で扱う', en: '' }, points: -8, axis: content, refs: [ppc-report-scope] }
+      - id: owner
+        label: { ja: '入力した人の扱い', en: '' }
+        options:
+          - { id: tr-o-intent, text: { ja: '本人の業務目的と意図を確認して記録する', en: '' }, points: 6, axis: care, refs: [meti-csm-guideline] }
+          - { id: tr-o-name, text: { ja: '名前と入力件数だけを一覧にする', en: '' }, points: -7, axis: care, refs: [meti-csm-guideline] }
+      - id: external
+        label: { ja: '外部の目', en: '' }
+        options:
+          - { id: tr-e-expert, text: { ja: '外部専門家と法務に評価を依頼する', en: '' }, points: 6, axis: order, refs: [ipa-sme-guideline] }
+          - { id: tr-e-self, text: { ja: '自分だけで判断して終える', en: '' }, points: -7, axis: order, refs: [jpcert-handling] }
+      - id: record
+        label: { ja: '抽出の記録', en: '' }
+        options:
+          - { id: tr-rec-log, text: { ja: '抽出条件と実行時刻を記録する', en: '' }, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: tr-rec-none, text: { ja: '抽出条件を記録しない', en: '' }, points: -7, axis: record, refs: [cissp-cbk-secops] }
+      - id: retention
+        label: { ja: '分類表の保管', en: '' }
+        options:
+          - { id: tr-ret-keep, text: { ja: '調査が終わるまで消さずに保管する', en: '' }, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: tr-ret-delete, text: { ja: '読んだらすぐ消す', en: '' }, points: -8, axis: record, refs: [jpcert-handling] }
+  forensic-plan:
+    title: { ja: '端末保全の手順', en: '' }
+    slots:
+      - id: order
+        label: { ja: '保全の順序', en: '' }
+        options:
+          - { id: fp-o-memory, text: { ja: 'メモリ、ディスク、ネットワークログの順に保全する', en: '' }, points: 7, axis: order, refs: [nist-sp800-61r3] }
+          - { id: fp-o-disk, text: { ja: 'ディスクだけをイメージする', en: '' }, points: -7, axis: content, refs: [nist-sp800-61r3] }
+      - id: hash
+        label: { ja: '完全性の担保', en: '' }
+        options:
+          - { id: fp-h-hash, text: { ja: '取得時にハッシュ値を計算し、記録と照合する', en: '' }, points: 7, axis: record, refs: [cissp-cbk-secops] }
+          - { id: fp-h-none, text: { ja: 'ハッシュは取らない', en: '' }, points: -10, axis: record, refs: [cissp-cbk-secops] }
+      - id: who
+        label: { ja: '実施者と立会い', en: '' }
+        options:
+          - { id: fp-w-two, text: { ja: '実施者と立会人を記録に残す', en: '' }, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: fp-w-solo, text: { ja: '一人で実施し、記録しない', en: '' }, points: -7, axis: record, refs: [jpcert-handling] }
+      - id: store
+        label: { ja: '保管場所', en: '' }
+        options:
+          - { id: fp-s-locked, text: { ja: '書き込み不可の媒体に保存し、施錠した場所で管理する', en: '' }, points: 6, axis: order, refs: [cissp-cbk-secops] }
+          - { id: fp-s-desk, text: { ja: '作業用の共有フォルダに置く', en: '' }, points: -8, axis: order, refs: [cissp-cbk-secops] }
+      - id: copy
+        label: { ja: '調査用コピー', en: '' }
+        options:
+          - { id: fp-c-copy, text: { ja: '原本と調査用コピーを分け、コピーだけを解析する', en: '' }, points: 6, axis: content, refs: [nist-sp800-61r3] }
+          - { id: fp-c-original, text: { ja: '原本を直接開いて解析する', en: '' }, points: -7, axis: record, refs: [nist-sp800-61r3] }
+      - id: notify
+        label: { ja: '現場への説明', en: '' }
+        options:
+          - { id: fp-n-explain, text: { ja: '保全の理由と、再起動しない理由を現場に説明する', en: '' }, points: 6, axis: care, refs: [ipa-sme-guideline] }
+          - { id: fp-n-silent, text: { ja: '何も説明せず端末を回収する', en: '' }, points: -7, axis: care, refs: [ipa-sme-guideline] }
+  tech-brief:
+    title: { ja: '公表用の技術資料', en: '' }
+    slots:
+      - id: timing
+        label: { ja: '資料の提出時刻', en: '' }
+        auto: true
+        items:
+          - { id: tb-t-26h, when: { withinHours: 26 }, points: 5, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: tb-t-48h, when: { withinHours: 48 }, points: 2, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: tb-t-late, when: { otherwise: true }, points: -8, axis: time, refs: [meti-disclosure-guidance] }
+      - id: scope
+        label: { ja: '対象範囲', en: '' }
+        options:
+          - { id: tb-s-all, text: { ja: '顧客情報、ソースコード、会議の文字起こしを含むすべて', en: '' }, points: 6, axis: content, refs: [meti-trade-secret] }
+          - { id: tb-s-narrow, text: { ja: 'ソースコードだけ', en: '' }, points: -10, axis: content, refs: [meti-trade-secret] }
+      - id: what
+        label: { ja: '入力された情報の書き方', en: '' }
+        options:
+          - { id: tb-w-specific, text: { ja: '入力された項目を具体的に列挙する', en: '' }, points: 5, axis: content, refs: [meti-trade-secret] }
+          - { id: tb-w-vague, text: { ja: '「一部の情報」とぼかす', en: '' }, points: -8, axis: content, refs: [meti-trade-secret] }
+      - id: cause
+        label: { ja: '原因の書き方', en: '' }
+        options:
+          - { id: tb-c-mechanism, text: { ja: '入力した社員の意図と、止められなかった仕組みを書く', en: '' }, points: 6, axis: content, refs: [no10-ai-guideline] }
+          - { id: tb-c-person, text: { ja: '「社員の不注意」と書く', en: '' }, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: ai
+        label: { ja: 'AI利用の扱い', en: '' }
+        options:
+          - { id: tb-ai-stop, text: { ja: 'AI利用の一時停止と再開の条件を書く', en: '' }, points: 6, axis: content, refs: [no10-ai-guideline] }
+          - { id: tb-ai-none, text: { ja: 'AIの扱いに触れない', en: '' }, points: -8, axis: content, refs: [no10-ai-guideline] }
+      - id: customer
+        label: { ja: '顧客が確認すること', en: '' }
+        options:
+          - { id: tb-cu-check, text: { ja: '顧客が照合すべき契約情報と、問い合わせ先を書く', en: '' }, points: 6, axis: care, refs: [meti-trade-secret] }
+          - { id: tb-cu-generic, text: { ja: '「注意してください」とだけ書く', en: '' }, points: -7, axis: care, refs: [meti-disclosure-guidance] }
+      - id: employee
+        label: { ja: '社員への言及', en: '' }
+        options:
+          - { id: tb-em-window, text: { ja: '社員の相談窓口と、自己申告を不利益に扱わない方針を書く', en: '' }, points: 6, axis: care, refs: [meti-csm-guideline] }
+          - { id: tb-em-none, text: { ja: '社員への言及を書かない', en: '' }, points: -6, axis: care, refs: [meti-csm-guideline] }
+      - id: contact
+        label: { ja: '問い合わせ窓口', en: '' }
+        options:
+          - { id: tb-co-window, text: { ja: '専用窓口の番号、受付時間、増員を書く', en: '' }, points: 4, axis: care, refs: [meti-csm-guideline] }
+          - { id: tb-co-number, text: { ja: '番号だけを書く', en: '' }, points: -4, axis: care, refs: [meti-csm-guideline] }
+          - { id: tb-co-none, text: { ja: '窓口を書かない', en: '' }, points: -8, axis: care, refs: [meti-csm-guideline] }
+      - id: certainty
+        label: { ja: '断定の強さ', en: '' }
+        options:
+          - { id: tb-ce-maybe, text: { ja: '「漏えいのおそれ」と「確認」を使い分ける', en: '' }, points: 4, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: tb-ce-confirm, text: { ja: 'すべて「漏えいした」と断定する', en: '' }, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: tb-ce-none, text: { ja: '「漏えいはない」と書く', en: '' }, points: -12, axis: wording, refs: [meti-trade-secret] }
+      - id: apology
+        label: { ja: '謝罪の主語', en: '' }
+        options:
+          - { id: tb-ap-company, text: { ja: '「当社」として謝罪する', en: '' }, points: 3, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: tb-ap-employee, text: { ja: '「社員個人」の責任として謝罪する', en: '' }, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: record
+        label: { ja: '記録', en: '' }
+        options:
+          - { id: tb-r-log, text: { ja: '資料の版と提出時刻を記録する', en: '' }, points: 4, axis: record, refs: [jpcert-handling] }
+          - { id: tb-r-none, text: { ja: '記録を残さない', en: '' }, points: -6, axis: record, refs: [jpcert-handling] }
+  audit-pack:
+    title: { ja: '監査提出資料', en: '' }
+    slots:
+      - id: timeline
+        label: { ja: '時系列', en: '' }
+        options:
+          - { id: ap-t-split, text: { ja: '入力された時期と検知の日時を分けて書く', en: '' }, points: 6, axis: time, refs: [jpcert-handling] }
+          - { id: ap-t-merge, text: { ja: '入力と検知をまとめて書く', en: '' }, points: -8, axis: time, refs: [jpcert-handling] }
+      - id: evidence
+        label: { ja: '証拠の連鎖', en: '' }
+        options:
+          - { id: ap-e-chain, text: { ja: 'ハッシュ、保管場所、受け渡しの記録を添える', en: '' }, points: 7, axis: record, refs: [cissp-cbk-secops] }
+          - { id: ap-e-none, text: { ja: 'ログの写しだけを渡す', en: '' }, points: -8, axis: record, refs: [cissp-cbk-secops] }
+      - id: scope
+        label: { ja: '対象範囲', en: '' }
+        options:
+          - { id: ap-s-all, text: { ja: '影響しうる全データを対象にする', en: '' }, points: 6, axis: content, refs: [meti-trade-secret] }
+          - { id: ap-s-confirmed, text: { ja: '確認できた分だけを対象にする', en: '' }, points: -7, axis: content, refs: [meti-trade-secret] }
+      - id: open
+        label: { ja: '未確認の点', en: '' }
+        options:
+          - { id: ap-o-list, text: { ja: '未確認の点と、確認する期限を書く', en: '' }, points: 6, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: ap-o-omit, text: { ja: '未確認の点には触れない', en: '' }, points: -6, axis: content, refs: [meti-disclosure-guidance] }
+      - id: care
+        label: { ja: '顧客の負担', en: '' }
+        options:
+          - { id: ap-c-burden, text: { ja: '顧客が確認する作業と、その問い合わせ先を書く', en: '' }, points: 6, axis: care, refs: [meti-csm-guideline] }
+          - { id: ap-c-none, text: { ja: '顧客の作業には触れない', en: '' }, points: -6, axis: care, refs: [meti-csm-guideline] }
+      - id: record
+        label: { ja: '版の管理', en: '' }
+        options:
+          - { id: ap-r-versioned, text: { ja: '版番号と提出時刻を書く', en: '' }, points: 4, axis: record, refs: [cissp-cbk-secops] }
+          - { id: ap-r-plain, text: { ja: '版を書かない', en: '' }, points: -3, axis: record, refs: [cissp-cbk-secops] }
+  restart-check:
+    title: { ja: '再開条件の確認表', en: '' }
+    slots:
+      - id: dlp
+        label: { ja: '入力制限', en: '' }
+        options:
+          - { id: rc-d-enforce, text: { ja: '機密区分に応じた入力制限を技術的に強制する', en: '' }, points: 7, axis: content, refs: [no10-ai-guideline] }
+          - { id: rc-d-guide, text: { ja: 'ガイドラインを配るだけにする', en: '' }, points: -8, axis: content, refs: [no10-ipa-genai] }
+      - id: log
+        label: { ja: '監査ログ', en: '' }
+        options:
+          - { id: rc-l-audit, text: { ja: '入力と管理操作の監査ログを取り、確認する', en: '' }, points: 6, axis: record, refs: [meti-csm-guideline] }
+          - { id: rc-l-none, text: { ja: '監査ログは取らない', en: '' }, points: -8, axis: record, refs: [no10-ai-guideline] }
+      - id: training
+        label: { ja: '教育', en: '' }
+        options:
+          - { id: rc-t-check, text: { ja: '研修の受講と理解度を確認する', en: '' }, points: 6, axis: care, refs: [no10-ipa-genai] }
+          - { id: rc-t-once, text: { ja: '一度だけ説明して終える', en: '' }, points: -6, axis: care, refs: [no10-ipa-genai] }
+      - id: staged
+        label: { ja: '再開の進め方', en: '' }
+        options:
+          - { id: rc-s-stage, text: { ja: '部門ごとに段階的に再開する', en: '' }, points: 6, axis: order, refs: [no10-ai-guideline] }
+          - { id: rc-s-all, text: { ja: '全社で一斉に再開する', en: '' }, points: -7, axis: order, refs: [no10-ai-guideline] }
+      - id: rollback
+        label: { ja: '止める条件', en: '' }
+        options:
+          - { id: rc-r-stop, text: { ja: '不審な入力や漏えいの兆候が出たら止める条件を決める', en: '' }, points: 6, axis: order, refs: [nist-sp800-61r3] }
+          - { id: rc-r-none, text: { ja: '止める条件は決めない', en: '' }, points: -6, axis: order, refs: [nist-sp800-61r3] }
+      - id: report
+        label: { ja: '進捗の報告', en: '' }
+        options:
+          - { id: rc-rep-weekly, text: { ja: '再発防止の進捗を週次で経営に報告する', en: '' }, points: 6, axis: record, refs: [meti-csm-guideline] }
+          - { id: rc-rep-none, text: { ja: '報告はしない', en: '' }, points: -4, axis: record, refs: [meti-csm-guideline] }
+voices:
+  - { id: va01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '漏えいも確認されていない。明日の定例会議で報告してくれ。', en: '' }, trigger: { at: point } }
+  - { id: va01-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: 'まずAI事業者に確認しましょう。誤検知かもしれません。', en: '' }, trigger: { at: point } }
+  - { id: va01-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場は便利に使っているだけです。止めると仕事が止まります。', en: '' }, trigger: { at: point } }
+  - { id: va01-ok, media: chat, misleading: false, text: { ja: 'まず入力履歴を保全して、検知時刻と操作を記録しましょう。', en: '' }, trigger: { at: point } }
+  - { id: va01-after, media: sns, misleading: false, text: { ja: 'まだ漏れてもいないのに、履歴を保全してどうする。', en: '' }, trigger: { at: after, choice: an01-preserve } }
+  - { id: va02-law, media: board, misleading: true, type: law-ish, text: { ja: '全部見る必要はない。目立つ数件で十分だ。', en: '' }, trigger: { at: point } }
+  - { id: va02-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場は便利に使っています。調査で止めると、仕事が止まります。', en: '' }, trigger: { at: point } }
+  - { id: va02-popular, media: sns, misleading: true, type: popular, text: { ja: '他の担当者の多くは、目立つ数件だけ確認しています。', en: '' }, trigger: { at: point } }
+  - { id: va02-ok, media: chat, misleading: false, text: { ja: '法務「機密区分と突き合わせないと、範囲は言えません」。', en: '' }, trigger: { at: point } }
+  - { id: va02-after, media: news, misleading: false, text: { ja: '全件調査なんて、誰がそんな残業をするんだ。', en: '' }, trigger: { at: after, choice: an02-classify } }
+  - { id: va03-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '共有リンクには触るな。社内が混乱する。', en: '' }, trigger: { at: point } }
+  - { id: va03-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '今さら騒ぐと、自分の管理責任を問われるぞ。', en: '' }, trigger: { at: point } }
+  - { id: va03-ok, media: chat, misleading: false, text: { ja: 'リンクを止めて、誰が見たかを記録しましょう。', en: '' }, trigger: { at: point } }
+  - { id: va03-after, media: sns, misleading: false, text: { ja: '閲覧者を洗うのか。監視社会だ。', en: '' }, trigger: { at: after, choice: an03-stop-plus } }
+  - { id: va04-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '危なそうだったので、電源を抜いておきました。これで安全です。', en: '' }, trigger: { at: point } }
+  - { id: va04-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'メモリなんて取っても分かりません。初期化が一番です。', en: '' }, trigger: { at: point } }
+  - { id: va04-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '私物の端末には触れるな。後で揉める。', en: '' }, trigger: { at: point } }
+  - { id: va04-ok, media: chat, misleading: false, text: { ja: 'メモリ、ディスク、ログの順で保全し、ハッシュを記録しましょう。', en: '' }, trigger: { at: point } }
+  - { id: va04-after, media: sns, misleading: false, text: { ja: '私物のパソコンを勝手に調べるのか。', en: '' }, trigger: { at: after, choice: an04-isolate } }
+  - { id: va05-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '本人を切れば示しがつく。甘い対応は他の社員に伝わるぞ。', en: '' }, trigger: { at: point } }
+  - { id: va05-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'すぐに処分しないと、ルールが形だけだと証明してしまう。', en: '' }, trigger: { at: point } }
+  - { id: va05-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、実はもっと多い。今すぐ全員を処分しろ。', en: '' }, trigger: { at: point } }
+  - { id: va05-ok, media: chat, misleading: false, text: { ja: '人事「本人は、同じことをした人が他にもいると話しています」。', en: '' }, trigger: { at: point } }
+  - { id: va05-after, media: sns, misleading: false, text: { ja: '処分しないのか。会社は本気で怒っていないんだな。', en: '' }, trigger: { at: after, choice: an05-hear-plus } }
+  - { id: va06-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '確定的なことだけ報告しろ。中途半端な報告は混乱する。', en: '' }, trigger: { at: point } }
+  - { id: va06-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: 'SNSで一言書けば、社内もすぐ動きますよ。', en: '' }, trigger: { at: point } }
+  - { id: va06-ok, media: chat, misleading: false, text: { ja: '分かったこと、分かっていないこと、次にやることを分けて報告しましょう。', en: '' }, trigger: { at: point } }
+  - { id: va06-after, media: boss, misleading: false, text: { ja: 'まだ分かっていないのに、上に報告するのか。', en: '' }, trigger: { at: after, choice: an06-report-plus } }
+  - { id: va07-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '学習には使いません。削除もできます。口頭で申し上げたとおりです。', en: '' }, trigger: { at: point } }
+  - { id: va07-law, media: board, misleading: true, type: law-ish, text: { ja: '口頭でも言質は取れています。書面まで求めると関係が悪くなります。', en: '' }, trigger: { at: point } }
+  - { id: va07-ok, media: chat, misleading: false, text: { ja: '法務「契約書には、学習利用の定めがありません」。', en: '' }, trigger: { at: point } }
+  - { id: va07-after, media: vendor, misleading: false, text: { ja: '契約の改定まで求めるのか。取引を見直させてもらう。', en: '' }, trigger: { at: after, choice: an07-check-plus } }
+  - { id: va08-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '予算はない。まず自分たちでできることをやれ。', en: '' }, trigger: { at: point } }
+  - { id: va08-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '外部に頼んでも、高いだけで何も変わりません。', en: '' }, trigger: { at: point } }
+  - { id: va08-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '外部に相談するのは、責任逃れに見えるぞ。', en: '' }, trigger: { at: point } }
+  - { id: va08-ok, media: chat, misleading: false, text: { ja: '無料の相談窓口があります。まず話だけでも。', en: '' }, trigger: { at: point } }
+  - { id: va08-after, media: boss, misleading: false, text: { ja: '外に出す前に、社内でできることがあるだろう。', en: '' }, trigger: { at: after, choice: an08-call-plus } }
+  - { id: va09-past, media: boss, misleading: true, type: past-success, text: { ja: '前も顧客に伝えずに収まった。今回も同じでいい。', en: '' }, trigger: { at: point } }
+  - { id: va09-law, media: board, misleading: true, type: law-ish, text: { ja: 'AIに入れただけなら、漏えいではない。契約違反にもならない。', en: '' }, trigger: { at: point } }
+  - { id: va09-ok, media: chat, misleading: false, text: { ja: '営業「A社の担当者は、明日の朝には知ると思います」。', en: '' }, trigger: { at: point } }
+  - { id: va09-after, media: news, misleading: false, text: { ja: 'すぐ白状するのか。顧客は離れるぞ。', en: '' }, trigger: { at: after, choice: an09-escalate-plus } }
+  - { id: va10-law, media: board, misleading: true, type: law-ish, text: { ja: '数百件なら報告はいらない。様子を見よう。', en: '' }, trigger: { at: point } }
+  - { id: va10-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が確定するまで外に出さない。余計な混乱を招く。', en: '' }, trigger: { at: point } }
+  - { id: va10-ok, media: chat, misleading: false, text: { ja: '法務「個人データの漏えいのおそれがあれば、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
+  - { id: va10-after, media: news, misleading: false, text: { ja: 'まだ確定していないのに報告するのか。後で訂正するのか。', en: '' }, trigger: { at: after, choice: an10-materials-plus } }
+  - { id: va11-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '早く結論を出せ。広報が待っている。', en: '' }, trigger: { at: point } }
+  - { id: va11-law, media: board, misleading: true, type: law-ish, text: { ja: '技術的な詳細は書かないほうが、後の責任を避けられます。', en: '' }, trigger: { at: point } }
+  - { id: va11-ok, media: chat, misleading: false, text: { ja: '確認できた事実と、まだ分からないことを分けて書いてもらいましょう。', en: '' }, trigger: { at: point } }
+  - { id: va11-after, media: news, misleading: false, text: { ja: 'まだ原因も分からないのか。', en: '' }, trigger: { at: after, choice: an11-facts-plus } }
+  - { id: va12-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '社内に詳しく言うと、必ず外に漏れる。説明は最小限にしろ。', en: '' }, trigger: { at: point } }
+  - { id: va12-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場は忙しい。説明会を開くと、かえって混乱します。', en: '' }, trigger: { at: point } }
+  - { id: va12-ok, media: chat, misleading: false, text: { ja: '総務「社内掲示板に、何が起きたか分からないという書き込みが増えています」。', en: '' }, trigger: { at: point } }
+  - { id: va12-after, media: sns, misleading: false, text: { ja: '相談窓口を作っても、使う社員がいるのか。', en: '' }, trigger: { at: after, choice: an12-dialogue } }
+  - { id: va13-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '禁止が一番安全で、説明も簡単だ。使わせ続ける理由を説明できるのか。', en: '' }, trigger: { at: point } }
+  - { id: va13-popular, media: sns, misleading: true, type: popular, text: { ja: '他の会社も、生成AIは全面禁止にしていますよ。', en: '' }, trigger: { at: point } }
+  - { id: va13-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '全面禁止を高らかに宣言すれば、株主に響きますよ。', en: '' }, trigger: { at: point } }
+  - { id: va13-ok, media: chat, misleading: false, text: { ja: '情報システム部「管理された環境なら、入力制限も記録もできます」。', en: '' }, trigger: { at: point } }
+  - { id: va13-after, media: sns, misleading: false, text: { ja: '社員の便利を優先するのか。情報管理はどうなった。', en: '' }, trigger: { at: after, choice: an13-enforce } }
+  - { id: va14-law, media: board, misleading: true, type: law-ish, text: { ja: '私物端末は会社の管理外だ。調べる権限はない。', en: '' }, trigger: { at: point } }
+  - { id: va14-coward, media: news, misleading: true, type: coward-critique, text: { ja: '甘く見られると、隠れ利用が広がる。ここで締めないと終わらない。', en: '' }, trigger: { at: point } }
+  - { id: va14-ok, media: chat, misleading: false, text: { ja: '情報システム部「私物の利用は、会社のログには残っていません」。', en: '' }, trigger: { at: point } }
+  - { id: va14-after, media: sns, misleading: false, text: { ja: '自己申告を募るだけで、何か変わるのか。', en: '' }, trigger: { at: after, choice: an14-improve } }
+  - { id: va15-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '処分しないと示しがつかない。表彰も取り消すべきだ。', en: '' }, trigger: { at: point } }
+  - { id: va15-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '甘い処分は、ルールが形だけだと証明する。', en: '' }, trigger: { at: point } }
+  - { id: va15-ok, media: chat, misleading: false, text: { ja: '人事「本人は、ルール作りに協力したいと言っています」。', en: '' }, trigger: { at: point } }
+  - { id: va15-after, media: sns, misleading: false, text: { ja: '処分しない会社。甘すぎる。', en: '' }, trigger: { at: after, choice: an15-involve } }
+  - { id: va16-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '監査を受け入れると、他の顧客にも知られます。営業が持ちません。', en: '' }, trigger: { at: point } }
+  - { id: va16-law, media: board, misleading: true, type: law-ish, text: { ja: '契約上、賠償責任はない。認める必要はありません。', en: '' }, trigger: { at: point } }
+  - { id: va16-ok, media: chat, misleading: false, text: { ja: '法務「契約上の責任の有無は、監査の結果とあわせて示すべきです」。', en: '' }, trigger: { at: point } }
+  - { id: va16-after, media: news, misleading: false, text: { ja: '責任を認めるのか。株主に説明できるのか。', en: '' }, trigger: { at: after, choice: an16-open } }
+  - { id: va17-flattery, media: chat, misleading: true, type: flattery, text: { ja: '準備なんていりません。あなたなら、その場で答えられます。', en: '' }, trigger: { at: point } }
+  - { id: va17-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '質問を制限すれば、失敗しません。時間を守ることが一番です。', en: '' }, trigger: { at: point } }
+  - { id: va17-public, media: sns, misleading: true, type: public-opinion, text: { ja: '会見を開いて説明すれば済む。準備なんていらない。', en: '' }, trigger: { at: point } }
+  - { id: va17-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '会見なんて開かなければいい。長引くだけです。', en: '' }, trigger: { at: point } }
+  - { id: va17-ok, media: chat, misleading: false, text: { ja: '広報「記録を手元に置いて、事実だけ答えましょう」。', en: '' }, trigger: { at: point } }
+  - { id: va17-after, media: news, misleading: false, text: { ja: '台本を読んでいるだけ。誠意がない。', en: '' }, trigger: { at: after, choice: an17-ready } }
+  - { id: va18-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'いつまでも止めているのは臆病すぎる。他社はもう使っている。', en: '' }, trigger: { at: point } }
+  - { id: va18-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '新しい安全な製品を買えば解決します。まずは導入を決めましょう。', en: '' }, trigger: { at: point } }
+  - { id: va18-ok, media: chat, misleading: false, text: { ja: '技術責任者「入力制限を技術で強制すれば、再開できます」。', en: '' }, trigger: { at: point } }
+  - { id: va18-after, media: sns, misleading: false, text: { ja: '再開が遅い。現場は待ってくれない。', en: '' }, trigger: { at: after, choice: an18-staged } }
+  - { id: va19-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '全文を出すと、攻撃に使われます。都合の悪い部分は伏せましょう。', en: '' }, trigger: { at: point } }
+  - { id: va19-law, media: news, misleading: true, type: law-ish, text: { ja: '確報は、書ける範囲だけ書けばいい。全部を出す義務はありません。', en: '' }, trigger: { at: point } }
+  - { id: va19-ok, media: chat, misleading: false, text: { ja: '調査委員「未解決の課題も、隠さずに書けます」。', en: '' }, trigger: { at: point } }
+  - { id: va19-after, media: news, misleading: false, text: { ja: '今さら全部を出すのか。宣伝か。', en: '' }, trigger: { at: after, choice: an19-open } }
+  - { id: va20-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '研修なんて形だけ。やめればいい。', en: '' }, trigger: { at: point } }
+  - { id: va20-popular, media: sns, misleading: true, type: popular, text: { ja: '他の会社も、年に一度だけですよ。', en: '' }, trigger: { at: point } }
+  - { id: va20-ok, media: chat, misleading: false, text: { ja: '教育担当「実際に起きたことを教材にすると、伝わります」。', en: '' }, trigger: { at: point } }
+  - { id: va20-after, media: sns, misleading: false, text: { ja: '業界に共有して、何の得があるんだ。', en: '' }, trigger: { at: after, choice: an20-share } }
+  - { id: va-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「調査中」なんだ。', en: '' }, trigger: { at: manual } }
+  - { id: va-coward-3, media: sns, misleading: false, text: { ja: '担当者は何も決められないのか。事なかれ主義だ。', en: '' }, trigger: { at: manual } }
+  - { id: va-coward-4, media: news, misleading: false, text: { ja: '臆病な対応が、隠れ利用を広げた。取引先が独自に確認を始めている。', en: '' }, trigger: { at: manual } }
+  - { id: va-ev-sns, media: sns, misleading: false, text: { ja: 'うちの会社も、同じことしてたかも。', en: '' }, trigger: { at: manual } }
+  - { id: va-ev-board, media: board, misleading: false, text: { ja: '社内掲示板「現場は何をしている。説明が欲しい」。', en: '' }, trigger: { at: manual } }
+  - { id: va-ev-customer, media: chat, misleading: false, text: { ja: '顧客A社「入力された情報の範囲を、技術的に説明してほしい」。', en: '' }, trigger: { at: manual } }
