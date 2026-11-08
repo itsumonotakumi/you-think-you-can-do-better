@@ -6,8 +6,6 @@ import {
 
 test.describe('2回目のプレイ', () => {
   test('ロール選択・本編・エンディングに「2回目」が出る', async ({ page }) => {
-    // 不具合1（i18n 未初期化)のため、文言の確認ができない。修正後にこの行を消す。
-    test.fixme(true, DEFECT_I18N);
     test.setTimeout(420_000);
 
     // 1回目を最後まで遊ぶ

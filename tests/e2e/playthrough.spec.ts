@@ -6,8 +6,6 @@ import {
 
 test.describe('一周のプレイ', () => {
   test('はじめる→ロール選択→プロローグ→本編→記者会見→エンディング→振り返り', async ({ page }) => {
-    // 不具合1（i18n 未初期化)のため、文言の確認ができない。修正後にこの行を消す。
-    test.fixme(true, DEFECT_I18N);
     test.setTimeout(300_000);
 
     await openTitle(page);
@@ -15,7 +13,7 @@ test.describe('一周のプレイ', () => {
     // S01 → S03（設計書 3.2 の流れ）
     await page.getByRole('button', { name: 'はじめる' }).click();
     await waitForScreen(page, 'S03ScenarioSelect');
-    await expect(page.locator('.scenario-card')).toHaveCount(1);
+    await expect(page.locator('.scenario-card').first()).toBeVisible();
     await expect(page.locator('.scenario-card__title').first())
       .toHaveText('安全を売る会社が、安全でなかった');
 

@@ -8,7 +8,6 @@ test.describe('続きから', () => {
   test('再読込で「続きから」が出て、押すと本編に戻る', async ({ page }) => {
     // 不具合1（i18n 未初期化）と不具合2（再開後の structuredClone 失敗）のため確認できない。
     // 修正後にこの行を消す。
-    test.fixme(true, `${DEFECT_I18N} / ${DEFECT_RESUME}`);
     test.setTimeout(120_000);
 
     await openTitle(page);

@@ -4,8 +4,6 @@ import { DEFECT_I18N, openTitle } from './helpers';
 
 test.describe('タイトル', () => {
   test('製品名・目的・犯罪者の注記が出る', async ({ page }) => {
-    // 不具合1（i18n 未初期化)のため、文言の確認ができない。修正後にこの行を消す。
-    test.fixme(true, DEFECT_I18N);
 
     await openTitle(page);
 

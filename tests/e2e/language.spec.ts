@@ -4,8 +4,6 @@ import { DEFECT_I18N, openTitle, waitForScreen } from './helpers';
 
 test.describe('言語切替', () => {
   test('設定で English を選ぶとタイトルと設定画面が英語になる', async ({ page }) => {
-    // 不具合1（i18n 未初期化)のため、文言の確認ができない。修正後にこの行を消す。
-    test.fixme(true, DEFECT_I18N);
 
     await openTitle(page);
     await page.getByRole('button', { name: '設定' }).click();

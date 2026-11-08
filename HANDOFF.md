@@ -1,6 +1,6 @@
 # HANDOFF
 
-最終更新: 2026-11-08（Wave1b 完了 / Wave2 実行中）
+最終更新: 2026-11-08（Wave2 完了 / Wave3 実行中）
 
 ## 体制
 - オーケストレーター: Claude Opus 5.5（計画・契約・マージ判断）
@@ -25,8 +25,12 @@
 - Wave1 ✅ 8並列: engine-core / engine-read / validate / storage-i18n / audio-fx / screens-a / screens-b / scenario-no1（結合時修正: validator のゲージ検査、UI キーの平坦化、相対 import、YAML 引用符）
 - Wave1b ✅ 5並列: screens-c（S07〜S09）/ No.1 の officer・lead・analyst / C11〜C13（実エンジンでの決定的シミュレーション方式）
   - 結合後: validate OK、単体テスト 372件合格、svelte-check 0、vite build 成功
-- Wave2 🔄 8並列: E2E（Playwright）/ 脆弱性検査 app・build / シナリオ No.2〜No.6 の経営者ロール
-- Wave3: No.7〜No.10 経営者ロール、脆弱性・E2E の指摘修正、Codex 品質検査
+- Wave2 ✅ 8並列: E2E（Playwright）/ 脆弱性検査 app・build / シナリオ No.2〜No.6 の経営者ロール
+  - E2E で発見: i18n 未初期化（main.ts で初期化して修正）、続きからで $state プロキシを渡していた（$state.snapshot で修正）
+  - 結合後: シナリオ6本、単体 423件、E2E 12件（PC・スマホ幅）すべて合格
+  - 脆弱性検査の指摘（中）: 保存データの要素検証不足、build-data の id 未検証・検査迂回、denylist の fail-open、Actions の SHA 未固定
+- Wave3 🔄 OpenCode 6並列: No.7〜No.10 経営者ロール / fix-app（保存データ検証・例外境界）/ fix-build（検査ツールと CI の強化）＋ Codex 品質検査2本
+- 残り: Actions の SHA 固定（fix-build のマージ後にオーケストレーターが gh api で実施）、Codex 指摘の修正
 - Wave4〜: No.2〜No.10 の残りロール、英語本文、音声素材
 
 ## 運用メモ
@@ -42,4 +46,4 @@
 - 音声素材の選定と置き場所（設計書 18章）
 - references.yaml の原典確認（公開前に人手）
 - origin への push（現在はローカル main のみ）
-- Codex の認証切れ（`codex login` が必要）。品質検査は未実施
+- Codex: `~/.codex/config.toml` の書き間違い（reqiores_openai_auth）を修正済み（バックアップ: config.toml.bak-20261108）
