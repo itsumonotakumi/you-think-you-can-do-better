@@ -1,0 +1,117 @@
+# No.9 ハマカゼ総合医療センター（地域中核病院）
+# 元事件は「構造」だけを参考にしたフィクション。病院名・人物名・数字はすべて架空。
+id: no09-hamakaze
+version: '1.0.0'
+status: latest
+published: '2026-11-08'
+sourcePeriod: { ja: '2022年の病院ランサムの構造を参考にしたフィクション', en: '' }
+difficulty: 4
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: 'カルテが開かない。急患は来る', en: '' }
+tagline: { ja: '委託先のVPNから入られ、電子カルテが止まった。地域の救急を預かる病院長として、何を守るか。', en: '' }
+company:
+  name: { ja: 'ハマカゼ総合医療センター', en: '' }
+  industry: { ja: '地域中核病院（急性期医療）', en: '' }
+  size: { ja: '職員1,200名、病床520床', en: '' }
+  people:
+    - id: director
+      name: { ja: '佐久間 玲子', en: '' }
+      title: { ja: '病院長', en: '' }
+    - id: admin
+      name: { ja: '早瀬 達也', en: '' }
+      title: { ja: '事務局長', en: '' }
+    - id: infosec
+      name: { ja: '三村 佳澄', en: '' }
+      title: { ja: '医療情報部長', en: '' }
+    - id: pr
+      name: { ja: '野々宮 薫', en: '' }
+      title: { ja: '広報室長', en: '' }
+    - id: nurse
+      name: { ja: '大森 千夏', en: '' }
+      title: { ja: '看護部長', en: '' }
+    - id: vendor
+      name: { ja: '外山 修', en: '' }
+      title: { ja: '給食委託先の運用担当', en: '' }
+start: { day: 0, minutes: 330 }
+initialGauges: { damage: 25, flame: 0, trust: 70, stamina: 100 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-stop
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: 'なぜ診療を止めたのですか。止める必要はあったのですか。', en: '' }
+      answers:
+        - { id: a-stop-fault, text: { ja: '設備の故障です。', en: '' }, points: -80 }
+        - { id: a-stop-admit, text: { ja: 'サイバー攻撃で電子カルテが使えなくなり、安全を確認できなかったためです。', en: '' }, points: 30 }
+        - { id: a-stop-note, text: { ja: '攻撃の全体像を確認するまで、患者の安全を優先して診療を制限しました。判断の時刻と記録は公開します。', en: '' }, points: 80, requiresNote: note-outage }
+    - id: q-delay
+      seconds: 25
+      timeoutPoints: -30
+      text: { ja: 'なぜ気づくのが遅れたのですか。', en: '' }
+      answers:
+        - { id: a-delay-attack, text: { ja: '高度な攻撃だったためです。', en: '' }, points: -80 }
+        - { id: a-delay-design, text: { ja: '委託先を含むネットワークの監視と、端末の権限管理が不十分でした。', en: '' }, points: 30 }
+        - { id: a-delay-note, text: { ja: '侵入口と経緯を検証し、再発防止策とあわせて公表します。', en: '' }, points: 80, requiresNote: note-entry }
+    - id: q-data
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: '患者の診療情報は漏れたのですか。', en: '' }
+      answers:
+        - { id: a-data-none, text: { ja: '漏れていません。', en: '' }, points: -100 }
+        - { id: a-data-admit, text: { ja: '一部が外部に公開されたことを確認しています。', en: '' }, points: 30 }
+        - { id: a-data-note, text: { ja: '公開された範囲を特定し、対象の患者本人に通知し、相談窓口を設けています。', en: '' }, points: 80, requiresNote: note-leak }
+    - id: q-ransom
+      seconds: 20
+      timeoutPoints: -30
+      text: { ja: '身代金は支払ったのですか。', en: '' }
+      answers:
+        - { id: a-ransom-paid, text: { ja: '支払いました。', en: '' }, points: -100 }
+        - { id: a-ransom-nocomment, text: { ja: '答えられません。', en: '' }, points: -30 }
+        - { id: a-ransom-refuse, text: { ja: '支払っていません。警察に相談し、犯罪組織への資金提供を避けました。', en: '' }, points: 80 }
+    - id: q-region
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '地域の救急はどうなるのですか。', en: '' }
+      answers:
+        - { id: a-region-unknown, text: { ja: '未定です。', en: '' }, points: -50 }
+        - { id: a-region-plan, text: { ja: '受け入れ先の病院と調整し、再開の見通しを毎日公表します。', en: '' }, points: 30 }
+  extraQuestions:
+    - when: { flags: { hidAttack: true } }
+      question:
+        id: q-hidden
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '当初「システム障害」と説明したのはなぜですか。', en: '' }
+        answers:
+          - { id: a-hidden-avoid, text: { ja: '混乱を避けるためです。', en: '' }, points: -100 }
+          - { id: a-hidden-late, text: { ja: '攻撃と分かった時点で公表が遅れました。', en: '' }, points: 30 }
+          - { id: a-hidden-correct, text: { ja: '隠す意図はありませんでしたが、最初の説明は不正確でした。経緯を公表します。', en: '' }, points: 80 }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '電子カルテは二週間で戻り、救急の受け入れも再開した。調査報告書は地域の医療機関に共有され、委託先との契約も作り直された。朝の申し送りで、看護部長が「紙の手順書が役に立った」と言った。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが、患者と地域の信頼は戻った。診療収入は半年で事件前の水準に近づき、委託先との関係も続いている。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '病院は立ち直ったが、紹介患者の一部は他の病院に流れた。地域での立場を取り戻すには、時間がかかる。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '第三者委員会は初動の遅れと権限管理の不備を指摘し、院長は辞任した。残った職員が、限られた予算で再建を進めている。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '行政指導と損害賠償の請求が重なり、一部の診療科を閉じた。それでも救急の電話は鳴り続ける。どこで判断を誤ったのか、記録を読み返す日が続く。', en: '' }
+salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 10, min: 40, max: 130 }
