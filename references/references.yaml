@@ -179,3 +179,19 @@
   summary: { ja: "遠隔勤務の情報管理と、働く人の健康への配慮を両立させる", en: "Balance information control and worker well-being in remote work" }
   checkedAt: 2026-11-08
   legalPack: jp
+- id: no07-ipa-insider
+  title: { ja: "組織における内部不正防止ガイドライン", en: "Guidelines for Preventing Insider Fraud in Organizations" }
+  issuer: { ja: "IPA（情報処理推進機構）", en: "IPA" }
+  version: "2026-11"
+  section: { ja: "基本方針、組織体制、権限管理、監視・検知、従業者の管理", en: "Policy, organization, access control, monitoring, workforce management" }
+  summary: { ja: "管理者権限の棚卸し、監査ログの保存、外部媒体への書き出し制限を、研修だけでなく仕組みとして備える", en: "Use access reviews, audit log retention, and export restrictions as mechanisms, not training alone" }
+  checkedAt: 2026-11-08
+  legalPack: jp
+- id: no07-dispatch-law
+  title: { ja: "労働者派遣事業の適正な運営の確保及び派遣労働者の保護等に関する法律", en: "Act on Securing Proper Operation of Worker Dispatch Undertakings and Protection of Dispatched Workers" }
+  issuer: { ja: "厚生労働省", en: "Ministry of Health, Labour and Welfare" }
+  version: "2026-11"
+  section: { ja: "派遣元事業主と派遣先の責任分担、秘密保持", en: "Responsibilities of the staffing agency and the client, confidentiality" }
+  summary: { ja: "派遣元と派遣先は、それぞれの立場で個人情報の管理と指揮命令の範囲を明確にする", en: "Both the agency and the client must clarify data management and the scope of direction" }
+  checkedAt: 2026-11-08
+  legalPack: jp

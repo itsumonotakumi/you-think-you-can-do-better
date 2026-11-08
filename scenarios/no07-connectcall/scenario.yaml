@@ -1,0 +1,111 @@
+# No.7 コネクトコール（コールセンター受託）
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+id: no07-connectcall
+version: '1.0.0'
+status: latest
+published: '2026-11-08'
+sourcePeriod: { ja: '2023年の内部不正事案の構造を参考にしたフィクション', en: '' }
+difficulty: 3
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: '10年間、誰も気づかなかった', en: '' }
+tagline: { ja: '派遣の管理者権限、数十社の顧客名簿、10年分の記録。経営者の判断が試される。', en: '' }
+company:
+  name: { ja: 'コネクトコール株式会社', en: '' }
+  industry: { ja: 'コールセンター・BPO受託', en: '' }
+  size: { ja: '従業員1,200名（うち派遣・業務委託700名）、グループ会社2社', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '真壁 修司', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: cfo
+      name: { ja: '八木 沙耶', en: '' }
+      title: { ja: '取締役管理本部長', en: '' }
+    - id: cso
+      name: { ja: '倉橋 直人', en: '' }
+      title: { ja: '情報システム部長', en: '' }
+    - id: pr
+      name: { ja: '藤崎 玲奈', en: '' }
+      title: { ja: '広報部長', en: '' }
+    - id: hr
+      name: { ja: '久住 圭', en: '' }
+      title: { ja: '人事・派遣管理部長', en: '' }
+    - id: ops
+      name: { ja: '大村 健司', en: '' }
+      title: { ja: 'オペレーション統括部長', en: '' }
+start: { day: 0, minutes: 600 }
+initialGauges: { damage: 20, flame: 0, trust: 65, stamina: 100 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-why
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: 'なぜ10年も気づかなかったのですか。', en: '' }
+      answers:
+        - { id: a-why-none, text: { ja: '確認しておりません。', en: '' }, points: -40 }
+        - { id: a-why-agency, text: { ja: '派遣元の管理の問題です。', en: '' }, points: -80 }
+        - { id: a-why-design, text: { ja: '管理者権限の棚卸しと、監査ログの保存期間の設計が不十分でした。', en: '' }, points: 40 }
+        - { id: a-why-verify, text: { ja: '権限の棚卸しと監査ログの不足を検証し、報告書で公表します。', en: '' }, points: 80, requiresNote: note-audit }
+    - id: q-scale
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '影響するクライアントは何社ですか。', en: '' }
+      answers:
+        - { id: a-scale-many, text: { ja: '多数です。', en: '' }, points: -30 }
+        - { id: a-scale-known, text: { ja: '確認できた範囲で十数社です。', en: '' }, points: 40 }
+        - { id: a-scale-update, text: { ja: '確認できた十数社と、調査中の範囲を分けて公表し、更新します。', en: '' }, points: 80, requiresNote: note-scale }
+    - id: q-victims
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: 'クライアントの顧客への補償はどうしますか。', en: '' }
+      answers:
+        - { id: a-victims-none, text: { ja: 'クライアントの判断です。', en: '' }, points: -60 }
+        - { id: a-victims-share, text: { ja: 'クライアントと費用を分担し、共同の窓口を設けています。', en: '' }, points: 40 }
+        - { id: a-victims-tier, text: { ja: '費用を分担し、被害の重さに応じた段階補償と説明会を用意しています。', en: '' }, points: 80 }
+    - id: q-training
+      seconds: 25
+      timeoutPoints: -30
+      text: { ja: '犯人は社内研修で満点だったそうですね。', en: '' }
+      answers:
+        - { id: a-training-none, text: { ja: '研修は関係ありません。', en: '' }, points: -40 }
+        - { id: a-training-more, text: { ja: '研修をさらに強化します。', en: '' }, points: 10 }
+        - { id: a-training-design, text: { ja: '研修の点数と、実際の権限管理は別です。研修だけでは防げない仕組みの欠陥を認めます。', en: '' }, points: 80 }
+  extraQuestions:
+    - when: { flags: { hidAudit: true } }
+      question:
+        id: q-audit
+        seconds: 30
+        timeoutPoints: -30
+        text: { ja: '監査ログが半年で消える設定だったのは本当ですか。', en: '' }
+        answers:
+          - { id: a-audit-none, text: { ja: '確認しておりません。', en: '' }, points: -100 }
+          - { id: a-audit-later, text: { ja: '設定の問題は、いずれ公表します。', en: '' }, points: 10 }
+          - { id: a-audit-own, text: { ja: '事実です。設定の経緯と再発防止を公表します。', en: '' }, points: 50 }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '事件前より信頼も受託も増えた。調査報告書は委託先管理の手本として引用され、復旧の朝にクライアントの担当者から短い感謝の言葉が届いた。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが信頼を取り戻し、主要クライアントの契約は更新された。失った信頼の一部は、時間をかけて戻すことになった。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '会社は立ち直ったが、大口のクライアントを一つ失った。残った取引先との関係を、一から作り直すことになった。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '第三者委員会は権限管理と監査の不備を指摘し、経営陣は辞任した。残された社員が、限られた予算で再発防止を進めている。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '行政指導と損害賠償請求が重なり、受託事業の一部を畳んだ。どこで判断を誤ったのか、記録を読み返す日が続く。', en: '' }
+salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 10, min: 40, max: 130 }
