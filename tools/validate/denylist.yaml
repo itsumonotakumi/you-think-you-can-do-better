@@ -1,7 +1,43 @@
 # 実名の混入検査（C16）と実在企業との比較（C20）。部分一致で検査する
 # 元事件の当事者企業・サービス名・人物名・攻撃に関与する国家の国名を追加していく
-companies: []
-services: []
+companies:
+  # 要件定義書の出典節に出る実在企業・団体
+  - GMO
+  - GMOインターネットグループ
+  - GMOペイメントゲートウェイ
+  - タイムズカー
+  - ニッポンレンタカー
+  - アサヒ
+  - アサヒグループホールディングス
+  - アサヒGHD
+  - NTT西日本
+  - NTT西日本グループ
+  - トヨタ
+  - トヨタ自動車
+  - Samsung
+  - 大阪急性期・総合医療センター
+  - ロイター
+services:
+  # 要件定義書の出典節に出る実在サービス・製品・媒体
+  - EC-CUBE
+  - Apache Struts
+  - Apache Struts 2
+  - J-PlatPat
+  - タイムズカーアプリ
+  - ニッポンレンタカーアプリ
+  - '@IT'
+  - ITmedia
+  - 神奈川新聞
+  - MONOist
+  - Impress Watch
+  - ビジネス+IT
+  - ScanNetSecurity
+  - The Register
+  - Korea Herald
+  - Asia News Network
+  - SO YOU THINK YOU CAN DANCE
+  - YOU CAN DO BETTER
+  - So You Think You Can Test?
 people: []
 countries: []
 # C20: 実在企業との比較表現（正規表現）
