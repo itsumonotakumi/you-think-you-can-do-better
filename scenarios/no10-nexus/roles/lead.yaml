@@ -3,7 +3,7 @@
 # 視点: 専任のセキュリティ部署がない会社で、情報システム部と総務を兼任で束ねる執行役員。
 #       技術の言葉を経営の言葉に訳し、証拠を守りながら、安全に使える環境を設計するのが仕事。
 estimateMinutes: 45
-intro: { ja: 'あなたはネクサス半導体の執行役員情報セキュリティ責任者。専任のセキュリティ部署はなく、情報システム部の五名と総務の二名を兼任で束ねている。生成AIの解禁から三週間。最初に気づいたのは、あなたのチームだった。技術の言葉を経営の言葉に訳し、証拠を守りながら、明日の使い方を決める。', en: '' }
+intro: { ja: 'あなたはネクサス半導体の執行役員情報セキュリティ責任者。専任のセキュリティ部署はなく、情報システム部の五名と総務の二名を兼任で束ねている。生成AIの解禁から五週間。最初に気づいたのは、あなたのチームだった。技術の言葉を経営の言葉に訳し、証拠を守りながら、明日の使い方を決める。', en: '' }
 pressEnabled: true
 cowardVoices:
   '2': v-coward-2
@@ -16,7 +16,7 @@ deadlines:
     points: -150
     doneFlag: ppcPrelimFiled
   - id: dl-ppc-final
-    ref: ppc-report-final-malicious
+    ref: ppc-report-final
     label: { ja: '個人情報保護委員会への確報', en: '' }
     points: -100
     doneFlag: ppcFinalFiled
@@ -42,7 +42,7 @@ points:
     at: { day: 0, minutes: 570 }
     phase: detect
     sound: { se: [notify_chat] }
-    text: { ja: '午前9時30分。兼任のメンバーから連絡が入る。「社内で使っている生成AIサービスの管理画面に、装置制御のソースコードらしい入力が残っています。誰が入れたかは、まだ分かりません」。解禁から三週間。まず何を守るか。', en: '' }
+    text: { ja: '午前9時30分。兼任のメンバーから連絡が入る。「社内で使っている生成AIサービスの管理画面に、装置制御のソースコードらしい入力が残っています。誰が入れたかは、まだ分かりません」。解禁から五週間。まず何を守るか。', en: '' }
     voices: [v01-boss, v01-field, v01-ok]
     choices:
       - id: p01-later
@@ -55,7 +55,7 @@ points:
         coward: true
         setFlags: { delayedTriage: true }
         delayed:
-          - { afterPhases: 1, points: -40, gauges: { damage: 15 }, reason: { ja: '確認が遅れた間に、同じ顧客情報が別の部署でも入力されていた。', en: '' } }
+          - { afterPhases: 1, points: -40, gauges: { damage: 15 }, reason: { ja: '確認が遅れた間に、同じ種類の入力が別の部署でも続いていた。', en: '' } }
         items:
           - { id: p01-a-time, points: -10, axis: time, refs: [jpcert-handling] }
           - { id: p01-a-order, points: -8, axis: order, refs: [cissp-cbk-secops] }
@@ -102,7 +102,7 @@ points:
     at: { day: 0, minutes: 690 }
     phase: detect
     sound: { se: [notify_chat] }
-    text: { ja: '午前11時30分。管理画面を集計すると、三週間で412人が使い、入力は数千件あった。設計部、営業部、製造本部。どこまで見るかで、その後のすべてが変わる。', en: '' }
+    text: { ja: '午前11時30分。管理画面を集計すると、五週間で412人が使い、入力は数千件あった。設計部、営業部、製造本部。どこまで見るかで、その後のすべてが変わる。', en: '' }
     voices: [v02-law, v02-field, v02-ok]
     popular: { choiceId: p02-sample, percent: 62 }
     choices:
@@ -477,7 +477,7 @@ points:
     at: { day: 1, minutes: 1170 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '午後7時30分。そもそも、いつから入っていたのか。AI事業者の管理画面には九十日分残っているが、社内の端末記録は二週間で上書きされ、私物端末の入力は会社の記録に残っていない。三週間の全体は、追えない。', en: '' }
+    text: { ja: '午後7時30分。そもそも、いつから入っていたのか。AI事業者の管理画面には入力の本文は残っているが、どの端末から誰が入れたかは共有アカウント分が区別できない。社内の端末記録は二週間で上書きされ、私物端末の入力は会社の記録にない。', en: '' }
     voices: [v09-expert, v09-boss, v09-ok]
     notable:
       - { id: note-ai-log, text: { ja: '入力履歴のうち、いつ誰が何を入れたかは、期間の一部しか復元できない。', en: '' } }
@@ -720,6 +720,7 @@ points:
         points: -60
         refs: [no10-ai-guideline]
         gauges: { trust: -5, stamina: 5 }
+        setFlags: { bannedAI: true }
         items:
           - { id: p13-b-content, points: -8, axis: content, refs: [no10-ai-guideline] }
           - { id: p13-b-order, points: -5, axis: order, refs: [no10-ipa-genai] }
@@ -839,14 +840,14 @@ points:
           - { id: p15-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
           - { id: p15-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
       - id: p15-plan-verify
-        text: { ja: '復旧計画に加え、復元テスト、共有の資格情報の全失効、監視の強化の結果を添えて監査に出す。', en: '' }
+        text: { ja: '復旧計画に加え、入力経路の遮断、共有アカウントの廃止、監視の強化の結果を添えて監査に出す。', en: '' }
         minutes: 240
         category: recover
         points: 120
         refs: [nist-sp800-61r3, cissp-cbk-secops]
         gauges: { flame: -10, trust: 15, stamina: -15 }
         detail: recovery-plan
-        setFlags: { recoveryDoc: true, credentialsRotated: true }
+        setFlags: { recoveryDoc: true, sharedAccountsRemoved: true }
         items:
           - { id: p15-d-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
           - { id: p15-d-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
@@ -918,46 +919,46 @@ points:
         minutes: 120
         category: hurt
         points: -120
-        refs: [ppc-report-final-malicious]
+        refs: [ppc-report-final]
         gauges: { flame: 10, trust: -10 }
         coward: true
         setFlags: { finalDelayed: true }
         items:
-          - { id: p17-a-time, points: -10, axis: time, refs: [ppc-report-final-malicious] }
-          - { id: p17-a-record, points: -10, axis: record, refs: [ppc-report-final-malicious] }
+          - { id: p17-a-time, points: -10, axis: time, refs: [ppc-report-final] }
+          - { id: p17-a-record, points: -10, axis: record, refs: [ppc-report-final] }
       - id: p17-oral
         text: { ja: '書類だけ出し、説明は口頭で済ませる。', en: '' }
         minutes: 60
         category: hurt
         points: -60
-        refs: [ppc-report-final-malicious]
+        refs: [ppc-report-final]
         gauges: { trust: -5 }
         setFlags: { ppcFinalFiled: true }
         items:
           - { id: p17-b-record, points: -8, axis: record, refs: [meti-disclosure-guidance] }
-          - { id: p17-b-content, points: -8, axis: content, refs: [ppc-report-final-malicious] }
+          - { id: p17-b-content, points: -8, axis: content, refs: [ppc-report-final] }
       - id: p17-min
         text: { ja: '分かっている範囲で確報を出し、件数が動く可能性を書く。', en: '' }
         minutes: 180
         category: maintain
         points: 20
-        refs: [ppc-report-final-malicious]
+        refs: [ppc-report-final]
         gauges: { trust: 5, stamina: -10 }
         setFlags: { ppcFinalFiled: true }
         items:
-          - { id: p17-c-time, points: 8, axis: time, refs: [ppc-report-final-malicious] }
-          - { id: p17-c-content, points: 8, axis: content, refs: [ppc-report-final-malicious] }
+          - { id: p17-c-time, points: 8, axis: time, refs: [ppc-report-final] }
+          - { id: p17-c-content, points: 8, axis: content, refs: [ppc-report-final] }
           - { id: p17-c-record, points: 5, axis: record, refs: [jpcert-handling] }
       - id: p17-open
         text: { ja: '全項目を報告し、未解決の課題も含めて公開する。更新の予定と窓口も添える。', en: '' }
         minutes: 240
         category: recover
         points: 100
-        refs: [ppc-report-final-malicious, meti-disclosure-guidance]
+        refs: [ppc-report-final, meti-disclosure-guidance]
         gauges: { flame: -10, trust: 15, stamina: -15 }
         setFlags: { ppcFinalFiled: true, fullDisclosure: true }
         items:
-          - { id: p17-d-content, points: 8, axis: content, refs: [ppc-report-final-malicious] }
+          - { id: p17-d-content, points: 8, axis: content, refs: [ppc-report-final] }
           - { id: p17-d-record, points: 8, axis: record, refs: [meti-disclosure-guidance] }
           - { id: p17-d-care, points: 8, axis: care, refs: [ppc-notify-person] }
           - { id: p17-d-order, points: 5, axis: order, refs: [meti-csm-guideline] }
@@ -1183,10 +1184,10 @@ drafts:
     title: { ja: '復旧計画', en: '' }
     slots:
       - id: clean
-        label: { ja: 'クリーンな環境', en: '' }
+        label: { ja: '入力経路', en: '' }
         options:
-          - { id: rp-c-new, text: { ja: '新規に構築し、イメージを検証する', en: '' }, points: 10, axis: content, refs: [nist-sp800-61r3] }
-          - { id: rp-c-reuse, text: { ja: '既存の環境をそのまま使う', en: '' }, points: -15, axis: content, refs: [nist-sp800-61r3] }
+          - { id: rp-c-gateway, text: { ja: '外部AIへの通信を許可リスト方式にし、管理環境以外を遮断する', en: '' }, points: 10, axis: content, refs: [no10-ai-guideline] }
+          - { id: rp-c-open, text: { ja: '通信経路は変えない', en: '' }, points: -15, axis: content, refs: [no10-ai-guideline] }
       - id: gate
         label: { ja: '入力制限の強制', en: '' }
         options:
@@ -1203,10 +1204,10 @@ drafts:
           - { id: rp-s-step, text: { ja: '設計部、営業部、全体の順に戻す', en: '' }, points: 8, axis: order, refs: [nist-sp800-61r3] }
           - { id: rp-s-all, text: { ja: '一斉に戻す', en: '' }, points: -10, axis: order, refs: [nist-sp800-61r3] }
       - id: creds
-        label: { ja: '資格情報', en: '' }
+        label: { ja: 'アカウント', en: '' }
         options:
-          - { id: rp-k-all, text: { ja: '共有の資格情報をすべて失効して再発行する', en: '' }, points: 10, axis: order, refs: [cissp-cbk-secops] }
-          - { id: rp-k-some, text: { ja: '分かっている分だけ変える', en: '' }, points: -10, axis: order, refs: [cissp-cbk-secops] }
+          - { id: rp-k-personal, text: { ja: 'AIサービスの共有アカウントを個人アカウントに切り替え、操作者を記録できるようにする', en: '' }, points: 10, axis: order, refs: [cissp-cbk-secops] }
+          - { id: rp-k-shared, text: { ja: '共有アカウントのまま', en: '' }, points: -10, axis: order, refs: [cissp-cbk-secops] }
       - id: rollback
         label: { ja: '切り戻しの条件', en: '' }
         options:
@@ -1227,7 +1228,7 @@ voices:
   - { id: v01-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場は便利に使っています。調査で止めると、設計が止まります。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: '兼任メンバー「管理画面の履歴は、まだ消していません。保全できます」。', en: '' }, trigger: { at: point } }
   - { id: v01-after, media: sns, misleading: false, text: { ja: '履歴を保全したところで、何が変わるんだ。', en: '' }, trigger: { at: after, choice: p01-preserve } }
-  - { id: v02-law, media: board, misleading: true, type: law-ish, text: { ja: '全部見る必要はない。目立つ数件で十分だ。', en: '' }, trigger: { at: point } }
+  - { id: v02-law, media: board, misleading: true, type: fake-expert, text: { ja: 'サンプル調査で統計的に十分です。全件は過剰です。', en: '' }, trigger: { at: point } }
   - { id: v02-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '入力の全部を調べるなんて、現場の残業を増やすだけです。', en: '' }, trigger: { at: point } }
   - { id: v02-ok, media: chat, misleading: false, text: { ja: '法務「機密区分と突き合わせないと、範囲は言えません」。', en: '' }, trigger: { at: point } }
   - { id: v03-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '顧客の条件表のことは、顧客が気づくまで伏せておけ。', en: '' }, trigger: { at: point } }
@@ -1251,11 +1252,11 @@ voices:
   - { id: v08-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '学習には使いません。削除もできます。口頭で申し上げたとおりです。', en: '' }, trigger: { at: point } }
   - { id: v08-law, media: board, misleading: true, type: law-ish, text: { ja: '口頭でも言質は取れています。書面まで求めると、関係が悪くなります。', en: '' }, trigger: { at: point } }
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '法務「契約書には、学習利用の定めがありません」。', en: '' }, trigger: { at: point } }
-  - { id: v09-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '分からない期間は、書かなかったことにすればいいじゃないですか。', en: '' }, trigger: { at: point } }
+  - { id: v09-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '欠損期間は推定で埋めて、注記なしで一本の時系列にしたほうが読み手に親切です。', en: '' }, trigger: { at: point } }
   - { id: v09-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: 'ログの欠損は、報告書に書かなくていい。', en: '' }, trigger: { at: point } }
   - { id: v09-ok, media: chat, misleading: false, text: { ja: '調査担当「端末側の記録に、当時の一部が残っています」。', en: '' }, trigger: { at: point } }
   - { id: v10-law, media: board, misleading: true, type: law-ish, text: { ja: '不確実なことは書かないほうがいい。後で訂正になります。', en: '' }, trigger: { at: point } }
-  - { id: v10-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'まだ出さないのか。他社はもう出している。', en: '' }, trigger: { at: point } }
+  - { id: v10-public, media: sns, misleading: false, text: { ja: 'まだ出さないのか。他社はもう出している。', en: '' }, trigger: { at: point } }
   - { id: v10-ok, media: chat, misleading: false, text: { ja: '広報「分かっている範囲で、今夜出したい」。', en: '' }, trigger: { at: point } }
   - { id: v10-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに速報を出すのか。また訂正か。', en: '' }, trigger: { at: after, choice: p10-factsheet-split } }
   - { id: v11-law, media: board, misleading: true, type: law-ish, text: { ja: '私物端末は会社の管理外だ。調べる権限はない。', en: '' }, trigger: { at: point } }

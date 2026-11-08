@@ -227,9 +227,9 @@ describe('no10-nexus / officer', () => {
     const deadlines = role.deadlines ?? [];
     expect(deadlines.length).toBeGreaterThanOrEqual(2);
     const prelim = deadlines.find((d) => d.ref === 'ppc-report-prelim');
-    const final = deadlines.find((d) => d.ref === 'ppc-report-final-malicious');
+    const final = deadlines.find((d) => d.ref === 'ppc-report-final');
     expect(prelim, 'ppc-report-prelim の期限がない').toBeTruthy();
-    expect(final, 'ppc-report-final-malicious の期限がない').toBeTruthy();
+    expect(final, 'ppc-report-final の期限がない').toBeTruthy();
     const choices = role.points.flatMap((p) => p.choices);
     for (const deadline of deadlines) {
       const setBy = choices.filter((c) => deadline && c.setFlags?.[deadline.doneFlag]);

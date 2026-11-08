@@ -177,7 +177,7 @@ describe('scenario no10-nexus', () => {
   it('deadline は速報と確報の根拠を使い、選択で done になる', () => {
     const deadlines = role.deadlines ?? [];
     const prelim = deadlines.find((d) => d.ref === 'ppc-report-prelim');
-    const final = deadlines.find((d) => d.ref === 'ppc-report-final-malicious');
+    const final = deadlines.find((d) => d.ref === 'ppc-report-final');
     expect(prelim, 'ppc-report-prelim の期限がない').toBeTruthy();
     expect(final, '確報の期限がない').toBeTruthy();
     for (const deadline of [prelim, final]) {
