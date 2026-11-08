@@ -56,10 +56,10 @@
     display: grid;
     gap: 0.4rem 1rem;
     padding: 0.6rem 0.8rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 8px;
-    background: var(--panel, #1b1f27);
-    color: var(--text, #e8e6e1);
+    background: var(--panel);
+    color: var(--text);
     font-size: 0.9rem;
   }
   .primary {
@@ -70,7 +70,7 @@
   }
   .play-count {
     font-weight: 700;
-    color: var(--accent, #d8b26a);
+    color: var(--accent);
   }
   .clock {
     display: inline-flex;
@@ -84,8 +84,8 @@
     letter-spacing: 0.04em;
   }
   .phase {
-    color: var(--muted, #a3a8b3);
-    border: 1px solid var(--border, #3a3f4b);
+    color: var(--muted);
+    border: 1px solid var(--line-strong);
     border-radius: 999px;
     padding: 0 0.5rem;
     font-size: 0.8rem;
@@ -99,18 +99,18 @@
     display: inline-flex;
     gap: 0.4rem;
     align-items: baseline;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
   }
   .deadline-label {
     font-weight: 600;
   }
   /* 期限の赤: 点滅させずに太くする（10.4） */
   .deadline[data-status='warn'] {
-    color: var(--warn, #e0a04a);
+    color: var(--warn);
     font-weight: 700;
   }
   .deadline[data-status='over'] {
-    color: var(--danger, #e05c5c);
+    color: var(--danger);
     font-weight: 800;
   }
   .gauges {
@@ -132,30 +132,30 @@
     font-variant-numeric: tabular-nums;
   }
   .level {
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
   }
   .meter {
     display: block;
     height: 4px;
     border-radius: 2px;
-    background: var(--track, #2a2f39);
+    background: var(--line);
     overflow: hidden;
   }
   .fill {
     display: block;
     height: 100%;
-    background: var(--accent, #d8b26a);
+    background: var(--accent);
   }
   .gauge[data-gauge='flame'] .fill {
-    background: #c9663f;
+    background: var(--gauge-flame);
   }
   .gauge[data-gauge='trust'] .fill {
-    background: #5f9e86;
+    background: var(--gauge-trust);
   }
   .gauge[data-gauge='stamina'] .fill {
-    background: #7a8db8;
+    background: var(--gauge-stamina);
   }
   .coward .fill {
-    background: #8a7bb0;
+    background: var(--gauge-coward);
   }
 </style>

@@ -227,19 +227,19 @@
     transform: rotate(-6deg);
   }
   .rank-s {
-    color: #e5c86a;
+    color: var(--warn);
   }
   .rank-a {
-    color: #9cc8ef;
+    color: var(--accent);
   }
   .rank-b {
-    color: #8fbf9f;
+    color: var(--ok);
   }
   .rank-c {
-    color: #c3cbd4;
+    color: var(--text-soft);
   }
   .rank-d {
-    color: #e2907f;
+    color: var(--danger);
   }
   .ending-text {
     margin: 0;
@@ -314,6 +314,7 @@
       width: 100%;
     }
   }
+  /* 印刷は紙面（白背景）を前提にするため、テーマ変数ではなく固定色を使う */
   @media print {
     :global(html),
     :global(body) {

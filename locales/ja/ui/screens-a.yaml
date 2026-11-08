@@ -80,6 +80,9 @@ sa.settings.fontSize: 文字サイズ
 sa.settings.fontSmall: 小
 sa.settings.fontMedium: 中
 sa.settings.fontLarge: 大
+sa.settings.theme: 画面の色
+sa.settings.themeLight: 白（既定）
+sa.settings.themeDark: ダーク
 sa.settings.bgm: BGMの音量
 sa.settings.se: 効果音の音量
 sa.settings.muted: ミュート

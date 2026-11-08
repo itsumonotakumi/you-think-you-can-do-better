@@ -104,7 +104,7 @@
     max-width: 48rem;
     margin: 0 auto;
     padding: 0.8rem;
-    color: var(--text, #e8e6e1);
+    color: var(--text);
   }
   h1 {
     margin: 0;
@@ -113,7 +113,7 @@
   h2 {
     margin: 0 0 0.4rem;
     font-size: 0.9rem;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
     font-weight: 600;
   }
   .title {
@@ -125,14 +125,14 @@
   .status,
   .empty {
     margin: 0;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
     font-size: 0.85rem;
   }
   .composed {
     padding: 0.8rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 8px;
-    background: var(--panel, #1b1f27);
+    background: var(--panel);
   }
   .composed :global(.typed) {
     line-height: 1.8;
@@ -144,18 +144,18 @@
   }
   button {
     padding: 0.5rem 0.9rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 6px;
-    background: var(--panel-2, #222731);
-    color: var(--text, #e8e6e1);
+    background: var(--panel-hover);
+    color: var(--text);
     font: inherit;
     cursor: pointer;
   }
   button:hover:not(:disabled) {
-    border-color: var(--accent, #d8b26a);
+    border-color: var(--accent);
   }
   button:focus-visible {
-    outline: 2px solid var(--focus, #8ab4f8);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
   button:disabled {
@@ -163,7 +163,7 @@
     cursor: default;
   }
   .confirm {
-    border-color: var(--accent, #d8b26a);
+    border-color: var(--accent);
   }
   @media (max-width: 639px) {
     .actions {

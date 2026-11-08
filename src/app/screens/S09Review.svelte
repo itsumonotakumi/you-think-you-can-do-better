@@ -640,6 +640,7 @@
       display: block;
     }
   }
+  /* 印刷は紙面（白背景）を前提にするため、テーマ変数ではなく固定色を使う */
   @media print {
     :global(html),
     :global(body) {

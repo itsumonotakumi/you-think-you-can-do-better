@@ -57,6 +57,11 @@
   let lastStartedAt = '';
 
   $effect(() => {
+    // 設定画面で配色を変えたとき、その場で html に反映する
+    document.documentElement.dataset.theme = $settings.theme;
+  });
+
+  $effect(() => {
     // 新しいプレイでは、前のプレイの字幕を持ち越さない
     const startedAt = $play?.startedAt ?? '';
     if (!startedAt || startedAt === lastStartedAt) return;

@@ -52,9 +52,9 @@
     gap: 0.4rem;
     margin: 0;
     padding: 0.6rem 0.8rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 6px;
-    background: var(--panel, #1b1f27);
+    background: var(--panel);
   }
   legend {
     padding: 0 0.3rem;
@@ -64,15 +64,15 @@
   .tag {
     margin-left: 0.4rem;
     padding: 0 0.4rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 999px;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
     font-size: 0.75rem;
     font-weight: 400;
   }
   .auto-value {
     margin: 0;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
     font-size: 0.9rem;
   }
   .options {
@@ -84,23 +84,23 @@
     gap: 0.55rem;
     align-items: baseline;
     padding: 0.45rem 0.55rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 5px;
     cursor: pointer;
   }
   .option.selected {
-    border-color: var(--accent, #d8b26a);
-    background: var(--panel-2, #222731);
+    border-color: var(--accent);
+    background: var(--panel-hover);
   }
   .option input {
     flex: 0 0 auto;
-    accent-color: var(--accent, #d8b26a);
+    accent-color: var(--accent);
   }
   .option span {
     line-height: 1.5;
   }
   .option:focus-within {
-    outline: 2px solid var(--focus, #8ab4f8);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 </style>

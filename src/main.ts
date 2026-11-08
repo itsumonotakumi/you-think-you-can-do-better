@@ -30,6 +30,8 @@ async function boot(): Promise<void> {
   const locales = await loadLocales();
   if (locales) initI18n(locales);
   const s = loadSettings();
+  // 描画前に配色を決める（ダーク設定なら初期表示から暗くする）
+  document.documentElement.dataset.theme = s.theme;
   setLang(s.lang);
   document.documentElement.lang = s.lang;
   settings.set(s);
