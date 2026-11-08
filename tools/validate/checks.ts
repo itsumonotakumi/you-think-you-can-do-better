@@ -1318,7 +1318,9 @@ export function checkC22(project: Project): Issue[] {
     if (isStr(entry.file)) {
       if (declaredFiles.has(entry.file)) report(out, file, entryValue, 'file', 'C22', `音素材の file が重複: ${entry.file}`);
       declaredFiles.add(entry.file);
-      if (!project.audioFiles.includes(entry.file)) {
+      // 音声ファイルは公開リポジトリに置かない。YTCDB_AUDIO=optional（通常の CI）では欠けを許す。Pages 配信では必須
+      const audioOptional = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.YTCDB_AUDIO === 'optional';
+      if (!audioOptional && !project.audioFiles.includes(entry.file)) {
         report(out, file, entryValue, 'file', 'C22', `manifest にある音声ファイルがない: audio/${entry.file}`);
       }
     }

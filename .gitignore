@@ -6,3 +6,8 @@ playwright-report/
 .worktrees/
 *.log
 .DS_Store
+# 音声素材は公開リポジトリに置かない（各配布元の規約: 素材単体の再配布禁止）
+audio/bgm/*
+audio/se/*
+!audio/bgm/.gitkeep
+!audio/se/.gitkeep

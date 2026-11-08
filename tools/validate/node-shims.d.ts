@@ -1,5 +1,6 @@
 // @types/node を追加しないための最小限の型宣言（ビルド時のみ使う API だけ）
 declare module 'node:fs' {
+  export function copyFileSync(src: string, dest: string): void;
   export interface Dirent {
     name: string;
     isDirectory(): boolean;

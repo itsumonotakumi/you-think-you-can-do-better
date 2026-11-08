@@ -7,7 +7,7 @@
     "validate": "node --experimental-strip-types tools/validate/index.ts",
     "build:data": "node --experimental-strip-types tools/build-data/index.ts",
     "dev": "npm run build:data && vite",
-    "build": "npm run validate && npm run build:data && vite build",
+    "build": "npm run validate && npm run build:data && vite build && node --experimental-strip-types tools/build-data/copy-audio.ts",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",

@@ -17,6 +17,17 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with: { node-version: 24, cache: npm }
+      # 音声素材は非公開リポジトリから取得し、配信物（dist/audio）にだけ含める
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: itsumonotakumi/ytcdb-audio
+          token: ${{ secrets.AUDIO_REPO_TOKEN }}
+          path: .audio-src
+          persist-credentials: false
+      - run: |
+          cp .audio-src/se/*.mp3 audio/se/
+          if ls .audio-src/bgm/*.mp3 >/dev/null 2>&1; then cp .audio-src/bgm/*.mp3 audio/bgm/; fi
+          rm -rf .audio-src
       - run: npm ci
       - run: npm run build
       - run: npm test
