@@ -15,7 +15,7 @@ deadlines:
     points: -150
     doneFlag: ppcPrelimFiled
   - id: dl-ppc-final
-    ref: ppc-report-final
+    ref: ppc-report-final-malicious
     label: { ja: '個人情報保護委員会への確報', en: '' }
     points: -150
     doneFlag: ppcFinalFiled
@@ -758,7 +758,7 @@ points:
     at: { day: 30, minutes: 600 }
     phase: after
     sound: { se: [notify_news] }
-    text: { ja: '30日目の午前10時。調査の報告書ができた。確報の期限も今日まで。公開する範囲と、何を次に残すかを決める。', en: '' }
+    text: { ja: '30日目の午前10時。調査の報告書ができた。確報の期限はまだ先だが、出す内容は今日のうちに決めたい。公開する範囲と、何を次に残すかを決める。', en: '' }
     voices: [v17-expert, v17-law, v17-ok]
     choices:
       - id: p17-hide
@@ -1039,7 +1039,7 @@ voices:
   - { id: v08-after, media: vendor, misleading: false, text: { ja: '制作会社「削除の確認書まで出せと言うのか」。', en: '' }, trigger: { at: after, choice: p08-remove-verify } }
   - { id: v09-law, media: board, misleading: true, type: law-ish, text: { ja: '12人の店に報告義務はない。カード会社に任せておけ。', en: '' }, trigger: { at: point } }
   - { id: v09-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '社長「件数が固まるまで、外には出さないほうがいい」。', en: '' }, trigger: { at: point } }
-  - { id: v09-ok, media: chat, misleading: false, text: { ja: '専門家「カード情報が入る可能性があるなら、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '専門家「カード情報が漏れたおそれ（財産的被害）があるなら、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
   - { id: v09-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに報告するのか。説明が二転三転するぞ。', en: '' }, trigger: { at: after, choice: p09-file-notice } }
   - { id: v10-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'まだ何も言ってこない。問い合わせの電話も来てないぞ。', en: '' }, trigger: { at: point } }
   - { id: v10-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'メールなんか送ったら、全員に知られる。静かに返金で済ませろ。', en: '' }, trigger: { at: point } }

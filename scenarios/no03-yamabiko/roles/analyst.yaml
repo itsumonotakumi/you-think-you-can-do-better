@@ -16,7 +16,7 @@ deadlines:
     points: -150
     doneFlag: ppcPrelimFiled
   - id: dl-ppc-final
-    ref: ppc-report-final
+    ref: ppc-report-final-malicious
     label: { ja: '個人情報保護委員会への確報の材料提出', en: '' }
     points: -150
     doneFlag: ppcFinalFiled
@@ -909,7 +909,7 @@ points:
     at: { day: 30, minutes: 600 }
     phase: after
     sound: { se: [mail_arrive] }
-    text: { ja: '30日目の午前10時。調査会社から「当日の操作を、時刻単位で説明してほしい」と依頼が来た。最初の通報を受けた日に、自分が確認しなかった項目もある。確報の材料も、今日が締め切りだ。', en: '' }
+    text: { ja: '30日目の午前10時。調査会社から「当日の操作を、時刻単位で説明してほしい」と依頼が来た。最初の通報を受けた日に、自分が確認しなかった項目もある。確報の期限はまだ先だが、材料は今日のうちに形にしておきたい。', en: '' }
     voices: [v16-law, v16-owner, v16-popular, v16-ok]
     choices:
       - id: a16-hide
@@ -1027,7 +1027,7 @@ points:
     at: { day: 31, minutes: 540 }
     phase: after
     sound: { se: [clock_tick] }
-    text: { ja: '会見の1時間前。聞かれることは決まっている。「なぜ8年も放っておいたのか」「いつ気づいたのか」「カード番号は漏れたのか」。手元には、記録と、まだ分からないことがある。', en: '' }
+    text: { ja: '31日目の朝。会見は明日に控えている。聞かれることは決まっている。「なぜ8年も放っておいたのか」「いつ気づいたのか」「カード番号は漏れたのか」。手元には、記録と、まだ分からないことがある。', en: '' }
     voices: [v18-owner, v18-public, v18-law, v18-ok]
     choices:
       - id: a18-assert
