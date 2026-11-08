@@ -115,3 +115,11 @@
   summary: { ja: "内部からの持ち出しは証拠保全と法的手続きの順序が重要", en: "Preserve evidence before legal steps for insider leaks" }
   checkedAt: 2026-11-08
   legalPack: jp
+- id: no04-ppc-guideline-general
+  title: { ja: "個人情報の保護に関する法律についてのガイドライン（通則編）", en: "Guidelines on the Act on the Protection of Personal Information (General Rules)" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
+  version: "2026-11"
+  section: { ja: "利用目的の特定と通知、保有個人データの安全管理措置、利用する必要がなくなった個人データの消去", en: "Specifying purposes, security measures, and deletion of unnecessary personal data" }
+  summary: { ja: "退会者や申込み途中の人の本人確認書類も、利用目的に照らして不要になったら消去を検討する。保存する場合も安全管理措置と本人への説明が必要", en: "Identity documents of former and prospective members must also be deleted when no longer needed, with security measures and clear explanation" }
+  checkedAt: "2026-11-08"
+  legalPack: "jp"
