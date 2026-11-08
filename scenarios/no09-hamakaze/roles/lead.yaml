@@ -25,9 +25,9 @@ events:
   - id: ev-poster
     at: { day: 0, minutes: 840 }
     voices: [v-ev-poster]
-    caption: { ja: '院内の掲示板には「不審なメールは開かないように」の貼り紙。今回の侵入口は、給食委託先のVPN機器だった。', en: '' }
+    caption: { ja: '院内の掲示板には「不審なメールは開かないように」の貼り紙。今回の侵入口は、設備保守委託先のVPN機器だった。', en: '' }
   - id: ev-news
-    at: { day: 0, minutes: 1320 }
+    at: { day: 0, minutes: 1260 }
     voices: [v-ev-news]
     gauges: { flame: 10 }
     sound: { se: [notify_news] }
@@ -138,7 +138,7 @@ points:
     at: { day: 0, minutes: 450 }
     phase: contain
     sound: { se: [phone_ring] }
-    text: { ja: '午前7時30分。侵入口の候補が一つに絞られた。給食委託先が保守用に置いたVPN機器。運用担当の外山は「弊社の機器に問題はない」と言い、設定を見せようとしない。', en: '' }
+    text: { ja: '午前7時30分。侵入口の候補が一つに絞られた。設備保守委託先が保守用に置いたVPN機器。運用担当の外山は「弊社の機器に問題はない」と言い、設定を見せようとしない。', en: '' }
     voices: [v03-vendor, v03-boss, v03-ok]
     choices:
       - id: p03-a-believe
@@ -220,9 +220,9 @@ points:
 
   - id: p05-ransom
     at: { day: 0, minutes: 570 }
-    phase: contain
+    phase: organize
     sound: { se: [mail_arrive] }
-    text: { ja: '午前9時30分。暗号化されたフォルダに、身代金の要求文が残されていた。医療情報部の端末が一通だけ開いてしまった。「連絡がなければ患者の情報をすべて公開する」と書いてある。', en: '' }
+    text: { ja: '午前9時30分。暗号化されたフォルダに、身代金の要求文が残されていた。医療情報部の端末が一通だけ開いてしまった。「連絡がなければ患者の情報をすべて公開する」と書いてある。法務が言った。「これは犯罪です。判断は私たちの側にあります」。', en: '' }
     voices: [v05-attacker, v05-public, v05-ok]
     choices:
       - id: p05-a-pay
@@ -244,7 +244,7 @@ points:
         points: 10
         refs: [npa-consult, jpcert-handling]
         gauges: { flame: -5, trust: 5, stamina: -5 }
-        setFlags: { policeConsult: true, ransomRefused: true }
+        setFlags: { policeConsult: true, refusedRansom: true }
         items:
           - { id: p05-b-order, points: 10, axis: order, refs: [npa-consult] }
           - { id: p05-b-record, points: 8, axis: record, refs: [jpcert-handling] }
@@ -255,7 +255,7 @@ points:
         points: 100
         refs: [npa-consult, ppc-notify-person]
         gauges: { flame: -10, trust: 10, stamina: -10 }
-        setFlags: { policeConsult: true, ransomRefused: true, patientPlanDraft: true }
+        setFlags: { policeConsult: true, refusedRansom: true, patientPlanDraft: true }
         items:
           - { id: p05-c-order, points: 8, axis: order, refs: [npa-consult] }
           - { id: p05-c-care, points: 10, axis: care, refs: [ppc-notify-person] }
@@ -286,14 +286,13 @@ points:
       - id: p06-b-wait
         text: { ja: '調査会社が来るまで、端末はそのまま触らずに待つ。', en: '' }
         minutes: 180
-        category: hurt
-        points: -70
+        category: maintain
+        points: 10
         refs: [jpcert-handling]
         gauges: { flame: 5, stamina: 5 }
-        coward: true
         items:
-          - { id: p06-b-time, points: -10, axis: time, refs: [jpcert-handling] }
-          - { id: p06-b-order, points: -5, axis: order, refs: [cissp-cbk-secops] }
+          - { id: p06-b-time, points: -5, axis: time, refs: [jpcert-handling] }
+          - { id: p06-b-record, points: 8, axis: record, refs: [jpcert-handling] }
       - id: p06-c-image
         text: { ja: '影響した端末のイメージとメモリを取得し、ハッシュ値と保管場所を記録してから作業を進める。', en: '' }
         minutes: 120
@@ -309,7 +308,7 @@ points:
 
   - id: p07-dfir
     at: { day: 0, minutes: 840 }
-    phase: organize
+    phase: investigate
     sound: { se: [mail_arrive] }
     text: { ja: '午後2時。保険会社から調査会社の紹介が届いた。費用は一日あたり数十万円。契約と守秘義務を確認する時間は、まだある。', en: '' }
     voices: [v07-vendor, v07-boss, v07-ok]
@@ -354,7 +353,7 @@ points:
     at: { day: 0, minutes: 1020 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '午後5時。調査で分かった。院内の職員は全員が管理者権限で端末を使い、共有の管理者パスワードが三つ使い回されていた。退職者のアカウントも残っている。', en: '' }
+    text: { ja: '午後5時。調査で分かった。院内の職員は全員が管理者権限で端末を使い、共有の管理者パスワードが使い回されていた。退職者のアカウントも残っている。', en: '' }
     voices: [v08-past, v08-boss, v08-ok]
     choices:
       - id: p08-a-later
@@ -464,7 +463,7 @@ points:
           - { id: p10-a-record, points: -8, axis: record, refs: [ppc-report-prelim] }
           - { id: p10-a-content, points: -5, axis: content, refs: [ppc-report-scope] }
       - id: p10-b-file
-        text: { ja: '分かっている範囲で速報を出し、不明点は調査中と書く。', en: '' }
+        text: { ja: '速報を出すよう上申し、分かっている範囲の技術情報をまとめる。', en: '' }
         minutes: 90
         category: maintain
         points: 10
@@ -476,7 +475,7 @@ points:
           - { id: p10-b-time, points: 5, axis: time, refs: [ppc-report-prelim] }
           - { id: p10-b-record, points: 5, axis: record, refs: [ppc-report-prelim] }
       - id: p10-c-prep
-        text: { ja: '速報を出し、本人通知の文面と相談窓口の準備を同時に始める。', en: '' }
+        text: { ja: '上申と技術情報に加え、本人通知の文面と相談窓口の準備を同時に始める。', en: '' }
         minutes: 120
         category: recover
         points: 100
@@ -493,7 +492,7 @@ points:
     at: { day: 1, minutes: 870 }
     phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '午後2時30分。バックアップの確認。昨夜のテープは暗号化されていなかったが、三日分の世代が同じ保管庫にあった。復旧の順番を決める前に、戻せるかどうかを確かめる。', en: '' }
+    text: { ja: '午後2時30分。バックアップの確認。オンラインの記憶装置は暗号化されたが、別館の保管庫にテープ三世代が無事だった。復旧の順番を決める前に、戻せるかどうかを確かめる。', en: '' }
     voices: [v11-vendor, v11-field, v11-ok]
     choices:
       - id: p11-a-trust
@@ -533,13 +532,13 @@ points:
           - { id: p11-c-record, points: 5, axis: record, refs: [jpcert-handling] }
 
   - id: p12-scope
-    at: { day: 2, minutes: 630 }
-    phase: investigate
+    at: { day: 2, minutes: 600 }
+    phase: recover
     sound: { se: [notify_chat] }
-    text: { ja: '午前10時30分。調査会社の報告。侵入は三週間前。給食委託先のVPN機器から院内に入り、全端末の管理者権限で動いていた。範囲は院内の共有フォルダ全体に及ぶ。', en: '' }
+    text: { ja: '午前10時。調査会社の報告。侵入は三週間前。設備保守委託先のVPN機器から院内に入り、全端末の管理者権限で動いていた。範囲は院内の共有フォルダ全体に及ぶ。', en: '' }
     voices: [v12-insider, v12-past, v12-ok]
     notable:
-      - { id: note-entry, text: { ja: '侵入口は給食委託先のVPN機器。院内は全員が管理者権限で動いていた。', en: '' } }
+      - { id: note-entry, text: { ja: '侵入口は設備保守委託先のVPN機器。院内は全員が管理者権限で動いていた。', en: '' } }
     choices:
       - id: p12-a-narrow
         text: { ja: '公表済みの範囲だけを調べ、追加の調査は控える。', en: '' }
@@ -577,9 +576,9 @@ points:
 
   - id: p13-contract
     at: { day: 2, minutes: 990 }
-    phase: organize
+    phase: recover
     sound: { se: [phone_ring] }
-    text: { ja: '午後4時30分。給食委託先との話し合い。契約書にはセキュリティの条項がない。先方は「うちの機器に問題はない」と言い、原因の断定を避けたい様子だ。', en: '' }
+    text: { ja: '午後4時30分。設備保守委託先との話し合い。契約書にはセキュリティの条項がない。先方は「うちの機器に問題はない」と言い、原因の断定を避けたい様子だ。', en: '' }
     voices: [v13-vendor, v13-boss, v13-ok]
     choices:
       - id: p13-a-blame
@@ -704,54 +703,11 @@ points:
           - { id: p15-c-care2, points: 8, axis: care, refs: [ipa-sme-guideline] }
           - { id: p15-c-care3, points: 8, axis: care, refs: [ipa-sme-guideline] }
 
-  - id: p16-resume
+  - id: p17-leak
     at: { day: 8, minutes: 600 }
     phase: recover
-    sound: { se: [notify_sns] }
-    text: { ja: '午前10時。再開の最終確認。クリーンな環境は用意できたが、全端末の状態を確かめきれてはいない。強化した監視は続いている。', en: '' }
-    voices: [v16-coward, v16-public, v16-ok]
-    choices:
-      - id: p16-a-rush
-        text: { ja: '全面再開し、監視は通常体制に戻す。', en: '' }
-        minutes: 120
-        category: hurt
-        points: -150
-        refs: [nist-sp800-61r3]
-        gauges: { damage: 20, flame: 10, trust: -10 }
-        delayed:
-          - { afterPhases: 1, points: -60, gauges: { damage: 15, trust: -15 }, reason: { ja: '再開後に別の端末で不審な通信が見つかり、再度停止した。', en: '' } }
-        items:
-          - { id: p16-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
-          - { id: p16-a-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
-      - id: p16-b-partial
-        text: { ja: '確認できた範囲だけ再開し、残りは止めたままにする。', en: '' }
-        minutes: 180
-        category: maintain
-        points: 10
-        refs: [nist-sp800-61r3]
-        gauges: { damage: -5, trust: 5 }
-        items:
-          - { id: p16-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
-          - { id: p16-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
-      - id: p16-c-gate
-        text: { ja: '段階的に再開し、未確認がゼロになるまで強化監視を続ける。完了の条件を病院長と共有する。', en: '' }
-        minutes: 240
-        category: recover
-        points: 120
-        refs: [nist-sp800-61r3, meti-csm-guideline]
-        gauges: { damage: -10, trust: 10, stamina: -15 }
-        setFlags: { gatedResume: true }
-        items:
-          - { id: p16-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
-          - { id: p16-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
-          - { id: p16-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
-          - { id: p16-c-care, points: 5, axis: care, refs: [mhlw-medical-guideline] }
-
-  - id: p17-leak
-    at: { day: 10, minutes: 630 }
-    phase: recover
     sound: { se: [notify_news] }
-    text: { ja: '午前10時30分。攻撃者が公開サイトに、患者の氏名と診療科、通院履歴の一部を公開した。公開されたファイルの形式は、院内のものと一致している。', en: '' }
+    text: { ja: '午前10時。攻撃者が公開サイトに、患者の氏名と診療科、通院履歴の一部を公開した。公開されたファイルの形式は、院内のものと一致している。公開したのは攻撃者であり、これは犯罪だ。', en: '' }
     voices: [v17-attacker, v17-public, v17-ok]
     notable:
       - { id: note-leak, text: { ja: '攻撃者が患者の氏名、診療科、通院履歴の一部を公開した。', en: '' } }
@@ -793,6 +749,49 @@ points:
           - { id: p17-c-care, points: 10, axis: care, refs: [ppc-notify-person] }
           - { id: p17-c-care2, points: 8, axis: care, refs: [ppc-notify-person] }
           - { id: p17-c-time, points: 5, axis: time, refs: [ppc-report-prelim] }
+
+  - id: p16-resume
+    at: { day: 8, minutes: 900 }
+    phase: recover
+    sound: { se: [notify_sns] }
+    text: { ja: '午後3時。再開の最終確認。クリーンな環境は用意できたが、全端末の状態を確かめきれてはいない。強化した監視は続いている。', en: '' }
+    voices: [v16-coward, v16-public, v16-ok]
+    choices:
+      - id: p16-a-rush
+        text: { ja: '全面再開し、監視は通常体制に戻す。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -150
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 20, flame: 10, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -60, gauges: { damage: 15, trust: -15 }, reason: { ja: '再開後に別の端末で不審な通信が見つかり、再度停止した。', en: '' } }
+        items:
+          - { id: p16-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: p16-a-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
+      - id: p16-b-partial
+        text: { ja: '確認できた範囲だけ再開し、残りは止めたままにする。', en: '' }
+        minutes: 180
+        category: maintain
+        points: 10
+        refs: [nist-sp800-61r3]
+        gauges: { damage: -5, trust: 5 }
+        items:
+          - { id: p16-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: p16-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+      - id: p16-c-gate
+        text: { ja: '段階的に再開し、未確認がゼロになるまで強化監視を続ける。完了の条件を病院長と共有する。', en: '' }
+        minutes: 240
+        category: recover
+        points: 120
+        refs: [nist-sp800-61r3, meti-csm-guideline]
+        gauges: { damage: -10, trust: 10, stamina: -15 }
+        setFlags: { gatedResume: true }
+        items:
+          - { id: p16-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: p16-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: p16-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: p16-c-care, points: 5, axis: care, refs: [mhlw-medical-guideline] }
 
   - id: p18-hardening
     at: { day: 14, minutes: 600 }
@@ -839,7 +838,7 @@ points:
     at: { day: 21, minutes: 660 }
     phase: after
     sound: { se: [notify_news] }
-    text: { ja: '午前11時。第三者委員会の調査報告書に、技術面の章を書く。検知の遅れ、権限の広さ、委託先の管理。どれも書きにくいが、書かなければ再発は防げない。', en: '' }
+    text: { ja: '午前11時。調査報告書に、技術面の章を書く。検知の遅れ、権限の広さ、委託先の管理。どれも書きにくいが、書かなければ再発は防げない。', en: '' }
     voices: [v19-flattery, v19-law, v19-ok]
     choices:
       - id: p19-a-polish
@@ -928,7 +927,7 @@ drafts:
         label: { ja: '出す時刻', en: '' }
         auto: true
         items:
-          - { id: tf-t-12h, when: { withinHours: 12 }, points: 10, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: tf-t-12h, when: { withinHours: 18 }, points: 10, axis: time, refs: [meti-disclosure-guidance] }
           - { id: tf-t-24h, when: { withinHours: 24 }, points: 5, axis: time, refs: [meti-disclosure-guidance] }
           - { id: tf-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [meti-disclosure-guidance] }
       - id: confirmed
@@ -989,7 +988,7 @@ drafts:
       - id: privilege
         label: { ja: '権限の広さ', en: '' }
         options:
-          - { id: cr-p-all, text: { ja: '全員が管理者権限で、共有パスワードが三つあったと書く', en: '' }, points: 10, axis: content, refs: [no07-ipa-insider] }
+          - { id: cr-p-all, text: { ja: '全員が管理者権限で、共有パスワードを使い回していたと書く', en: '' }, points: 10, axis: content, refs: [no07-ipa-insider] }
           - { id: cr-p-vague, text: { ja: '「権限設定の不備」とだけ書く', en: '' }, points: -10, axis: content, refs: [no07-ipa-insider] }
       - id: vendor
         label: { ja: '委託先の扱い', en: '' }
@@ -1041,9 +1040,9 @@ voices:
   - { id: v02-ok, media: chat, misleading: false, text: { ja: '看護部長「紙の指示簿なら、うちの病棟は回せます」。', en: '' }, trigger: { at: point } }
   - { id: v02-after, media: news, misleading: false, text: { ja: '紙の手順を配る前に、患者を診ろ。', en: '' }, trigger: { at: after, choice: p02-c-share } }
   - { id: v03-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '弊社のVPN機器に問題はありません。運用の問題です。', en: '' }, trigger: { at: point } }
-  - { id: v03-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '委託先の名前は出さないでくれ。地域の給食は止められない。', en: '' }, trigger: { at: point } }
+  - { id: v03-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '委託先の名前は出さないでくれ。地域の設備保守は止められない。', en: '' }, trigger: { at: point } }
   - { id: v03-ok, media: chat, misleading: false, text: { ja: '主任「機器の接続履歴は、まだ残っています」。', en: '' }, trigger: { at: point } }
-  - { id: v03-after, media: news, misleading: false, text: { ja: '委託先の機器を止めたら給食が止まる。誰が責任を取るんだ。', en: '' }, trigger: { at: after, choice: p03-c-joint } }
+  - { id: v03-after, media: news, misleading: false, text: { ja: '委託先の機器を止めたら設備の監視が止まる。誰が責任を取るんだ。', en: '' }, trigger: { at: after, choice: p03-c-joint } }
   - { id: v04-flattery, media: chat, misleading: true, type: flattery, text: { ja: '部長ひとりで十分です。みんなあなたの判断を信じています。', en: '' }, trigger: { at: point } }
   - { id: v04-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '体制の話は後だ。まず端末を戻せ。', en: '' }, trigger: { at: point } }
   - { id: v04-ok, media: chat, misleading: false, text: { ja: '事務局長「役割を紙に書かないと、誰に聞けばいいか分からない」。', en: '' }, trigger: { at: point } }
@@ -1062,7 +1061,7 @@ voices:
   - { id: v07-after, media: board, misleading: false, text: { ja: '外部と内部で結論が違うと、説明が割れる。', en: '' }, trigger: { at: after, choice: p07-c-parallel } }
   - { id: v08-past, media: boss, misleading: true, type: past-success, text: { ja: '前の入れ替えのときも、権限はそのままで問題なかった。', en: '' }, trigger: { at: point } }
   - { id: v08-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '診療を止めてまでパスワードを変えるのか。', en: '' }, trigger: { at: point } }
-  - { id: v08-ok, media: chat, misleading: false, text: { ja: '主任「退職者のアカウントが、まだ三つ残っています」。', en: '' }, trigger: { at: point } }
+  - { id: v08-ok, media: chat, misleading: false, text: { ja: '主任「退職者のアカウントが、まだいくつも残っています」。', en: '' }, trigger: { at: point } }
   - { id: v08-after, media: sns, misleading: false, text: { ja: '診療も止めずにパスワード変更を強いるのか。', en: '' }, trigger: { at: after, choice: p08-c-rotate } }
   - { id: v09-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '攻撃とは書くな。システム障害で通せ。', en: '' }, trigger: { at: point } }
   - { id: v09-law, media: board, misleading: true, type: law-ish, text: { ja: '確定していないことを書くと、後で訂正になる。今日は出さないほうがいい。', en: '' }, trigger: { at: point } }
@@ -1074,7 +1073,7 @@ voices:
   - { id: v10-after, media: news, misleading: false, text: { ja: '件数も分からないのに、報告するのか。', en: '' }, trigger: { at: after, choice: p10-c-prep } }
   - { id: v11-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: 'バックアップは大丈夫です。そのまま戻せます。', en: '' }, trigger: { at: point } }
   - { id: v11-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '昨夜のテープから戻せば、半日で終わりますよ。', en: '' }, trigger: { at: point } }
-  - { id: v11-ok, media: chat, misleading: false, text: { ja: '主任「別館の保管庫に、三日分の世代があります」。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '主任「別館の保管庫に、テープ三世代が無事です」。', en: '' }, trigger: { at: point } }
   - { id: v11-after, media: sns, misleading: false, text: { ja: '手順書を作る時間があるなら、戻せ。', en: '' }, trigger: { at: after, choice: p11-c-plan } }
   - { id: v12-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の者だけど、本当は十倍漏れている。今すぐ全部公表しろ。', en: '' }, trigger: { at: point } }
   - { id: v12-past, media: boss, misleading: true, type: past-success, text: { ja: '前回は範囲を絞って収まった。今回も同じでいい。', en: '' }, trigger: { at: point } }

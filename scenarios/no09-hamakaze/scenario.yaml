@@ -4,7 +4,7 @@ id: no09-hamakaze
 version: '1.0.0'
 status: latest
 published: '2026-11-08'
-sourcePeriod: { ja: '2022年の病院ランサムの構造を参考にしたフィクション', en: '' }
+sourcePeriod: { ja: '2020年代前半の病院ランサムの構造を参考にしたフィクション', en: '' }
 difficulty: 4
 languages: [ja]
 referencesVersion: '2026-11-08'
@@ -33,7 +33,7 @@ company:
       title: { ja: '看護部長', en: '' }
     - id: vendor
       name: { ja: '外山 修', en: '' }
-      title: { ja: '給食委託先の運用担当', en: '' }
+      title: { ja: '設備保守委託先の運用担当', en: '' }
 start: { day: 0, minutes: 330 }
 initialGauges: { damage: 25, flame: 0, trust: 70, stamina: 100 }
 audio:
@@ -72,14 +72,6 @@ press:
         - { id: a-data-none, text: { ja: '漏れていません。', en: '' }, points: -100 }
         - { id: a-data-admit, text: { ja: '一部が外部に公開されたことを確認しています。', en: '' }, points: 30 }
         - { id: a-data-note, text: { ja: '公開された範囲を特定し、対象の患者本人に通知し、相談窓口を設けています。', en: '' }, points: 80, requiresNote: note-leak }
-    - id: q-ransom
-      seconds: 20
-      timeoutPoints: -30
-      text: { ja: '身代金は支払ったのですか。', en: '' }
-      answers:
-        - { id: a-ransom-paid, text: { ja: '支払いました。', en: '' }, points: -100 }
-        - { id: a-ransom-nocomment, text: { ja: '答えられません。', en: '' }, points: -30 }
-        - { id: a-ransom-refuse, text: { ja: '支払っていません。警察に相談し、犯罪組織への資金提供を避けました。', en: '' }, points: 80 }
     - id: q-region
       seconds: 30
       timeoutPoints: -30
@@ -88,6 +80,26 @@ press:
         - { id: a-region-unknown, text: { ja: '未定です。', en: '' }, points: -50 }
         - { id: a-region-plan, text: { ja: '受け入れ先の病院と調整し、再開の見通しを毎日公表します。', en: '' }, points: 30 }
   extraQuestions:
+    - when: { flags: { paidRansom: false } }
+      question:
+        id: q-ransom
+        seconds: 20
+        timeoutPoints: -30
+        text: { ja: '身代金は支払ったのですか。', en: '' }
+        answers:
+          - { id: a-ransom-paid, text: { ja: '支払いました。', en: '' }, points: -100 }
+          - { id: a-ransom-nocomment, text: { ja: '答えられません。', en: '' }, points: -30 }
+          - { id: a-ransom-refuse, text: { ja: '支払っていません。警察に相談し、犯罪組織への資金提供を避けました。', en: '' }, points: 80 }
+    - when: { flags: { paidRansom: true } }
+      question:
+        id: q-ransom-paid
+        seconds: 20
+        timeoutPoints: -30
+        text: { ja: '身代金は支払ったのですか。', en: '' }
+        answers:
+          - { id: a-ransom-paid-admit, text: { ja: '支払いました。判断の経緯と、警察への相談状況を説明します。', en: '' }, points: 30 }
+          - { id: a-ransom-paid-deny, text: { ja: '支払っていません。', en: '' }, points: -200 }
+          - { id: a-ransom-paid-nocomment, text: { ja: '答えられません。', en: '' }, points: -30 }
     - when: { flags: { hidAttack: true } }
       question:
         id: q-hidden
@@ -101,17 +113,17 @@ press:
 endings:
   S:
     bgm: ending_s
-    text: { ja: '電子カルテは二週間で戻り、救急の受け入れも再開した。調査報告書は地域の医療機関に共有され、委託先との契約も作り直された。朝の申し送りで、看護部長が「紙の手順書が役に立った」と言った。', en: '' }
+    text: { ja: '電子カルテは二週間で戻り、救急の受け入れも再開した。調査報告書は地域の医療機関に共有され、委託先との契約も作り直された。朝の申し送りで、看護部長が「紙の手順書が役に立った」と言った。被害の責任は攻撃者にある。問われたのは、被害を広げないための対応だった。', en: '' }
   A:
     bgm: ending_a
-    text: { ja: '批判は受けたが、患者と地域の信頼は戻った。診療収入は半年で事件前の水準に近づき、委託先との関係も続いている。', en: '' }
+    text: { ja: '批判は受けたが、患者と地域の信頼は戻った。診療収入は半年で事件前の水準に近づき、委託先との関係も続いている。被害の責任は攻撃者にある。問われたのは、被害を広げないための対応だった。', en: '' }
   B:
     bgm: ending_b
-    text: { ja: '病院は立ち直ったが、紹介患者の一部は他の病院に流れた。地域での立場を取り戻すには、時間がかかる。', en: '' }
+    text: { ja: '病院は立ち直ったが、紹介患者の一部は他の病院に流れた。地域での立場を取り戻すには、時間がかかる。被害の責任は攻撃者にある。問われたのは、被害を広げないための対応だった。', en: '' }
   C:
     bgm: ending_c
-    text: { ja: '第三者委員会は初動の遅れと権限管理の不備を指摘し、院長は辞任した。残った職員が、限られた予算で再建を進めている。', en: '' }
+    text: { ja: '第三者委員会は初動の遅れと権限管理の不備を指摘し、院長は辞任した。残った職員が、限られた予算で再建を進めている。被害の責任は攻撃者にある。問われたのは、被害を広げないための対応だった。', en: '' }
   D:
     bgm: ending_d
-    text: { ja: '行政指導と損害賠償の請求が重なり、一部の診療科を閉じた。それでも救急の電話は鳴り続ける。どこで判断を誤ったのか、記録を読み返す日が続く。', en: '' }
+    text: { ja: '行政指導と損害賠償の請求が重なり、一部の診療科を閉じた。それでも救急の電話は鳴り続ける。どこで判断を誤ったのか、記録を読み返す日が続く。被害の責任は攻撃者にある。問われたのは、被害を広げないための対応だった。', en: '' }
 salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 10, min: 40, max: 130 }
