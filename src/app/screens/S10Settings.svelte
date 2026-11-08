@@ -1,6 +1,6 @@
 <script lang="ts">
   import { audio } from '../../audio';
-  import { setLang, t } from '../../i18n';
+  import { applyLang, t } from '../../i18n';
   import { DEFAULT_SETTINGS, clearAll, memoryOnly, saveSettings } from '../../storage';
   import { backTo, screen, settings } from '../store';
   import type { Lang, Settings } from '../../engine/types';
@@ -13,7 +13,7 @@
   const memOnly = memoryOnly;
 
   const ui = $derived.by(() => {
-    setLang($settings.lang);
+    applyLang($settings.lang);
     return {
       title: t('sa.settings.title'),
       lead: t('sa.settings.lead'),
@@ -49,13 +49,17 @@
 
   $effect(() => {
     audioError = audio.hasLoadError();
+    // 試聴などで後から失敗したときも表示を更新する
+    return audio.onLoadError(() => {
+      audioError = true;
+    });
   });
 
   function apply(patch: Partial<Settings>): void {
     const next = { ...$settings, ...patch };
     settings.set(next);
     saveSettings(next);
-    setLang(next.lang);
+    applyLang(next.lang);
     audio.setVolumes({ bgm: next.bgmVolume, se: next.seVolume, muted: next.muted });
   }
 

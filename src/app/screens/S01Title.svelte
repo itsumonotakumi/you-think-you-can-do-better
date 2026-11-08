@@ -1,8 +1,35 @@
+<script module lang="ts">
+  import type { PlayState as SavedPlayState, Scenario as LoadedScenario } from '../../engine/types';
+
+  export type ResumeScreen = 'S05' | 'S06' | 'S07' | 'S08';
+
+  /** 保存した状態から、再開する画面を決める（終了 > 会見 > 文案 > 本編） */
+  export function resumeScreen(state: SavedPlayState): ResumeScreen {
+    if (state.finished) return 'S08';
+    if (state.press) return 'S07';
+    if (state.pendingDraft) return 'S06';
+    return 'S05';
+  }
+
+  /** 再開先に合わせた BGM。会見は press、それ以外はフェーズの曲 */
+  export function resumeBgm(state: SavedPlayState, scenario: LoadedScenario): string {
+    if (resumeScreen(state) === 'S07') return 'press';
+    return scenario.audio.bgmByPhase?.[state.phase] ?? scenario.audio.bgmDefault;
+  }
+
+  /** 保存された版と読み込んだシナリオの版が違うか */
+  export function versionChanged(saved: SavedPlayState, scenario: LoadedScenario): boolean {
+    return saved.scenarioVersion !== scenario.version;
+  }
+</script>
+
 <script lang="ts">
   import { audio } from '../../audio';
   import { loadScenario } from '../../data/loader';
-  import { notice, setLang, t } from '../../i18n';
-  import { loadProgress, saveSettings } from '../../storage';
+  import {
+    applyLang, notice, setLang, setPendingNotice, t, versionChangedNotice,
+  } from '../../i18n';
+  import { loadProgress, saveProgress, saveSettings } from '../../storage';
   import { backTo, errorMessage, play, scenario, screen, selectedScenarioId, settings } from '../store';
   import type { Lang, PlayState } from '../../engine/types';
   import '../styles/base.css';
@@ -41,7 +68,7 @@
     const next = { ...$settings, lang };
     settings.set(next);
     saveSettings(next);
-    setLang(lang);
+    applyLang(lang);
   }
 
   async function start(): Promise<void> {
@@ -60,14 +87,31 @@
   }
 
   async function resume(): Promise<void> {
-    if (!progress || resuming) return;
+    const saved = progress;
+    if (!saved || resuming) return;
     resuming = true;
     try {
-      const sc = await loadScenario(progress.scenarioId);
+      try {
+        await audio.unlock();
+      } catch {
+        // 音を有効にできなくても、無音で再開する
+      }
+      const sc = await loadScenario(saved.scenarioId);
+
+      if (versionChanged(saved, sc)) {
+        // 初版では旧版の続きを用意しない。遊び直しはシナリオ選択から
+        saveProgress(null);
+        progress = null;
+        setPendingNotice(versionChangedNotice($settings.lang));
+        screen.set('S03');
+        return;
+      }
+
       scenario.set(sc);
-      play.set($state.snapshot(progress) as PlayState);
-      selectedScenarioId.set(progress.scenarioId);
-      screen.set('S05');
+      play.set($state.snapshot(saved) as PlayState);
+      selectedScenarioId.set(saved.scenarioId);
+      audio.playBgm(resumeBgm(saved, sc));
+      screen.set(resumeScreen(saved));
     } catch {
       errorMessage.set(ui.loadError);
       screen.set('error');

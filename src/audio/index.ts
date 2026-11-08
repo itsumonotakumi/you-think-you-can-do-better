@@ -16,6 +16,8 @@ export interface AudioController {
   runCues(cues: Cue[]): void;
   /** 読み込みに失敗した素材があるか（設定画面に表示） */
   hasLoadError(): boolean;
+  /** 読み込み失敗を購読する。解除関数を返す */
+  onLoadError(cb: () => void): () => void;
 }
 
 /** 炎上度の段階。0=tension_low, 1=tension_mid, 2=tension_high */
@@ -53,12 +55,27 @@ const inflight = new Map<string, Promise<AudioBuffer | null>>();
 const playingSe = new Map<string, number>();
 
 let loadError = false;
+const loadErrorListeners = new Set<() => void>();
+
+/** 失敗を最初の一度だけ記録し、購読者へ知らせる */
+function markLoadError(): void {
+  if (loadError) return;
+  loadError = true;
+  for (const listener of [...loadErrorListeners]) {
+    try {
+      listener();
+    } catch {
+      // 購読側の失敗で音の処理を止めない
+    }
+  }
+}
+
 const manifestReady: Promise<void> = loadAudioManifest()
   .then((list) => {
     for (const a of list) assets.set(a.id, a);
   })
   .catch(() => {
-    loadError = true;
+    markLoadError();
   });
 
 type AudioContextCtor = new () => AudioContext;
@@ -108,7 +125,7 @@ function ensureBuffer(asset: AudioAsset): Promise<AudioBuffer | null> {
       buffers.set(asset.id, buffer);
       return buffer;
     } catch {
-      loadError = true;
+      markLoadError();
       return null;
     }
   })();
@@ -281,5 +298,12 @@ export const audio: AudioController = {
 
   hasLoadError() {
     return loadError;
+  },
+
+  onLoadError(cb) {
+    loadErrorListeners.add(cb);
+    return () => {
+      loadErrorListeners.delete(cb);
+    };
   },
 };

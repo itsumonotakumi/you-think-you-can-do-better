@@ -1,7 +1,7 @@
 <script lang="ts">
   import { audio } from '../../audio';
   import { loadIndex } from '../../data/loader';
-  import { loc, notice, setLang, t } from '../../i18n';
+  import { applyLang, loc, notice, t, takePendingNotice } from '../../i18n';
   import { loadPlays } from '../../storage';
   import { scenario, screen, selectedScenarioId, settings } from '../store';
   import type { PlaysStore, ScenarioSummary } from '../../engine/types';
@@ -12,6 +12,8 @@
   let summaries = $state<ScenarioSummary[]>([]);
   let plays = $state<PlaysStore>({});
   let phase = $state<Phase>('loading');
+  // タイトルから引き継いだ連絡（版が変わった等）。無ければ何も出さない
+  let transitionNotice = $state<string | null>(takePendingNotice());
 
   async function load(): Promise<void> {
     phase = 'loading';
@@ -45,7 +47,7 @@
   }
 
   const cards = $derived.by(() => {
-    setLang($settings.lang);
+    applyLang($settings.lang);
     return summaries.map((s) => {
       const { first, best } = recordFor(s.id);
       const minutes = s.roles.length > 0 ? Math.min(...s.roles.map((r) => r.estimateMinutes)) : null;
@@ -74,7 +76,7 @@
   const hasAnyRecord = $derived(cards.some((card) => card.hasRecord));
 
   const ui = $derived.by(() => {
-    setLang($settings.lang);
+    applyLang($settings.lang);
     return {
       title: t('sa.scenarios.title'),
       lead: t('sa.scenarios.lead'),
@@ -86,6 +88,7 @@
       loadError: t('sa.scenarios.loadError'),
       loading: t('sa.common.loading'),
       retry: t('sa.common.retry'),
+      back: t('sa.common.back'),
       score: notice('score'),
     };
   });
@@ -96,6 +99,11 @@
     scenario.set(null);
     screen.set('S04');
   }
+
+  function backToTitle(): void {
+    transitionNotice = null;
+    screen.set('S01');
+  }
 </script>
 
 <section class="screen" data-screen="S03ScenarioSelect">
@@ -103,6 +111,10 @@
     <h1>{ui.title}</h1>
     <p class="lead">{ui.lead}</p>
   </header>
+
+  {#if transitionNotice}
+    <p class="notice notice--warn" role="status">{transitionNotice}</p>
+  {/if}
 
   {#if phase === 'loading'}
     <p class="muted" role="status">{ui.loading}</p>
@@ -157,4 +169,8 @@
       <p class="notice">{ui.score}</p>
     {/if}
   {/if}
+
+  <div class="row">
+    <button class="btn btn--ghost" onclick={backToTitle}>{ui.back}</button>
+  </div>
 </section>
