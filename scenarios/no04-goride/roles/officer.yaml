@@ -1,0 +1,971 @@
+# No.4 ゴーライド / 役員・グループ会社社長ロール
+# プレイヤーはゴーライドの執行役員で、グループ会社ゴーライド・モビリティサービスの社長を兼務する。
+# 自社には専任のセキュリティ部署がなく、情報システムは経理部の兼任、技術調査は外部に頼る。
+# 親会社（上場企業の子会社）への報告、店舗と法人契約の業務継続、部下を守る判断を扱う。
+# 判断ポイント16、細目は choices[].items と drafts の合計で80以上。
+estimateMinutes: 35
+intro: { ja: 'あなたはゴーライドの執行役員で、グループ会社ゴーライド・モビリティサービスの代表取締役社長を兼務している。レンタカー店舗と法人向けの長期貸出を預かり、グループ共通の予約アプリを使っている。専任のセキュリティ部署はない。情報システムは経理部の兼任が二人で、技術の調査は外部に頼るしかない。午前9時15分、店舗から電話が入る。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-coward-2
+  '3': v-coward-3
+  '4': v-coward-4
+deadlines:
+  - id: dl-group-prelim
+    ref: ppc-report-prelim
+    label: { ja: '自社分を含む漏えい等報告（速報）', en: '' }
+    points: -150
+    doneFlag: ppcPrelimFiled
+events:
+  - id: ev-client-call
+    at: { day: 1, minutes: 720 }
+    voices: [v-ev-client]
+    gauges: { flame: 5 }
+    sound: { se: [phone_ring] }
+    caption: { ja: '法人契約先から、ドライバーの免許証画像の扱いについて問い合わせが相次いでいる。', en: '' }
+  - id: ev-news
+    at: { day: 3, minutes: 720 }
+    voices: [v-ev-news]
+    gauges: { flame: 8 }
+    sound: { se: [notify_news] }
+    caption: { ja: 'ニュースが「退会者の免許証画像が残っていた」と報じた。', en: '' }
+  - id: ev-staff-fatigue
+    at: { day: 8, minutes: 1080 }
+    voices: [v-ev-staff]
+    gauges: { flame: 5 }
+    sound: { se: [notify_chat] }
+    caption: { ja: '店舗スタッフの疲労が限界に近づいている。', en: '' }
+points:
+  - id: o01-group-call
+    at: { day: 0, minutes: 555 }
+    phase: detect
+    sound: { se: [phone_ring] }
+    text: { ja: '午前9時15分。本社の役員会議に入った直後、店舗運用部長から電話が入る。「グループ共通の予約アプリのデータベースに、外部からアクセスされた形跡があります。店舗で預かった免許証の画像も、同じ場所に保存されていました」。自社に専任のセキュリティ部署はない。', en: '' }
+    voices: [v01-parent, v01-public, v01-ok]
+    notable:
+      - { id: note-first-call, text: { ja: '午前9時15分、グループ共通アプリへの不正アクセスを把握。店舗で預かった免許証画像も同じ保存場所にあった。', en: '' } }
+    choices:
+      - id: o01-wait
+        text: { ja: '本社の指示を待ち、店舗の営業は通常どおり続ける。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -100
+        refs: [meti-csm-guideline]
+        gauges: { flame: -5, trust: -5, stamina: 5 }
+        coward: true
+        setFlags: { delayedCommand: true }
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { flame: 15, trust: -10 }, reason: { ja: 'その日のうちに店舗の問い合わせが殺到し、翌朝には炎上した。', en: '' } }
+        items:
+          - { id: o01-a-time, points: -10, axis: time, refs: [meti-csm-guideline] }
+          - { id: o01-a-order, points: -8, axis: order, refs: [jpcert-handling] }
+      - id: o01-own
+        text: { ja: '自社の対策会議を開き、預かり画像の所在を確認する。外部の調査会社と弁護士に連絡し、本社にも同時に第一報を入れる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [meti-csm-guideline]
+        gauges: { flame: -5, trust: 5, stamina: -5 }
+        setFlags: { groupTaskForce: true }
+        items:
+          - { id: o01-b-time, points: 5, axis: time, refs: [meti-csm-guideline] }
+          - { id: o01-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: o01-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: o01-self
+        text: { ja: '自分で店舗の端末を確認しに行き、現場の対応を直接見る。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -60
+        refs: [jpcert-handling]
+        gauges: { stamina: -10, trust: -5 }
+        items:
+          - { id: o01-c-order, points: -10, axis: order, refs: [jpcert-handling] }
+          - { id: o01-c-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
+          - { id: o01-c-care, points: -5, axis: care, refs: [ipa-sme-guideline] }
+
+  - id: o02-store-stop
+    at: { day: 0, minutes: 660 }
+    phase: contain
+    sound: { se: [notify_sns] }
+    text: { ja: '午前11時。店舗では免許証の原本をスキャンして返却している。グループのアプリはまだ動いている。自社の店舗だけでも貸出を止めるか。止めれば、法人契約の車が全国で動かなくなる。', en: '' }
+    voices: [v02-flattery, v02-public, v02-expert, v02-ok]
+    popular: { choiceId: o02-partial, percent: 45 }
+    choices:
+      - id: o02-continue
+        text: { ja: '通常営業を続け、グループの復旧を待つ。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -120
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, flame: 5 }
+        delayed:
+          - { afterPhases: 1, points: -60, gauges: { damage: 15, trust: -10 }, reason: { ja: '止めなかった店舗からも画像の持ち出しが続いた。', en: '' } }
+        items:
+          - { id: o02-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: o02-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: o02-a-record, points: -5, axis: record, refs: [jpcert-handling] }
+      - id: o02-partial
+        text: { ja: '新しい免許証画像の取り込みと、アプリ経由の予約だけを止める。対面の貸出は続ける。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [nist-sp800-61r3]
+        gauges: { damage: -10, flame: 5, trust: 5, stamina: -10 }
+        setFlags: { containedIngest: true }
+        items:
+          - { id: o02-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: o02-b-order, points: 5, axis: order, refs: [jpcert-handling] }
+          - { id: o02-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: o02-stop-all
+        text: { ja: '自社の全店舗の貸出を止め、代替の車と返却方法を案内する。グループの封じ込めが終わるまで再開しない。', en: '' }
+        minutes: 120
+        category: recover
+        points: 100
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, damage: -20, trust: 5, stamina: -10 }
+        setFlags: { contained: true, alternativeTransport: true }
+        items:
+          - { id: o02-c-care, points: 10, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: o02-c-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: o02-c-order, points: 5, axis: order, refs: [nist-sp800-61r3] }
+
+  - id: o03-evidence
+    at: { day: 0, minutes: 840 }
+    phase: contain
+    sound: { se: [notify_chat] }
+    text: { ja: '午後2時。グループの調査担当から「店舗のスキャン画像の原本は、自社のファイルサーバーにも残っています。消しますか」と聞かれた。消せば被害は減るが、何が漏れたか分からなくなる。', en: '' }
+    voices: [v03-expert, v03-field, v03-ok]
+    choices:
+      - id: o03-delete
+        text: { ja: '共有フォルダごと削除して、被害の範囲を狭める。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -250
+        refs: [nist-sp800-61r3]
+        gauges: { flame: 20, damage: 10, trust: -20 }
+        setFlags: { destroyedEvidence: true }
+        delayed:
+          - { afterPhases: 2, points: -100, gauges: { damage: 15, trust: -20 }, reason: { ja: '証拠が消え、どの画像が漏れたか分からなくなった。', en: '' } }
+        items:
+          - { id: o03-a-record, points: -20, axis: record, refs: [nist-sp800-61r3] }
+          - { id: o03-a-content, points: -15, axis: content, refs: [nist-sp800-61r3] }
+          - { id: o03-a-order, points: -10, axis: order, refs: [jpcert-handling] }
+      - id: o03-keep
+        text: { ja: '削除せず、共有フォルダのアクセスを止めて、保存されている画像の一覧を作る。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 30
+        refs: [nist-sp800-61r3]
+        gauges: { damage: -5, trust: 5, stamina: -10 }
+        setFlags: { evidenceKept: true }
+        items:
+          - { id: o03-b-record, points: 8, axis: record, refs: [nist-sp800-61r3] }
+          - { id: o03-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: o03-b-order, points: 5, axis: order, refs: [jpcert-handling] }
+      - id: o03-preserve
+        text: { ja: '外部の調査会社に引き継ぎ、証拠保全の手順を文書化する。削除は調査が終わってからにする。', en: '' }
+        minutes: 150
+        category: recover
+        points: 120
+        refs: [nist-sp800-61r3, jpcert-handling]
+        gauges: { damage: -10, trust: 10, stamina: -10 }
+        setFlags: { evidenceKept: true, forensics: true }
+        items:
+          - { id: o03-c-record, points: 10, axis: record, refs: [nist-sp800-61r3] }
+          - { id: o03-c-order, points: 8, axis: order, refs: [jpcert-handling] }
+          - { id: o03-c-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: o03-c-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+
+  - id: o04-parent-report
+    at: { day: 1, minutes: 510 }
+    phase: organize
+    sound: { se: [phone_ring] }
+    text: { ja: '翌朝8時30分。本社の社長（榊原）から電話。「上場している親会社に、今日の午前中に第一報を出す。子会社の分も含める。君のところの数字は」。件数はまだ確定していない。', en: '' }
+    voices: [v04-parent, v04-coward, v04-ok]
+    choices:
+      - id: o04-wait
+        text: { ja: '件数が固まるまで待ち、電話で概要だけを伝える。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -100
+        refs: [jpcert-handling]
+        gauges: { flame: 5, trust: -10 }
+        coward: true
+        items:
+          - { id: o04-a-order, points: -10, axis: order, refs: [jpcert-handling] }
+          - { id: o04-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+          - { id: o04-a-time, points: -5, axis: time, refs: [meti-csm-guideline] }
+      - id: o04-outline
+        text: { ja: '分かっている事実と不明点を、メールで簡潔に送る。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: o04-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: o04-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
+          - { id: o04-b-time, points: 3, axis: time, refs: [jpcert-handling] }
+      - id: o04-written
+        text: { ja: '書面で、自社の範囲・確認できた事実・不明点を分けて提出する。', en: '' }
+        minutes: 120
+        category: recover
+        points: 100
+        refs: [jpcert-handling, no02-timely-disclosure]
+        gauges: { trust: 10, stamina: -10 }
+        detail: group-report
+        setFlags: { parentReportFiled: true }
+        items:
+          - { id: o04-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: o04-c-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: o04-c-time, points: 8, axis: time, refs: [jpcert-handling] }
+          - { id: o04-c-order, points: 5, axis: order, refs: [no02-timely-disclosure] }
+
+  - id: o05-retention-own
+    at: { day: 1, minutes: 780 }
+    phase: organize
+    sound: { se: [notify_chat] }
+    text: { ja: '午後1時。本社から「退会者や申込み途中の人の免許証画像を、なぜ残していたのか」と聞かれた。2023年の会議で「再入会のときに本人確認が楽になる」と提案したのは、あなただった。', en: '' }
+    voices: [v05-insider, v05-boss, v05-ok]
+    notable:
+      - { id: note-retention, text: { ja: '退会者・申込み途中の人の免許証画像も保存する方針が、2023年の会議で決まっていた。提案したのは自分。', en: '' } }
+    choices:
+      - id: o05-hide
+        text: { ja: '自分の提案だったことは伏せ、「現場の運用の誤り」として説明する。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -250
+        refs: [meti-csm-guideline]
+        gauges: { flame: -10, trust: -25 }
+        setFlags: { hidRetention: true }
+        delayed:
+          - { afterPhases: 2, points: -100, gauges: { flame: 25, trust: -15 }, reason: { ja: '議事録の存在が報じられ、組織的な隠蔽と批判された。', en: '' } }
+        items:
+          - { id: o05-a-record, points: -20, axis: record, refs: [meti-csm-guideline] }
+          - { id: o05-a-content, points: -15, axis: content, refs: [meti-csm-guideline] }
+          - { id: o05-a-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+      - id: o05-explain
+        text: { ja: '自分が提案したことと、見直さなかったことを説明する。保存方針の棚卸しと、退会者分の削除を始める。', en: '' }
+        minutes: 150
+        category: recover
+        points: 120
+        refs: [no04-ppc-guideline-general]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        setFlags: { retentionAudit: true }
+        items:
+          - { id: o05-b-content, points: 10, axis: content, refs: [no04-ppc-guideline-general] }
+          - { id: o05-b-record, points: 8, axis: record, refs: [meti-csm-guideline] }
+          - { id: o05-b-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: o05-b-time, points: 5, axis: time, refs: [meti-csm-guideline] }
+      - id: o05-minimum
+        text: { ja: '聞かれた事実だけを答え、保存方針の見直しは本社に任せる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [meti-csm-guideline]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: o05-c-content, points: 3, axis: content, refs: [no04-ppc-guideline-general] }
+          - { id: o05-c-record, points: 3, axis: record, refs: [meti-csm-guideline] }
+          - { id: o05-c-care, points: -5, axis: care, refs: [ppc-notify-person] }
+
+  - id: o06-scope
+    at: { day: 2, minutes: 540 }
+    phase: investigate
+    sound: { se: [notify_chat] }
+    text: { ja: '2日目午前9時。調査会社の報告。漏えたのはグループ共通のアカウント情報と免許証画像。自社の法人契約のドライバーと、店舗で一度だけ借りた人の分も含まれる可能性がある。', en: '' }
+    voices: [v06-vendor, v06-past, v06-ok]
+    notable:
+      - { id: note-scope, text: { ja: '自社の法人契約ドライバーと店舗の対面貸出の免許証画像も、同じ保存場所にあった。', en: '' } }
+    choices:
+      - id: o06-narrow
+        text: { ja: 'グループが示した範囲だけを調査し、自社の法人契約は含めない。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -100
+        refs: [ppc-report-scope]
+        gauges: { damage: 15, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { damage: 10, flame: 10 }, reason: { ja: '調査していなかった法人ドライバーの画像が、あとから公開された。', en: '' } }
+        items:
+          - { id: o06-a-content, points: -10, axis: content, refs: [ppc-report-scope] }
+          - { id: o06-a-record, points: -8, axis: record, refs: [nist-sp800-61r3] }
+      - id: o06-include
+        text: { ja: '自社の法人契約と店舗の対面貸出も、調査範囲に含める。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 30
+        refs: [ppc-report-scope]
+        gauges: { damage: -5, trust: 5, stamina: -10 }
+        setFlags: { groupScope: true }
+        items:
+          - { id: o06-b-content, points: 8, axis: content, refs: [ppc-report-scope] }
+          - { id: o06-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: o06-include-plan
+        text: { ja: '全範囲を調査し、対象者の一覧を先に作る。法人契約先への先行連絡も準備する。', en: '' }
+        minutes: 180
+        category: recover
+        points: 100
+        refs: [ppc-report-scope, ppc-notify-person]
+        gauges: { damage: -10, trust: 10, stamina: -15 }
+        setFlags: { groupScope: true, clientPlan: true }
+        items:
+          - { id: o06-c-content, points: 8, axis: content, refs: [ppc-report-scope] }
+          - { id: o06-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: o06-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: o06-c-time, points: 5, axis: time, refs: [jpcert-handling] }
+
+  - id: o07-clients
+    at: { day: 2, minutes: 900 }
+    phase: notify
+    sound: { se: [phone_ring] }
+    text: { ja: '午後3時。法人契約の配送会社から「うちのドライバーの免許証は大丈夫か」と電話が入った。報道はまだ出ていない。先に個別に伝えるか、報道を待ってまとめて伝えるか。', en: '' }
+    voices: [v07-sales, v07-public, v07-ok]
+    popular: { choiceId: o07-wait, percent: 56 }
+    choices:
+      - id: o07-wait
+        text: { ja: '報道を待って、まとめて通知する。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -120
+        refs: [ppc-notify-person]
+        gauges: { flame: 10, trust: -10 }
+        coward: true
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { flame: 10, trust: -10 }, reason: { ja: '報道で知った法人契約先から、取引の見直しを告げられた。', en: '' } }
+        items:
+          - { id: o07-a-time, points: -10, axis: time, refs: [ppc-notify-person] }
+          - { id: o07-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
+      - id: o07-call
+        text: { ja: '主要な法人契約先に電話で伝え、確認できた範囲と今後の連絡体制を説明する。', en: '' }
+        minutes: 120
+        category: recover
+        points: 100
+        refs: [ppc-notify-person, meti-csm-guideline]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        detail: customer-notice
+        items:
+          - { id: o07-b-time, points: 8, axis: time, refs: [ppc-notify-person] }
+          - { id: o07-b-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: o07-b-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+      - id: o07-mail
+        text: { ja: '全法人契約先に、一斉メールで通知する。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [ppc-notify-person]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: o07-c-time, points: 5, axis: time, refs: [ppc-notify-person] }
+          - { id: o07-c-care, points: 3, axis: care, refs: [ppc-notify-person] }
+          - { id: o07-c-content, points: -5, axis: content, refs: [meti-csm-guideline] }
+
+  - id: o08-prelim
+    at: { day: 2, minutes: 960 }
+    phase: notify
+    sound: { se: [typing] }
+    text: { ja: '午後4時。速報の期限が明日の朝に迫っている。本社は「グループで一本化する」と言う。自社の顧客分をどう出すか。', en: '' }
+    voices: [v08-parent, v08-law, v08-ok]
+    popular: { choiceId: o08-leave, percent: 61 }
+    choices:
+      - id: o08-leave
+        text: { ja: '本社に任せ、自社からは出さない。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -150
+        refs: [ppc-report-prelim]
+        gauges: { flame: 15, trust: -15 }
+        coward: true
+        setFlags: { delayedReport: true }
+        items:
+          - { id: o08-a-time, points: -10, axis: time, refs: [ppc-report-prelim] }
+          - { id: o08-a-record, points: -10, axis: record, refs: [ppc-report-prelim] }
+      - id: o08-joint
+        text: { ja: '本社と連名で、自社の範囲を明記した速報を出す。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [ppc-report-prelim]
+        gauges: { trust: 5, stamina: -10 }
+        setFlags: { ppcPrelimFiled: true }
+        items:
+          - { id: o08-b-time, points: 5, axis: time, refs: [ppc-report-prelim] }
+          - { id: o08-b-content, points: 8, axis: content, refs: [ppc-report-prelim] }
+          - { id: o08-b-record, points: 5, axis: record, refs: [ppc-report-prelim] }
+      - id: o08-joint-notice
+        text: { ja: '連名の速報に加え、対象者への通知準備と法人契約先への説明を同時に始める。', en: '' }
+        minutes: 150
+        category: recover
+        points: 120
+        refs: [ppc-report-prelim, ppc-notify-person]
+        gauges: { flame: -5, trust: 10, stamina: -15 }
+        setFlags: { ppcPrelimFiled: true, notifyPrepared: true }
+        items:
+          - { id: o08-c-time, points: 5, axis: time, refs: [ppc-report-prelim] }
+          - { id: o08-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: o08-c-content, points: 8, axis: content, refs: [ppc-report-prelim] }
+          - { id: o08-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+
+  - id: o09-notify-targets
+    at: { day: 3, minutes: 960 }
+    phase: notify
+    sound: { se: [mail_arrive] }
+    text: { ja: '3日目午後4時。本人通知の対象を決める。現会員、退会者、申込み途中、そして法人契約のドライバー。どこまで宛てるか。', en: '' }
+    voices: [v09-marketing, v09-public, v09-ok]
+    choices:
+      - id: o09-current
+        text: { ja: '現会員だけにメールを送る。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -150
+        refs: [ppc-notify-person]
+        gauges: { flame: 15, trust: -15 }
+        setFlags: { noNotify: true }
+        delayed:
+          - { afterPhases: 2, points: -80, gauges: { flame: 20, trust: -15 }, reason: { ja: '通知が届かなかった人から、二次被害の相談が相次いだ。', en: '' } }
+        items:
+          - { id: o09-a-care, points: -20, axis: care, refs: [ppc-notify-person] }
+          - { id: o09-a-record, points: -10, axis: record, refs: [jpcert-handling] }
+      - id: o09-all
+        text: { ja: '現会員・退会者・申込み途中・法人ドライバーをすべて対象に、メールとアプリ通知で送る。', en: '' }
+        minutes: 150
+        category: maintain
+        points: 30
+        refs: [ppc-notify-person]
+        gauges: { flame: -5, trust: 5, stamina: -15 }
+        setFlags: { notifyAll: true }
+        items:
+          - { id: o09-b-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: o09-b-content, points: 8, axis: content, refs: [ppc-notify-person] }
+          - { id: o09-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: o09-all-plus
+        text: { ja: 'すべてを対象に、はがきと電話の窓口も用意する。法人契約先には担当者から直接渡す。', en: '' }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [ppc-notify-person, meti-csm-guideline]
+        gauges: { flame: -10, trust: 15, stamina: -20 }
+        setFlags: { notifyAll: true, notifyMulti: true }
+        items:
+          - { id: o09-c-care, points: 10, axis: care, refs: [ppc-notify-person] }
+          - { id: o09-c-care2, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: o09-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: o09-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+
+  - id: o10-staff
+    at: { day: 4, minutes: 600 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: '4日目午前10時。店舗は通常営業に戻ったが、スタッフは3日連続で問い合わせ対応に追われている。店舗から「このままだと、確認漏れが出ます」と声が上がった。', en: '' }
+    voices: [v10-flattery, v10-public, v10-ok]
+    choices:
+      - id: o10-allnight
+        text: { ja: '全員で最後まで走り抜く。ここで休むと流れが切れる。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -60
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -20, damage: 10, trust: -5 }
+        delayed:
+          - { afterPhases: 2, points: -40, gauges: { stamina: -15, damage: 10 }, reason: { ja: '疲労から確認漏れが起き、本人通知の宛先が抜けた。', en: '' } }
+        items:
+          - { id: o10-a-care, points: -10, axis: care, refs: [ipa-sme-guideline] }
+          - { id: o10-a-care2, points: -8, axis: care, refs: [ipa-sme-guideline] }
+      - id: o10-shift
+        text: { ja: '半日ごとの交代制を敷き、社長自身も休む。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 30
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: 10, trust: 5 }
+        items:
+          - { id: o10-b-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: o10-b-care2, points: 5, axis: care, refs: [ipa-sme-guideline] }
+      - id: o10-shift-help
+        text: { ja: '交代制に加え、本社の応援と外部ヘルプデスクを入れる。社員の相談窓口も案内する。', en: '' }
+        minutes: 150
+        category: recover
+        points: 120
+        refs: [ipa-sme-guideline, meti-csm-guideline]
+        gauges: { stamina: 15, trust: 10, flame: -5 }
+        setFlags: { staffSupport: true }
+        items:
+          - { id: o10-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: o10-c-care2, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: o10-c-care3, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: o10-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+
+  - id: o11-darkweb
+    at: { day: 6, minutes: 480 }
+    phase: notify
+    sound: { se: [notify_news] }
+    text: { ja: '6日目午前8時。ダークウェブで、自社の店舗で撮影した免許証画像が売られているという情報が入った。真偽はまだ分からない。', en: '' }
+    voices: [v11-attacker, v11-coward, v11-ok]
+    notable:
+      - { id: note-leak, text: { ja: 'ダークウェブで自社の店舗の免許証画像が売られているという情報。真偽は未確認。', en: '' } }
+    choices:
+      - id: o11-deny
+        text: { ja: '「確認中」を続け、公開された事実を認めない。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -150
+        refs: [ppc-report-scope]
+        gauges: { flame: 20, trust: -15, damage: 10 }
+        coward: true
+        items:
+          - { id: o11-a-content, points: -10, axis: content, refs: [ppc-report-scope] }
+          - { id: o11-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: o11-support
+        text: { ja: '公開された範囲を特定し、対象者への追加通知と警察への相談を進める。', en: '' }
+        minutes: 240
+        category: recover
+        points: 120
+        refs: [ppc-notify-person, npa-consult]
+        gauges: { flame: -15, trust: 15, stamina: -20 }
+        setFlags: { leakAdmitted: true, policeConsult: true }
+        items:
+          - { id: o11-b-content, points: 8, axis: content, refs: [ppc-report-scope] }
+          - { id: o11-b-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: o11-b-care2, points: 8, axis: care, refs: [npa-consult] }
+          - { id: o11-b-time, points: 5, axis: time, refs: [ppc-report-prelim] }
+      - id: o11-monitor
+        text: { ja: '対象者向けの専用窓口を開き、なりすまし監視を案内する。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 30
+        refs: [ppc-notify-person]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: o11-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: o11-c-care2, points: 5, axis: care, refs: [ppc-notify-person] }
+
+  - id: o12-resume
+    at: { day: 7, minutes: 600 }
+    phase: recover
+    sound: { se: [notify_sns] }
+    text: { ja: '7日目午前10時。グループの復旧のめどが立った。本社は「グループ全体で、もう少し様子を見る」と言う。自社の店舗と法人契約は、今週末の予約で埋まっている。', en: '' }
+    voices: [v12-sales, v12-public, v12-ok]
+    popular: { choiceId: o12-standalone, percent: 52 }
+    choices:
+      - id: o12-standalone
+        text: { ja: '自社だけ先に全面再開する。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -150
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, flame: 15, trust: -15 }
+        delayed:
+          - { afterPhases: 1, points: -60, gauges: { damage: 15, flame: 10, trust: -15 }, reason: { ja: '再開後に店舗の端末で不審な通信が見つかり、再度停止した。', en: '' } }
+        items:
+          - { id: o12-a-order, points: -10, axis: order, refs: [nist-sp800-61r3] }
+          - { id: o12-a-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
+          - { id: o12-a-care, points: -8, axis: care, refs: [ppc-notify-person] }
+      - id: o12-wait
+        text: { ja: 'グループの検証完了を待ち、段階的に再開する。', en: '' }
+        minutes: 240
+        category: maintain
+        points: 30
+        refs: [nist-sp800-61r3]
+        gauges: { damage: -10, trust: 5, stamina: -10 }
+        items:
+          - { id: o12-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: o12-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: o12-verified
+        text: { ja: '検証完了を待ち、店舗ごとに段階再開する。点検結果を公開し、止めた間の代替車も案内する。', en: '' }
+        minutes: 300
+        category: recover
+        points: 120
+        refs: [nist-sp800-61r3, ppc-notify-person]
+        gauges: { damage: -15, trust: 10, stamina: -15 }
+        setFlags: { verifiedResume: true }
+        items:
+          - { id: o12-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: o12-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: o12-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+
+  - id: o13-compensation
+    at: { day: 10, minutes: 540 }
+    phase: recover
+    sound: { se: [phone_ring] }
+    text: { ja: '10日目午前9時。法人契約先から、貸出を止めた間の損失の補償を求められている。金額と対象を決める日。免許証は再発行できても、ドライバーの手間は戻らない。', en: '' }
+    voices: [v13-vendor, v13-public, v13-ok]
+    choices:
+      - id: o13-none
+        text: { ja: '補償はせず、問い合わせには一次対応だけで答える。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -150
+        refs: [ppc-notify-person]
+        gauges: { flame: 20, trust: -15 }
+        items:
+          - { id: o13-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: o13-a-care2, points: -10, axis: care, refs: [ppc-notify-person] }
+      - id: o13-flat
+        text: { ja: '法人契約先に一律の少額見舞金を出す。', en: '' }
+        minutes: 120
+        category: recover
+        points: 50
+        refs: [ppc-notify-person]
+        gauges: { flame: -5, trust: 5, stamina: -10 }
+        items:
+          - { id: o13-b-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: o13-b-content, points: 5, axis: content, refs: [ppc-notify-person] }
+      - id: o13-tiered
+        text: { ja: '損失と期間に応じた段階補償を決め、説明会と相談窓口を用意する。', en: '' }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [ppc-notify-person, meti-csm-guideline]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        setFlags: { compensation: true }
+        items:
+          - { id: o13-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: o13-c-care2, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: o13-c-content, points: 8, axis: content, refs: [ppc-notify-person] }
+          - { id: o13-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+
+  - id: o14-board
+    at: { day: 14, minutes: 600 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: '14日目午前10時。本社の取締役会で、グループ会社の対応を説明する。上場している親会社のIRも同席する。自社の失敗を、どこまで話すか。', en: '' }
+    voices: [v14-parent, v14-bold, v14-ok]
+    choices:
+      - id: o14-downplay
+        text: { ja: '親会社の発表に合わせ、自社の失敗は軽く説明する。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -250
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 25, trust: -25 }
+        setFlags: { hidFacts: true }
+        delayed:
+          - { afterPhases: 2, points: -100, gauges: { flame: 20, trust: -20 }, reason: { ja: '自社の失敗を軽く説明したことが報道され、説明責任を問われた。', en: '' } }
+        items:
+          - { id: o14-a-record, points: -20, axis: record, refs: [meti-csm-guideline] }
+          - { id: o14-a-content, points: -15, axis: content, refs: [meti-csm-guideline] }
+          - { id: o14-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: o14-facts
+        text: { ja: '事実と自社の責任、再発防止の実施状況を数字で説明する。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 30
+        refs: [meti-csm-guideline]
+        gauges: { trust: 10, stamina: -10 }
+        items:
+          - { id: o14-b-record, points: 8, axis: record, refs: [meti-csm-guideline] }
+          - { id: o14-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
+      - id: o14-own
+        text: { ja: '事実に加え、2023年に自分が保存を提案し、見直さなかった責任を明言する。', en: '' }
+        minutes: 120
+        category: recover
+        points: 120
+        refs: [meti-csm-guideline]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        setFlags: { ownResponsibility: true }
+        items:
+          - { id: o14-c-record, points: 8, axis: record, refs: [meti-csm-guideline] }
+          - { id: o14-c-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: o14-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+
+  - id: o15-report
+    at: { day: 30, minutes: 600 }
+    phase: after
+    sound: { se: [notify_news] }
+    text: { ja: '30日目午前10時。グループの調査報告書が完成した。自社の店舗と法人契約の部分を、どこまで公開するか。攻撃に使える詳細は伏せる必要がある。', en: '' }
+    voices: [v15-expert, v15-law, v15-ok]
+    choices:
+      - id: o15-hide
+        text: { ja: '自社部分は公開せず、確報も本社に任せる。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -150
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -15 }
+        items:
+          - { id: o15-a-content, points: -10, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: o15-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: o15-publish
+        text: { ja: '攻撃に使える部分だけ伏せて、自社部分を全文公開する。確報も提出する。', en: '' }
+        minutes: 180
+        category: recover
+        points: 120
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        detail: final-report
+        setFlags: { fullDisclosure: true, ppcFinalFiled: true }
+        items:
+          - { id: o15-b-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: o15-b-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
+      - id: o15-share
+        text: { ja: '全文公開に加え、再発防止の進捗を毎月公開する。グループ会社と業界に、教訓を無償で共有する。', en: '' }
+        minutes: 240
+        category: increase
+        points: 300
+        fatalAlternate: 50
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: -15, trust: 20, stamina: -15 }
+        detail: final-report
+        setFlags: { fullDisclosure: true, ppcFinalFiled: true, industryShare: true }
+        items:
+          - { id: o15-c-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: o15-c-record, points: 8, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: o15-c-content2, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+
+  - id: o16-own-fate
+    at: { day: 31, minutes: 540 }
+    phase: after
+    sound: { se: [notify_chat] }
+    text: { ja: '31日目午前9時。記者会見を明日に控え、本社の社長から「君の処遇を、取締役会で決める」と言われた。辞任すれば区切りはつく。残れば、グループ全体の保存ルールを作れる。', en: '' }
+    voices: [v16-coward, v16-flattery, v16-ok]
+    choices:
+      - id: o16-resign
+        text: { ja: '辞任して、区切りをつける。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -60
+        refs: [meti-csm-guideline]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: o16-a-order, points: -8, axis: order, refs: [meti-csm-guideline] }
+          - { id: o16-a-care, points: -5, axis: care, refs: [ipa-sme-guideline] }
+      - id: o16-stay
+        text: { ja: '残って、自社の再発防止と保存ルールの見直しを続ける。', en: '' }
+        minutes: 120
+        category: recover
+        points: 100
+        refs: [meti-csm-guideline]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { stayReform: true }
+        items:
+          - { id: o16-b-record, points: 8, axis: record, refs: [meti-csm-guideline] }
+          - { id: o16-b-content, points: 8, axis: content, refs: [no04-ppc-guideline-general] }
+          - { id: o16-b-care, points: 5, axis: care, refs: [ipa-sme-guideline] }
+      - id: o16-group-rule
+        text: { ja: '残り、グループ全体の保存期間・削除・本人説明のルールを作る。業界団体にも公開する。', en: '' }
+        minutes: 240
+        category: increase
+        points: 300
+        fatalAlternate: 50
+        refs: [no04-ppc-guideline-general, meti-csm-guideline]
+        gauges: { flame: -15, trust: 20, stamina: -15 }
+        setFlags: { stayReform: true, groupRule: true, industryShare: true }
+        items:
+          - { id: o16-c-content, points: 8, axis: content, refs: [no04-ppc-guideline-general] }
+          - { id: o16-c-record, points: 8, axis: record, refs: [meti-csm-guideline] }
+          - { id: o16-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+
+drafts:
+  group-report:
+    title: { ja: '親会社への第一報', en: '' }
+    slots:
+      - id: timing
+        label: { ja: '提出までの時間', en: '' }
+        auto: true
+        items:
+          - { id: og-t-24h, when: { withinHours: 24 }, points: 8, axis: time, refs: [jpcert-handling] }
+          - { id: og-t-36h, when: { withinHours: 36 }, points: 3, axis: time, refs: [jpcert-handling] }
+          - { id: og-t-late, when: { otherwise: true }, points: -10, axis: time, refs: [jpcert-handling] }
+      - id: scope
+        label: { ja: '被害の範囲', en: '' }
+        options:
+          - { id: og-s-split, text: { ja: 'グループ全体の被害と自社の範囲を分けて書く', en: '' }, points: 10, axis: content, refs: [ppc-report-scope] }
+          - { id: og-s-none, text: { ja: '「子会社は影響なし」と書く', en: '' }, points: -20, axis: content, refs: [ppc-report-scope], delayed: { afterPhases: 1, points: -20, reason: { ja: '自社の影響を否定した訂正が必要になった。', en: '' } } }
+      - id: facts
+        label: { ja: '事実と推測の分け方', en: '' }
+        options:
+          - { id: og-f-split, text: { ja: '確認できた事実と不明点を分けて書く', en: '' }, points: 8, axis: content, refs: [jpcert-handling] }
+          - { id: og-f-guess, text: { ja: '推測も事実として書く', en: '' }, points: -10, axis: wording, refs: [jpcert-handling] }
+      - id: retention
+        label: { ja: '保存していた対象', en: '' }
+        options:
+          - { id: og-r-all, text: { ja: '退会者・申込み途中・法人ドライバーを含むと書く', en: '' }, points: 10, axis: content, refs: [no04-ppc-guideline-general] }
+          - { id: og-r-current, text: { ja: '現会員のみと書く', en: '' }, points: -15, axis: content, refs: [ppc-report-scope] }
+      - id: cause
+        label: { ja: '原因の書き方', en: '' }
+        options:
+          - { id: og-c-maybe, text: { ja: 'グループ共通アプリが入口の可能性と書く', en: '' }, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: og-c-fixed, text: { ja: '自社の端末が原因と断定する', en: '' }, points: -10, axis: wording, refs: [nist-sp800-61r3] }
+      - id: data
+        label: { ja: '漏れた項目', en: '' }
+        options:
+          - { id: og-d-list, text: { ja: '免許証画像、氏名、生年月日、利用履歴を列挙する', en: '' }, points: 8, axis: content, refs: [ppc-report-prelim] }
+          - { id: og-d-vague, text: { ja: '「顧客情報の一部」とぼかす', en: '' }, points: -10, axis: content, refs: [ppc-report-prelim] }
+      - id: ask
+        label: { ja: '親会社への要請', en: '' }
+        options:
+          - { id: og-a-resource, text: { ja: '調査資源と応援要員の支援を書く', en: '' }, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: og-a-none, text: { ja: '要請は書かない', en: '' }, points: -5, axis: order, refs: [meti-csm-guideline] }
+      - id: contact
+        label: { ja: '窓口', en: '' }
+        options:
+          - { id: og-w-own, text: { ja: '自社の窓口と連絡できる時間を書く', en: '' }, points: 5, axis: order, refs: [jpcert-handling] }
+          - { id: og-w-parent, text: { ja: '連絡は親会社に任せると書く', en: '' }, points: -8, axis: order, refs: [jpcert-handling] }
+      - id: record
+        label: { ja: '記録', en: '' }
+        options:
+          - { id: og-rec-log, text: { ja: '提出した時刻と版を記録する', en: '' }, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: og-rec-none, text: { ja: '記録を残さない', en: '' }, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: next
+        label: { ja: '次の報告', en: '' }
+        options:
+          - { id: og-n-next, text: { ja: '次の報告予定を書く', en: '' }, points: 3, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: og-n-none, text: { ja: '次回の予定を書かない', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance] }
+  customer-notice:
+    title: { ja: '法人契約先への説明', en: '' }
+    slots:
+      - id: order
+        label: { ja: '伝える順番', en: '' }
+        options:
+          - { id: oc-order-first, text: { ja: '報道より先に、担当者から個別に伝える', en: '' }, points: 8, axis: order, refs: [ppc-notify-person] }
+          - { id: oc-order-news, text: { ja: '報道が出てから、まとめて伝える', en: '' }, points: -10, axis: order, refs: [ppc-notify-person] }
+      - id: scope
+        label: { ja: '対象データ', en: '' }
+        options:
+          - { id: oc-scope-license, text: { ja: 'ドライバーの免許証画像を含むと書く', en: '' }, points: 10, axis: content, refs: [ppc-report-scope] }
+          - { id: oc-scope-vague, text: { ja: '「顧客情報の一部」と書く', en: '' }, points: -10, axis: content, refs: [ppc-report-scope] }
+      - id: action
+        label: { ja: 'ドライバーがすること', en: '' }
+        options:
+          - { id: oc-action-concrete, text: { ja: '免許証の再発行と警察相談を案内する', en: '' }, points: 8, axis: care, refs: [npa-consult] }
+          - { id: oc-action-generic, text: { ja: '「ご注意ください」とだけ書く', en: '' }, points: -8, axis: care, refs: [ppc-notify-person] }
+      - id: contact
+        label: { ja: '窓口', en: '' }
+        options:
+          - { id: oc-contact-window, text: { ja: '専用窓口の番号と担当者名を書く', en: '' }, points: 8, axis: care, refs: [meti-csm-guideline] }
+          - { id: oc-contact-none, text: { ja: '窓口を書かない', en: '' }, points: -15, axis: care, refs: [meti-csm-guideline] }
+      - id: alternate
+        label: { ja: '代替の車', en: '' }
+        options:
+          - { id: oc-alt-plan, text: { ja: '代替車の手配と返却方法を書く', en: '' }, points: 8, axis: care, refs: [meti-csm-guideline] }
+          - { id: oc-alt-none, text: { ja: '代替に触れない', en: '' }, points: -8, axis: care, refs: [meti-csm-guideline] }
+      - id: apology
+        label: { ja: '謝罪の主語', en: '' }
+        options:
+          - { id: oc-ap-company, text: { ja: '「当社」として謝罪する', en: '' }, points: 3, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: oc-ap-vendor, text: { ja: '「委託先」の責任として説明する', en: '' }, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: record
+        label: { ja: '連絡の記録', en: '' }
+        options:
+          - { id: oc-rec-log, text: { ja: '連絡した時刻と相手を記録する', en: '' }, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: oc-rec-none, text: { ja: '記録を残さない', en: '' }, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: next
+        label: { ja: '次の連絡', en: '' }
+        options:
+          - { id: oc-next-plan, text: { ja: '次の連絡予定を書く', en: '' }, points: 3, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: oc-next-none, text: { ja: '次回の予定を書かない', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance] }
+  final-report:
+    title: { ja: '調査報告書の自社部分', en: '' }
+    slots:
+      - id: scope
+        label: { ja: '公開する範囲', en: '' }
+        options:
+          - { id: of-s-full, text: { ja: '攻撃に使える詳細だけ伏せて全文公開する', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: of-s-hide, text: { ja: '自社部分は公開しない', en: '' }, points: -20, axis: content, refs: [meti-disclosure-guidance] }
+      - id: retention
+        label: { ja: '保存方針の書き方', en: '' }
+        options:
+          - { id: of-r-own, text: { ja: '保存を提案した会議と自分の責任を書く', en: '' }, points: 10, axis: record, refs: [meti-csm-guideline] }
+          - { id: of-r-field, text: { ja: '現場の運用の誤りとして書く', en: '' }, points: -10, axis: wording, refs: [meti-csm-guideline] }
+      - id: cause
+        label: { ja: '侵入経路の書き方', en: '' }
+        options:
+          - { id: of-c-cause, text: { ja: 'グループ共通アプリの設定の不備を具体的に書く', en: '' }, points: 10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: of-c-vague, text: { ja: '「外部からの攻撃」とだけ書く', en: '' }, points: -10, axis: content, refs: [nist-sp800-61r3] }
+      - id: measures
+        label: { ja: '再発防止策', en: '' }
+        options:
+          - { id: of-m-plan, text: { ja: '実施時期と担当を書く', en: '' }, points: 8, axis: content, refs: [cissp-cbk-secops] }
+          - { id: of-m-slogan, text: { ja: '「再発防止に努めます」とだけ書く', en: '' }, points: -10, axis: content, refs: [cissp-cbk-secops] }
+      - id: victims
+        label: { ja: '被害者への対応', en: '' }
+        options:
+          - { id: of-v-record, text: { ja: '補償と窓口の実績を書く', en: '' }, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: of-v-none, text: { ja: '補償に触れない', en: '' }, points: -10, axis: care, refs: [ppc-notify-person] }
+      - id: progress
+        label: { ja: '進捗の公開', en: '' }
+        options:
+          - { id: of-p-monthly, text: { ja: '進捗を毎月公開する', en: '' }, points: 8, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: of-p-once, text: { ja: '一度だけ公開する', en: '' }, points: -5, axis: record, refs: [meti-disclosure-guidance] }
+      - id: group
+        label: { ja: 'グループ会社への共有', en: '' }
+        options:
+          - { id: of-g-share, text: { ja: 'グループ会社向けに教訓を共有する', en: '' }, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: of-g-keep, text: { ja: '自社の中にとどめる', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance] }
+      - id: parent
+        label: { ja: '親会社との責任分界', en: '' }
+        options:
+          - { id: of-parent-split, text: { ja: '親会社との責任分界を書く', en: '' }, points: 8, axis: content, refs: [no02-timely-disclosure] }
+          - { id: of-parent-none, text: { ja: '親会社に任せると書く', en: '' }, points: -8, axis: content, refs: [no02-timely-disclosure] }
+      - id: record
+        label: { ja: '公開の記録', en: '' }
+        options:
+          - { id: of-rec-log, text: { ja: '報告書の版と公開時刻を記録する', en: '' }, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: of-rec-none, text: { ja: '記録を残さない', en: '' }, points: -8, axis: record, refs: [jpcert-handling] }
+voices:
+  - { id: v01-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: 'グループの発表に任せろ。子会社が出しゃばると、説明が二つに割れる。', en: '' }, trigger: { at: point } }
+  - { id: v01-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'また個人情報か。店舗を止めろ、早く。', en: '' }, trigger: { at: point } }
+  - { id: v01-ok, media: chat, misleading: false, text: { ja: '店舗運用部長「まず、どの画像が残っているか確認します。消さずに置いておきます」。', en: '' }, trigger: { at: point } }
+  - { id: v01-after, media: sns, misleading: false, text: { ja: '子会社が勝手に動くなんて。本社の指示を待て。', en: '' }, trigger: { at: after, choice: o01-own } }
+  - { id: v02-flattery, media: chat, misleading: true, type: flattery, text: { ja: '法人契約の車を止めたら、明日の配送が止まります。今のままで回っていますよ。', en: '' }, trigger: { at: point } }
+  - { id: v02-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'レンタカーを止めるな。今週末に使うんだ。', en: '' }, trigger: { at: point } }
+  - { id: v02-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '画像の取り込みだけ止めれば十分です。店舗は全部閉める必要はありません。', en: '' }, trigger: { at: point } }
+  - { id: v02-ok, media: chat, misleading: false, text: { ja: '店舗運用部長「取り込みだけ止めれば、対面の貸出は続けられます」。', en: '' }, trigger: { at: point } }
+  - { id: v02-after, media: sns, misleading: false, text: { ja: '止めたのは分かるが、代替の車はいつ来るんだ。', en: '' }, trigger: { at: after, choice: o02-stop-all } }
+  - { id: v03-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '消せば漏えいの範囲が狭まります。まず消しましょう。', en: '' }, trigger: { at: point } }
+  - { id: v03-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '危なそうだったので、共有フォルダごと消しておきました。これで安全です。', en: '' }, trigger: { at: point } }
+  - { id: v03-ok, media: chat, misleading: false, text: { ja: '外部の調査会社「削除する前に、対象の一覧と保存場所を記録してください」。', en: '' }, trigger: { at: point } }
+  - { id: v04-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が固まるまで、子会社の名前は出さないでくれ。', en: '' }, trigger: { at: point } }
+  - { id: v04-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'まだ分かっていないのに書面を出すと、あとで訂正だらけになる。', en: '' }, trigger: { at: point } }
+  - { id: v04-ok, media: chat, misleading: false, text: { ja: '法務「分かった事実と不明点を分けて書けば、訂正は最小で済みます」。', en: '' }, trigger: { at: point } }
+  - { id: v04-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに、子会社が書面を出すのか。', en: '' }, trigger: { at: after, choice: o04-written } }
+  - { id: v05-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、退会者の画像は十万枚単位で残ってる。全部公表しろ。', en: '' }, trigger: { at: point } }
+  - { id: v05-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: 'その議事録は出さなくていい。今さら言っても混乱するだけだ。', en: '' }, trigger: { at: point } }
+  - { id: v05-ok, media: chat, misleading: false, text: { ja: '総務「当時の議事録と資料は、調査資料として保全しています」。', en: '' }, trigger: { at: point } }
+  - { id: v05-after, media: sns, misleading: false, text: { ja: '今さら議事録を出して、責任逃れに見える。', en: '' }, trigger: { at: after, choice: o05-explain } }
+  - { id: v06-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: 'うちの本人確認システムは別です。調べる必要はないでしょう。', en: '' }, trigger: { at: point } }
+  - { id: v06-past, media: boss, misleading: true, type: past-success, text: { ja: '前の障害は範囲を絞って収まった。今回も同じでいい。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '調査責任者「店舗の対面貸出と法人契約の免許証も、同じ保存場所です」。', en: '' }, trigger: { at: point } }
+  - { id: v07-sales, media: chat, misleading: true, type: flattery, text: { ja: '先に言うと、取引を止められますよ。報道を待てば、こちらから言わなくて済みます。', en: '' }, trigger: { at: point } }
+  - { id: v07-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'ニュースで知るのは嫌だ。先に言え。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '営業部長「先に言えば、代替の車を手配できます」。', en: '' }, trigger: { at: point } }
+  - { id: v08-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: 'グループの発表に任せろ。子会社が単独で出すと、数字が食い違う。', en: '' }, trigger: { at: point } }
+  - { id: v08-law, media: board, misleading: true, type: law-ish, text: { ja: '子会社の顧客は数千人だから、報告はいらないでしょ。', en: '' }, trigger: { at: point } }
+  - { id: v08-ok, media: chat, misleading: false, text: { ja: '法務「グループと連名にして、自社の範囲を明記すれば一本化できます」。', en: '' }, trigger: { at: point } }
+  - { id: v08-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに、子会社が名前を出すのか。', en: '' }, trigger: { at: after, choice: o08-joint-notice } }
+  - { id: v09-marketing, media: chat, misleading: true, type: flattery, text: { ja: '退会者に連絡すると、また問い合わせが増えますよ。今の会員だけで十分です。', en: '' }, trigger: { at: point } }
+  - { id: v09-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'メールが来ても、偽物だと思う。電話で説明してほしい。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '顧客対応「法人契約のドライバーは、会社を通さないと連絡できません」。', en: '' }, trigger: { at: point } }
+  - { id: v09-after, media: sns, misleading: false, text: { ja: '通知が多すぎて、どれが本物か分からない。', en: '' }, trigger: { at: after, choice: o09-all-plus } }
+  - { id: v10-flattery, media: chat, misleading: true, type: flattery, text: { ja: '社長が店舗を回れば、現場も頑張りますよ。寝ずにやりましょう。', en: '' }, trigger: { at: point } }
+  - { id: v10-public, media: sns, misleading: true, type: public-opinion, text: { ja: '経営者が休んでいる場合か。早く普通に戻せ。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '店舗運用部長「交代を入れてください。研修中のスタッフも動かせます」。', en: '' }, trigger: { at: point } }
+  - { id: v11-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '次の公開は、法人契約のドライバーの免許証だ。', en: '' }, trigger: { at: point } }
+  - { id: v11-coward, media: news, misleading: true, type: coward-critique, text: { ja: '一部が売られている程度で、全部を認めるのか。弱みを見せるな。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '窓口「公開された画像について、顧客から電話が来ています」。', en: '' }, trigger: { at: point } }
+  - { id: v11-after, media: sns, misleading: false, text: { ja: '見舞金が少ない。これで済むと思うな。', en: '' }, trigger: { at: after, choice: o11-support } }
+  - { id: v12-sales, media: chat, misleading: true, type: flattery, text: { ja: '自社だけ先に戻せば、週末の売上は守れます。本社も分かってくれますよ。', en: '' }, trigger: { at: point } }
+  - { id: v12-public, media: sns, misleading: true, type: public-opinion, text: { ja: '一週間も止めて、いい加減にしろ。他社は動いている。', en: '' }, trigger: { at: point } }
+  - { id: v12-ok, media: chat, misleading: false, text: { ja: '情報システム担当（兼任）「クリーンな環境から、店舗ごとに段階的に戻せます」。', en: '' }, trigger: { at: point } }
+  - { id: v12-after, media: news, misleading: false, text: { ja: '再開が遅い。他社はとっくに動いている。', en: '' }, trigger: { at: after, choice: o12-verified } }
+  - { id: v13-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '補償を出すと、被害を認めたことになりますよ。', en: '' }, trigger: { at: point } }
+  - { id: v13-public, media: sns, misleading: true, type: public-opinion, text: { ja: '免許証の値段はそんなものか。再発行の手間を考えろ。', en: '' }, trigger: { at: point } }
+  - { id: v13-ok, media: chat, misleading: false, text: { ja: '顧客対応「金額だけでなく、相談窓口と説明の場が要ります」。', en: '' }, trigger: { at: point } }
+  - { id: v14-parent, media: boss, misleading: true, type: boss-pressure, text: { ja: '上場企業の発表に合わせて、子会社の失敗は軽く説明してくれ。', en: '' }, trigger: { at: point } }
+  - { id: v14-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '社長が「攻撃に屈しない」と強気で言えば、株主も安心します。', en: '' }, trigger: { at: point } }
+  - { id: v14-ok, media: chat, misleading: false, text: { ja: '本社の法務「事前の指摘を生かせなかった経緯まで話さないと、あとで説明が変わります」。', en: '' }, trigger: { at: point } }
+  - { id: v14-after, media: news, misleading: false, text: { ja: '自分の責任を認めるのは、株主への印象が悪い。', en: '' }, trigger: { at: after, choice: o14-own } }
+  - { id: v15-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '報告書を出すと、攻撃者に手の内が分かります。伏せましょう。', en: '' }, trigger: { at: point } }
+  - { id: v15-law, media: board, misleading: true, type: law-ish, text: { ja: '任意の報告書です。出さなくても違法ではありません。', en: '' }, trigger: { at: point } }
+  - { id: v15-ok, media: chat, misleading: false, text: { ja: '調査委員「攻撃に使える部分だけ伏せれば、公開できます」。', en: '' }, trigger: { at: point } }
+  - { id: v15-after, media: news, misleading: false, text: { ja: '今さら報告書を出して、宣伝か。', en: '' }, trigger: { at: after, choice: o15-share } }
+  - { id: v16-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '辞めれば済むと思っているのか。逃げるな。', en: '' }, trigger: { at: point } }
+  - { id: v16-flattery, media: chat, misleading: true, type: flattery, text: { ja: '辞任会見をすれば、会社は守れますよ。社長の責任は重いですから。', en: '' }, trigger: { at: point } }
+  - { id: v16-ok, media: chat, misleading: false, text: { ja: '本社の社長「残って改革をやるなら、グループ全体の保存ルールを任せる」。', en: '' }, trigger: { at: point } }
+  - { id: v16-after, media: news, misleading: false, text: { ja: '残って改革と言っても、説得力がない。', en: '' }, trigger: { at: after, choice: o16-group-rule } }
+  - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「調査中」なんだ。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-3, media: sns, misleading: false, text: { ja: '子会社の社長は責任を取りたくないだけだ。事なかれ主義の会社。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-4, media: news, misleading: false, text: { ja: '臆病な経営が被害を広げた。法人契約先が独自に調査を始めている。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-client, media: news, misleading: false, text: { ja: '法人契約先「復旧の見通しと、ドライバーの免許証画像の扱いを説明してほしい」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-news, media: news, misleading: false, text: { ja: '「退会者の免許証画像が残っていた」。ニュースが一斉に報じた。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-staff, media: chat, misleading: false, text: { ja: '店舗スタッフ「交代を入れないと、接客の確認漏れが出ます」。', en: '' }, trigger: { at: manual } }
