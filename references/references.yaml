@@ -115,3 +115,11 @@
   summary: { ja: "内部からの持ち出しは証拠保全と法的手続きの順序が重要", en: "Preserve evidence before legal steps for insider leaks" }
   checkedAt: 2026-11-08
   legalPack: jp
+- id: "no02-timely-disclosure"
+  title: { ja: "上場企業の会社情報の適時開示（開示府令）", en: "Timely disclosure of corporate information by listed companies" }
+  issuer: { ja: "金融庁", en: "Financial Services Agency" }
+  version: "2026-11"
+  section: { ja: "業績や事業に重要な影響を及ぼす情報の適時開示", en: "Timely disclosure of information materially affecting business" }
+  summary: { ja: "業績や事業に重要な影響を及ぼす事実は、事実が確定していなくても速やかに開示し、進捗を更新する", en: "Disclose material facts promptly even before they are fully confirmed, and update progress" }
+  checkedAt: "2026-11-08"
+  legalPack: "jp"
