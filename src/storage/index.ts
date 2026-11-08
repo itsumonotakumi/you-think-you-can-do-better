@@ -7,7 +7,7 @@ import type {
 import { LANGS, PHASES, ROLES, STORAGE_KEYS } from '../engine/types';
 
 export const DEFAULT_SETTINGS: Settings = {
-  lang: 'ja', fontSize: 'medium', bgmVolume: 0.5, seVolume: 0.7, muted: false,
+  lang: 'ja', fontSize: 'medium', theme: 'light', bgmVolume: 0.5, seVolume: 0.7, muted: false,
   reduceMotion: false, pressTimeScale: 1, soundNoticeShown: false,
 };
 /** 書き込み失敗で true（保存なしモード）。画面は一度だけ知らせる */
@@ -114,6 +114,7 @@ function sanitizeSettings(v: unknown): Settings {
   if (typeof v.fontSize === 'string' && (FONT_SIZES as readonly string[]).includes(v.fontSize)) {
     s.fontSize = v.fontSize as Settings['fontSize'];
   }
+  if (v.theme === 'light' || v.theme === 'dark') s.theme = v.theme;
   if (isVolume(v.bgmVolume)) s.bgmVolume = v.bgmVolume;
   if (isVolume(v.seVolume)) s.seVolume = v.seVolume;
   if (typeof v.muted === 'boolean') s.muted = v.muted;

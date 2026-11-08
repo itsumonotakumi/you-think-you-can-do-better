@@ -341,6 +341,7 @@ export interface Report {
 export interface Settings {
   lang: Lang;
   fontSize: 'small' | 'medium' | 'large';
+  theme: 'light' | 'dark'; // 既定 light（白背景）
   bgmVolume: number; // 0〜1, 既定0.5
   seVolume: number;  // 0〜1, 既定0.7
   muted: boolean;
