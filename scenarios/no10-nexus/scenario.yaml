@@ -10,7 +10,7 @@ languages: [ja]
 referencesVersion: '2026-11-08'
 legalPack: jp
 title: { ja: '漏らしたのは、一番真面目な社員だった', en: '' }
-tagline: { ja: '生成AIを解禁して三週間。漏れたのは、コードと会議録。禁じるか、使わせるか。', en: '' }
+tagline: { ja: '生成AIを解禁して五週間。漏れたのは、コードと会議録。禁じるか、使わせるか。', en: '' }
 company:
   name: { ja: 'ネクサス半導体株式会社', en: '' }
   industry: { ja: '半導体製造装置の設計・製造', en: '' }
@@ -54,19 +54,20 @@ press:
     - id: q-why
       seconds: 30
       timeoutPoints: -30
-      text: { ja: 'なぜ三週間も、入力に気づかなかったのですか。', en: '' }
+      text: { ja: 'なぜ五週間も、入力に気づかなかったのですか。', en: '' }
       answers:
         - { id: a-why-none, text: { ja: '便利に使っていたので、監視はしていませんでした。', en: '' }, points: -30 }
         - { id: a-why-design, text: { ja: '入力履歴を見る仕組みがなく、確認が遅れました。', en: '' }, points: 30 }
-        - { id: a-why-verify, text: { ja: '三週間気づかなかった理由を検証し、入力制限と監査の仕組みとあわせて公表します。', en: '' }, points: 80, requiresNote: note-ai-log }
+        - { id: a-why-verify, text: { ja: '五週間気づかなかった理由を検証し、入力制限と監査の仕組みとあわせて公表します。', en: '' }, points: 80, requiresNote: note-ai-log }
     - id: q-employee
       seconds: 25
       timeoutPoints: -30
       text: { ja: '入力した社員を処分したのですか。', en: '' }
       answers:
-        - { id: a-emp-fire, text: { ja: '懲戒解雇にしました。', en: '' }, points: -100 }
-        - { id: a-emp-warn, text: { ja: '注意指導にとどめました。', en: '' }, points: 30 }
-        - { id: a-emp-own, text: { ja: '本人の意図を聞き、処分より再発防止を優先しました。その理由も含めて説明します。', en: '' }, points: 80, requiresNote: note-employee-intent }
+        - { id: a-emp-fire, text: { ja: '懲戒解雇にしました。', en: '' }, points: -100, when: { flags: { employeeDismissed: true } } }
+        - { id: a-emp-warn, text: { ja: '注意指導にとどめました。', en: '' }, points: 30, when: { flags: { employeeDismissed: false, employeeDisciplined: false } } }
+        - { id: a-emp-own, text: { ja: '本人の意図を聞き、処分より再発防止を優先しました。その理由も含めて説明します。', en: '' }, points: 80, requiresNote: note-employee-intent, when: { flags: { employeeDismissed: false, employeeDisciplined: false } } }
+        - { id: a-emp-explain, text: { ja: '処分の有無と理由は、本人の同意を得た範囲で説明します。', en: '' }, points: 20 }
     - id: q-customer
       seconds: 35
       timeoutPoints: -30
@@ -80,9 +81,10 @@ press:
       timeoutPoints: -30
       text: { ja: '生成AIを、これからも使うのですか。', en: '' }
       answers:
-        - { id: a-ban-yes, text: { ja: 'はい。便利なので使い続けます。', en: '' }, points: -30 }
-        - { id: a-ban-managed, text: { ja: '管理された環境に限って使います。', en: '' }, points: 30 }
-        - { id: a-ban-design, text: { ja: '入力制限と監査を技術的に強制した環境でのみ使い、再開の条件も公表します。', en: '' }, points: 60 }
+        - { id: a-ban-yes, text: { ja: 'はい。便利なので使い続けます。', en: '' }, points: -30, when: { flags: { bannedAI: false } } }
+        - { id: a-ban-managed, text: { ja: '管理された環境に限って使います。', en: '' }, points: 30, when: { flags: { bannedAI: false } } }
+        - { id: a-ban-design, text: { ja: '入力制限と監査を技術的に強制した環境でのみ使い、再開の条件も公表します。', en: '' }, points: 60, when: { flags: { managedAI: true } } }
+        - { id: a-ban-review, text: { ja: '再開するかどうかは、検証の結果が出てから説明します。', en: '' }, points: 20 }
   extraQuestions:
     - when: { flags: { downplayed: true } }
       question:
