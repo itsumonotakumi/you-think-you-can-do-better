@@ -3,7 +3,7 @@
 # 専任のセキュリティ部署はない。医療情報部、外部の調査会社、法務、委託先が頼り。
 # 判断ポイント17、細目は choices[].items と drafts の合計で80以上。
 estimateMinutes: 40
-intro: { ja: 'あなたはハマカゼ総合医療センターの事務局長、早瀬 達也。病院長と並ぶ役員として、職員・予算・委託契約・地域連携・患者対応を預かる。午前5時30分、電子カルテが全館で止まった。病院長は救急の現場へ向かった。あなたの机には、給食委託先との契約書、地域の医療機関の連絡先、そして報道からの電話がある。診療を止めない段取りと、外に出す説明の順番を決めるのは、あなたの仕事だ。', en: '' }
+intro: { ja: 'あなたはハマカゼ総合医療センターの事務局長、早瀬 達也。病院長と並ぶ役員として、職員・予算・委託契約・地域連携・患者対応を預かる。午前5時30分、電子カルテが全館で止まった。病院長は救急の現場へ向かった。あなたの机には、設備保守委託先との契約書、地域の医療機関の連絡先、そして報道からの電話がある。診療を止めない段取りと、外に出す説明の順番を決めるのは、あなたの仕事だ。', en: '' }
 pressEnabled: true
 cowardVoices:
   '2': v-coward-2
@@ -18,7 +18,7 @@ deadlines:
   - id: dl-officer-ppc-final
     ref: ppc-report-final-malicious
     label: { ja: '個人情報保護委員会への確報', en: '' }
-    points: -150
+    points: -100
     doneFlag: ppcFinalFiled
 events:
   - id: ev-officer-board
@@ -52,7 +52,7 @@ points:
     text: { ja: '午前6時。夜勤の看護師長から事務局に電話が入る。「電子カルテが開きません。救急の患者さんが来ています」。病院長は救急外来へ向かった。事務局として、まず何を押さえるか。', en: '' }
     voices: [v01-boss, v01-coward, v01-ok]
     notable:
-      - { id: note-officer-outage, text: { ja: '午前5時30分、電子カルテが全館で停止。午前6時、事務局が連絡台を設置。', en: '' } }
+      - { id: note-officer-outage, text: { ja: '午前5時30分、電子カルテが全館で停止。午前6時、事務局に第一報。', en: '' } }
     choices:
       - id: p01-wait
         text: { ja: '理事会への根回しを優先し、現場の対応は病院長に任せる。', en: '' }
@@ -99,13 +99,13 @@ points:
     at: { day: 0, minutes: 450 }
     phase: detect
     sound: { se: [notify_chat] }
-    text: { ja: '午前7時30分。医療情報部が、給食委託先のVPN機器が院内ネットワークにつながったままだと報告した。委託先は「弊社の機器に問題はない」と言う。接続をどうするか。', en: '' }
+    text: { ja: '午前7時30分。医療情報部が、設備保守委託先のVPN機器が院内ネットワークにつながったままだと報告した。委託先は「弊社の機器に問題はない」と言う。接続をどうするか。', en: '' }
     voices: [v02-vendor, v02-past, v02-ok]
     notable:
-      - { id: note-officer-entry, text: { ja: '侵入口は給食委託先のVPN機器の疑い。機器は院内ネットワークにつながったまま。', en: '' } }
+      - { id: note-officer-entry, text: { ja: '侵入口は設備保守委託先のVPN機器の疑い。機器は院内ネットワークにつながったまま。', en: '' } }
     choices:
       - id: p02-keep
-        text: { ja: '委託先の説明を信じ、給食を止めないよう接続を残す。', en: '' }
+        text: { ja: '委託先の説明を信じ、設備の遠隔監視を止めないよう接続を残す。', en: '' }
         minutes: 60
         category: hurt
         points: -120
@@ -130,7 +130,7 @@ points:
           - { id: p02-b-record, points: 8, axis: record, refs: [jpcert-handling] }
           - { id: p02-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
       - id: p02-cut-plan
-        text: { ja: 'VPNを切り、ログを保全する。加えて、給食の代替手順を委託先と決め、委託先の他の接続も一覧にする。', en: '' }
+        text: { ja: 'VPNを切り、ログを保全する。加えて、設備監視の代替手順を委託先と決め、委託先の他の接続も一覧にする。', en: '' }
         minutes: 90
         category: recover
         points: 100
@@ -193,11 +193,11 @@ points:
     at: { day: 0, minutes: 630 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '午前10時30分。委託先の保守アカウントが、院内の全端末に管理者権限で入れる状態だった。止めれば給食の遠隔保守も止まる。どうするか。', en: '' }
+    text: { ja: '午前10時30分。委託先の保守アカウントが、院内の全端末に管理者権限で入れる状態だった。止めれば設備の遠隔監視も止まる。どうするか。', en: '' }
     voices: [v04-vendor, v04-insider, v04-ok]
     choices:
       - id: p04-leave
-        text: { ja: '給食を止めないため、保守アカウントはそのままにする。', en: '' }
+        text: { ja: '設備の遠隔監視を止めないため、保守アカウントはそのままにする。', en: '' }
         minutes: 60
         category: hurt
         points: -130
@@ -222,7 +222,7 @@ points:
           - { id: p04-b-record, points: 8, axis: record, refs: [jpcert-handling] }
           - { id: p04-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
       - id: p04-stop-plan
-        text: { ja: '記録してから止める。加えて、全委託先の接続とアカウントを棚卸しし、給食の代替手段を用意する。', en: '' }
+        text: { ja: '記録してから止める。加えて、全委託先の接続とアカウントを棚卸しし、設備監視の代替手段を用意する。', en: '' }
         minutes: 120
         category: recover
         points: 100
@@ -375,10 +375,10 @@ points:
     at: { day: 0, minutes: 1140 }
     phase: investigate
     sound: { se: [notify_news] }
-    text: { ja: '午後7時。医療情報部の調査で、電子カルテの患者情報が外部に持ち出された可能性が出てきた。広報が「今夜、第一報を出したい」と言う。何を書くか。', en: '' }
+    text: { ja: '午後7時。医療情報部から「暗号化だけでなく、持ち出しの有無も調べている」と聞いた。広報が「今夜、第一報を出したい」と言う。何を書くか。', en: '' }
     voices: [v08-public, v08-coward, v08-ok]
     notable:
-      - { id: note-officer-scope, text: { ja: '患者情報が外部に持ち出された可能性。第一報の文案を事務局で作る。', en: '' } }
+      - { id: note-officer-scope, text: { ja: '持ち出しの有無は調査中。第一報の文案を事務局で作る。', en: '' } }
     choices:
       - id: p08-fault
         text: { ja: '「電子カルテの機器故障」とだけ発表する。', en: '' }
@@ -498,8 +498,8 @@ points:
       - id: p10-window
         text: { ja: '専用の相談窓口を増員し、患者と家族向けの説明会を開く。', en: '' }
         minutes: 180
-        category: recover
-        points: 90
+        category: maintain
+        points: 30
         refs: [ppc-notify-person]
         gauges: { flame: -10, trust: 10, stamina: -15 }
         setFlags: { patientWindowStaffed: true }
@@ -660,7 +660,7 @@ points:
     at: { day: 5, minutes: 600 }
     phase: recover
     sound: { se: [typing] }
-    text: { ja: '午前10時。電子カルテが戻り始めたが、止まっていた間のレセプトと会計が二千件を超えて残っている。患者への請求も止まっている。', en: '' }
+    text: { ja: '午前10時。電子カルテの一部が戻り始めたが、止まっていた間のレセプトと会計が二千件を超えて残っている。患者への請求も止まっている。', en: '' }
     voices: [v14-law, v14-coward, v14-ok]
     choices:
       - id: p14-leave
@@ -706,7 +706,7 @@ points:
     at: { day: 8, minutes: 600 }
     phase: recover
     sound: { se: [notify_news] }
-    text: { ja: '午前10時。攻撃者が公開サイトに、患者の氏名と診療科、通院履歴の一部を公開した。件数はまだ数え切れていない。', en: '' }
+    text: { ja: '午前10時。攻撃者が公開サイトに、患者の氏名と診療科、通院履歴の一部を公開した。件数はまだ数え切れていない。公開したのは攻撃者であり、これは犯罪だ。', en: '' }
     voices: [v15-attacker, v15-public, v15-ok]
     notable:
       - { id: note-officer-leak, text: { ja: '攻撃者が患者の氏名、診療科、通院履歴の一部を公開した。', en: '' } }
@@ -727,8 +727,8 @@ points:
       - id: p15-notice
         text: { ja: '公開された範囲を特定し、対象の患者本人に通知する。追加の速報も出す。', en: '' }
         minutes: 180
-        category: recover
-        points: 120
+        category: maintain
+        points: 30
         refs: [ppc-notify-person, ppc-report-scope]
         gauges: { flame: -10, trust: 5, stamina: -15 }
         setFlags: { leakAdmitted: true }
@@ -754,16 +754,17 @@ points:
     at: { day: 21, minutes: 600 }
     phase: after
     sound: { se: [notify_news] }
-    text: { ja: '午前10時。第三者委員会の調査報告書が完成した。事務局部分には、委託契約、地域連携、患者対応の検証が入っている。公開範囲と確報を決める。', en: '' }
+    text: { ja: '午前10時。調査報告書が完成した。事務局部分には、委託契約、地域連携、患者対応の検証が入っている。公開範囲と確報を決める。', en: '' }
     voices: [v16-expert, v16-law, v16-ok]
     choices:
       - id: p16-hide
         text: { ja: '報告書は公開せず、確報も出さない。', en: '' }
         minutes: 60
-        category: hurt
-        points: -150
+        category: fatal
+        points: -250
         refs: [meti-disclosure-guidance]
         gauges: { flame: 15, trust: -15 }
+        setFlags: { skippedFinal: true }
         items:
           - { id: p16-a-content, points: -10, axis: content, refs: [meti-disclosure-guidance] }
           - { id: p16-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
@@ -964,21 +965,21 @@ drafts:
           - { id: ofr-staff-none, text: { ja: '職員の負担に触れない', en: '' }, points: -5, axis: care, refs: [ipa-sme-guideline] }
 voices:
   - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '理事会への根回しが先だ。現場の指示は病院長に任せておけ。', en: '' }, trigger: { at: point } }
-  - { id: v01-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '原因も分からないうちに動くと、余計に混乱する。', en: '' }, trigger: { at: point } }
+  - { id: v01-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '原因も分からないうちに動くと、余計に混乱する。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: '事務局の総務課長「委託先の連絡先と、昨夜の当直表はこちらです」。', en: '' }, trigger: { at: point } }
   - { id: v01-after, media: news, misleading: false, text: { ja: '事務局が前のめりになり、現場が混乱した。', en: '' }, trigger: { at: after, choice: p01-desk-plan } }
-  - { id: v02-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '止めると給食が止まります。弊社の機器は関係ありません。', en: '' }, trigger: { at: point } }
+  - { id: v02-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '止めると設備の遠隔監視が止まります。弊社の機器は関係ありません。', en: '' }, trigger: { at: point } }
   - { id: v02-past, media: boss, misleading: true, type: past-success, text: { ja: '前の機器更新のときも、つないだままで問題なかった。', en: '' }, trigger: { at: point } }
   - { id: v02-ok, media: chat, misleading: false, text: { ja: '医療情報部「まずVPNを切り、機器のログは残しましょう」。', en: '' }, trigger: { at: point } }
-  - { id: v02-after, media: vendor, misleading: false, text: { ja: '給食を止める前に、相談してほしかった。', en: '' }, trigger: { at: after, choice: p02-cut-plan } }
+  - { id: v02-after, media: vendor, misleading: false, text: { ja: '設備の監視を止める前に、相談してほしかった。', en: '' }, trigger: { at: after, choice: p02-cut-plan } }
   - { id: v03-public, media: sns, misleading: true, type: public-opinion, text: { ja: '救急を断るな。地域の信用が落ちる。', en: '' }, trigger: { at: point } }
-  - { id: v03-coward, media: news, misleading: true, type: coward-critique, text: { ja: '受け入れ調整なんて前例がない。様子を見よう。', en: '' }, trigger: { at: point } }
+  - { id: v03-coward, media: news, misleading: true, type: coward-critique, text: { ja: '救急を断る病院に、誰が患者を預ける。受け入れを止めるな。', en: '' }, trigger: { at: point } }
   - { id: v03-ok, media: chat, misleading: false, text: { ja: '看護部長「搬送先と情報を共有する紙の様式が要ります」。', en: '' }, trigger: { at: point } }
   - { id: v03-after, media: sns, misleading: false, text: { ja: '他所の病院に押し付けるのか。', en: '' }, trigger: { at: after, choice: p03-coordinate-plan } }
   - { id: v04-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: 'アカウントを止めると、復旧は保証できません。', en: '' }, trigger: { at: point } }
   - { id: v04-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の者だけど、委託先のアカウントは全部消されている。今すぐ公表しろ。', en: '' }, trigger: { at: point } }
   - { id: v04-ok, media: chat, misleading: false, text: { ja: '医療情報部「止める前に、使われた形跡を記録しましょう」。', en: '' }, trigger: { at: point } }
-  - { id: v04-after, media: vendor, misleading: false, text: { ja: '止めるなら、給食の代替を先に決めてほしかった。', en: '' }, trigger: { at: after, choice: p04-stop-plan } }
+  - { id: v04-after, media: vendor, misleading: false, text: { ja: '止めるなら、設備監視の代替を先に決めてほしかった。', en: '' }, trigger: { at: after, choice: p04-stop-plan } }
   - { id: v05-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '会議は病院長に任せろ。事務は議事録だけ取っていろ。', en: '' }, trigger: { at: point } }
   - { id: v05-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場はもう紙で回しています。会議なんていりません。', en: '' }, trigger: { at: point } }
   - { id: v05-ok, media: chat, misleading: false, text: { ja: '看護部長「誰が決めるのか、一枚にしてください」。', en: '' }, trigger: { at: point } }
@@ -992,7 +993,7 @@ voices:
   - { id: v07-ok, media: chat, misleading: false, text: { ja: '法務「共同調査を求めて、契約の棚卸しをしましょう」。', en: '' }, trigger: { at: point } }
   - { id: v07-after, media: vendor, misleading: false, text: { ja: '契約を点検するとは、うちを疑っているのか。', en: '' }, trigger: { at: after, choice: p07-joint-plan } }
   - { id: v08-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'まだ原因が分からない。システム障害で出そう。', en: '' }, trigger: { at: point } }
-  - { id: v08-coward, media: news, misleading: true, type: coward-critique, text: { ja: 'サイバー攻撃と書くと、患者が離れる。', en: '' }, trigger: { at: point } }
+  - { id: v08-coward, media: news, misleading: true, type: public-opinion, text: { ja: 'サイバー攻撃と書くと、患者が離れる。', en: '' }, trigger: { at: point } }
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '広報「診療の制限と、患者が今することは今夜出せます」。', en: '' }, trigger: { at: point } }
   - { id: v08-after, media: sns, misleading: false, text: { ja: 'まだ分かっていないのに、攻撃と断定するのか。', en: '' }, trigger: { at: after, choice: p08-window } }
   - { id: v09-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '理事会の了承が取れるまで、報告は待ってくれ。', en: '' }, trigger: { at: point } }
@@ -1000,7 +1001,7 @@ voices:
   - { id: v09-ok, media: chat, misleading: false, text: { ja: '法務「分かっている範囲で速報、不明点は調査中と書きましょう」。', en: '' }, trigger: { at: point } }
   - { id: v09-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに、報告するのか。', en: '' }, trigger: { at: after, choice: p09-file-notify } }
   - { id: v10-popular, media: sns, misleading: true, type: popular, text: { ja: '他の病院も、窓口は通常体制のままだ。', en: '' }, trigger: { at: point } }
-  - { id: v10-coward, media: news, misleading: true, type: coward-critique, text: { ja: '説明会を開く余裕があるなら、レセプトを止めるな。', en: '' }, trigger: { at: point } }
+  - { id: v10-coward, media: news, misleading: true, type: public-opinion, text: { ja: '説明会を開く余裕があるなら、レセプトを止めるな。', en: '' }, trigger: { at: point } }
   - { id: v10-ok, media: chat, misleading: false, text: { ja: '窓口「予約の変更方法を聞く電話が、1時間で80件です」。', en: '' }, trigger: { at: point } }
   - { id: v10-after, media: sns, misleading: false, text: { ja: '説明会なんて、誰が来るんだ。', en: '' }, trigger: { at: after, choice: p10-window-support } }
   - { id: v11-public, media: news, misleading: true, type: public-opinion, text: { ja: '地域の病院には、報道で伝わるだろう。', en: '' }, trigger: { at: point } }
@@ -1016,7 +1017,7 @@ voices:
   - { id: v13-ok, media: chat, misleading: false, text: { ja: '看護部長「交代を入れないと、通常の病棟が持ちません」。', en: '' }, trigger: { at: point } }
   - { id: v13-after, media: sns, misleading: false, text: { ja: '事務局長が休んでいる間に、患者は待っている。', en: '' }, trigger: { at: after, choice: p13-help } }
   - { id: v14-law, media: news, misleading: true, type: law-ish, text: { ja: 'レセプトの遅れは、請求期限までに間に合えば問題ない。', en: '' }, trigger: { at: point } }
-  - { id: v14-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '患者に遅延を詫びると、苦情が増える。', en: '' }, trigger: { at: point } }
+  - { id: v14-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '患者に遅延を詫びると、苦情が増える。', en: '' }, trigger: { at: point } }
   - { id: v14-ok, media: chat, misleading: false, text: { ja: '医事課「未処理の請求が二千件を超えています」。', en: '' }, trigger: { at: point } }
   - { id: v14-after, media: sns, misleading: false, text: { ja: '請求の遅れを謝るだけでは、生活が回らない。', en: '' }, trigger: { at: after, choice: p14-plan-support } }
   - { id: v15-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '次の公開は、もっと多くの患者だ。', en: '' }, trigger: { at: point } }
@@ -1028,7 +1029,7 @@ voices:
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '調査委員「攻撃に使える部分だけ伏せれば、公開できます」。', en: '' }, trigger: { at: point } }
   - { id: v16-after, media: news, misleading: false, text: { ja: '今さら報告書を出して、宣伝か。', en: '' }, trigger: { at: after, choice: p16-share } }
   - { id: v17-flattery, media: chat, misleading: true, type: flattery, text: { ja: '準備なんていりません。事務局長なら、その場で答えられます。', en: '' }, trigger: { at: point } }
-  - { id: v17-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '会見なんて開かなければいい。長引くだけです。', en: '' }, trigger: { at: point } }
+  - { id: v17-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '会見なんて開かなければいい。長引くだけです。', en: '' }, trigger: { at: point } }
   - { id: v17-ok, media: chat, misleading: false, text: { ja: '広報「記録を手元に置いて、事実だけ答えましょう」。', en: '' }, trigger: { at: point } }
   - { id: v17-after, media: news, misleading: false, text: { ja: '台本を読んでいるだけ。誠意がない。', en: '' }, trigger: { at: after, choice: p17-ready } }
   - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「確認中」なんだ。', en: '' }, trigger: { at: manual } }
