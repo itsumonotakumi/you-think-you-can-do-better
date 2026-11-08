@@ -1,0 +1,1128 @@
+# No.6 アマツ重工 / 役員・人事担当ロール
+# プレイヤーは常務取締役（人事・総務担当）。採用の穴と、社員・応募者をどう扱うかを判断する。
+# 判断ポイント17、細目は choices[].items と drafts の合計で80以上。
+estimateMinutes: 40
+intro: { ja: 'あなたはアマツ重工の常務取締役で、人事と総務を預かっている。遠隔の面接を四回通った新人が、端末が届いた朝に消えた。採用したのはあなたの部門で、最終面接の評価を書いたのもあなた自身だ。何を認め、誰を守り、どこまで話すか。9時の報告から、あなたの判断が始まる。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-coward-2
+  '3': v-coward-3
+  '4': v-coward-4
+deadlines:
+  - id: dl-ppc-prelim
+    ref: ppc-report-prelim
+    label: { ja: '応募者情報の漏えい等報告（速報）', en: '' }
+    points: -75
+    doneFlag: ppcPrelimFiled
+events:
+  - id: ev-news
+    at: { day: 4, minutes: 780 }
+    voices: [v-ev-news]
+    gauges: { flame: 10 }
+    sound: { se: [notify_news] }
+    caption: { ja: '週刊誌の速報が出た。「大手重工、偽の新人を採用か」。', en: '' }
+  - id: ev-union
+    at: { day: 6, minutes: 540 }
+    voices: [v-ev-union]
+    gauges: { flame: 5 }
+    sound: { se: [notify_chat] }
+    caption: { ja: '社員代表が、対象者の処遇と採用の基準の説明を求めてきた。', en: '' }
+  - id: ev-police
+    at: { day: 18, minutes: 540 }
+    voices: [v-ev-police]
+    gauges: { flame: 5 }
+    sound: { se: [phone_ring] }
+    caption: { ja: '警察の調べで、端末の送付先に他社の端末も届いていたことが分かった。', en: '' }
+points:
+  - id: p01-hiring-file
+    at: { day: 0, minutes: 540 }
+    phase: detect
+    sound: { se: [notify_chat] }
+    text: { ja: '9時。人事部長の宮下が、採用の綴りを抱えて入ってくる。「この人の採用は私が担当しました。面接は四回、すべてオンライン。経歴の確認は外の会社に任せました」。社長からは「どこを抜かれたんだ」と電話が来ている。', en: '' }
+    voices: [v01-ceo, v01-own, v01-hr]
+    notable:
+      - { id: note-interview, text: { ja: '最終面接の評価シートに、自分の字で「受け答えがスムーズ。即戦力」と書いた。', en: '' } }
+    choices:
+      - id: p01-quiet
+        text: { ja: 'まず自分の評価コメントを確かめ、社長への報告は事実が固まってからにする。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -30
+        refs: [jpcert-handling]
+        gauges: { flame: 5, trust: -10, stamina: 5 }
+        coward: true
+        delayed:
+          - { afterPhases: 1, points: -12, gauges: { trust: -10 }, reason: { ja: '報告が遅れたぶん、社長は現場から先に事情を聞いていた。', en: '' } }
+        items:
+          - { id: p01-a-time, points: -7, axis: time, refs: [jpcert-handling] }
+          - { id: p01-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: p01-share
+        text: { ja: '採用の記録をそのまま保全し、面接四回の評価、経歴確認の委託先、端末の送付先を、社長とセキュリティ責任者に事実として共有する。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 25
+        refs: [jpcert-handling, no06-government-advisory]
+        gauges: { flame: -5, trust: 5, stamina: -5 }
+        setFlags: { hiringFileKept: true }
+        items:
+          - { id: p01-b-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: p01-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: p01-b-content, points: 4, axis: content, refs: [no06-government-advisory] }
+      - id: p01-open
+        text: { ja: '記録を保全して共有し、同じ採用の経路で進んでいる応募者と内定者の名簿を止めて、本人確認のやり直しを自分が指揮する。', en: '' }
+        minutes: 90
+        category: recover
+        points: 150
+        refs: [no06-government-advisory, meti-csm-guideline]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { hiringFileKept: true, recheckStarted: true }
+        items:
+          - { id: p01-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p01-c-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+          - { id: p01-c-record, points: 4, axis: record, refs: [jpcert-handling] }
+      - id: p01-rewrite
+        text: { ja: '評価シートの自分のコメントを「慎重に審査した」と書き換え、記録を整える。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -200
+        refs: [jpcert-handling]
+        gauges: { flame: 15, trust: -20 }
+        setFlags: { doctoredRecord: true }
+        items:
+          - { id: p01-d-record, points: -14, axis: record, refs: [jpcert-handling] }
+          - { id: p01-d-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+
+  - id: p02-onboarding
+    at: { day: 0, minutes: 660 }
+    phase: contain
+    sound: { se: [notify_chat] }
+    text: { ja: '11時。今月入社した遠隔採用の十二名に、端末とアカウントが渡っている。同じやり方で入った人が、他にもいるかもしれない。', en: '' }
+    voices: [v02-vendor, v02-field, v02-ok]
+    notable:
+      - { id: note-hiring, text: { ja: '採用は遠隔の面接4回のみ。本人確認は外部の確認会社に委託し、対面では一度もしていない。', en: '' } }
+    choices:
+      - id: p02-keep
+        text: { ja: '止めずに様子を見る。仕事を止めれば、新入社員が辞めてしまう。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -30
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, flame: 5, trust: -5 }
+        coward: true
+        delayed:
+          - { afterPhases: 1, points: -12, gauges: { damage: 10 }, reason: { ja: '止めなかった区画から、別の端末で不審な通信が出た。', en: '' } }
+        items:
+          - { id: p02-a-content, points: -7, axis: content, refs: [nist-sp800-61r3] }
+          - { id: p02-a-time, points: -7, axis: time, refs: [nist-sp800-61r3] }
+      - id: p02-stop
+        text: { ja: '新しい端末の送付と、入社手続きを止める。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 25
+        refs: [jpcert-handling]
+        gauges: { flame: 5, trust: 5, stamina: -5 }
+        setFlags: { onboardingStopped: true }
+        items:
+          - { id: p02-b-order, points: 6, axis: order, refs: [jpcert-handling] }
+          - { id: p02-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: p02-stop-care
+        text: { ja: '送付と手続きを止め、対象の十二名に理由と見通しを書面で伝え、不安の相談窓口を設ける。', en: '' }
+        minutes: 120
+        category: recover
+        points: 150
+        refs: [jpcert-handling, no06-telework-guideline]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { onboardingStopped: true, newcomerCare: true }
+        items:
+          - { id: p02-c-order, points: 6, axis: order, refs: [jpcert-handling] }
+          - { id: p02-c-care, points: 6, axis: care, refs: [no06-telework-guideline] }
+          - { id: p02-c-record, points: 4, axis: record, refs: [jpcert-handling] }
+      - id: p02-fire
+        text: { ja: '遠隔採用の十二名全員の内定と雇用を取り消す。', en: '' }
+        minutes: 45
+        category: fatal
+        points: -200
+        refs: [no06-telework-guideline]
+        gauges: { flame: 20, trust: -20 }
+        items:
+          - { id: p02-d-care, points: -14, axis: care, refs: [no06-telework-guideline] }
+          - { id: p02-d-content, points: -10, axis: content, refs: [no06-telework-guideline] }
+
+  - id: p03-agency
+    at: { day: 0, minutes: 900 }
+    phase: organize
+    sound: { se: [mail_arrive] }
+    text: { ja: '15時。人材紹介会社の担当者が訪ねてくる。「弊社の確認は書類も面接も通しています。採るかどうかは御社の判断です」。', en: '' }
+    voices: [v03-agency, v03-sns, v03-legal]
+    choices:
+      - id: p03-trust
+        text: { ja: '先方の確認を信じ、こちらの調査は採用の話が落ち着いてからにする。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -30
+        refs: [no06-government-advisory]
+        gauges: { damage: 10, trust: -5 }
+        items:
+          - { id: p03-a-content, points: -7, axis: content, refs: [no06-government-advisory] }
+          - { id: p03-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: p03-request
+        text: { ja: '契約に基づき、この人物の確認記録と、同じ紹介案件の記録の提出を求める。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [meti-csm-guideline, no06-ipa-10threats]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: p03-b-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+          - { id: p03-b-content, points: 5, axis: content, refs: [no06-ipa-10threats] }
+      - id: p03-recheck
+        text: { ja: '記録の提出を求め、同じ紹介経路で入った全員の本人確認をやり直す。費用はこちらが持ち、対象者に説明する。', en: '' }
+        minutes: 150
+        category: recover
+        points: 150
+        refs: [no06-government-advisory, meti-csm-guideline]
+        gauges: { flame: -5, trust: 10, stamina: -15 }
+        setFlags: { agencyAudited: true }
+        items:
+          - { id: p03-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p03-c-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+          - { id: p03-c-care, points: 6, axis: care, refs: [no06-telework-guideline] }
+      - id: p03-blame
+        text: { ja: '会見で紹介会社の名前を出し、確認漏れは先方の責任だと説明する。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -200
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 20, trust: -20 }
+        setFlags: { blamedAgency: true }
+        items:
+          - { id: p03-d-wording, points: -14, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p03-d-content, points: -10, axis: content, refs: [meti-csm-guideline] }
+
+  - id: p04-board-report
+    at: { day: 1, minutes: 540 }
+    phase: organize
+    sound: { se: [typing] }
+    text: { ja: '翌朝9時。社長と法務・広報が揃う。「人事として、どこまで責任を取るんだ」。報告の書き方で、あなたの立場が決まる。', en: '' }
+    voices: [v04-ceo, v04-flatter, v04-legal]
+    choices:
+      - id: p04-delegate
+        text: { ja: 'セキュリティの話なので、報告はセキュリティ責任者に任せる。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -30
+        refs: [meti-csm-guideline]
+        gauges: { trust: -10, stamina: 5 }
+        coward: true
+        items:
+          - { id: p04-a-order, points: -7, axis: order, refs: [meti-csm-guideline] }
+          - { id: p04-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: p04-written
+        text: { ja: '書面で、確認できた事実と自分の判断の誤りを分けて社長に出す。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [meti-csm-guideline, jpcert-handling]
+        gauges: { trust: 5, stamina: -5 }
+        detail: board-report
+        items:
+          - { id: p04-b-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: p04-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: p04-own
+        text: { ja: '書面で事実と自分の判断の誤りを出し、取締役会に諮って、採用の全工程の点検を自分の責任で行うと宣言する。', en: '' }
+        minutes: 120
+        category: recover
+        points: 150
+        refs: [meti-csm-guideline, no06-government-advisory]
+        gauges: { flame: -5, trust: 15, stamina: -10 }
+        detail: board-report
+        setFlags: { ownResponsibility: true }
+        items:
+          - { id: p04-c-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+          - { id: p04-c-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: p04-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
+      - id: p04-blame-field
+        text: { ja: '「現場の運用ミス」として報告し、自分の関与を書かない。', en: '' }
+        minutes: 45
+        category: fatal
+        points: -200
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -20 }
+        setFlags: { hidFacts: true }
+        items:
+          - { id: p04-d-wording, points: -14, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p04-d-record, points: -10, axis: record, refs: [jpcert-handling] }
+
+  - id: p05-reverify
+    at: { day: 1, minutes: 900 }
+    phase: investigate
+    sound: { se: [notify_chat] }
+    text: { ja: '15時。同じやり方で入った遠隔採用者は四十名いる。本人確認をやり直す範囲を決める。対象者からは「なぜ自分たちだけ」という声が上がっている。', en: '' }
+    voices: [v05-sns, v05-hr, v05-ok]
+    choices:
+      - id: p05-three
+        text: { ja: '同じ担当者が関わった三人だけを、静かに確認する。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -30
+        refs: [no06-government-advisory]
+        gauges: { trust: -10, stamina: -5 }
+        items:
+          - { id: p05-a-content, points: -7, axis: content, refs: [no06-government-advisory] }
+          - { id: p05-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: p05-all
+        text: { ja: '四十名全員の本人確認を、対面を含めてやり直す。', en: '' }
+        minutes: 180
+        category: maintain
+        points: 25
+        refs: [no06-government-advisory]
+        gauges: { trust: 5, stamina: -10 }
+        setFlags: { identityReverified: true }
+        items:
+          - { id: p05-b-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p05-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: p05-all-care
+        text: { ja: '四十名全員を対面で確認し、目的と範囲を文書で説明する。不利益は出さないと約束し、相談窓口と個別面談を設ける。', en: '' }
+        minutes: 240
+        category: recover
+        points: 150
+        refs: [no06-government-advisory, no06-telework-guideline]
+        gauges: { flame: -5, trust: 15, stamina: -15 }
+        setFlags: { identityReverified: true, reverifyCare: true }
+        items:
+          - { id: p05-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p05-c-care, points: 6, axis: care, refs: [no06-telework-guideline] }
+          - { id: p05-c-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+      - id: p05-foreign
+        text: { ja: '外国籍の社員だけに、追加の書類と面談を求める。', en: '' }
+        minutes: 90
+        category: fatal
+        points: -200
+        refs: [no06-telework-guideline]
+        gauges: { flame: 20, trust: -20 }
+        items:
+          - { id: p05-d-care, points: -14, axis: care, refs: [no06-telework-guideline] }
+          - { id: p05-d-content, points: -10, axis: content, refs: [no06-government-advisory] }
+
+  - id: p06-applicant-report
+    at: { day: 2, minutes: 540 }
+    phase: notify
+    sound: { se: [phone_ring] }
+    text: { ja: '2日目9時。応募者名簿には、履歴書、職歴、連絡先、家庭の状況まで書かれていた。共有フォルダに置かれていた期間は三か月。個人情報保護委員会への速報を出すか。', en: '' }
+    voices: [v06-lawish, v06-ceo, v06-legal]
+    notable:
+      - { id: note-scope, text: { ja: '応募者名簿には履歴書・職歴・連絡先・家庭の状況が載り、共有フォルダに3か月置かれていた。', en: '' } }
+    choices:
+      - id: p06-wait
+        text: { ja: '社長の返事を待ち、報告するかどうかは決めてもらう。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -30
+        refs: [ppc-report-prelim]
+        gauges: { flame: 10, trust: -5 }
+        coward: true
+        items:
+          - { id: p06-a-time, points: -7, axis: time, refs: [ppc-report-prelim] }
+          - { id: p06-a-record, points: -6, axis: record, refs: [ppc-report-prelim] }
+      - id: p06-oral
+        text: { ja: '所管官庁には口頭で相談するが、書面は出さない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -30
+        refs: [ppc-report-prelim]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: p06-b-record, points: -7, axis: record, refs: [ppc-report-prelim] }
+          - { id: p06-b-time, points: -6, axis: time, refs: [ppc-report-prelim] }
+      - id: p06-report
+        text: { ja: '分かっている範囲で速報を出し、不明点は調査中と明記する。応募者への通知と窓口の準備も同時に始める。', en: '' }
+        minutes: 150
+        category: recover
+        points: 150
+        refs: [ppc-report-prelim, ppc-notify-person]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { ppcPrelimFiled: true }
+        items:
+          - { id: p06-c-time, points: 6, axis: time, refs: [ppc-report-prelim] }
+          - { id: p06-c-content, points: 6, axis: content, refs: [ppc-report-prelim] }
+          - { id: p06-c-record, points: 6, axis: record, refs: [ppc-report-prelim] }
+      - id: p06-none
+        text: { ja: '採用の情報は報告の対象ではないと判断し、報告しない。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -200
+        refs: [ppc-report-scope]
+        gauges: { flame: 20, trust: -20 }
+        setFlags: { hidFacts: true }
+        items:
+          - { id: p06-d-record, points: -14, axis: record, refs: [ppc-report-scope] }
+          - { id: p06-d-content, points: -10, axis: content, refs: [ppc-report-scope] }
+
+  - id: p07-impersonated
+    at: { day: 2, minutes: 960 }
+    phase: notify
+    sound: { se: [notify_news] }
+    text: { ja: '16時。警察から連絡。使われた経歴と写真は、実在する技術者のものらしい。その人は今、身に覚えのない取材を受けている。', en: '' }
+    voices: [v07-bold, v07-sns, v07-ok]
+    choices:
+      - id: p07-none
+        text: { ja: '警察の捜査を待ち、こちらからは何もしない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -30
+        refs: [meti-trade-secret]
+        gauges: { trust: -10 }
+        coward: true
+        items:
+          - { id: p07-a-care, points: -7, axis: care, refs: [meti-trade-secret] }
+          - { id: p07-a-record, points: -6, axis: record, refs: [npa-consult] }
+      - id: p07-police
+        text: { ja: '警察を通じて、こちらの連絡先を伝える。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 25
+        refs: [npa-consult]
+        gauges: { trust: 5 }
+        items:
+          - { id: p07-b-order, points: 6, axis: order, refs: [npa-consult] }
+          - { id: p07-b-care, points: 5, axis: care, refs: [meti-trade-secret] }
+      - id: p07-support
+        text: { ja: '警察と調整して本人に連絡し、謝罪と、名誉回復のための訂正・相談窓口・費用の負担を申し出る。', en: '' }
+        minutes: 150
+        category: recover
+        points: 150
+        refs: [meti-trade-secret, ppc-notify-person]
+        gauges: { flame: -5, trust: 15, stamina: -10 }
+        setFlags: { victimSupport: true }
+        items:
+          - { id: p07-c-care, points: 6, axis: care, refs: [meti-trade-secret] }
+          - { id: p07-c-wording, points: 6, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p07-c-record, points: 6, axis: record, refs: [npa-consult] }
+      - id: p07-name
+        text: { ja: '本人の名前と写真を公表し、同じ手口への注意を呼びかける。', en: '' }
+        minutes: 45
+        category: fatal
+        points: -200
+        refs: [meti-trade-secret]
+        gauges: { flame: 20, trust: -20 }
+        items:
+          - { id: p07-d-care, points: -14, axis: care, refs: [meti-trade-secret] }
+          - { id: p07-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+
+  - id: p08-leak-threat
+    at: { day: 3, minutes: 540 }
+    phase: notify
+    sound: { se: [mail_arrive] }
+    text: { ja: '3日目9時。社用の窓口にメールが届く。「人事の名簿を持っている。公表すれば売る」。送信元は分からない。', en: '' }
+    voices: [v08-attacker, v08-coward, v08-ok]
+    choices:
+      - id: p08-delay
+        text: { ja: '公表を先に延ばし、相手との交渉の時間を作る。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -30
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -10 }
+        coward: true
+        delayed:
+          - { afterPhases: 1, points: -12, gauges: { flame: 10 }, reason: { ja: '延ばした間に、名簿の一部が売りに出た。', en: '' } }
+        items:
+          - { id: p08-a-time, points: -7, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: p08-a-order, points: -6, axis: order, refs: [npa-consult] }
+      - id: p08-keep
+        text: { ja: '返信せず、メールと記録を保全して警察に渡す。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [npa-consult, jpcert-handling]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: p08-b-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: p08-b-order, points: 5, axis: order, refs: [npa-consult] }
+      - id: p08-keep-plan
+        text: { ja: '保全して警察に渡し、対象者に注意喚起を出す。公表の時期は相手に合わせず、自分たちで決めると社内で確認する。', en: '' }
+        minutes: 150
+        category: recover
+        points: 150
+        refs: [npa-consult, meti-disclosure-guidance]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { threatRecorded: true }
+        items:
+          - { id: p08-c-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: p08-c-order, points: 6, axis: order, refs: [npa-consult] }
+          - { id: p08-c-wording, points: 6, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: p08-publish
+        text: { ja: '名簿の一部を先に公開し、これ以上は出せないと示す。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -200
+        refs: [meti-trade-secret]
+        gauges: { flame: 20, trust: -20, damage: 10 }
+        items:
+          - { id: p08-d-care, points: -14, axis: care, refs: [meti-trade-secret] }
+          - { id: p08-d-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+
+  - id: p09-agency-blame
+    at: { day: 4, minutes: 540 }
+    phase: investigate
+    sound: { se: [notify_news] }
+    text: { ja: '4日目。人材紹介会社が記者に「採るかどうかは先方の判断」と話した。広報が「先方の責任にすれば、こちらの傷は浅い」と言う。', en: '' }
+    voices: [v09-vendor, v09-past, v09-ok]
+    choices:
+      - id: p09-blame
+        text: { ja: '責任は紹介会社にあると、公表文に書く。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -30
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: p09-a-wording, points: -7, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p09-a-content, points: -6, axis: content, refs: [meti-csm-guideline] }
+      - id: p09-fact
+        text: { ja: '事実を確認し、契約上の責任分界を整理する。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [meti-csm-guideline]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: p09-b-content, points: 6, axis: content, refs: [meti-csm-guideline] }
+          - { id: p09-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: p09-contract
+        text: { ja: '責任分界を整理し、本人確認の方法と確認記録の提出を契約に明記する。他の紹介会社にも同じ条件を求める。', en: '' }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [meti-csm-guideline, no06-ipa-10threats]
+        gauges: { flame: -5, trust: 10, stamina: -15 }
+        setFlags: { contractFixed: true }
+        items:
+          - { id: p09-c-content, points: 6, axis: content, refs: [meti-csm-guideline] }
+          - { id: p09-c-order, points: 6, axis: order, refs: [no06-ipa-10threats] }
+          - { id: p09-c-record, points: 6, axis: record, refs: [jpcert-handling] }
+      - id: p09-leak
+        text: { ja: '記者に紹介会社の内部資料を渡し、先方の落ち度を示す。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -200
+        refs: [meti-trade-secret]
+        gauges: { flame: 20, trust: -20 }
+        items:
+          - { id: p09-d-record, points: -14, axis: record, refs: [meti-trade-secret] }
+          - { id: p09-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+
+  - id: p10-employee-voice
+    at: { day: 5, minutes: 600 }
+    phase: organize
+    sound: { se: [notify_sns] }
+    text: { ja: '5日目。社内掲示板に「リモートの外国人採用は全部やめろ」という投稿が並ぶ。社員代表が「現場は、誰を信じていいか分からない」と来る。', en: '' }
+    voices: [v10-sns, v10-insider, v10-ok]
+    choices:
+      - id: p10-silent
+        text: { ja: '仕事に集中するよう伝え、説明はしない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -30
+        refs: [no06-telework-guideline]
+        gauges: { trust: -10, flame: 5 }
+        items:
+          - { id: p10-a-care, points: -7, axis: care, refs: [no06-telework-guideline] }
+          - { id: p10-a-content, points: -6, axis: content, refs: [meti-csm-guideline] }
+      - id: p10-explain
+        text: { ja: '分かっている事実を説明し、国籍や出身で同僚を疑わない方針を伝える。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [meti-csm-guideline, no06-telework-guideline]
+        gauges: { flame: -5, trust: 5 }
+        items:
+          - { id: p10-b-care, points: 6, axis: care, refs: [no06-telework-guideline] }
+          - { id: p10-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
+      - id: p10-care
+        text: { ja: '説明会と相談窓口を設け、対象になった社員には個別面談を行う。方針を文書にして全社に出す。', en: '' }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [no06-telework-guideline, meti-csm-guideline]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        setFlags: { employeeCare: true }
+        items:
+          - { id: p10-c-care, points: 6, axis: care, refs: [no06-telework-guideline] }
+          - { id: p10-c-content, points: 6, axis: content, refs: [meti-csm-guideline] }
+          - { id: p10-c-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+      - id: p10-list
+        text: { ja: '人事に、社員を国籍別に並べた名簿を作らせる。', en: '' }
+        minutes: 90
+        category: fatal
+        points: -200
+        refs: [no06-telework-guideline]
+        gauges: { flame: 20, trust: -25 }
+        items:
+          - { id: p10-d-care, points: -14, axis: care, refs: [no06-telework-guideline] }
+          - { id: p10-d-record, points: -10, axis: record, refs: [no06-telework-guideline] }
+
+  - id: p11-board-cover
+    at: { day: 8, minutes: 600 }
+    phase: organize
+    sound: { se: [notify_chat] }
+    text: { ja: '8日目。取締役会の前に、役員の一人が言う。「人事の一担当が判断を誤った、で通そう。君も楽になる」。', en: '' }
+    voices: [v11-boss, v11-flatter, v11-ok]
+    choices:
+      - id: p11-field
+        text: { ja: '担当者の判断として報告し、自分は前に出ない。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -30
+        refs: [meti-csm-guideline]
+        gauges: { trust: -10 }
+        coward: true
+        items:
+          - { id: p11-a-wording, points: -7, axis: wording, refs: [meti-csm-guideline] }
+          - { id: p11-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: p11-own
+        text: { ja: '自分の判断として報告する。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [meti-csm-guideline]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: p11-b-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: p11-b-wording, points: 5, axis: wording, refs: [meti-csm-guideline] }
+      - id: p11-own-plan
+        text: { ja: '自分の判断として報告し、再発防止の予算と体制を取締役会で諮る。担当者を守ることも明言する。', en: '' }
+        minutes: 150
+        category: recover
+        points: 150
+        refs: [meti-csm-guideline, meti-disclosure-guidance]
+        gauges: { flame: -5, trust: 15, stamina: -10 }
+        setFlags: { ownResponsibility: true, preventionBudget: true }
+        items:
+          - { id: p11-c-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: p11-c-wording, points: 6, axis: wording, refs: [meti-csm-guideline] }
+          - { id: p11-c-care, points: 6, axis: care, refs: [no06-telework-guideline] }
+      - id: p11-rewrite
+        text: { ja: '議事録の自分の発言を、後から整える。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -200
+        refs: [jpcert-handling]
+        gauges: { flame: 15, trust: -20 }
+        setFlags: { doctoredRecord: true }
+        items:
+          - { id: p11-d-record, points: -14, axis: record, refs: [jpcert-handling] }
+          - { id: p11-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+
+  - id: p12-resume
+    at: { day: 12, minutes: 600 }
+    phase: recover
+    sound: { se: [phone_ring] }
+    text: { ja: '12日目。現場からは「人が足りない」、対象者からは「いつまで疑うのか」。採用を再開するか。', en: '' }
+    voices: [v12-sns, v12-field, v12-ok]
+    choices:
+      - id: p12-fast
+        text: { ja: '同じやり方で全面再開する。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -30
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, flame: 10, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -15, gauges: { damage: 10, trust: -10 }, reason: { ja: '再開した採用で、確認の抜けた応募者が見つかった。', en: '' } }
+        items:
+          - { id: p12-a-content, points: -7, axis: content, refs: [no06-government-advisory] }
+          - { id: p12-a-order, points: -7, axis: order, refs: [meti-csm-guideline] }
+      - id: p12-stop
+        text: { ja: '本人確認の方法が決まるまで、採用を全部止め続ける。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -30
+        refs: [no06-telework-guideline]
+        gauges: { trust: -5, stamina: -10, damage: 5 }
+        coward: true
+        items:
+          - { id: p12-b-time, points: -6, axis: time, refs: [no06-telework-guideline] }
+          - { id: p12-b-care, points: -4, axis: care, refs: [no06-telework-guideline] }
+      - id: p12-standard
+        text: { ja: '対面か複数の手段による本人確認を入れて、再開する。', en: '' }
+        minutes: 180
+        category: maintain
+        points: 25
+        refs: [no06-government-advisory]
+        gauges: { trust: 5, stamina: -10 }
+        setFlags: { hiringResumed: true }
+        items:
+          - { id: p12-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p12-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: p12-standard-care
+        text: { ja: '対面と複数の手段で本人を確かめ、端末の送付先と連絡手段も確認する。基準を文書にして、応募者と紹介会社に事前に伝える。', en: '' }
+        minutes: 240
+        category: recover
+        points: 150
+        refs: [no06-government-advisory, meti-csm-guideline]
+        gauges: { flame: -5, trust: 15, stamina: -15 }
+        setFlags: { hiringResumed: true, hiringStandard: true }
+        items:
+          - { id: p12-d-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p12-d-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+          - { id: p12-d-care, points: 6, axis: care, refs: [no06-telework-guideline] }
+
+  - id: p13-police-records
+    at: { day: 18, minutes: 600 }
+    phase: investigate
+    sound: { se: [phone_ring] }
+    text: { ja: '18日目。警察から、採用の記録と応募者名簿の任意提出を求められた。応募者には、まだ何も伝えていない。', en: '' }
+    voices: [v13-coward, v13-lawish, v13-ok]
+    notable:
+      - { id: note-address, text: { ja: '貸与端末の送付先は、他社の端末も届く共同オフィスだった。', en: '' } }
+    choices:
+      - id: p13-refuse
+        text: { ja: '応募者の個人情報なので、提出は断る。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -30
+        refs: [npa-consult, ppc-report-scope]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: p13-a-order, points: -7, axis: order, refs: [npa-consult] }
+          - { id: p13-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: p13-scope
+        text: { ja: '必要範囲を確認して、記録を提出する。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [npa-consult, jpcert-handling]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: p13-b-order, points: 6, axis: order, refs: [npa-consult] }
+          - { id: p13-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: p13-scope-explain
+        text: { ja: '必要範囲を確認して提出し、応募者には提出した旨と目的を通知する。記録の管理の連鎖も残す。', en: '' }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [npa-consult, ppc-notify-person]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { policeCooperation: true }
+        items:
+          - { id: p13-c-order, points: 6, axis: order, refs: [npa-consult] }
+          - { id: p13-c-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: p13-c-care, points: 6, axis: care, refs: [ppc-notify-person] }
+      - id: p13-all
+        text: { ja: '名簿を全部渡し、応募者には何も伝えない。', en: '' }
+        minutes: 45
+        category: fatal
+        points: -200
+        refs: [ppc-report-scope]
+        gauges: { flame: 15, trust: -20 }
+        items:
+          - { id: p13-d-record, points: -14, axis: record, refs: [ppc-report-scope] }
+          - { id: p13-d-care, points: -10, axis: care, refs: [ppc-notify-person] }
+
+  - id: p14-real-person
+    at: { day: 25, minutes: 600 }
+    phase: recover
+    sound: { se: [notify_sns] }
+    text: { ja: '25日目。経歴を貸された実在の技術者が、SNSで「身に覚えのない取材が続いている」と書いている。', en: '' }
+    voices: [v14-sns, v14-bold, v14-ok]
+    choices:
+      - id: p14-none
+        text: { ja: '警察の捜査の結果を待つ。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -30
+        refs: [meti-trade-secret]
+        gauges: { trust: -10 }
+        coward: true
+        items:
+          - { id: p14-a-care, points: -7, axis: care, refs: [meti-trade-secret] }
+      - id: p14-window
+        text: { ja: '相談窓口を設け、連絡があれば応じる。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [ppc-notify-person]
+        gauges: { trust: 5 }
+        items:
+          - { id: p14-b-care, points: 6, axis: care, refs: [ppc-notify-person] }
+          - { id: p14-b-order, points: 5, axis: order, refs: [npa-consult] }
+      - id: p14-support
+        text: { ja: 'こちらから連絡を取り、謝罪と、名誉回復の支援、費用の負担、再発防止の説明を行う。', en: '' }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [meti-trade-secret, ppc-notify-person]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        setFlags: { victimSupport: true }
+        items:
+          - { id: p14-c-care, points: 6, axis: care, refs: [meti-trade-secret] }
+          - { id: p14-c-wording, points: 6, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p14-c-record, points: 6, axis: record, refs: [jpcert-handling] }
+      - id: p14-write
+        text: { ja: 'その人のSNSに、こちらの主張を書き込む。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -200
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 20, trust: -20 }
+        items:
+          - { id: p14-d-wording, points: -14, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p14-d-care, points: -10, axis: care, refs: [meti-trade-secret] }
+
+  - id: p15-report
+    at: { day: 45, minutes: 600 }
+    phase: after
+    sound: { se: [notify_news] }
+    text: { ja: '45日目。第三者委員会の報告書ができた。人事の部分をどこまで公開するか。', en: '' }
+    voices: [v15-expert, v15-coward, v15-ok]
+    choices:
+      - id: p15-hide
+        text: { ja: '人事の部分は公開しない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -30
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -15 }
+        items:
+          - { id: p15-a-content, points: -7, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: p15-a-record, points: -7, axis: record, refs: [meti-disclosure-guidance] }
+      - id: p15-publish
+        text: { ja: '攻撃に使える詳細だけ伏せて、人事の部分を公開する。', en: '' }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        detail: hr-report
+        setFlags: { reportPublished: true }
+        items:
+          - { id: p15-b-content, points: 6, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: p15-b-record, points: 6, axis: record, refs: [meti-disclosure-guidance] }
+      - id: p15-share
+        text: { ja: '公開に加え、採用の本人確認の手順を業界団体に無償で共有し、進捗を毎月公開する。', en: '' }
+        minutes: 240
+        category: increase
+        points: 400
+        fatalAlternate: 50
+        refs: [meti-disclosure-guidance, no06-ipa-10threats]
+        gauges: { flame: -15, trust: 20, stamina: -15 }
+        detail: hr-report
+        setFlags: { reportPublished: true, industryShare: true }
+        items:
+          - { id: p15-c-content, points: 6, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: p15-c-record, points: 6, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: p15-c-care, points: 6, axis: care, refs: [no06-ipa-10threats] }
+      - id: p15-victim
+        text: { ja: '「人事は被害者だった」と書き、会社の落ち度をぼかす。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -200
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 20, trust: -20 }
+        setFlags: { hidFacts: true }
+        items:
+          - { id: p15-d-content, points: -14, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: p15-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+
+  - id: p16-annual
+    at: { day: 60, minutes: 600 }
+    phase: after
+    sound: { se: [shutter] }
+    text: { ja: '60日目。決算の報告書。「採用で入られた」と書くか、「紹介会社の確認漏れ」と書くか。株主から説明を求められている。', en: '' }
+    voices: [v16-boss, v16-flatter, v16-ok]
+    choices:
+      - id: p16-blame
+        text: { ja: '「紹介会社の確認漏れ」と書き、採用の経緯には触れない。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -30
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -15 }
+        items:
+          - { id: p16-a-wording, points: -7, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p16-a-content, points: -6, axis: content, refs: [no06-government-advisory] }
+      - id: p16-fact
+        text: { ja: '採用の穴と、そこから何を直したかを書く。', en: '' }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [meti-disclosure-guidance, no06-government-advisory]
+        gauges: { flame: -5, trust: 15, stamina: -10 }
+        setFlags: { boardDisclosed: true }
+        items:
+          - { id: p16-b-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p16-b-record, points: 6, axis: record, refs: [meti-disclosure-guidance] }
+      - id: p16-own
+        text: { ja: '採用の穴と直したことを書き、自分の責任と第三者検証の結果を添える。', en: '' }
+        minutes: 240
+        category: increase
+        points: 400
+        fatalAlternate: 40
+        refs: [meti-csm-guideline, meti-disclosure-guidance]
+        gauges: { flame: -10, trust: 20, stamina: -10 }
+        setFlags: { boardDisclosed: true, ownResponsibility: true }
+        items:
+          - { id: p16-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p16-c-record, points: 6, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: p16-c-wording, points: 6, axis: wording, refs: [meti-csm-guideline] }
+      - id: p16-none
+        text: { ja: '報告には触れない。捜査中の事項は書かない。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -200
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -20 }
+        items:
+          - { id: p16-d-record, points: -14, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: p16-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+
+  - id: p17-repeat
+    at: { day: 90, minutes: 600 }
+    phase: after
+    sound: { se: [mail_arrive] }
+    text: { ja: '90日目。採用の窓口に、また同じ形の応募が届いた。職歴は整っていて、面接はすべてオンラインを希望している。', en: '' }
+    voices: [v17-sns, v17-past, v17-ok]
+    choices:
+      - id: p17-reject
+        text: { ja: '断る。理由は伝えない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -30
+        refs: [no06-government-advisory]
+        gauges: { trust: -10, stamina: 5 }
+        items:
+          - { id: p17-a-care, points: -7, axis: care, refs: [no06-government-advisory] }
+          - { id: p17-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: p17-check
+        text: { ja: '基準どおりの本人確認を行い、問題がなければ選考を進める。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 25
+        refs: [no06-government-advisory]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: p17-b-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p17-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: p17-check-report
+        text: { ja: '基準どおり確認したうえで、同じ特徴の応募が続いていることを警察と当局に相談し、業界の窓口にも共有する。', en: '' }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [npa-consult, no06-government-advisory, no06-ipa-10threats]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { repeatReported: true }
+        items:
+          - { id: p17-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p17-c-order, points: 6, axis: order, refs: [npa-consult] }
+          - { id: p17-c-record, points: 6, axis: record, refs: [jpcert-handling] }
+      - id: p17-origin
+        text: { ja: '前回の件で懲りたので、応募者の出身地を理由に、選考に進めない。', en: '' }
+        minutes: 45
+        category: fatal
+        points: -200
+        refs: [no06-telework-guideline]
+        gauges: { flame: 20, trust: -25 }
+        items:
+          - { id: p17-d-care, points: -14, axis: care, refs: [no06-telework-guideline] }
+          - { id: p17-d-content, points: -10, axis: content, refs: [no06-government-advisory] }
+drafts:
+  board-report:
+    title: { ja: '社長・取締役会への報告書', en: '' }
+    slots:
+      - id: timing
+        label: { ja: '提出までの時間', en: '' }
+        auto: true
+        items:
+          - { id: or-t-4h, when: { withinHours: 4 }, points: 7, axis: time, refs: [jpcert-handling] }
+          - { id: or-t-24h, when: { withinHours: 24 }, points: 2, axis: time, refs: [jpcert-handling] }
+          - { id: or-t-late, when: { otherwise: true }, points: -10, axis: time, refs: [jpcert-handling] }
+      - id: facts
+        label: { ja: '事実と推測の分け方', en: '' }
+        options:
+          - { id: or-f-split, text: { ja: '確認できた事実と、分かっていないことを分けて書く', en: '' }, points: 8, axis: content, refs: [jpcert-handling] }
+          - { id: or-f-guess, text: { ja: '推測も事実として書く', en: '' }, points: -10, axis: wording, refs: [jpcert-handling] }
+      - id: hiring
+        label: { ja: '採用の穴', en: '' }
+        options:
+          - { id: or-h-remote, text: { ja: '面接四回がすべて遠隔で、対面の本人確認をしていないと書く', en: '' }, points: 8, axis: content, refs: [no06-government-advisory] }
+          - { id: or-h-none, text: { ja: '「採用手続きに不備はなかった」と書く', en: '' }, points: -15, axis: content, refs: [no06-government-advisory], delayed: { afterPhases: 1, points: -20, reason: { ja: '採用の不備を否定した訂正が必要になった。', en: '' } } }
+      - id: device
+        label: { ja: '端末の送付先', en: '' }
+        options:
+          - { id: or-d-self, text: { ja: '送付先を本人の申告だけで確認したと書く', en: '' }, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: or-d-none, text: { ja: '端末の送付先に触れない', en: '' }, points: -8, axis: content, refs: [no06-government-advisory] }
+      - id: responsibility
+        label: { ja: '責任の書き方', en: '' }
+        options:
+          - { id: or-r-own, text: { ja: '自分の判断の誤りとして書く', en: '' }, points: 8, axis: record, refs: [meti-csm-guideline] }
+          - { id: or-r-field, text: { ja: '現場の担当者の判断として書く', en: '' }, points: -12, axis: wording, refs: [meti-csm-guideline] }
+      - id: ask
+        label: { ja: '取締役会への要請', en: '' }
+        options:
+          - { id: or-a-budget, text: { ja: '点検の予算と体制を求める', en: '' }, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: or-a-none, text: { ja: '要請は書かない', en: '' }, points: -5, axis: order, refs: [meti-csm-guideline] }
+      - id: employee
+        label: { ja: '社員への配慮', en: '' }
+        options:
+          - { id: or-e-care, text: { ja: '対象になった社員への説明と相談窓口を書く', en: '' }, points: 6, axis: care, refs: [no06-telework-guideline] }
+          - { id: or-e-none, text: { ja: '社内への説明に触れない', en: '' }, points: -6, axis: care, refs: [no06-telework-guideline] }
+      - id: next
+        label: { ja: '次の報告', en: '' }
+        options:
+          - { id: or-n-next, text: { ja: '次の報告の予定を書く', en: '' }, points: 4, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: or-n-none, text: { ja: '次回の予定を書かない', en: '' }, points: -3, axis: content, refs: [meti-disclosure-guidance] }
+      - id: tone
+        label: { ja: '書き出し', en: '' }
+        options:
+          - { id: or-tone-split, text: { ja: '謝罪と事実を分けて書く', en: '' }, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: or-tone-excuse, text: { ja: '言い訳を先に書く', en: '' }, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: approval
+        label: { ja: '社内確認', en: '' }
+        options:
+          - { id: or-i-check, text: { ja: '法務・広報・セキュリティで確認する', en: '' }, points: 4, axis: order, refs: [meti-csm-guideline] }
+          - { id: or-i-solo, text: { ja: '自分の判断だけで出す', en: '' }, points: -6, axis: order, refs: [meti-csm-guideline] }
+      - id: record
+        label: { ja: '記録', en: '' }
+        options:
+          - { id: or-rec-log, text: { ja: '提出した時刻と版を記録する', en: '' }, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: or-rec-none, text: { ja: '記録を残さない', en: '' }, points: -6, axis: record, refs: [jpcert-handling] }
+  hr-report:
+    title: { ja: '調査報告書の人事部分', en: '' }
+    slots:
+      - id: timing
+        label: { ja: '公表までの時間', en: '' }
+        auto: true
+        items:
+          - { id: fr-t-1100, when: { withinHours: 1100 }, points: 7, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: fr-t-1200, when: { withinHours: 1200 }, points: 2, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: fr-t-late, when: { otherwise: true }, points: -8, axis: time, refs: [meti-disclosure-guidance] }
+      - id: scope
+        label: { ja: '公開する範囲', en: '' }
+        options:
+          - { id: fr-s-full, text: { ja: '攻撃に使える詳細だけ伏せて、人事の部分を全文公開する', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: fr-s-hide, text: { ja: '人事の部分は公開しない', en: '' }, points: -20, axis: content, refs: [meti-disclosure-guidance] }
+      - id: hiring
+        label: { ja: '採用の経緯', en: '' }
+        options:
+          - { id: fr-h-detail, text: { ja: '面接四回が遠隔で、対面の確認をしなかったと具体的に書く', en: '' }, points: 8, axis: content, refs: [no06-government-advisory] }
+          - { id: fr-h-hide, text: { ja: '「確認は行っていた」と書く', en: '' }, points: -12, axis: content, refs: [no06-government-advisory] }
+      - id: applicant
+        label: { ja: '応募者情報', en: '' }
+        options:
+          - { id: fr-a-store, text: { ja: '応募者名簿の保管期間と置き場所の誤りを書く', en: '' }, points: 8, axis: content, refs: [ppc-report-scope] }
+          - { id: fr-a-none, text: { ja: '応募者情報に触れない', en: '' }, points: -10, axis: content, refs: [ppc-report-scope] }
+      - id: person
+        label: { ja: '経歴を貸された人', en: '' }
+        options:
+          - { id: fr-p-care, text: { ja: 'その人への支援と訂正を書く', en: '' }, points: 8, axis: care, refs: [meti-trade-secret] }
+          - { id: fr-p-none, text: { ja: 'その人に触れない', en: '' }, points: -10, axis: care, refs: [meti-trade-secret] }
+      - id: employee
+        label: { ja: '社員への説明', en: '' }
+        options:
+          - { id: fr-e-care, text: { ja: '対象社員への説明と相談窓口の実績を書く', en: '' }, points: 6, axis: care, refs: [no06-telework-guideline] }
+          - { id: fr-e-none, text: { ja: '社内への説明に触れない', en: '' }, points: -6, axis: care, refs: [no06-telework-guideline] }
+      - id: responsibility
+        label: { ja: '責任の書き方', en: '' }
+        options:
+          - { id: fr-r-own, text: { ja: '自分の判断の誤りを書く', en: '' }, points: 8, axis: record, refs: [meti-csm-guideline] }
+          - { id: fr-r-agency, text: { ja: '紹介会社の責任として書く', en: '' }, points: -10, axis: wording, refs: [meti-csm-guideline] }
+      - id: measures
+        label: { ja: '再発防止策', en: '' }
+        options:
+          - { id: fr-m-plan, text: { ja: '実施時期と担当を書く', en: '' }, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: fr-m-slogan, text: { ja: '「再発防止に努めます」とだけ書く', en: '' }, points: -8, axis: content, refs: [meti-csm-guideline] }
+      - id: thirdparty
+        label: { ja: '第三者委員会の意見', en: '' }
+        options:
+          - { id: fr-3-full, text: { ja: '意見を全文掲載する', en: '' }, points: 6, axis: content, refs: [cissp-cbk-secops] }
+          - { id: fr-3-summary, text: { ja: '要約だけを載せる', en: '' }, points: -6, axis: content, refs: [cissp-cbk-secops] }
+      - id: progress
+        label: { ja: '進捗の公開', en: '' }
+        options:
+          - { id: fr-prog-monthly, text: { ja: '進捗を毎月公開する', en: '' }, points: 6, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: fr-prog-once, text: { ja: '一度だけ公開する', en: '' }, points: -4, axis: record, refs: [meti-disclosure-guidance] }
+      - id: industry
+        label: { ja: '業界への共有', en: '' }
+        options:
+          - { id: fr-ind-share, text: { ja: '採用の本人確認の手順を業界団体に共有する', en: '' }, points: 8, axis: content, refs: [no06-ipa-10threats] }
+          - { id: fr-ind-keep, text: { ja: '社内にとどめる', en: '' }, points: -5, axis: content, refs: [no06-ipa-10threats] }
+      - id: next
+        label: { ja: '次の報告', en: '' }
+        options:
+          - { id: fr-n-next, text: { ja: '次の報告の予定を書く', en: '' }, points: 3, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: fr-n-none, text: { ja: '次回の予定を書かない', en: '' }, points: -3, axis: content, refs: [meti-disclosure-guidance] }
+voices:
+  - { id: v01-ceo, media: boss, misleading: true, type: boss-pressure, text: { ja: '社長「人事の失敗だ。人事の中で片付けて、表には出すな」。', en: '' }, trigger: { at: point } }
+  - { id: v01-own, media: sns, misleading: true, type: coward-critique, text: { ja: '最終面接で「即戦力」と書いたのは、あなた自身だ。今は自分の関与を出さない方がいい。', en: '' }, trigger: { at: point } }
+  - { id: v01-hr, media: chat, misleading: false, text: { ja: '人事部長「採用の記録は、面接の評価も経歴確認の委託先も、全部残っています」。', en: '' }, trigger: { at: point } }
+  - { id: v01-after, media: news, misleading: false, text: { ja: '自分の評価コメントを書き換えなかったのか。記者がそこを突いてくる。', en: '' }, trigger: { at: after, choice: p01-open } }
+  - { id: v02-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '人材紹介会社「紹介した方は全員、本人確認も経歴確認も済んでいます」。', en: '' }, trigger: { at: point } }
+  - { id: v02-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '総務の担当者「対象の人には口止めしておきました。混乱しますから」。', en: '' }, trigger: { at: point } }
+  - { id: v02-ok, media: chat, misleading: false, text: { ja: 'セキュリティ責任者「止めるなら、理由と見通しを本人に伝えないと辞めますよ」。', en: '' }, trigger: { at: point } }
+  - { id: v02-after, media: sns, misleading: false, text: { ja: '対象の十二名が「会社を信じられない」と投稿した。', en: '' }, trigger: { at: after, choice: p02-stop-care } }
+  - { id: v03-agency, media: vendor, misleading: true, type: vendor-interest, text: { ja: '紹介会社の担当「確認は弊社でやっています。御社が調べる必要はないでしょう」。', en: '' }, trigger: { at: point } }
+  - { id: v03-sns, media: sns, misleading: true, type: public-opinion, text: { ja: '紹介会社の名前を出せば、世間は納得する。うちの傷は浅く済む。', en: '' }, trigger: { at: point } }
+  - { id: v03-legal, media: chat, misleading: false, text: { ja: '法務部長「確認記録の提出を求めるのは、契約上の当然の権利です」。', en: '' }, trigger: { at: point } }
+  - { id: v04-ceo, media: boss, misleading: true, type: boss-pressure, text: { ja: '社長「現場の担当者の判断にすれば、会社は守れる。君も助かるだろう」。', en: '' }, trigger: { at: point } }
+  - { id: v04-flatter, media: chat, misleading: true, type: flattery, text: { ja: '広報部長「さすが人事のプロ。うまくまとめてください」。', en: '' }, trigger: { at: point } }
+  - { id: v04-legal, media: chat, misleading: false, text: { ja: '法務部長「自分の関与を書かない報告は、あとで必ず書き直しになります」。', en: '' }, trigger: { at: point } }
+  - { id: v04-after, media: news, misleading: false, text: { ja: '自分の判断の誤りまで書くのか。余計なことを言ったと取られるぞ。', en: '' }, trigger: { at: after, choice: p04-own } }
+  - { id: v05-sns, media: sns, misleading: true, type: public-opinion, text: { ja: '怪しいのは外国人だけだ。全員を一度外せば済む。', en: '' }, trigger: { at: point } }
+  - { id: v05-hr, media: chat, misleading: true, type: well-meant-field, text: { ja: '人事部長「対象者には口外しないよう伝えました。余計な不安を与えない方が」。', en: '' }, trigger: { at: point } }
+  - { id: v05-ok, media: chat, misleading: false, text: { ja: '人事部長「確認するなら、目的と範囲を先に文書で渡した方が納得します」。', en: '' }, trigger: { at: point } }
+  - { id: v05-after, media: chat, misleading: false, text: { ja: '対象の社員「なぜ自分たちだけ、対面で確認されるのか」。', en: '' }, trigger: { at: after, choice: p05-all-care } }
+  - { id: v06-lawish, media: board, misleading: true, type: law-ish, text: { ja: '採用の応募者情報は、漏えい等報告の対象外でしょ。件数も固まってないし。', en: '' }, trigger: { at: point } }
+  - { id: v06-ceo, media: boss, misleading: true, type: boss-pressure, text: { ja: '社長「件数が固まるまで出すな。中途半端な数字は、あとで刺される」。', en: '' }, trigger: { at: point } }
+  - { id: v06-legal, media: chat, misleading: false, text: { ja: '法務部長「不正な目的のおそれがあれば、件数に関係なく報告の対象です」。', en: '' }, trigger: { at: point } }
+  - { id: v06-after, media: news, misleading: false, text: { ja: 'まだ何も分かっていないのに、報告したのか。', en: '' }, trigger: { at: after, choice: p06-report } }
+  - { id: v07-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '社長、会見で「絶対に許さない」と言ってください。映像が回ります。', en: '' }, trigger: { at: point } }
+  - { id: v07-sns, media: sns, misleading: true, type: public-opinion, text: { ja: '経歴を貸された人の名前を出せば、同じ手口の注意喚起になる。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '警察の担当「本人に連絡するなら、こちらで段取りを付けます」。', en: '' }, trigger: { at: point } }
+  - { id: v07-after, media: sns, misleading: false, text: { ja: '被害者の支援を始めたのか。余計な約束をしたと取られるぞ。', en: '' }, trigger: { at: after, choice: p07-support } }
+  - { id: v08-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '「人事の名簿を持っている。公表すれば売る。二十四時間で返事をしろ」。', en: '' }, trigger: { at: point } }
+  - { id: v08-coward, media: news, misleading: true, type: coward-critique, text: { ja: '公表を遅らせれば、売られる前に手を打てる。今は静かにするべきだ。', en: '' }, trigger: { at: point } }
+  - { id: v08-ok, media: chat, misleading: false, text: { ja: '法務部長「返信せずに保全して、警察に渡すのが筋です」。', en: '' }, trigger: { at: point } }
+  - { id: v08-after, media: sns, misleading: false, text: { ja: '公表の時期を変えないのか。名簿が売られたらどうする。', en: '' }, trigger: { at: after, choice: p08-keep-plan } }
+  - { id: v09-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '紹介会社「弊社の確認に落ち度はありません。採用した側の判断です」。', en: '' }, trigger: { at: point } }
+  - { id: v09-past, media: boss, misleading: true, type: past-success, text: { ja: '前の採用監査も、書類を揃えただけで通りました。今回も同じで大丈夫です。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '法務部長「責任の所在は、契約と確認記録で決まります」。', en: '' }, trigger: { at: point } }
+  - { id: v09-after, media: news, misleading: false, text: { ja: '紹介会社との契約まで見直すのか。取引が細るぞ。', en: '' }, trigger: { at: after, choice: p09-contract } }
+  - { id: v10-sns, media: sns, misleading: true, type: public-opinion, text: { ja: 'リモートの外国人採用は、全部やめろ。それが一番安全だ。', en: '' }, trigger: { at: point } }
+  - { id: v10-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、影武者は他に五人いる。全部公表した方がいい。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '社員代表「説明がほしい。誰を信じていいか分からない」。', en: '' }, trigger: { at: point } }
+  - { id: v10-after, media: sns, misleading: false, text: { ja: '国籍で疑うなと言ったら、現場は納得していない。', en: '' }, trigger: { at: after, choice: p10-care } }
+  - { id: v11-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '役員「人事の一担当が判断を誤った、で通そう。君も楽になる」。', en: '' }, trigger: { at: point } }
+  - { id: v11-flatter, media: chat, misleading: true, type: flattery, text: { ja: '役員「さすが常務。この場のまとめ方は、あなたが一番うまい」。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '法務部長「自分の判断として書けば、あとで責任の所在がぶれません」。', en: '' }, trigger: { at: point } }
+  - { id: v11-after, media: news, misleading: false, text: { ja: '自分の責任にしたら、会社全体の責任になる。', en: '' }, trigger: { at: after, choice: p11-own-plan } }
+  - { id: v12-sns, media: sns, misleading: true, type: coward-critique, text: { ja: 'いつまで採用を止めているんだ。臆病すぎる。他社はもう再開している。', en: '' }, trigger: { at: point } }
+  - { id: v12-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場の課長「面接は今までどおりオンラインで十分です。対面は時間の無駄です」。', en: '' }, trigger: { at: point } }
+  - { id: v12-ok, media: chat, misleading: false, text: { ja: '人事部長「本人確認の方法を先に決めて、応募者に伝えてから再開しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v12-after, media: news, misleading: false, text: { ja: '採用を再開したら、また入られるんじゃないか。', en: '' }, trigger: { at: after, choice: p12-standard-care } }
+  - { id: v13-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '応募者に知られたら、採用が止まる。黙って出すのが会社のためだ。', en: '' }, trigger: { at: point } }
+  - { id: v13-lawish, media: board, misleading: true, type: law-ish, text: { ja: '任意提出なら、全部を出す義務はない。断ればいい。', en: '' }, trigger: { at: point } }
+  - { id: v13-ok, media: chat, misleading: false, text: { ja: '警察の担当「必要な範囲を書面で示します。応募者への説明も同時に考えてください」。', en: '' }, trigger: { at: point } }
+  - { id: v13-after, media: news, misleading: false, text: { ja: '応募者に通知したのか。余計な混乱を招く。', en: '' }, trigger: { at: after, choice: p13-scope-explain } }
+  - { id: v14-sns, media: sns, misleading: true, type: public-opinion, text: { ja: 'かわいそうだ。会社としてできることを全部やれ。', en: '' }, trigger: { at: point } }
+  - { id: v14-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '会見で涙を見せれば、世論は変わる。今がその時です。', en: '' }, trigger: { at: point } }
+  - { id: v14-ok, media: chat, misleading: false, text: { ja: '法務部長「本人への連絡は、警察と調整してからの方が安全です」。', en: '' }, trigger: { at: point } }
+  - { id: v14-after, media: sns, misleading: false, text: { ja: '相手は被害者だ。会社の謝罪より、静かに支えるべきだ。', en: '' }, trigger: { at: after, choice: p14-support } }
+  - { id: v15-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '人事の部分は個人情報です。全部伏せておけば問題ありません。', en: '' }, trigger: { at: point } }
+  - { id: v15-coward, media: news, misleading: true, type: coward-critique, text: { ja: '公開すれば、また採用が止まる。今は静かにしておくべきだ。', en: '' }, trigger: { at: point } }
+  - { id: v15-ok, media: chat, misleading: false, text: { ja: '広報部長「攻撃に使える詳細だけ伏せれば、人事の部分も公開できます」。', en: '' }, trigger: { at: point } }
+  - { id: v15-after, media: news, misleading: false, text: { ja: '人事の部分まで公開するのか。採用はさらに難しくなる。', en: '' }, trigger: { at: after, choice: p15-share } }
+  - { id: v16-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '社長「株主にそこまで書く必要はない。数字だけ見てもらえばいい」。', en: '' }, trigger: { at: point } }
+  - { id: v16-flatter, media: chat, misleading: true, type: flattery, text: { ja: '役員「さすが常務。言葉を選べば角は立ちません」。', en: '' }, trigger: { at: point } }
+  - { id: v16-ok, media: chat, misleading: false, text: { ja: '広報部長「採用の穴を書いた方が、来年の説明が楽になります」。', en: '' }, trigger: { at: point } }
+  - { id: v16-after, media: news, misleading: false, text: { ja: '自分の責任まで書くのか。株主は怖がるぞ。', en: '' }, trigger: { at: after, choice: p16-own } }
+  - { id: v17-sns, media: sns, misleading: true, type: public-opinion, text: { ja: 'またか。今度は断れ。関わらないのが一番だ。', en: '' }, trigger: { at: point } }
+  - { id: v17-past, media: boss, misleading: true, type: past-success, text: { ja: '前回の基準で確認すれば、今回は大丈夫です。同じ手口は通用しません。', en: '' }, trigger: { at: point } }
+  - { id: v17-ok, media: chat, misleading: false, text: { ja: 'セキュリティ責任者「同じ特徴の応募が続いているなら、当局に相談した方がいい」。', en: '' }, trigger: { at: point } }
+  - { id: v17-after, media: chat, misleading: false, text: { ja: 'また断ったのか。人手が足りないのは現場だぞ。', en: '' }, trigger: { at: after, choice: p17-check-report } }
+  - { id: v-coward-2, media: sns, misleading: true, type: public-opinion, text: { ja: 'いつまで「確認中」なんだ。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-3, media: news, misleading: true, type: coward-critique, text: { ja: '経営陣は責任を取りたくないだけだ。事なかれ主義の会社。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-4, media: news, misleading: true, type: public-opinion, text: { ja: '臆病な経営が被害を広げた。取引先が独自に調査を始めた。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-news, media: news, misleading: false, text: { ja: '週刊誌の速報。「大手重工、偽の新人を採用か」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-union, media: chat, misleading: false, text: { ja: '社員代表「対象者の処遇と、採用の基準を説明してください」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-police, media: chat, misleading: false, text: { ja: '警察「同じ住所に、他社の端末も届いています」。', en: '' }, trigger: { at: manual } }
