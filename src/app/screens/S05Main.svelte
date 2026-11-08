@@ -1,5 +1,411 @@
 <script lang="ts">
-  // スタブ（Wave1 で実装）
+  // S05 本編: 上部バー、状況、選択肢、世間の声、記録
+  import { onMount, untrack } from 'svelte';
+  import type { Localized } from '../../engine/types';
+  import { addNote, choose, currentPoint, startPress } from '../../engine';
+  import { audio } from '../../audio';
+  import { t, loc, notice } from '../../i18n';
+  import { saveProgress } from '../../storage';
+  import { applyStep, cues, errorMessage, play, scenario, screen, settings } from '../store';
+  import { runFxCues } from '../effects';
+  import type { ShownCaption } from '../parts/logic';
+  import { choiceIndexFromKey, cueCaptions, voiceViews } from '../parts/logic';
+  import { claimCues } from '../parts/cueMemory';
+  import TopBar from '../parts/TopBar.svelte';
+  import CaptionBar from '../parts/CaptionBar.svelte';
+  import Typewriter from '../parts/Typewriter.svelte';
+  import ChoiceList from '../parts/ChoiceList.svelte';
+  import VoiceList from '../parts/VoiceList.svelte';
+  import NotePanel from '../parts/NotePanel.svelte';
+
+  let busy = $state(false);
+  let tab = $state<'voices' | 'notes'>('voices');
+  let captions = $state<ShownCaption[]>([]);
+  let captionSeq = 0;
+
+  const point = $derived($play && $scenario ? currentPoint($play, $scenario) : null);
+  const draftPending = $derived(Boolean($play?.pendingDraft));
+  const voices = $derived($play && $scenario ? voiceViews($play, $scenario) : []);
+  const illustration = $derived(
+    point?.illustration && $scenario
+      ? ($scenario.illustrations ?? []).find((i) => i.id === point?.illustration)
+      : undefined,
+  );
+  const addedNotableIds = $derived(
+    point?.notable && $play
+      ? point.notable
+        .filter((n) => $play!.notes.some((note) => note.id === `n:${point?.id}:${n.id}`))
+        .map((n) => n.id)
+      : [],
+  );
+
+  let noteStatus = $state('');
+  let voicesNoticeOpen = $state(false);
+  let systemReduce = $state(false);
+  let lastPointId = '';
+  const noticeKeys = new Set<string>();
+
+  $effect(() => {
+    const list = $cues;
+    if (!list || list.length === 0) return;
+    // 画面を開き直したときに、同じキューを鳴らし直さない
+    if (!claimCues(list)) return;
+    audio.runCues(list);
+    runFxCues(list, $settings.reduceMotion || systemReduce);
+    const items = cueCaptions(list);
+    if (items.length === 0) return;
+    const prev = untrack(() => captions);
+    captions = [
+      ...prev,
+      ...items.map((item) => ({ ...item, captionId: ++captionSeq })),
+    ].slice(-3);
+  });
+
+  $effect(() => {
+    audio.setVolumes({ bgm: $settings.bgmVolume, se: $settings.seVolume, muted: $settings.muted });
+  });
+
+  $effect(() => {
+    const state = $play;
+    if (state) audio.updateFlame(state.gauges.flame);
+  });
+
+  $effect(() => {
+    // 判断が変わったら、前の記録メッセージを消す
+    const id = point?.id ?? '';
+    if (id !== lastPointId) {
+      lastPointId = id;
+      noteStatus = '';
+    }
+  });
+
+  $effect(() => {
+    const state = $play;
+    if (!state || state.voicesShown.length === 0) return;
+    const key = `${state.scenarioId}:${state.role}:${state.startedAt}`;
+    if (noticeKeys.has(key)) return;
+    noticeKeys.add(key);
+    voicesNoticeOpen = true;
+  });
+
+  onMount(() => {
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    systemReduce = motionQuery.matches;
+    const handleMotion = (event: MediaQueryListEvent): void => {
+      systemReduce = event.matches;
+    };
+    motionQuery.addEventListener('change', handleMotion);
+
+    const handleKey = (event: KeyboardEvent): void => {
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA'
+        || target.tagName === 'SELECT' || target.isContentEditable)) return;
+      if (!point || draftPending || busy) return;
+      const index = choiceIndexFromKey(event.key, point.choices.length);
+      if (index === null) return;
+      const choice = point.choices[index];
+      if (!choice) return;
+      event.preventDefault();
+      select(choice.id);
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      motionQuery.removeEventListener('change', handleMotion);
+    };
+  });
+
+  function select(choiceId: string): void {
+    const state = $play;
+    const current = $scenario;
+    if (!state || !current || busy) return;
+    busy = true;
+    try {
+      let result = choose(state, current, choiceId);
+      // 記者会見へ行く前に、質問の準備を済ませる
+      if (result.next === 'press') {
+        const started = startPress(result.state, current);
+        result = { state: started.state, cues: [...result.cues, ...started.cues], next: started.next };
+      }
+      saveProgress(result.state);
+      applyStep(result);
+    } catch (error) {
+      errorMessage.set(error instanceof Error ? error.message : String(error));
+      screen.set('error');
+    } finally {
+      busy = false;
+    }
+  }
+
+  function addNotable(item: { id: string; text: Localized }): void {
+    const state = $play;
+    const currentPointId = point?.id ?? 'unknown';
+    if (!state) return;
+    const id = `n:${currentPointId}:${item.id}`;
+    if (state.notes.some((n) => n.id === id)) return;
+    const next = addNote(state, { id, text: item.text, at: state.clock });
+    play.set(next);
+    saveProgress(next);
+    noteStatus = t('sb.notes.addedAnnounce', { count: next.notes.length });
+  }
+
+  function addFree(text: string): void {
+    const state = $play;
+    if (!state) return;
+    const id = `f:${state.notes.length}:${state.clock.day}:${state.clock.minutes}`;
+    const next = addNote(state, { id, text, at: state.clock });
+    play.set(next);
+    saveProgress(next);
+    noteStatus = t('sb.notes.addedAnnounce', { count: next.notes.length });
+  }
 </script>
 
-<section data-screen="S05Main"><p>S05Main</p></section>
+<section class="main" data-screen="S05Main">
+  <h1 class="sr-only">{t('sb.main.title')}</h1>
+
+  {#if $play && $scenario}
+    <TopBar play={$play} scenario={$scenario} />
+  {/if}
+
+  <CaptionBar {captions} />
+
+  <div class="body">
+    <div class="primary-col">
+      <section class="situation" aria-labelledby="situation-heading">
+        <h2 id="situation-heading">{t('sb.situation.heading')}</h2>
+        {#if point}
+          <Typewriter text={loc(point.text)} instant={$settings.reduceMotion} />
+        {:else}
+          <p>{t('sb.main.noPoint')}</p>
+        {/if}
+        {#if illustration}
+          <figure>
+            <img src={illustration.file} alt={loc(illustration.alt)} />
+            <figcaption>{loc(illustration.credit)}</figcaption>
+          </figure>
+        {/if}
+      </section>
+
+      <section class="choices" aria-labelledby="choices-heading">
+        <h2 id="choices-heading">{t('sb.choices.heading')}</h2>
+        {#if draftPending}
+          <p class="draft-pending">{t('sb.main.draftPending')}</p>
+          <button type="button" class="resume" onclick={() => screen.set('S06')}>
+            {t('sb.draft.resume')}
+          </button>
+        {:else if point}
+          <ChoiceList
+            choices={point.choices}
+            stamina={$play?.gauges.stamina ?? 100}
+            disabled={busy}
+            onselect={select}
+          />
+        {:else}
+          <p class="empty">{t('sb.main.noChoices')}</p>
+        {/if}
+      </section>
+    </div>
+
+    <aside class="side" aria-label={t('sb.main.side')}>
+      <div class="tabs" role="tablist" aria-label={t('sb.main.side')}>
+        <button
+          id="tab-voices"
+          type="button"
+          role="tab"
+          aria-selected={tab === 'voices'}
+          aria-controls="panel-voices"
+          class:active={tab === 'voices'}
+          onclick={() => (tab = 'voices')}
+        >{t('sb.voices.heading')}</button>
+        <button
+          id="tab-notes"
+          type="button"
+          role="tab"
+          aria-selected={tab === 'notes'}
+          aria-controls="panel-notes"
+          class:active={tab === 'notes'}
+          onclick={() => (tab = 'notes')}
+        >{t('sb.notes.heading')}</button>
+      </div>
+
+      <section
+        id="panel-voices"
+        class="panel"
+        class:active={tab === 'voices'}
+        aria-labelledby="tab-voices"
+      >
+        <h2>{t('sb.voices.heading')}</h2>
+        {#if voicesNoticeOpen}
+          <div class="notice" role="note">
+            <p>{notice('voices')}</p>
+            <button type="button" onclick={() => (voicesNoticeOpen = false)}>{t('sb.notice.close')}</button>
+          </div>
+        {/if}
+        <VoiceList {voices} />
+      </section>
+
+      <section
+        id="panel-notes"
+        class="panel"
+        class:active={tab === 'notes'}
+        aria-labelledby="tab-notes"
+      >
+        <h2>{t('sb.notes.heading')}</h2>
+        <NotePanel
+          notable={point?.notable ?? []}
+          notes={$play?.notes ?? []}
+          addedIds={addedNotableIds}
+          status={noteStatus}
+          onaddnotable={addNotable}
+          onaddfree={addFree}
+        />
+      </section>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .main {
+    display: grid;
+    gap: 0.7rem;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0.8rem;
+    color: var(--text, #e8e6e1);
+  }
+  .body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: 0.8rem;
+    align-items: start;
+  }
+  .primary-col {
+    display: grid;
+    gap: 0.8rem;
+    min-width: 0;
+  }
+  section.situation,
+  section.choices,
+  .panel {
+    padding: 0.8rem;
+    border: 1px solid var(--border, #3a3f4b);
+    border-radius: 8px;
+    background: var(--panel, #1b1f27);
+  }
+  h2 {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    color: var(--muted, #a3a8b3);
+    font-weight: 600;
+  }
+  .situation :global(.typed) {
+    font-size: 1.05rem;
+  }
+  figure {
+    margin: 0.6rem 0 0;
+  }
+  figure img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+  figcaption {
+    color: var(--muted, #a3a8b3);
+    font-size: 0.75rem;
+  }
+  .side {
+    display: grid;
+    gap: 0.6rem;
+    min-width: 0;
+  }
+  .tabs {
+    display: none;
+    gap: 0.35rem;
+  }
+  .tabs button {
+    flex: 1;
+    padding: 0.45rem;
+    border: 1px solid var(--border, #3a3f4b);
+    border-radius: 5px;
+    background: var(--panel-2, #222731);
+    color: var(--muted, #a3a8b3);
+    font: inherit;
+    cursor: pointer;
+  }
+  .tabs button.active {
+    border-color: var(--accent, #d8b26a);
+    color: var(--text, #e8e6e1);
+  }
+  .tabs button:focus-visible,
+  .resume:focus-visible {
+    outline: 2px solid var(--focus, #8ab4f8);
+    outline-offset: 2px;
+  }
+  .panel h2 {
+    margin-bottom: 0.5rem;
+  }
+  .notice {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border, #3a3f4b);
+    border-left: 3px solid var(--accent, #d8b26a);
+    border-radius: 5px;
+    background: var(--panel-2, #222731);
+    font-size: 0.85rem;
+  }
+  .notice p {
+    margin: 0 0 0.35rem;
+    line-height: 1.6;
+  }
+  .notice button {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--border, #3a3f4b);
+    border-radius: 4px;
+    background: none;
+    color: var(--text, #e8e6e1);
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .resume {
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--accent, #d8b26a);
+    border-radius: 6px;
+    background: var(--panel-2, #222731);
+    color: var(--text, #e8e6e1);
+    font: inherit;
+    cursor: pointer;
+  }
+  .draft-pending,
+  .empty {
+    margin: 0 0 0.5rem;
+    color: var(--muted, #a3a8b3);
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  /* スマートフォン: 世間の声と記録をタブで切り替える */
+  @media (max-width: 639px) {
+    .body {
+      grid-template-columns: 1fr;
+    }
+    .tabs {
+      display: flex;
+    }
+    .panel {
+      display: none;
+    }
+    .panel.active {
+      display: block;
+    }
+  }
+</style>
