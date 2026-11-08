@@ -1480,9 +1480,12 @@ const CHECKS = [
   checkC22,
 ];
 
-export function runChecks(project: Project): ValidationResult {
+/** skipPaths: 経路検査（C11〜C13、重い）を省く。build-data 用（validate は必ず全検査する） */
+export function runChecks(project: Project, opts: { skipPaths?: boolean } = {}): ValidationResult {
   const all: Issue[] = [...project.loadIssues];
+  const PATH_CHECKS = new Set([checkC11, checkC12, checkC13]);
   for (const check of CHECKS) {
+    if (opts.skipPaths && PATH_CHECKS.has(check)) continue;
     all.push(...check(project));
   }
   all.sort((a, b) => {

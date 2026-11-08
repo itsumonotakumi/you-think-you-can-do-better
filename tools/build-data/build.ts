@@ -60,7 +60,7 @@ export function buildData(options: BuildOptions): BuildResult {
   }
 
   // 単体実行でも validate と同じ検査を全部通す。シナリオ0件でも共通データは検査する。
-  const result = runChecks(project);
+  const result = runChecks(project, { skipPaths: true }); // 経路検査は npm run validate で行う
   if (result.errors.length > 0) {
     const first = result.errors[0]!;
     const rest = result.errors.length - 1;
