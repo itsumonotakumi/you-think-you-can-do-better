@@ -13,6 +13,11 @@ deadlines:
     label: { ja: '個人情報保護委員会への速報', en: '' }
     points: -150
     doneFlag: ppcPrelimFiled
+  - id: dl-ppc-final
+    ref: ppc-report-final-malicious
+    label: { ja: '個人情報保護委員会への確報', en: '' }
+    points: -100
+    doneFlag: ppcFinalFiled
 events:
   - id: ev-client-inquiry
     at: { day: 1, minutes: 720 }
@@ -82,7 +87,7 @@ points:
     at: { day: 1, minutes: 240 }
     phase: contain
     sound: { se: [phone_ring, notify_news] }
-    text: { ja: '午前4時。被害が確認されたサーバーは三台。同じネットワークに、まだ五百台の顧客サーバーがぶら下がっている。全プランを止めるか。', en: '' }
+    text: { ja: '午前4時。被害が確認されたサーバーは三台。同じネットワークに、まだ数百台の顧客サーバーがぶら下がっている。全プランを止めるか。', en: '' }
     voices: [v02-public, v02-coward, v02-field, v02-ok]
     choices:
       - id: p02-partial
@@ -121,6 +126,18 @@ points:
           - { id: p02-c-care, points: 10, axis: care, refs: [ppc-notify-person] }
           - { id: p02-c-content, points: 5, axis: content, refs: [meti-disclosure-guidance] }
           - { id: p02-c-next, points: 3, axis: content, refs: [meti-disclosure-guidance] }
+      - id: p02-praise
+        text: { ja: '現場の判断を褒め、他のサーバーも同じ手順で止めるよう指示する。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -80
+        refs: [nist-sp800-61r3]
+        gauges: { damage: -10, trust: 5, stamina: -5 }
+        delayed:
+          - { afterPhases: 2, points: -60, gauges: { damage: 10 }, reason: { ja: '電源を切った三台は、メモリ上の痕跡を失っていた。侵入の手口が分からない。', en: '' } }
+        items:
+          - { id: p02-e-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
+          - { id: p02-e-order, points: -8, axis: order, refs: [nist-sp800-61r3] }
       - id: p02-maintenance
         text: { ja: '全停止するが、告知は「メンテナンス」と書く。', en: '' }
         minutes: 90
@@ -140,7 +157,7 @@ points:
     at: { day: 1, minutes: 840 }
     phase: contain
     sound: { se: [mail_arrive] }
-    text: { ja: '午後2時。攻撃者からメールが届く。「顧客情報を預かっている。連絡がなければ公開する」。', en: '' }
+    text: { ja: '午後2時。攻撃者からメールが届く。「24時間以内に連絡がなければ、顧客情報を公開する」。', en: '' }
     voices: [v03-public, v03-bold, v03-attacker, v03-ok]
     choices:
       - id: p03-pay
@@ -185,6 +202,7 @@ points:
         points: -60
         refs: [meti-disclosure-guidance]
         gauges: { flame: 15, trust: -5 }
+        setFlags: { refusedRansom: true }
         delayed:
           - { afterPhases: 1, points: -40, gauges: { flame: 15 }, reason: { ja: '攻撃者が社長の発信に反応し、公開を早めた。', en: '' } }
         items:
@@ -238,14 +256,14 @@ points:
     phase: notify
     sound: { se: [typing] }
     text: { ja: '午後3時。広報が「今夜、第1報を出せます」と言う。被害の全容はまだ分かっていない。', en: '' }
-    voices: [v05-expert, v05-coward, v05-popular, v05-ok]
+    voices: [v05-coward, v05-popular, v05-ok]
     choices:
       - id: p05-tonight
         text: { ja: '今夜中に第1報を出す。', en: '' }
         minutes: 120
         category: maintain
         points: 20
-        refs: [ppc-report-prelim]
+        refs: [meti-disclosure-guidance]
         gauges: { trust: 5, stamina: -10 }
         detail: first-report
         setFlags: { firstPublic: true }
@@ -280,7 +298,7 @@ points:
 
   - id: p06-ad
     at: { day: 2, minutes: 1140 }
-    phase: contain
+    phase: notify
     sound: { se: [notify_news] }
     text: { ja: '午後7時。駅前の大型ビジョンで、自社のセキュリティ商品の広告が流れている。「安心を、すべての人に」。', en: '' }
     voices: [v06-vendor, v06-flattery]
@@ -319,12 +337,12 @@ points:
 
   - id: p07-scope
     at: { day: 3, minutes: 600 }
-    phase: investigate
+    phase: notify
     sound: { se: [notify_chat] }
-    text: { ja: '午前10時。調査会社の報告。侵入は二か月半前。影響範囲は顧客の一部とAPIキーに及ぶ可能性がある。', en: '' }
+    text: { ja: '午前10時。調査会社の報告。侵入は数か月前。影響範囲は顧客の一部とAPIキーに及ぶ可能性がある。', en: '' }
     voices: [v07-insider, v07-past, v07-ok]
     notable:
-      - { id: note-scope, text: { ja: '侵入は二か月半前。影響範囲は調査中。APIキーも対象の可能性。', en: '' } }
+      - { id: note-scope, text: { ja: '侵入は数か月前。影響範囲は調査中。APIキーも対象の可能性。', en: '' } }
     choices:
       - id: p07-narrow
         text: { ja: 'すでに公表した範囲だけを調査し、追加の公表は控える。', en: '' }
@@ -363,7 +381,7 @@ points:
 
   - id: p08-warning
     at: { day: 3, minutes: 960 }
-    phase: organize
+    phase: notify
     sound: { se: [notify_chat] }
     text: { ja: '午後4時。半年前に社内の技術者が「VPN機器の更新とログ保全を優先してほしい」と送っていたメールが見つかった。当時、あなたは決裁していない。', en: '' }
     voices: [v08-boss, v08-coward, v08-ok]
@@ -410,7 +428,7 @@ points:
 
   - id: p09-vendor
     at: { day: 4, minutes: 600 }
-    phase: investigate
+    phase: notify
     sound: { se: [mail_arrive] }
     text: { ja: '午前10時。VPN機器のベンダーが「弊社の製品に問題はありません。運用の問題です」と説明した。', en: '' }
     voices: [v09-vendor, v09-law, v09-ok]
@@ -449,9 +467,9 @@ points:
 
   - id: p10-stamina
     at: { day: 5, minutes: 540 }
-    phase: organize
+    phase: notify
     sound: { se: [notify_chat] }
-    text: { ja: '午前9時。対策本部は三日連続の徹夜。現場から「交代を入れないと持たない」という声が出ている。', en: '' }
+    text: { ja: '午前9時。対策本部は五日目の朝で、満足に眠れていない。現場から「交代を入れないと持たない」という声が出ている。', en: '' }
     voices: [v10-flattery, v10-public, v10-ok]
     choices:
       - id: p10-allnight
@@ -578,7 +596,7 @@ points:
     phase: recover
     sound: { se: [notify_sns] }
     text: { ja: '午前9時。復旧のめどが立った。全面再開を急ぐ声と、検証を優先する声がぶつかっている。', en: '' }
-    voices: [v13-coward, v13-public, v13-ok]
+    voices: [v13-expert, v13-coward, v13-public, v13-ok]
     choices:
       - id: p13-rush
         text: { ja: '全面再開する。監視は通常体制に戻す。', en: '' }
@@ -619,7 +637,7 @@ points:
 
   - id: p14-blog
     at: { day: 14, minutes: 600 }
-    phase: notify
+    phase: recover
     sound: { se: [notify_sns] }
     text: { ja: '午前10時。広報から「社長の個人ブログに、今回の判断を書くか」と聞かれた。公式発表はすでに何度も出している。', en: '' }
     voices: [v14-bold, v14-flattery, v14-ok]
@@ -663,11 +681,11 @@ points:
     at: { day: 30, minutes: 600 }
     phase: after
     sound: { se: [notify_news] }
-    text: { ja: '午前10時。第三者委員会の調査報告書が完成した。公開範囲を決める。', en: '' }
+    text: { ja: '午前10時。第三者委員会の調査報告書が完成した。確報の提出と公開範囲を決める。', en: '' }
     voices: [v15-expert, v15-law, v15-ok]
     choices:
       - id: p15-hide
-        text: { ja: '報告書は公開しない。攻撃者に利用されるおそれがある。', en: '' }
+        text: { ja: '報告書は公開せず、確報も出さない。攻撃者に利用されるおそれがある。', en: '' }
         minutes: 60
         category: hurt
         points: -150
@@ -683,7 +701,7 @@ points:
         points: 100
         refs: [meti-disclosure-guidance]
         gauges: { flame: -10, trust: 15, stamina: -10 }
-        setFlags: { fullDisclosure: true }
+        setFlags: { fullDisclosure: true, ppcFinalFiled: true }
         detail: final-report
         items:
           - { id: p15-b-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
@@ -696,7 +714,7 @@ points:
         fatalAlternate: 50
         refs: [meti-disclosure-guidance]
         gauges: { flame: -15, trust: 20, stamina: -15 }
-        setFlags: { fullDisclosure: true, industryShare: true }
+        setFlags: { fullDisclosure: true, industryShare: true, ppcFinalFiled: true }
         detail: final-report
         items:
           - { id: p15-c-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
@@ -707,7 +725,7 @@ points:
     at: { day: 31, minutes: 540 }
     phase: after
     sound: { se: [shutter] }
-    text: { ja: '午前9時。記者会見を翌日に控え、広報が「質問は五問、二十分で終わらせたい」と言う。', en: '' }
+    text: { ja: '午前9時。記者会見を翌日に控え、広報が「質問は五問か六問、二十分で終わらせたい」と言う。', en: '' }
     voices: [v16-flattery, v16-coward, v16-ok]
     choices:
       - id: p16-short
@@ -875,14 +893,14 @@ voices:
   - { id: v02-after, media: sns, misleading: false, text: { ja: '止めるのは分かるが、返金はいつだ。', en: '' }, trigger: { at: after, choice: p02-stop-guide } }
   - { id: v03-public, media: sns, misleading: true, type: public-opinion, text: { ja: '身代金を払ってさっさと戻せ。客が困っているんだ。', en: '' }, trigger: { at: point } }
   - { id: v03-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '社長、犯人に「絶対に許さない」と言ってください。バズりますよ。', en: '' }, trigger: { at: point } }
-  - { id: v03-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '連絡がなければ、顧客情報をすべて公開する。', en: '' }, trigger: { at: point } }
+  - { id: v03-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '24時間以内に連絡がなければ、顧客情報をすべて公開する。', en: '' }, trigger: { at: point } }
   - { id: v03-ok, media: chat, misleading: false, text: { ja: '法務「支払いは復号も削除も保証しません。警察に相談しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v03-after, media: news, misleading: false, text: { ja: '補償方針を先に出すのは、被害を認めたことになるのでは。', en: '' }, trigger: { at: after, choice: p03-refuse-plan } }
   - { id: v04-law, media: board, misleading: true, type: law-ish, text: { ja: '千人未満なら報告はいらないでしょ。', en: '' }, trigger: { at: point } }
   - { id: v04-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が確定するまで外には出すな。', en: '' }, trigger: { at: point } }
   - { id: v04-ok, media: chat, misleading: false, text: { ja: '法務「不正の目的のおそれがあれば、件数に関係なく速報の対象です」。', en: '' }, trigger: { at: point } }
-  - { id: v05-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'サーバーを全部初期化すれば安全ですよ。証拠も残りません。', en: '' }, trigger: { at: point } }
-  - { id: v05-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '確定してから出せばいい。今出したらパニックになる。', en: '' }, trigger: { at: point } }
+  - { id: v13-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '環境を初期化して作り直せば、今夜中に戻せますよ。古いログは後からバックアップで追えます。', en: '' }, trigger: { at: point } }
+  - { id: v05-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '確定してから出せばいい。今出したらパニックになる。', en: '' }, trigger: { at: point } }
   - { id: v05-popular, media: sns, misleading: true, type: popular, text: { ja: '他のプレイヤーの多くは、全容が分かるまで待つを選んでいます。', en: '' }, trigger: { at: point } }
   - { id: v05-ok, media: chat, misleading: false, text: { ja: '広報「分かっている範囲で、今夜出せます」。', en: '' }, trigger: { at: point } }
   - { id: v05-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに公表するのか。説明が二転三転するぞ。', en: '' }, trigger: { at: after, choice: p05-tonight } }
@@ -891,12 +909,12 @@ voices:
   - { id: v06-after, media: sns, misleading: false, text: { ja: '広告枠で注意喚起とは、うまい商売だな。', en: '' }, trigger: { at: after, choice: p06-replace } }
   - { id: v07-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、本当は十倍漏れてる。今すぐ全部公表しろ。', en: '' }, trigger: { at: point } }
   - { id: v07-past, media: boss, misleading: true, type: past-success, text: { ja: '前の障害は範囲を絞って収まった。今回も同じでいい。', en: '' }, trigger: { at: point } }
-  - { id: v07-ok, media: chat, misleading: false, text: { ja: '調査責任者「侵入は二か月半前。範囲はまだ確定していません」。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '調査責任者「侵入は数か月前。範囲はまだ確定していません」。', en: '' }, trigger: { at: point } }
   - { id: v07-after, media: news, misleading: false, text: { ja: '補償基準が甘い。免責ばかり目立つ。', en: '' }, trigger: { at: after, choice: p07-expand-plan } }
   - { id: v08-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '内部のメールは出さなくていい。今さら言っても混乱するだけだ。', en: '' }, trigger: { at: point } }
-  - { id: v08-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '今さら内部の指摘を出して、責任逃れか。', en: '' }, trigger: { at: point } }
+  - { id: v08-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '今さら内部の指摘を出して、責任逃れか。', en: '' }, trigger: { at: point } }
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '総務「当時の指摘メールは、調査資料として保全しています」。', en: '' }, trigger: { at: point } }
-  - { id: v08-after, media: sns, misleading: false, text: { ja: '今さら内部の指摘を出して、責任逃れに見える。', en: '' }, trigger: { at: after, choice: p08-own } }
+  - { id: v08-after, media: sns, misleading: false, text: { ja: '指摘を握りつぶした経営が、今になって「責任は私に」。遅すぎる。', en: '' }, trigger: { at: after, choice: p08-own } }
   - { id: v09-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '弊社の製品に問題はありません。運用の問題です。', en: '' }, trigger: { at: point } }
   - { id: v09-law, media: news, misleading: true, type: law-ish, text: { ja: '契約に免責条項があるから、公表しなくて大丈夫です。', en: '' }, trigger: { at: point } }
   - { id: v09-ok, media: chat, misleading: false, text: { ja: '法務「まず共同調査を求めて、原因の断定を避けましょう」。', en: '' }, trigger: { at: point } }
@@ -906,14 +924,14 @@ voices:
   - { id: v10-ok, media: chat, misleading: false, text: { ja: '現場「交代を入れてください。このままだと確認漏れが出ます」。', en: '' }, trigger: { at: point } }
   - { id: v10-after, media: sns, misleading: false, text: { ja: '社長が休んでいる間に、顧客は逃げていく。', en: '' }, trigger: { at: after, choice: p10-shift-care } }
   - { id: v11-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '次の公開は、もっと多くの顧客だ。', en: '' }, trigger: { at: point } }
-  - { id: v11-coward, media: news, misleading: true, type: coward-critique, text: { ja: '一部が公開された程度で、全部を認めるのか。弱みを見せるな。', en: '' }, trigger: { at: point } }
+  - { id: v11-coward, media: news, misleading: true, type: public-opinion, text: { ja: '一部が公開された程度で、全部を認めるのか。弱みを見せるな。', en: '' }, trigger: { at: point } }
   - { id: v11-ok, media: chat, misleading: false, text: { ja: '窓口「公開された顧客から電話が来ています」。', en: '' }, trigger: { at: point } }
   - { id: v11-after, media: sns, misleading: false, text: { ja: '見舞金が少ない。これで済むと思うな。', en: '' }, trigger: { at: after, choice: p11-support } }
   - { id: v12-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '見舞金を出せば、被害を認めたことになります。', en: '' }, trigger: { at: point } }
   - { id: v12-law, media: board, misleading: true, type: law-ish, text: { ja: '払えば訴訟の材料になる。何もしないのが法的に安全です。', en: '' }, trigger: { at: point } }
   - { id: v12-ok, media: chat, misleading: false, text: { ja: '顧客対応「金額だけでなく、相談窓口と説明の場が要ります」。', en: '' }, trigger: { at: point } }
   - { id: v12-after, media: news, misleading: false, text: { ja: '金額が低すぎる。顧客情報の値段はそれだけか。', en: '' }, trigger: { at: after, choice: p12-tiered } }
-  - { id: v13-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '一週間も止めているのは臆病すぎる。他社ならもう再開している。', en: '' }, trigger: { at: point } }
+  - { id: v13-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '二週間近く止めているのは臆病すぎる。他社ならもう再開している。', en: '' }, trigger: { at: point } }
   - { id: v13-public, media: news, misleading: true, type: public-opinion, text: { ja: '顧客は待ってくれない。再開しないなら解約だ。', en: '' }, trigger: { at: point } }
   - { id: v13-ok, media: chat, misleading: false, text: { ja: '技術責任者「クリーンな環境から段階的に戻しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v13-after, media: sns, misleading: false, text: { ja: '再開が遅い。他社はもう動いている。', en: '' }, trigger: { at: after, choice: p13-verified } }
@@ -926,7 +944,7 @@ voices:
   - { id: v15-ok, media: chat, misleading: false, text: { ja: '調査委員「攻撃に使える部分だけ伏せれば、公開できます」。', en: '' }, trigger: { at: point } }
   - { id: v15-after, media: news, misleading: false, text: { ja: '今さら報告書を出して、宣伝か。', en: '' }, trigger: { at: after, choice: p15-publish-share } }
   - { id: v16-flattery, media: chat, misleading: true, type: flattery, text: { ja: '準備なんていりません。社長ならその場で答えられます。', en: '' }, trigger: { at: point } }
-  - { id: v16-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '会見なんて開かなければいい。長引くだけです。', en: '' }, trigger: { at: point } }
+  - { id: v16-coward, media: boss, misleading: true, type: boss-pressure, text: { ja: '会見なんて開かなければいい。長引くだけです。', en: '' }, trigger: { at: point } }
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '広報「記録を手元に置いて、事実だけ答えましょう」。', en: '' }, trigger: { at: point } }
   - { id: v16-after, media: news, misleading: false, text: { ja: '台本を読んでいるだけ。誠意がない。', en: '' }, trigger: { at: after, choice: p16-ready } }
   - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「調査中」なんだ。', en: '' }, trigger: { at: manual } }

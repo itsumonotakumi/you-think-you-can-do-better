@@ -42,13 +42,13 @@ points:
     at: { day: 0, minutes: 1185 }
     phase: detect
     sound: { se: [notify_chat] }
-    text: { ja: '19時45分。顧客の仮想サーバーで不審なプロセスの実行を検知した。同じ時刻、基盤運用部長から「顧客のサーバーに不正プログラムが見つかった」と電話が入る。影響範囲はまだ分からない。', en: '' }
+    text: { ja: '19時45分。顧客の仮想サーバー三台で不審なプロセスの実行を検知した。同じ時刻、基盤運用部長から「顧客のサーバーに不正プログラムが見つかった」と電話が入る。影響範囲はまだ分からない。', en: '' }
     voices: [v01-vendor, v01-boss, v01-field, v01-ok]
     notable:
-      - { id: note-first-alert, text: { ja: '19時45分、顧客の仮想サーバーで不審なプロセスを検知。影響範囲は不明。', en: '' } }
+      - { id: note-first-alert, text: { ja: '19時45分、顧客の仮想サーバー三台で不審なプロセスを検知。影響範囲は不明。', en: '' } }
     choices:
       - id: a01-poweroff
-        text: { ja: '危険なので、そのサーバーの電源を抜いて止める。', en: '' }
+        text: { ja: '危険なので、該当する三台の電源を抜いて止める。', en: '' }
         minutes: 15
         category: hurt
         points: -30
@@ -62,7 +62,7 @@ points:
         text: { ja: '誤検知かもしれない。朝までアラートの推移を見てから動く。', en: '' }
         minutes: 60
         category: hurt
-        points: -30
+        points: -60
         refs: [jpcert-handling]
         gauges: { damage: 10, flame: 5, trust: -5 }
         coward: true
@@ -70,7 +70,7 @@ points:
           - { id: a01-b-time, points: -7, axis: time, refs: [jpcert-handling] }
           - { id: a01-b-record, points: -6, axis: record, refs: [jpcert-handling] }
       - id: a01-isolate
-        text: { ja: '対象サーバーをネットワークから隔離し、メモリとディスクの保全を始める。検知時刻と操作を記録する。', en: '' }
+        text: { ja: '対象の三台をネットワークから隔離し、メモリとディスクの保全を始める。検知時刻と操作を記録する。', en: '' }
         minutes: 30
         category: maintain
         points: 30
@@ -86,7 +86,7 @@ points:
         text: { ja: '監視サービスのベンダーに一次切り分けを依頼し、結果を待つ。', en: '' }
         minutes: 90
         category: hurt
-        points: -30
+        points: -50
         refs: [meti-csm-guideline]
         gauges: { damage: 5, trust: -5 }
         items:
@@ -97,12 +97,12 @@ points:
     at: { day: 0, minutes: 1215 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '20時15分。隔離した一台と同じ認証情報を使うサーバーが、同じネットワークに五百台ある。全部止めれば顧客の取引も止まる。', en: '' }
+    text: { ja: '20時15分。隔離した三台と同じ認証情報を使うサーバーが、同じネットワークに数百台ある。全部止めれば顧客の取引も止まる。', en: '' }
     voices: [v02-public, v02-past, v02-popular, v02-ok]
     popular: { choiceId: a02-one, percent: 64 }
     choices:
       - id: a02-one
-        text: { ja: '隔離した一台だけを止め、ほかは監視を強めて様子を見る。', en: '' }
+        text: { ja: '隔離は三台で止め、ほかは監視を強めて様子を見る。上には進言しない。', en: '' }
         minutes: 60
         category: hurt
         points: -30
@@ -115,13 +115,13 @@ points:
           - { id: a02-a-record, points: 2, axis: record, refs: [jpcert-handling] }
           - { id: a02-a-time, points: -6, axis: time, refs: [nist-sp800-61r3] }
       - id: a02-all
-        text: { ja: '影響しうる全サーバーの認証情報を無効化し、順次隔離する。顧客への影響は運用部と調整する。', en: '' }
+        text: { ja: '同じ認証情報を使う全サーバーの一覧と影響を30分でまとめ、認証情報の無効化と順次隔離をCSIRTリーダーに進言する。', en: '' }
         minutes: 120
         category: maintain
         points: 30
         refs: [nist-sp800-61r3, meti-csm-guideline]
         gauges: { damage: -20, flame: 10, stamina: -10 }
-        setFlags: { contained: true }
+        setFlags: { containmentProposed: true }
         items:
           - { id: a02-b-content, points: 6, axis: content, refs: [nist-sp800-61r3] }
           - { id: a02-b-order, points: 6, axis: order, refs: [meti-csm-guideline] }
@@ -131,7 +131,7 @@ points:
         text: { ja: '監視ツールの誤検知としてアラートを閉じる。', en: '' }
         minutes: 15
         category: hurt
-        points: -30
+        points: -60
         refs: [jpcert-handling]
         gauges: { damage: 20, trust: -10 }
         coward: true
@@ -150,7 +150,7 @@ points:
         text: { ja: '再起動して、様子を見る。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -40
         refs: [nist-sp800-61r3]
         gauges: { damage: 10, trust: -5 }
         delayed:
@@ -187,7 +187,7 @@ points:
         text: { ja: '不審なファイルだけをUSBメモリにコピーし、元のファイルは消す。', en: '' }
         minutes: 45
         category: hurt
-        points: -30
+        points: -60
         refs: [cissp-cbk-secops]
         gauges: { damage: 5, trust: -10 }
         items:
@@ -196,7 +196,7 @@ points:
 
   - id: a04-first-report
     at: { day: 0, minutes: 1305 }
-    phase: organize
+    phase: contain
     sound: { se: [typing] }
     text: { ja: '21時45分。CSIRTリーダーに第一報を出す時間。まだ影響範囲は分かっていない。個人のSNSには「うちの会社やばい」と書きたい気持ちもある。', en: '' }
     voices: [v04-boss, v04-bold, v04-ok]
@@ -205,7 +205,7 @@ points:
         text: { ja: '全容が分かってから報告する。', en: '' }
         minutes: 120
         category: hurt
-        points: -30
+        points: -60
         refs: [jpcert-handling]
         gauges: { flame: 10, trust: -10, damage: 5 }
         coward: true
@@ -230,7 +230,7 @@ points:
         text: { ja: '個人のSNSに「大変なことになっている」と投稿して、社内に知らせる。', en: '' }
         minutes: 15
         category: hurt
-        points: -30
+        points: -100
         refs: [meti-disclosure-guidance]
         gauges: { flame: 15, trust: -10 }
         delayed:
@@ -243,7 +243,7 @@ points:
         text: { ja: '口頭で軽く伝え、書面は後回しにする。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -40
         refs: [jpcert-handling]
         gauges: { trust: -5 }
         items:
@@ -261,7 +261,7 @@ points:
         text: { ja: '影響が確認できるまで、キーは有効のままにする。', en: '' }
         minutes: 60
         category: hurt
-        points: -30
+        points: -60
         refs: [nist-sp800-61r3]
         gauges: { damage: 15, trust: -10 }
         delayed:
@@ -286,7 +286,7 @@ points:
         text: { ja: '全キーを一斉に失効させ、再発行は顧客に任せる。', en: '' }
         minutes: 60
         category: hurt
-        points: -30
+        points: -40
         refs: [meti-csm-guideline]
         gauges: { damage: -10, flame: 10, trust: -10 }
         items:
@@ -296,7 +296,7 @@ points:
         text: { ja: '調査を急ぐため、新しい共通キーを担当者全員に配る。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -80
         refs: [cissp-cbk-secops]
         gauges: { damage: 10, trust: -10 }
         items:
@@ -307,16 +307,16 @@ points:
     at: { day: 1, minutes: 360 }
     phase: investigate
     sound: { se: [typing] }
-    text: { ja: '午前6時。侵入は二か月半前と分かった。しかしログの保存期間は30日で、それ以前の記録は残っていない。バックアップのログも一部だけだ。', en: '' }
+    text: { ja: '午前6時。残ったログから、侵入は少なくとも数週間前にさかのぼる可能性が出た。しかしログの保存期間は30日で、それ以前の記録は残っていない。バックアップのログも一部だけだ。', en: '' }
     voices: [v06-expert, v06-insider, v06-ok]
     notable:
-      - { id: note-scope, text: { ja: '侵入は二か月半前。ログの保存期間は30日で、古い記録は復元が必要。', en: '' } }
+      - { id: note-scope, text: { ja: '侵入は数週間以上前の可能性。保存期間30日で古い記録は復元が必要。', en: '' } }
     choices:
       - id: a06-give-up
         text: { ja: 'ログがないので、侵入経路の調査は打ち切る。', en: '' }
         minutes: 60
         category: hurt
-        points: -30
+        points: -60
         refs: [nist-sp800-61r3]
         gauges: { damage: 10, trust: -10 }
         coward: true
@@ -340,7 +340,7 @@ points:
         text: { ja: 'おそらくVPN機器の脆弱性だろうと断定し、公表文の材料に書く。', en: '' }
         minutes: 60
         category: hurt
-        points: -30
+        points: -120
         refs: [meti-disclosure-guidance]
         gauges: { flame: 10, trust: -10 }
         items:
@@ -350,7 +350,7 @@ points:
         text: { ja: 'SNSに「内部犯の可能性がある」と書き込む。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -120
         refs: [meti-disclosure-guidance]
         gauges: { flame: 20, trust: -15 }
         items:
@@ -360,7 +360,7 @@ points:
 
   - id: a07-ransom
     at: { day: 1, minutes: 840 }
-    phase: contain
+    phase: investigate
     sound: { se: [mail_arrive] }
     text: { ja: '午後2時。攻撃者から要求メールが届いた。「24時間以内に連絡しなければ、顧客情報をすべて公開する」。あなたの端末に直接届いている。', en: '' }
     voices: [v07-attacker, v07-public, v07-ok]
@@ -369,7 +369,7 @@ points:
         text: { ja: '自分で返信して、公開を止める交渉をする。', en: '' }
         minutes: 60
         category: hurt
-        points: -30
+        points: -60
         refs: [npa-consult]
         gauges: { flame: 10, trust: -10 }
         delayed:
@@ -405,7 +405,7 @@ points:
         text: { ja: '要求文をそのままSNSに公開して、注意を呼びかける。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -100
         refs: [meti-disclosure-guidance]
         gauges: { flame: 20, trust: -10 }
         items:
@@ -415,7 +415,7 @@ points:
 
   - id: a08-my-warning
     at: { day: 2, minutes: 540 }
-    phase: organize
+    phase: investigate
     sound: { se: [notify_chat] }
     text: { ja: '午前9時。調査資料の中に、半年前に自分が送ったメールがあった。「VPN機器の更新とログ保存期間の延長を優先してほしい」。当時、上司から「今期は予算がない」と返され、自分もそれ以上押さなかった。', en: '' }
     voices: [v08-boss, v08-coward, v08-ok]
@@ -484,7 +484,7 @@ points:
         text: { ja: '掲示板とSNSの書き込みを全部追い、一つずつ反論する。', en: '' }
         minutes: 180
         category: hurt
-        points: -30
+        points: -50
         refs: [meti-disclosure-guidance]
         gauges: { flame: 10, stamina: -10 }
         delayed:
@@ -520,7 +520,7 @@ points:
         text: { ja: '掲示板の書き込みは無視して、何もしない。', en: '' }
         minutes: 15
         category: hurt
-        points: -30
+        points: -60
         refs: [jpcert-handling]
         gauges: { damage: 5, flame: 5 }
         coward: true
@@ -539,7 +539,7 @@ points:
         text: { ja: 'ベンダーの説明をそのまま受け入れ、調査を任せる。', en: '' }
         minutes: 60
         category: hurt
-        points: -30
+        points: -60
         refs: [meti-csm-guideline]
         gauges: { flame: 5, trust: -10 }
         items:
@@ -561,7 +561,7 @@ points:
         text: { ja: 'SNSで「ベンダーの製品が原因」と断定して書き込む。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -120
         refs: [meti-disclosure-guidance]
         gauges: { flame: 25, trust: -15 }
         items:
@@ -572,7 +572,7 @@ points:
         text: { ja: '調査を急ぐため、侵害指標を外部の掲示板に共有して助力を求める。', en: '' }
         minutes: 45
         category: hurt
-        points: -30
+        points: -80
         refs: [meti-trade-secret]
         gauges: { flame: 10, trust: -10 }
         items:
@@ -581,7 +581,7 @@ points:
 
   - id: a11-fatigue
     at: { day: 4, minutes: 540 }
-    phase: organize
+    phase: investigate
     sound: { se: [notify_chat] }
     text: { ja: '午前9時。対策本部は三日連続の徹夜。あなたはログの見落としを二度している。後任に渡す引き継ぎ書もまだない。', en: '' }
     voices: [v11-flattery, v11-public, v11-ok]
@@ -590,7 +590,7 @@ points:
         text: { ja: '自分が最後までやる。他の人に渡すと分からなくなる。', en: '' }
         minutes: 120
         category: hurt
-        points: -30
+        points: -60
         refs: [ipa-sme-guideline]
         gauges: { stamina: -20, damage: 10, trust: -5 }
         delayed:
@@ -627,7 +627,7 @@ points:
         text: { ja: '疲れていることを隠して、いつも通りに装う。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -50
         refs: [ipa-sme-guideline]
         gauges: { stamina: -15, damage: 10 }
         coward: true
@@ -646,7 +646,7 @@ points:
         text: { ja: '「VPN機器の脆弱性が原因」と断定して渡す。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -120
         refs: [meti-disclosure-guidance]
         gauges: { flame: 10, trust: -10 }
         items:
@@ -669,7 +669,7 @@ points:
         text: { ja: '「技術のことは分かりません」と丸投げする。', en: '' }
         minutes: 15
         category: hurt
-        points: -30
+        points: -40
         refs: [meti-csm-guideline]
         gauges: { trust: -5 }
         items:
@@ -679,7 +679,7 @@ points:
         text: { ja: '公表前の文案を、知人の技術者に相談する。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -100
         refs: [meti-trade-secret]
         gauges: { flame: 10, trust: -10 }
         items:
@@ -698,7 +698,7 @@ points:
         text: { ja: '個人SNSで会社を擁護する長文を投稿する。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -100
         refs: [meti-disclosure-guidance]
         gauges: { flame: 15, trust: -10 }
         delayed:
@@ -731,7 +731,7 @@ points:
           - { id: a13-c-care, points: -10, axis: care, refs: [meti-csm-guideline] }
           - { id: a13-c-wording, points: -7, axis: wording, refs: [meti-disclosure-guidance] }
       - id: a13-ad-flag
-        text: { ja: '広報に広告の停止と注意喚起への差し替えを進言し、問い合わせ窓口を一本化する。', en: '' }
+        text: { ja: '広告の停止と注意喚起への差し替え、窓口の一本化を広報に進言する。', en: '' }
         minutes: 90
         category: recover
         points: 120
@@ -756,7 +756,7 @@ points:
         text: { ja: '「確認中」を続け、公開された事実を認めない。', en: '' }
         minutes: 120
         category: hurt
-        points: -30
+        points: -60
         refs: [meti-disclosure-guidance]
         gauges: { flame: 20, trust: -15 }
         coward: true
@@ -781,7 +781,7 @@ points:
         text: { ja: '該当しそうな顧客に、個別にDMで連絡する。', en: '' }
         minutes: 90
         category: hurt
-        points: -30
+        points: -40
         refs: [ppc-notify-person]
         gauges: { flame: 5, trust: -5 }
         items:
@@ -791,7 +791,7 @@ points:
         text: { ja: '公開されたデータを削除するよう、攻撃者に要求する。', en: '' }
         minutes: 45
         category: hurt
-        points: -30
+        points: -40
         refs: [npa-consult]
         gauges: { flame: 5, trust: -5 }
         items:
@@ -809,7 +809,7 @@ points:
         text: { ja: 'バックアップから一気に戻して、復旧を急ぐ。', en: '' }
         minutes: 120
         category: hurt
-        points: -30
+        points: -60
         refs: [nist-sp800-61r3]
         gauges: { damage: 15, trust: -10 }
         delayed:
@@ -835,7 +835,7 @@ points:
         text: { ja: '重要な顧客のシステムだけ、先に戻す。', en: '' }
         minutes: 120
         category: hurt
-        points: -30
+        points: -40
         refs: [nist-sp800-61r3]
         gauges: { damage: 10, trust: -5 }
         items:
@@ -845,7 +845,7 @@ points:
         text: { ja: '全認証情報を作り直さず、パスワード変更だけで戻す。', en: '' }
         minutes: 60
         category: hurt
-        points: -30
+        points: -60
         refs: [cissp-cbk-secops]
         gauges: { damage: 10, trust: -5 }
         items:
@@ -863,7 +863,7 @@ points:
         text: { ja: '通常の監視体制に戻す。', en: '' }
         minutes: 60
         category: hurt
-        points: -30
+        points: -60
         refs: [nist-sp800-61r3]
         gauges: { damage: 10, trust: -5 }
         delayed:
@@ -900,7 +900,7 @@ points:
         text: { ja: 'アラートがうるさいので、通知を切る。', en: '' }
         minutes: 15
         category: hurt
-        points: -30
+        points: -80
         refs: [nist-sp800-61r3]
         gauges: { damage: 20, trust: -15 }
         items:
@@ -944,7 +944,7 @@ points:
         text: { ja: '「ログが残っていない」と答える。', en: '' }
         minutes: 30
         category: hurt
-        points: -30
+        points: -60
         refs: [jpcert-handling]
         gauges: { flame: 10, trust: -15 }
         items:
@@ -954,7 +954,7 @@ points:
         text: { ja: '記憶だけで時系列を作る。', en: '' }
         minutes: 45
         category: hurt
-        points: -30
+        points: -40
         refs: [cissp-cbk-secops]
         gauges: { trust: -10 }
         items:
@@ -972,7 +972,7 @@ points:
         text: { ja: '侵入経路と回避方法の詳細まで話す。', en: '' }
         minutes: 90
         category: hurt
-        points: -30
+        points: -80
         refs: [meti-trade-secret]
         gauges: { flame: 10, trust: -10 }
         items:
@@ -1103,7 +1103,7 @@ voices:
   - { id: v02-ok, media: chat, misleading: false, text: { ja: 'まず同じ認証情報を使うサーバーの一覧を出しましょう。', en: '' }, trigger: { at: point } }
   - { id: v02-after, media: sns, misleading: false, text: { ja: '止めるのは分かるが、顧客への説明はいつだ。', en: '' }, trigger: { at: after, choice: a02-all } }
   - { id: v03-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '再起動すれば直りますよ。いつもそうしてます。', en: '' }, trigger: { at: point } }
-  - { id: v03-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'メモリなんて取っても分かりません。初期化して作り直すのが一番です。', en: '' }, trigger: { at: point } }
+  - { id: v03-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'メモリの解析は時間がかかるだけで、結論は変わりません。初期化して作り直すのが早いですよ。', en: '' }, trigger: { at: point } }
   - { id: v03-ok, media: chat, misleading: false, text: { ja: 'メモリ、ディスク、ログの順で保全し、ハッシュを記録しましょう。', en: '' }, trigger: { at: point } }
   - { id: v03-after, media: sns, misleading: false, text: { ja: '調査を優先して、サーバーを返さないのか。', en: '' }, trigger: { at: after, choice: a03-image } }
   - { id: v04-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '確定的なことだけ報告しろ。中途半端な報告は混乱する。', en: '' }, trigger: { at: point } }
@@ -1123,7 +1123,7 @@ voices:
   - { id: v07-ok, media: chat, misleading: false, text: { ja: '返信せず、メールを保全して上と警察の窓口に渡しましょう。', en: '' }, trigger: { at: point } }
   - { id: v07-after, media: news, misleading: false, text: { ja: '返信もしないのか。顧客情報が公開されたらどうする。', en: '' }, trigger: { at: after, choice: a07-preserve } }
   - { id: v08-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: 'お前のメールのことは、調査と関係ない。出さなくていい。', en: '' }, trigger: { at: point } }
-  - { id: v08-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '今さら自分のメールを出すのは、責任逃れに見えるぞ。', en: '' }, trigger: { at: point } }
+  - { id: v08-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '今さら自分のメールを出すのは、責任逃れに見えるぞ。', en: '' }, trigger: { at: point } }
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '事実は事実として出しましょう。出し方は相談できます。', en: '' }, trigger: { at: point } }
   - { id: v08-after, media: sns, misleading: false, text: { ja: '今さら自分の指摘を出して、格好をつけている。', en: '' }, trigger: { at: after, choice: a08-submit-detail } }
   - { id: v09-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、本当は十倍漏れている。今すぐ全部公表しろ。', en: '' }, trigger: { at: point } }
@@ -1148,10 +1148,10 @@ voices:
   - { id: v13-ok, media: chat, misleading: false, text: { ja: '個人では答えず、広報と決めた窓口に集約しましょう。', en: '' }, trigger: { at: point } }
   - { id: v13-after, media: sns, misleading: false, text: { ja: '広告を止めるのは、自信がない証拠だ。', en: '' }, trigger: { at: after, choice: a13-ad-flag } }
   - { id: v14-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '次の公開は、もっと多くの顧客だ。', en: '' }, trigger: { at: point } }
-  - { id: v14-coward, media: news, misleading: true, type: coward-critique, text: { ja: '一部だけなら、認めずに確認中で通せばいい。', en: '' }, trigger: { at: point } }
+  - { id: v14-coward, media: news, misleading: true, type: public-opinion, text: { ja: '一部だけなら、認めずに確認中で通せばいい。', en: '' }, trigger: { at: point } }
   - { id: v14-ok, media: chat, misleading: false, text: { ja: '照合結果と、古いバックアップの可能性を分けて報告しましょう。', en: '' }, trigger: { at: point } }
   - { id: v14-after, media: sns, misleading: false, text: { ja: '古いバックアップと言えば、責任が軽くなると思っているのか。', en: '' }, trigger: { at: after, choice: a14-verify } }
-  - { id: v15-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'もう二週間も止めている。早く戻せ。', en: '' }, trigger: { at: point } }
+  - { id: v15-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '十日近く止めている。早く戻せ。', en: '' }, trigger: { at: point } }
   - { id: v15-past, media: boss, misleading: true, type: past-success, text: { ja: '前回の復旧はバックアップから戻すだけでうまくいった。', en: '' }, trigger: { at: point } }
   - { id: v15-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '検証に時間をかけると、復旧費用が増えますよ。', en: '' }, trigger: { at: point } }
   - { id: v15-ok, media: chat, misleading: false, text: { ja: 'クリーンな環境で検証してから、段階的に戻しましょう。', en: '' }, trigger: { at: point } }
