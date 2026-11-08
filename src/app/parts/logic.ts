@@ -1,8 +1,22 @@
 // S05 本編・S06 文案作成で使う純粋な処理（表示のための計算だけ。状態は変えない）
 import type {
-  Cue, Draft, DraftSlot, GameTime, Gauges, Localized, Media, PlayState, Scenario,
+  Cue, Draft, DraftSlot, GameTime, Gauges, Localized, Media, PlayState, RoleScript, Scenario,
 } from '../../engine/types';
 import { DEADLINE_WARN_MINUTES, SE_IDS, STAMINA_BLUR } from '../../engine/types';
+
+// ---------------- 再開（S01・エラー画面で共通） ----------------
+
+/** 保存した版と、読み込んだシナリオの版が違うか */
+export function versionChanged(saved: PlayState, scenario: Scenario): boolean {
+  return saved.scenarioVersion !== scenario.version;
+}
+
+/** ロール定義を引く。__proto__ などの継承したキーは返さない */
+function roleScript(scenario: Scenario, role: string): RoleScript | undefined {
+  const roles = scenario.roles as Record<string, RoleScript | undefined>;
+  if (!Object.hasOwn(roles, role)) return undefined;
+  return roles[role];
+}
 
 // ---------------- 時計・期限 ----------------
 
@@ -28,7 +42,7 @@ export interface DeadlineItem {
 }
 
 export function deadlineViews(state: PlayState, scenario: Scenario): DeadlineItem[] {
-  const labels = new Map((scenario.roles[state.role]?.deadlines ?? []).map((d) => [d.id, d.label]));
+  const labels = new Map((roleScript(scenario, state.role)?.deadlines ?? []).map((d) => [d.id, d.label]));
   return state.deadlines
     .filter((d) => !d.done)
     .map((d) => {
@@ -137,7 +151,7 @@ export interface VoiceItem {
 
 /** 表示済みの声を、シナリオの定義と突き合わせて返す。misleading は画面に出さない */
 export function voiceViews(state: PlayState, scenario: Scenario): VoiceItem[] {
-  const voices = scenario.roles[state.role]?.voices ?? [];
+  const voices = roleScript(scenario, state.role)?.voices ?? [];
   const byId = new Map(voices.map((v) => [v.id, v]));
   const out: VoiceItem[] = [];
   for (const shown of state.voicesShown) {
@@ -219,7 +233,9 @@ export function nextFreeNoteId(notes: { id: string }[]): string {
 export function draftFor(state: PlayState, scenario: Scenario): Draft | null {
   const key = state.pendingDraft;
   if (!key) return null;
-  return scenario.roles[state.role]?.drafts?.[key] ?? null;
+  const drafts = roleScript(scenario, state.role)?.drafts;
+  if (!drafts || !Object.hasOwn(drafts, key)) return null;
+  return drafts[key] ?? null;
 }
 
 type AutoDraftItem = NonNullable<DraftSlot['items']>[number];
