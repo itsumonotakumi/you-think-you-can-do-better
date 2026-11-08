@@ -28,6 +28,10 @@ sc:
     waiting: "The conference is being prepared."
     missing: "Press conference data was not found."
     shutter: "Camera shutter"
+    caption:
+      shutter: "Camera shutter"
+      fiveSeconds: "5 seconds left"
+      timeout: "Time is up"
   ending:
     title: "Ending"
     rank: "Your rank"

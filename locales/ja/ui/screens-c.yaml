@@ -28,6 +28,10 @@ sc:
     waiting: "会見の準備中です。"
     missing: "記者会見のデータが見つかりません。"
     shutter: "カメラのシャッター"
+    caption:
+      shutter: "シャッター音"
+      fiveSeconds: "残り5秒"
+      timeout: "時間切れ"
   ending:
     title: "エンディング"
     rank: "今回のランク"

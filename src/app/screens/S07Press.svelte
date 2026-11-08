@@ -1,5 +1,9 @@
 <script module lang="ts">
-  import type { PressQuestion } from '../../engine/types';
+  import { get } from 'svelte/store';
+  import type { Localized, PressQuestion } from '../../engine/types';
+  import { t } from '../../i18n';
+  import { advanceCaption, captions } from '../store';
+  import type { CueCaption } from '../parts/logic';
 
   export const DEFAULT_PRESS_SECONDS = 30;
   export const PRESS_WARN_SECONDS = 5;
@@ -16,6 +20,53 @@
   export function displaySeconds(remaining: number): number {
     return Math.max(0, Math.ceil(remaining));
   }
+
+  /** 会見の音・出来事で字幕に出す合図 */
+  export type PressCaptionKind = 'fiveSeconds' | 'timeout';
+
+  /** 残り時間と警告済みかどうかから、その時点で出す字幕を決める */
+  export function pressCaptionKinds(remaining: number, warned: boolean): PressCaptionKind[] {
+    const kinds: PressCaptionKind[] = [];
+    if (!warned && remaining <= PRESS_WARN_SECONDS) kinds.push('fiveSeconds');
+    if (remaining <= 0) kinds.push('timeout');
+    return kinds;
+  }
+
+  /** 合図に対応する画面文言のキー */
+  export const PRESS_CAPTION_KEYS: Record<PressCaptionKind, string> = {
+    fiveSeconds: 'sc.press.caption.fiveSeconds',
+    timeout: 'sc.press.caption.timeout',
+  };
+
+  /**
+   * 画面文言を字幕の文字にする。
+   * 字幕は数秒で消える一時的なものなので、作った時点の言語の文字を両方に入れる。
+   */
+  export function pressCaptionText(key: string): Localized {
+    const text = t(key);
+    return { ja: text, en: text };
+  }
+
+  /** 合図を、字幕の待ち行列へ積める形にする */
+  export function pressCaptionItems(kinds: PressCaptionKind[]): CueCaption[] {
+    return kinds.map((kind) => ({ kind: 'text', text: pressCaptionText(PRESS_CAPTION_KEYS[kind]) }));
+  }
+
+  /**
+   * たまっている字幕を履歴へ送る。
+   * 残り5秒・時間切れは、前の画面から残った字幕の後ろに並ぶと間に合わないため、
+   * 会見の合図を出す直前に呼んで先頭に出す。
+   */
+  export function flushCaptions(): void {
+    let head = get(captions)[0];
+    while (head) {
+      advanceCaption(head.captionId);
+      const next = get(captions)[0];
+      // 何かの理由で先頭が進まないときは止める（無限ループを避ける）
+      if (next?.captionId === head.captionId) return;
+      head = next;
+    }
+  }
 </script>
 
 <script lang="ts">
@@ -23,12 +74,15 @@
   import { onMount } from 'svelte';
   import { answerPress, availableAnswers } from '../../engine';
   import { audio } from '../../audio';
-  import { loc, t } from '../../i18n';
+  import { loc } from '../../i18n';
   import { saveProgress } from '../../storage';
-  import { applyStep, cues, errorMessage, play, scenario, screen, settings } from '../store';
+  import {
+    applyStep, cues, enqueueCaptions, errorMessage, play, scenario, screen, settings,
+  } from '../store';
   import { runFxCues } from '../effects';
   import { claimCues } from '../parts/cueMemory';
   import { choiceIndexFromKey, formatClock } from '../parts/logic';
+  import CaptionBar from '../parts/CaptionBar.svelte';
   import '../effects/effects.css';
 
   let busy = $state(false);
@@ -148,9 +202,15 @@
     if (!Number.isFinite(delta) || delta <= 0) return;
 
     remaining = Math.max(0, remaining - delta);
-    if (!warned && remaining <= PRESS_WARN_SECONDS) {
+    // ミュートでも分かるよう、残り5秒と時間切れは音だけでなく字幕でも知らせる
+    const kinds = pressCaptionKinds(remaining, warned);
+    if (kinds.includes('fiveSeconds')) {
       warned = true;
       audio.playSe('press_timer');
+    }
+    if (kinds.length > 0) {
+      flushCaptions();
+      enqueueCaptions(pressCaptionItems(kinds));
     }
     if (remaining <= 0) {
       running = false;
@@ -179,6 +239,8 @@
 
 <section class="screen screen--narrow press" data-screen="S07Press">
   <h1 class="sr-only">{t('sc.press.title')}</h1>
+
+  <CaptionBar />
 
   {#if !$play || !$scenario}
     <div class="panel stack">
@@ -219,7 +281,7 @@
     </section>
 
     <section class="panel" aria-labelledby="press-question-heading">
-      <p class="sound-caption">{t('sc.press.shutter')}</p>
+      <p class="sound-caption">{t('sc.press.caption.shutter')}</p>
       <h2 id="press-question-heading">{t('sc.press.question')}</h2>
       <p class="question">{loc(question.text)}</p>
 
