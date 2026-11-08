@@ -1,7 +1,8 @@
 // 保存（localStorage）。担当: storage。設計書 8章, 13章。
 // localStorage が無い・例外のときは memoryOnly=true にしてメモリ上で動く。
 import type {
-  Gauges, GameTime, PlayRecord, PlayState, PlaysStore, Rank, Settings,
+  DeadlineState, DelayedEffect, Flags, Gauges, GameTime, Localized, PlayRecord, PlayState,
+  PlaysStore, PlayerNote, PressState, Rank, Settings, VoiceShown,
 } from '../engine/types';
 import { LANGS, PHASES, ROLES, STORAGE_KEYS } from '../engine/types';
 
@@ -80,6 +81,27 @@ function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v);
 }
 
+/** JSON のキーをそのまま代入してよいか。プロトタイプ汚染を招くキーは捨てる */
+function isSafeKey(key: string): boolean {
+  return key !== '__proto__' && key !== 'constructor' && key !== 'prototype';
+}
+
+function isNum(v: unknown): v is number {
+  return typeof v === 'number' && Number.isFinite(v);
+}
+
+function isInt(v: unknown): v is number {
+  return isNum(v) && Number.isInteger(v);
+}
+
+function isStrArray(v: unknown): v is string[] {
+  return Array.isArray(v) && v.every((item) => typeof item === 'string');
+}
+
+function isLocalized(v: unknown): v is Localized {
+  return isRecord(v) && typeof v.ja === 'string' && typeof v.en === 'string';
+}
+
 // ---------------- 設定 ----------------
 const FONT_SIZES: readonly Settings['fontSize'][] = ['small', 'medium', 'large'];
 
@@ -154,6 +176,7 @@ export function loadPlays(): PlaysStore {
   if (!isRecord(raw)) return {};
   const out: PlaysStore = {};
   for (const [key, value] of Object.entries(raw)) {
+    if (!isSafeKey(key)) continue;
     const rec = sanitizeRecord(value);
     if (rec) out[key] = rec;
   }
@@ -207,41 +230,123 @@ export function recordResult(
 
 // ---------------- 進行中プレイ ----------------
 function isGameTime(v: unknown): v is GameTime {
-  return isRecord(v)
-    && typeof v.day === 'number' && Number.isInteger(v.day)
-    && typeof v.minutes === 'number' && Number.isFinite(v.minutes);
+  return isRecord(v) && isInt(v.day) && v.day >= 0 && isNum(v.minutes) && v.minutes >= 0;
+}
+
+/** ゲージは 0〜100 の有限数だけを受け付ける */
+function isGaugeValue(v: unknown): v is number {
+  return isNum(v) && v >= 0 && v <= 100;
 }
 
 function isGauges(v: unknown): v is Gauges {
   return isRecord(v)
-    && typeof v.damage === 'number'
-    && typeof v.flame === 'number'
-    && typeof v.trust === 'number'
-    && typeof v.stamina === 'number';
+    && isGaugeValue(v.damage)
+    && isGaugeValue(v.flame)
+    && isGaugeValue(v.trust)
+    && isGaugeValue(v.stamina);
+}
+
+/** 遅れて来る効果の差分はマイナスもあり得るので、有限数だけを見る */
+function isGaugeDelta(v: unknown): boolean {
+  if (v === undefined) return true;
+  if (!isRecord(v)) return false;
+  const keys = ['damage', 'flame', 'trust', 'stamina'];
+  return keys.every((key) => v[key] === undefined || isNum(v[key]));
+}
+
+function isLocalizedText(v: unknown): boolean {
+  return typeof v === 'string' || isLocalized(v);
 }
 
 function isPrologue(v: unknown): v is PlayState['prologue'] {
   return isRecord(v)
     && typeof v.comment === 'string'
-    && (v.predictedHours === null || typeof v.predictedHours === 'number');
+    && (v.predictedHours === null || isNum(v.predictedHours));
+}
+
+function isFlags(v: unknown): v is Flags {
+  return isRecord(v) && Object.values(v).every((value) => typeof value === 'boolean');
+}
+
+function isChoiceRecord(v: unknown): boolean {
+  return isRecord(v)
+    && typeof v.pointId === 'string'
+    && typeof v.choiceId === 'string'
+    && isGameTime(v.at)
+    && isNum(v.policyPoints)
+    && isNum(v.itemPoints)
+    && isStrArray(v.voicesBefore);
+}
+
+function isVoiceShown(v: unknown): v is VoiceShown {
+  return isRecord(v)
+    && typeof v.voiceId === 'string'
+    && isGameTime(v.at)
+    && (v.pointId === null || typeof v.pointId === 'string');
+}
+
+function isPlayerNote(v: unknown): v is PlayerNote {
+  return isRecord(v)
+    && typeof v.id === 'string'
+    && isLocalizedText(v.text)
+    && isGameTime(v.at);
+}
+
+function isDelayedEffect(v: unknown): v is DelayedEffect {
+  return isRecord(v)
+    && typeof v.sourcePointId === 'string'
+    && typeof v.sourceChoiceId === 'string'
+    && isInt(v.dueAtPhaseIndex)
+    && isNum(v.points)
+    && isGaugeDelta(v.gauges)
+    && isLocalized(v.reason)
+    && typeof v.applied === 'boolean';
+}
+
+function isDeadlineState(v: unknown): v is DeadlineState {
+  return isRecord(v)
+    && typeof v.id === 'string'
+    && isGameTime(v.dueAt)
+    && typeof v.warned === 'boolean'
+    && typeof v.done === 'boolean'
+    && typeof v.over === 'boolean';
+}
+
+function isPressAnswer(v: unknown): boolean {
+  return isRecord(v)
+    && typeof v.questionId === 'string'
+    && (v.answerId === null || typeof v.answerId === 'string')
+    && isNum(v.points);
+}
+
+function isPressState(v: unknown): v is PressState {
+  return isRecord(v)
+    && isStrArray(v.questionIds)
+    && isInt(v.index)
+    && v.index >= 0
+    && Array.isArray(v.answers)
+    && v.answers.every(isPressAnswer);
 }
 
 function isPlayState(v: unknown): v is PlayState {
   if (!isRecord(v)) return false;
   if (typeof v.scenarioId !== 'string' || typeof v.scenarioVersion !== 'string') return false;
   if (typeof v.role !== 'string' || !(ROLES as readonly string[]).includes(v.role)) return false;
-  if (typeof v.playCount !== 'number' || !Number.isInteger(v.playCount)) return false;
+  if (!isInt(v.playCount) || v.playCount < 1) return false;
   if (!isGameTime(v.clock)) return false;
   if (typeof v.phase !== 'string' || !(PHASES as readonly string[]).includes(v.phase)) return false;
   if (!(v.pointId === null || typeof v.pointId === 'string')) return false;
   if (!isGauges(v.gauges)) return false;
-  if (typeof v.cowardStreak !== 'number' || typeof v.rawScore !== 'number') return false;
+  if (!isInt(v.cowardStreak) || !isNum(v.rawScore)) return false;
   if (typeof v.fatal !== 'boolean') return false;
-  if (!Array.isArray(v.history) || !Array.isArray(v.itemsEarned) || !Array.isArray(v.itemsMissed)) return false;
-  if (!Array.isArray(v.delayed) || !Array.isArray(v.voicesShown) || !Array.isArray(v.notes)) return false;
-  if (!Array.isArray(v.deadlines)) return false;
-  if (!isRecord(v.flags)) return false;
-  if (!(v.press === null || isRecord(v.press))) return false;
+  if (!Array.isArray(v.history) || !v.history.every(isChoiceRecord)) return false;
+  if (!isStrArray(v.itemsEarned) || !isStrArray(v.itemsMissed)) return false;
+  if (!Array.isArray(v.delayed) || !v.delayed.every(isDelayedEffect)) return false;
+  if (!Array.isArray(v.voicesShown) || !v.voicesShown.every(isVoiceShown)) return false;
+  if (!Array.isArray(v.notes) || !v.notes.every(isPlayerNote)) return false;
+  if (!Array.isArray(v.deadlines) || !v.deadlines.every(isDeadlineState)) return false;
+  if (!isFlags(v.flags)) return false;
+  if (!(v.press === null || isPressState(v.press))) return false;
   if (!isPrologue(v.prologue)) return false;
   if (typeof v.startedAt !== 'string') return false;
   if (!(v.pendingDraft === null || typeof v.pendingDraft === 'string')) return false;
@@ -250,8 +355,12 @@ function isPlayState(v: unknown): v is PlayState {
 }
 
 export function loadProgress(): PlayState | null {
-  const raw = parseJson(readRaw(STORAGE_KEYS.progress));
-  return isPlayState(raw) ? raw : null;
+  try {
+    const raw = parseJson(readRaw(STORAGE_KEYS.progress));
+    return isPlayState(raw) ? raw : null;
+  } catch {
+    return null;
+  }
 }
 
 export function saveProgress(s: PlayState | null): void {
