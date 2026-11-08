@@ -41,8 +41,8 @@ points:
       - { id: note-first, text: { ja: '土曜21時15分、情報システム課長から第一報。サーバーが暗号化され、受発注システムが停止。', en: '' } }
     choices:
       - id: p01-wait
-        text: { ja: '正確な状況が分かるまで、月曜の朝に出社してから対応を決める。', en: '' }
-        minutes: 480
+        text: { ja: '今夜は様子を見て、明朝に担当者を集めてから決める。', en: '' }
+        minutes: 120
         category: hurt
         points: -30
         refs: [jpcert-handling]
@@ -55,7 +55,7 @@ points:
           - { id: p01-a-time, points: -8, axis: time, refs: [jpcert-handling] }
           - { id: p01-a-record, points: -6, axis: record, refs: [jpcert-handling] }
       - id: p01-command
-        text: { ja: '対策本部を立ち上げ、情報システム課長に決裁を委ね、外部の調査会社と警察への相談を同時に手配する。', en: '' }
+        text: { ja: '対策本部を立ち上げて自分が本部長になり、技術判断は情報システム課長に任せる。外部の調査会社と警察への相談を同時に手配する。', en: '' }
         minutes: 60
         category: maintain
         points: 25
@@ -81,7 +81,7 @@ points:
     at: { day: 0, minutes: 1425 }
     phase: contain
     sound: { se: [phone_ring] }
-    text: { ja: '午後11時45分。受発注システムは、取引先三社の生産計画システムとつながっている。接続を切れば、月曜の朝から取引先のラインが止まる。', en: '' }
+    text: { ja: '午後11時45分。受発注システムは、取引先三社の生産計画システムとつながっている。接続を切れば、明日の昼には取引先のラインが止まる。', en: '' }
     voices: [v02-sales, v02-public, v02-ok]
     notable:
       - { id: note-link, text: { ja: '23時45分、取引先三社の生産計画システムとの接続を遮断するか判断。連絡した時刻と相手を記録する。', en: '' } }
@@ -195,7 +195,7 @@ points:
     text: { ja: '午前9時。営業本部長が血相を変えて入ってくる。「取引先の二社が、今日の昼でラインを止めると言っています」。情報システムは三人いて、一人は育休中だ。動けるのは二人しかいない。', en: '' }
     voices: [v04-boss, v04-field, v04-ok]
     notable:
-      - { id: note-line, text: { ja: '月曜9時、取引先二社が同日の昼でラインを止めると連絡してきた。情報システムは実質二人。', en: '' } }
+      - { id: note-line, text: { ja: '日曜9時、取引先二社が同日の昼でラインを止めると連絡してきた。情報システムは実質二人。', en: '' } }
     choices:
       - id: p04-allnight
         text: { ja: '情報システムの二人と経営で、休まずに復旧を進める。', en: '' }
@@ -363,10 +363,10 @@ points:
     at: { day: 2, minutes: 810 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '午後1時30分。先月、取引先に提出したセキュリティチェックシートが出てきた。VPN機器の更新、ログの保管、多要素認証。すべて「はい」に丸が付いている。書いたのは、育休中の担当者だ。', en: '' }
+    text: { ja: '午後1時30分。先月、取引先に提出したセキュリティチェックシートが出てきた。VPN機器の更新、ログの保管、多要素認証。すべて「はい」に丸が付いている。記入したのは育休中の担当者で、主任が根拠を確かめずに確認印を押し、課として提出していた。実際には、どれも実施していない。', en: '' }
     voices: [v07-insider, v07-past, v07-ok]
     notable:
-      - { id: note-check, text: { ja: '先月のセキュリティチェックシートは全項目「はい」。実際には更新も多要素認証も未実施だった。', en: '' } }
+      - { id: note-check, text: { ja: '先月のセキュリティチェックシートは全項目「はい」。記入は育休中の担当者で、主任が根拠を確かめずに確認印を押していた。実際には更新も多要素認証も未実施だった。', en: '' } }
     choices:
       - id: p07-hide
         text: { ja: 'チェックシートの回答には触れず、調査の対象からも外す。', en: '' }
@@ -527,11 +527,11 @@ points:
     at: { day: 3, minutes: 600 }
     phase: notify
     sound: { se: [typing] }
-    text: { ja: '火曜の午前10時。広報が「取引先と従業員向けの第1報を、今日中に出せます」と言う。全容はまだ分かっていない。', en: '' }
+    text: { ja: '火曜の午前10時。広報が「取引先と従業員向けの第2報を、今日中に出せます」と言う。分かっていることを足して出す形になる。全容はまだ分かっていない。', en: '' }
     voices: [v10-expert, v10-popular, v10-ok]
     choices:
       - id: p10-tonight
-        text: { ja: '今夜、分かっている範囲で第1報を出す。', en: '' }
+        text: { ja: '今夜、分かっている範囲で第2報を出す。', en: '' }
         minutes: 120
         category: maintain
         points: 30
@@ -667,7 +667,7 @@ points:
           - { id: p12-b-content, points: 6, axis: content, refs: [nist-sp800-61r3] }
           - { id: p12-b-record, points: 4, axis: record, refs: [nist-sp800-61r3] }
       - id: p12-customer-first
-        text: { ja: '取引先の受発注システムを最優先で戻し、その間の自社生産は手作業で維持する。再開の条件と順序は事前に取引先へ伝える。', en: '' }
+        text: { ja: '調査用の複製を保全したまま、検査済みのバックアップから取引先の受発注システムを最優先で戻し、その間の自社生産は手作業で維持する。再開の条件と順序は事前に取引先へ伝える。', en: '' }
         minutes: 300
         category: recover
         points: 150
@@ -811,7 +811,7 @@ points:
           - { id: p15-a-content, points: -8, axis: content, refs: [meti-disclosure-guidance] }
           - { id: p15-a-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
       - id: p15-publish
-        text: { ja: '攻撃に使える部分だけ伏せて、全文を公開する。', en: '' }
+        text: { ja: '攻撃に使える部分だけを伏せ、それ以外をすべて公開する。', en: '' }
         minutes: 180
         category: recover
         points: 150
@@ -822,7 +822,7 @@ points:
           - { id: p15-b-content, points: 6, axis: content, refs: [meti-disclosure-guidance] }
           - { id: p15-b-record, points: 4, axis: record, refs: [meti-disclosure-guidance] }
       - id: p15-publish-share
-        text: { ja: '全文を公開し、再発防止の進捗を毎月出し、得た教訓を業界に無償で共有する。', en: '' }
+        text: { ja: '攻撃に使える部分を伏せて全文を公開し、再発防止の進捗を毎月出し、得た教訓を業界に無償で共有する。', en: '' }
         minutes: 240
         category: increase
         points: 400
@@ -947,7 +947,7 @@ points:
 
 drafts:
   first-report:
-    title: { ja: '第1報の文案', en: '' }
+    title: { ja: '第2報の文案', en: '' }
     slots:
       - id: timing
         label: { ja: '出す時刻', en: '' }
@@ -959,7 +959,7 @@ drafts:
       - id: scope
         label: { ja: '対象範囲', en: '' }
         options:
-          - { id: fd-s-all, text: { ja: '取引先の担当者、従業員とその家族、退職者を含む', en: '' }, points: 8, axis: content, refs: [ppc-notify-person] }
+          - { id: fd-s-all, text: { ja: '取引先の担当者、従業員、退職者を含む', en: '' }, points: 8, axis: content, refs: [ppc-notify-person] }
           - { id: fd-s-current, text: { ja: '現役の従業員のみ', en: '' }, points: -16, axis: content, refs: [ppc-notify-person], delayed: { afterPhases: 1, points: -20, reason: { ja: '対象の訂正が必要になった。', en: '' } } }
       - id: dates
         label: { ja: '日時の書き方', en: '' }
@@ -1068,11 +1068,11 @@ drafts:
           - { id: cb-rec-log, text: { ja: '配布した版と日時、渡した相手を記録する', en: '' }, points: 4, axis: record, refs: [jpcert-handling] }
           - { id: cb-rec-none, text: { ja: '記録しない', en: '' }, points: -6, axis: record, refs: [jpcert-handling] }
 voices:
-  - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '日曜のうちに戻せるだろ。月曜の朝には間に合わせろ。', en: '' }, trigger: { at: point } }
-  - { id: v01-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '初期化して作り直せば済みますよ。証拠なんて要りません。', en: '' }, trigger: { at: point } }
+  - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '日曜のうちに戻せるだろ。明日の昼までに間に合わせろ。', en: '' }, trigger: { at: point } }
+  - { id: v01-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '初期化して作り直すのが一番早いです。明日の昼に間に合わせるなら、それしかありません。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: '情報システム課長「電源は落とさず、ログは保全しています」。', en: '' }, trigger: { at: point } }
-  - { id: v01-after, media: sns, misleading: false, text: { ja: '社長が現場に来たところで、直るものじゃない。', en: '' }, trigger: { at: after, choice: p01-command } }
-  - { id: v02-sales, media: boss, misleading: true, type: boss-pressure, text: { ja: '切るな。月曜からラインが止まったら、取引そのものがなくなる。', en: '' }, trigger: { at: point } }
+  - { id: v01-after, media: sns, misleading: false, text: { ja: '社長が現場に来たところで、直るものじゃない。', en: '' }, trigger: { at: after, choice: p01-self } }
+  - { id: v02-sales, media: boss, misleading: true, type: boss-pressure, text: { ja: '切るな。明日の昼にラインが止まったら、取引そのものがなくなる。', en: '' }, trigger: { at: point } }
   - { id: v02-public, media: sns, misleading: true, type: public-opinion, text: { ja: '部品屋の都合で、よそのラインを止めるな。', en: '' }, trigger: { at: point } }
   - { id: v02-ok, media: chat, misleading: false, text: { ja: '生産管理「切らないと、こちらの被害が取引先に広がる可能性があります」。', en: '' }, trigger: { at: point } }
   - { id: v02-after, media: news, misleading: false, text: { ja: '接続を切っただけで、ラインが戻るわけではない。', en: '' }, trigger: { at: after, choice: p02-cut-plan } }
@@ -1096,7 +1096,7 @@ voices:
   - { id: v07-ok, media: chat, misleading: false, text: { ja: '総務「回答の根拠を、いまから一つずつ確認しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v07-after, media: sns, misleading: false, text: { ja: '今さらチェックシートを出して、責任逃れに見える。', en: '' }, trigger: { at: after, choice: p07-admit-fix } }
   - { id: v08-public, media: news, misleading: true, type: public-opinion, text: { ja: '社名はまだ出ていない。今日は黙っていればいい。', en: '' }, trigger: { at: point } }
-  - { id: v08-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '名前が出る前に逃げ切れ。余計なことを言うな。', en: '' }, trigger: { at: point } }
+  - { id: v08-coward, media: boss, misleading: true, type: boss-pressure, text: { ja: '名前が出る前に逃げ切れ。余計なことを言うな。', en: '' }, trigger: { at: point } }
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '広報「名前が出る前に、自分たちの言葉で説明したほうがいい」。', en: '' }, trigger: { at: point } }
   - { id: v08-after, media: sns, misleading: false, text: { ja: '自分から名乗り出て、余計に目立つことになったな。', en: '' }, trigger: { at: after, choice: p08-own } }
   - { id: v09-law, media: board, misleading: true, type: law-ish, text: { ja: '千人に満たないから、報告はいらないでしょう。', en: '' }, trigger: { at: point } }
@@ -1111,7 +1111,7 @@ voices:
   - { id: v11-flattery, media: chat, misleading: true, type: flattery, text: { ja: '社長が出れば場は収まります。資料はいりません。', en: '' }, trigger: { at: point } }
   - { id: v11-ok, media: chat, misleading: false, text: { ja: '営業「一社ずつ、復旧の見通しと補償の窓口を伝えましょう」。', en: '' }, trigger: { at: point } }
   - { id: v11-after, media: sns, misleading: false, text: { ja: '個別に会うのは、口止めでは。', en: '' }, trigger: { at: after, choice: p11-individual } }
-  - { id: v12-public, media: sns, misleading: true, type: public-opinion, text: { ja: '取引先を優先しろ。うちの社員は待てる。', en: '' }, trigger: { at: point } }
+  - { id: v12-public, media: sns, misleading: true, type: public-opinion, text: { ja: '自社の生産が先だ。取引先は待たせておけ。', en: '' }, trigger: { at: point } }
   - { id: v12-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '一週間も止めているのは臆病すぎる。全部いっぺんに戻せ。', en: '' }, trigger: { at: point } }
   - { id: v12-ok, media: chat, misleading: false, text: { ja: '技術責任者「検査した環境から、順に戻しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v12-after, media: news, misleading: false, text: { ja: '取引先を優先したせいで、自社の納期が遅れた。', en: '' }, trigger: { at: after, choice: p12-customer-first } }
@@ -1127,12 +1127,12 @@ voices:
   - { id: v15-law, media: news, misleading: true, type: law-ish, text: { ja: '上場していないのだから、公表義務はありません。', en: '' }, trigger: { at: point } }
   - { id: v15-ok, media: chat, misleading: false, text: { ja: '調査委員「攻撃に使える部分だけ伏せれば、公開できます」。', en: '' }, trigger: { at: point } }
   - { id: v15-after, media: news, misleading: false, text: { ja: '今さら報告書を出して、宣伝か。', en: '' }, trigger: { at: after, choice: p15-publish-share } }
-  - { id: v16-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '他社のためになることをして、何の得がある。', en: '' }, trigger: { at: point } }
+  - { id: v16-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '他社のためになることをして、何の得がある。', en: '' }, trigger: { at: point } }
   - { id: v16-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '事例を出すと、取引先に自社の弱みを見せることになります。', en: '' }, trigger: { at: point } }
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '総務「同じ機器を使っている会社は、まだたくさんあります」。', en: '' }, trigger: { at: point } }
   - { id: v16-after, media: sns, misleading: false, text: { ja: '他社の役に立つために、自社の弱みを晒すのか。', en: '' }, trigger: { at: after, choice: p16-named } }
   - { id: v17-flattery, media: chat, misleading: true, type: flattery, text: { ja: '社長ならその場で答えられます。想定問答はいりません。', en: '' }, trigger: { at: point } }
-  - { id: v17-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '会見なんて開かなければいい。長引くだけです。', en: '' }, trigger: { at: point } }
+  - { id: v17-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '会見なんて開かなければいい。長引くだけです。', en: '' }, trigger: { at: point } }
   - { id: v17-ok, media: chat, misleading: false, text: { ja: '広報「記録を手元に置いて、事実だけ答えましょう」。', en: '' }, trigger: { at: point } }
   - { id: v17-after, media: news, misleading: false, text: { ja: '台本を読んでいるだけ。誠意がない。', en: '' }, trigger: { at: after, choice: p17-ready } }
   - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「調査中」なんだ。', en: '' }, trigger: { at: manual } }
