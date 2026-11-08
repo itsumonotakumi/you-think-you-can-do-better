@@ -1,4 +1,4 @@
-// シナリオ検査 C01〜C10, C14〜C22（C11〜C13 は TODO）。
+// シナリオ検査 C01〜C22（C11〜C13 は実エンジンの貪欲シミュレーション）。
 import {
   CATEGORY_RANGE,
   PHASES,
@@ -8,9 +8,12 @@ import {
   BGM_IDS,
   SE_IDS,
 } from '../../src/engine/types.ts';
+import type { Rank, Reference, RoleId, Scenario } from '../../src/engine/types.ts';
 import { locate } from './source.ts';
 import { loadProject } from './project.ts';
 import type { Issue, LoadedScenario, Obj, Project } from './project.ts';
+import { simulatePaths } from './paths.ts';
+import type { PathSimulation } from './paths.ts';
 
 const PHASE_SET = new Set<string>(PHASES);
 const ROLE_SET = new Set<string>(ROLES);
@@ -1141,21 +1144,104 @@ export function checkC22(project: Project): Issue[] {
   return out;
 }
 
-// ---------------- C11〜C13 は今回やらない（TODO） ----------------
+// ---------------- C11〜C13 経路シミュレーション ----------------
+//
+// 実エンジンを貪欲に走らせた結果を使う簡略版。厳密な全経路探索はしない。
+// 同じプロジェクトでは1回だけ走らせて C11〜C13 で共有する。
+
+const simulations = new WeakMap<Project, Map<string, PathSimulation>>();
+
+function simulationFor(
+  project: Project,
+  sc: LoadedScenario,
+  role: string,
+  script: Obj,
+): PathSimulation | null {
+  if (!Array.isArray(script.points) || script.points.length === 0) return null;
+
+  let byKey = simulations.get(project);
+  if (!byKey) {
+    byKey = new Map<string, PathSimulation>();
+    simulations.set(project, byKey);
+  }
+  const key = `${sc.id}/${role}`;
+  const cached = byKey.get(key);
+  if (cached) return cached;
+
+  const refs = Array.isArray(project.references?.data)
+    ? (project.references.data as Reference[])
+    : [];
+  let simulation: PathSimulation;
+  try {
+    simulation = simulatePaths(sc.scenario as unknown as Scenario, refs, role as RoleId);
+  } catch (error) {
+    simulation = {
+      runs: [],
+      failures: [{ label: '全体', message: error instanceof Error ? error.message : String(error) }],
+    };
+  }
+  byKey.set(key, simulation);
+  return simulation;
+}
 
 export function checkC11(project: Project): Issue[] {
-  void project;
-  return []; // TODO: 到達可能性（ランクごとの経路）
+  const out: Issue[] = [];
+  for (const sc of project.scenarios) {
+    for (const [role, script] of roleEntries(sc)) {
+      const simulation = simulationFor(project, sc, role, script);
+      if (!simulation || simulation.runs.length === 0) continue;
+      const ranks = new Set(simulation.runs.map((run) => run.rank));
+      const file = roleFile(sc, role);
+      if (!ranks.has('S') || !ranks.has('D')) {
+        const missing = (['S', 'A', 'B', 'C', 'D'] as Rank[])
+          .filter((rank) => !ranks.has(rank))
+          .join(', ');
+        report(out, file, script, 'points', 'C11', `到達できないランクがある: ${missing}`);
+      }
+      if (!(['A', 'B', 'C'] as Rank[]).some((rank) => ranks.has(rank))) {
+        report(out, file, script, 'points', 'C11', 'A/B/C のいずれにも到達しない（警告）', 'warning');
+      }
+    }
+  }
+  return out;
 }
 
 export function checkC12(project: Project): Issue[] {
-  void project;
-  return []; // TODO: fatal を含む経路で S に届かないこと
+  const out: Issue[] = [];
+  for (const sc of project.scenarios) {
+    for (const [role, script] of roleEntries(sc)) {
+      const simulation = simulationFor(project, sc, role, script);
+      if (!simulation) continue;
+      for (const run of simulation.runs) {
+        if (run.fatal && run.rank === 'S') {
+          report(out, roleFile(sc, role), script, 'points', 'C12',
+            `致命的な失点を含む経路で S に到達する: ${run.label}`);
+        }
+      }
+    }
+  }
+  return out;
 }
 
 export function checkC13(project: Project): Issue[] {
-  void project;
-  return []; // TODO: 行き止まりがないこと
+  const out: Issue[] = [];
+  for (const sc of project.scenarios) {
+    for (const [role, script] of roleEntries(sc)) {
+      const simulation = simulationFor(project, sc, role, script);
+      if (!simulation) continue;
+      const file = roleFile(sc, role);
+      for (const failure of simulation.failures) {
+        report(out, file, script, 'points', 'C13',
+          `経路シミュレーションが失敗した: ${failure.label}（${failure.message}）`);
+      }
+      for (const run of simulation.runs) {
+        if (!run.finished) {
+          report(out, file, script, 'points', 'C13', `エンディングに着かない経路がある: ${run.label}`);
+        }
+      }
+    }
+  }
+  return out;
 }
 
 // ---------------- 実行 ----------------
