@@ -159,6 +159,8 @@ export function submitDraft(
   const cues: Cue[] = [];
   const elapsedMinutes = Math.max(0, toAbs(next.clock) - toAbs(scenario.start));
   let itemPoints = 0;
+  const record = [...next.history].reverse().find((r) => r.pointId === next.pointId);
+  const sourceChoiceId = record?.choiceId ?? '';
 
   for (const slot of draft.slots) {
     const picked = pickDraftItem(slot, elapsedMinutes, selections);
@@ -173,12 +175,11 @@ export function submitDraft(
       }
     }
     if (picked?.delayed) {
-      const sourcePointId = next.pointId ?? next.history[next.history.length - 1]?.pointId ?? '';
-      reserveDelayed(next, sourcePointId, picked.id, picked.delayed);
+      const sourcePointId = next.pointId ?? record?.pointId ?? '';
+      reserveDelayed(next, sourcePointId, sourceChoiceId, picked.delayed);
     }
   }
 
-  const record = [...next.history].reverse().find((r) => r.pointId === next.pointId);
   if (record) record.itemPoints += itemPoints;
 
   next.pendingDraft = null;

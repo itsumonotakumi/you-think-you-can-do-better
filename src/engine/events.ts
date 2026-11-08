@@ -4,6 +4,7 @@ import type {
   Cue,
   DecisionPoint,
   Flags,
+  GameTime,
   Next,
   PlayState,
   Scenario,
@@ -29,6 +30,7 @@ function eventKey(id: string): string {
 
 function fireEvent(state: PlayState, scenario: Scenario, event: ScenarioEvent, cues: Cue[]): void {
   state.flags[eventKey(event.id)] = true;
+  if (event.setFlags) Object.assign(state.flags, event.setFlags);
   if (event.gauges) {
     const flameBefore = state.gauges.flame;
     state.gauges = applyGauges(state.gauges, event.gauges, isNight(state.clock));
@@ -43,7 +45,15 @@ function fireEvent(state: PlayState, scenario: Scenario, event: ScenarioEvent, c
   if (event.caption) cues.push({ kind: 'caption', text: event.caption });
 }
 
-/** 時計を進める。通過した時刻イベントを時刻順に発火する */
+/** 時計を目標時刻へ進める。深夜帯をまたいだら演出を出す */
+function moveClockTo(state: PlayState, target: GameTime, cues: Cue[]): void {
+  if (toAbs(target) === toAbs(state.clock)) return;
+  const night = isNight(target);
+  if (isNight(state.clock) !== night) cues.push({ kind: 'fx', id: 'night', on: night });
+  state.clock = cloneTime(target);
+}
+
+/** 時計を進める。通過した時刻イベントを時刻順に、それぞれの発生時刻で発火する */
 export function advanceClock(
   state: PlayState,
   scenario: Scenario,
@@ -53,11 +63,7 @@ export function advanceClock(
   if (minutes <= 0) return;
   const from = cloneTime(state.clock);
   const to = addMinutes(state.clock, minutes);
-  state.clock = to;
   cues.push({ kind: 'clock', from, to });
-  if (isNight(from) !== isNight(to)) {
-    cues.push({ kind: 'fx', id: 'night', on: isNight(to) });
-  }
   const events = [...(scenario.roles[state.role]?.events ?? [])].sort(
     (a, b) => toAbs(a.at) - toAbs(b.at),
   );
@@ -68,8 +74,10 @@ export function advanceClock(
     if (at <= fromAbs || at > toAbsValue) continue;
     if (state.flags[eventKey(event.id)]) continue;
     if (!conditionMet(event.when, state.flags)) continue;
+    moveClockTo(state, event.at, cues);
     fireEvent(state, scenario, event, cues);
   }
+  moveClockTo(state, to, cues);
   fireFlagVoices(state, scenario, state.pointId, cues);
 }
 
