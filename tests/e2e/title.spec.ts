@@ -7,7 +7,7 @@ test.describe('タイトル', () => {
 
     await openTitle(page);
 
-    await expect(page.locator('.title-name')).toHaveText('じゃ、あなたがやってみてよ');
+    await expect(page.locator('.title-name')).toHaveText('じゃ、あなたがやってみて');
     await expect(page.locator('.eyebrow')).toHaveText('インシデント対応シミュレーター');
     await expect(page.locator('.title-screen button.btn--primary')).toHaveText('はじめる');
 

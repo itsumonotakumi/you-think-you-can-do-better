@@ -10,7 +10,7 @@ sa.common.loading: 読み込み中…
 sa.common.retry: もう一度試す
 
 # --- S01 タイトル ---
-sa.title.product: じゃ、あなたがやってみてよ
+sa.title.product: じゃ、あなたがやってみて
 sa.title.tagline: インシデント対応シミュレーター
 sa.title.sub: 事件のとき、外野は好きなことを言う。では、あなたが担当だったら。
 sa.title.start: はじめる
