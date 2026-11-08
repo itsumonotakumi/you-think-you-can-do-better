@@ -9,3 +9,13 @@ export function claimCues(cues: Cue[]): boolean {
   played.add(cues);
   return true;
 }
+
+// 字幕は音と別に記録する（画面側が先に音を処理しても、字幕は必ず作る）
+const captioned = new WeakSet<Cue[]>();
+
+/** 字幕をまだ作っていないキューなら true */
+export function claimCaptionCues(cues: Cue[]): boolean {
+  if (captioned.has(cues)) return false;
+  captioned.add(cues);
+  return true;
+}
