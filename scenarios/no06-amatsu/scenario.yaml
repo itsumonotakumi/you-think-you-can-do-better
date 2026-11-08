@@ -1,0 +1,118 @@
+# No.6 アマツ重工（防衛・重要インフラ）
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+id: no06-amatsu
+version: '1.0.0'
+status: latest
+published: '2026-11-08'
+sourcePeriod: { ja: '2024年に公表された、遠隔採用を悪用した事例の構造を参考にしたフィクション', en: '' }
+difficulty: 5
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: '今年いちばん優秀な新人は、存在しなかった', en: '' }
+tagline: { ja: '遠隔の面接を四回通った新人は、端末が届いた朝に消えた。何をどこまで話すかで、会社の信用が決まる。', en: '' }
+company:
+  name: { ja: 'アマツ重工株式会社', en: '' }
+  industry: { ja: '防衛・重要インフラ向け機器の製造', en: '' }
+  size: { ja: '従業員4,800名、非上場。防衛関連の主要取引先と長期契約', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '真壁 隆司', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: ciso
+      name: { ja: '芹沢 みなみ', en: '' }
+      title: { ja: '執行役員セキュリティ責任者', en: '' }
+    - id: hr
+      name: { ja: '宮下 理恵', en: '' }
+      title: { ja: '人事部長', en: '' }
+    - id: pr
+      name: { ja: '柏木 慎', en: '' }
+      title: { ja: '広報部長', en: '' }
+    - id: legal
+      name: { ja: '苅田 伸', en: '' }
+      title: { ja: '法務部長', en: '' }
+    - id: ops
+      name: { ja: '東 康平', en: '' }
+      title: { ja: '生産技術部長', en: '' }
+start: { day: 0, minutes: 525 }
+initialGauges: { damage: 15, flame: 0, trust: 70, stamina: 100 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-hiring
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '採用のどこが突破されたのですか。', en: '' }
+      answers:
+        - { id: a-hiring-none, text: { ja: '確認しておりません。', en: '' }, points: -30 }
+        - { id: a-hiring-fact, text: { ja: '遠隔の面接だけで、対面の本人確認をしていませんでした。', en: '' }, points: 30 }
+        - { id: a-hiring-own, text: { ja: '採用時の本人確認と、端末の送付先の確認を怠りました。責任は経営にあります。再発防止策とあわせて公表します。', en: '' }, points: 80, requiresNote: note-hiring }
+    - id: q-authority
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '所管官庁への報告と公表のあいだに、なぜ時間がかかったのですか。', en: '' }
+      answers:
+        - { id: a-authority-fast, text: { ja: 'できるだけ早く出しました。', en: '' }, points: -30 }
+        - { id: a-authority-split, text: { ja: '報告を先にし、事実の確認を待って公表しました。順序の判断は説明できます。', en: '' }, points: 30 }
+        - { id: a-authority-verify, text: { ja: '初動の判断が遅れた理由を検証し、再発防止策とともに公表します。', en: '' }, points: 80, requiresNote: note-scope }
+    - id: q-national
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: '犯人は某国の工作員だという報道は、事実ですか。', en: '' }
+      answers:
+        - { id: a-national-yes, text: { ja: '間違いありません。', en: '' }, points: -100 }
+        - { id: a-national-none, text: { ja: '答えられません。', en: '' }, points: -30 }
+        - { id: a-national-fact, text: { ja: '国籍や出身で人を疑うことはしません。確認できた事実だけを話し、捜査と自社調査を続けます。', en: '' }, points: 80 }
+    - id: q-people
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '社員や取引先には、いつ、どう伝えたのですか。', en: '' }
+      answers:
+        - { id: a-people-news, text: { ja: '報道で知ってもらいました。', en: '' }, points: -100 }
+        - { id: a-people-after, text: { ja: '報道のあとに説明しました。', en: '' }, points: -30 }
+        - { id: a-people-before, text: { ja: '公表の前に、取引先へは個別に、社員へは説明会と相談窓口で伝えました。', en: '' }, points: 80, requiresNote: note-address }
+    - id: q-irony
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '最終面接で「即戦力」と書いたのは、社長ですね。', en: '' }
+      answers:
+        - { id: a-irony-avoid, text: { ja: '記憶にありません。', en: '' }, points: -100 }
+        - { id: a-irony-admit, text: { ja: '私が書きました。採用の判断も私です。', en: '' }, points: 30 }
+        - { id: a-irony-own, text: { ja: '私が書きました。言葉だけで人を見た結果です。採用の責任は経営にあります。', en: '' }, points: 80, requiresNote: note-interview }
+  extraQuestions:
+    - when: { flags: { hidHiring: true } }
+      question:
+        id: q-hidden
+        seconds: 30
+        timeoutPoints: -30
+        text: { ja: '採用の経緯を、最初から隠していたのではありませんか。', en: '' }
+        answers:
+          - { id: a-hidden-avoid, text: { ja: '隠す意図はありませんでした。', en: '' }, points: -100 }
+          - { id: a-hidden-late, text: { ja: '説明の順序が悪かったと思います。', en: '' }, points: 30 }
+          - { id: a-hidden-own, text: { ja: '採用で入られた事実を書けませんでした。隠したのと同じです。訂正して経緯を公表します。', en: '' }, points: 80 }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '一年後、採用の本人確認と端末の送付先の確認は業界の標準になった。調査報告書は重要インフラの訓練教材として使われ、現場からは「次は自分たちが止める」という短い言葉が届いた。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが、取引先との契約は続いた。採用プロセスを作り直し、売上は事件前の水準に戻った。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '会社は立ち直ったが、防衛関連の主要取引先を一つ失った。残った取引先との信頼を、時間をかけて作り直すことになった。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '第三者委員会は採用と情報管理の不備を指摘し、経営陣は辞任した。残された社員が、限られた予算で再発防止策を進めている。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '所管官庁の指導と取引先の契約解除が重なり、防衛関連の事業から撤退した。あの朝の判断を、記録を読み返しながら振り返る日が続く。', en: '' }
+salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 10, min: 40, max: 130 }
