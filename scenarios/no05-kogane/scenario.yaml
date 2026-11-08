@@ -57,7 +57,7 @@ press:
       text: { ja: '御社が身代金を支払わないと決めた理由を説明してください。', en: '' }
       answers:
         - { id: a-ransom-none, text: { ja: '特に決めていません。', en: '' }, points: -40 }
-        - { id: a-ransom-risk, text: { ja: '支払っても復号も削除も保証されないためです。', en: '' }, points: 30 }
+        - { id: a-ransom-risk, text: { ja: '支払っても復号も削除も保証されないためです。', en: '' }, points: 30, when: { flags: { paidRansom: false } } }
         - { id: a-ransom-police, text: { ja: '会社として警察に相談し、犯罪組織への資金提供を避けると決めました。', en: '' }, points: 80, when: { flags: { refusedRansom: true } } }
         - { id: a-ransom-paid, text: { ja: '支払いました。復号も削除も保証されず、警察にも相談しています。', en: '' }, points: 20, when: { flags: { paidRansom: true } } }
     - id: q-backup
@@ -83,7 +83,7 @@ press:
       text: { ja: '周年記念キャンペーンの延期と、被害の説明は、どの順で決めましたか。', en: '' }
       answers:
         - { id: a-launch-none, text: { ja: '関係がないからです。', en: '' }, points: -30 }
-        - { id: a-launch-delay, text: { ja: '延期を決め、理由を説明しました。', en: '' }, points: 30 }
+        - { id: a-launch-delay, text: { ja: '延期を決め、理由を説明しました。', en: '' }, points: 30, when: { flags: { launchOnTime: false } } }
         - { id: a-launch-order, text: { ja: '延期の判断と理由を先に取引先と従業員へ伝え、告知は別の機会にしました。', en: '' }, points: 80, when: { flags: { launchPostponed: true } } }
         - { id: a-launch-ontime, text: { ja: '延期はせず、被害の説明と告知の日程を分けて伝えました。', en: '' }, points: 30, when: { flags: { launchOnTime: true } } }
     - id: q-supply
