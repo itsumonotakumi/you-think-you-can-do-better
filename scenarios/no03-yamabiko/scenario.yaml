@@ -1,0 +1,115 @@
+# No.3 やまびこ商店（従業員12名の通販）
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+id: no03-yamabiko
+version: '1.0.0'
+status: latest
+published: '2026-11-08'
+sourcePeriod: { ja: '2020年代前半の小型通販サイトの改ざん事例の構造を参考にしたフィクション', en: '' }
+difficulty: 2
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: '予算も人もない。あるのは社長の男だけ', en: '' }
+tagline: { ja: '止めれば売上の6割が消える。12人の店の、いつもの朝に電話が鳴る。', en: '' }
+company:
+  name: { ja: 'やまびこ商店', en: '' }
+  industry: { ja: '健康食品・日用品の通信販売', en: '' }
+  size: { ja: '従業員12名、家族経営', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '佐伯 健司', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: spouse
+      name: { ja: '佐伯 真由美', en: '' }
+      title: { ja: '常務取締役（経理兼任）', en: '' }
+    - id: warehouse
+      name: { ja: '熊谷 大輔', en: '' }
+      title: { ja: '倉庫・出荷担当', en: '' }
+    - id: office
+      name: { ja: '村瀬 千夏', en: '' }
+      title: { ja: '事務パート', en: '' }
+    - id: advisor
+      name: { ja: '小柳 誠', en: '' }
+      title: { ja: '商工会議所 経営相談員', en: '' }
+start: { day: 0, minutes: 600 }
+initialGauges: { damage: 15, flame: 0, trust: 65, stamina: 90 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-card
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: 'カード番号が漏れたのは事実ですか。', en: '' }
+      answers:
+        - { id: a-card-unknown, text: { ja: 'まだ調べています。', en: '' }, points: -30 }
+        - { id: a-card-possible, text: { ja: '偽の決済画面が表示されていました。入力された可能性があります。', en: '' }, points: 30 }
+        - { id: a-card-admit, text: { ja: '入力されたお客様がいます。対象と時期を特定し、連絡を始めています。', en: '' }, points: 80, requiresNote: note-payment-fake }
+    - id: q-old
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: 'なぜ8年も、サイトを更新しなかったのですか。', en: '' }
+      answers:
+        - { id: a-old-cost, text: { ja: '予算がなかったからです。', en: '' }, points: -50 }
+        - { id: a-old-own, text: { ja: '更新の判断を先送りしました。', en: '' }, points: 30 }
+        - { id: a-old-record, text: { ja: '制作会社に古い複製が残っていたことも分かりました。削除を確認し、パスワードを変えています。', en: '' }, points: 80, requiresNote: note-old-site }
+    - id: q-detect
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: 'いつ気づいたのですか。公表が遅くありませんか。', en: '' }
+      answers:
+        - { id: a-detect-fast, text: { ja: 'すぐに公表しました。', en: '' }, points: -30 }
+        - { id: a-detect-late, text: { ja: '最初の連絡は3日前でした。公表は遅れました。', en: '' }, points: 30 }
+        - { id: a-detect-verify, text: { ja: '最初の連絡は3日前です。何を出すかを決めるのに時間を使い、公表が遅れました。経緯を検証して公表します。', en: '' }, points: 80, requiresNote: note-first-call }
+    - id: q-comp
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: 'お客様への補償はどうしますか。', en: '' }
+      answers:
+        - { id: a-comp-none, text: { ja: '被害の申し出があれば個別に相談します。', en: '' }, points: -50 }
+        - { id: a-comp-flat, text: { ja: '一律の見舞金を用意します。', en: '' }, points: 30 }
+        - { id: a-comp-care, text: { ja: 'カードの再発行にかかる費用を負担し、専用の窓口を置きます。対象と金額の考え方は公表します。', en: '' }, points: 80 }
+    - id: q-budget
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: '予算も人もない中で、再発防止はできるのですか。', en: '' }
+      answers:
+        - { id: a-budget-none, text: { ja: 'できる範囲でやるしかありません。', en: '' }, points: -30 }
+        - { id: a-budget-plan, text: { ja: '毎年の点検と更新の費用を、先に決めました。', en: '' }, points: 30 }
+        - { id: a-budget-share, text: { ja: '商工会議所と外部の専門家の支援を受け、点検の結果を毎年公表します。', en: '' }, points: 80 }
+  extraQuestions:
+    - when: { flags: { keptSite: true } }
+      question:
+        id: q-kept
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '危ないと分かっていて、サイトを止めなかったのですか。', en: '' }
+        answers:
+          - { id: a-kept-sales, text: { ja: '売上が止まるからです。', en: '' }, points: -100 }
+          - { id: a-kept-late, text: { ja: '止める判断が遅れました。', en: '' }, points: 30 }
+          - { id: a-kept-own, text: { ja: '止める判断が遅れ、その間に注文が入りました。責任は私にあります。', en: '' }, points: 80 }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '事件のあと、電話注文を続けた常連客がそのまま残った。秋の売上は前年を上回り、商工会議所の事例集に「小さな店の対応」として載った。倉庫の担当者が、復旧の朝に短く「助かりました」と言った。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが、客は戻った。売上は事件前の水準に届き、カード会社との取引も続いている。家族4人で、来年の点検の予定を手帳に書き込んだ。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '店は立ち直ったが、法人の大口取引を一つ失った。残った客との関係を、電話と手書きの案内で作り直している。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '調査の報告は不十分だと指摘され、社長は代表を退いた。妻が店を続け、限られた予算で点検の予定を立てている。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: 'カード会社との契約が止まり、通販をやめた。店の灯りは消えていないが、注文の電話はもう鳴らない。どこで決断を誤ったのか、手帳を読み返す日が続く。', en: '' }
+salesModel: { base: 100, trustWeight: 0.5, fatalPenalty: 20, min: 25, max: 125 }
