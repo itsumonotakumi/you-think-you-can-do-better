@@ -92,34 +92,38 @@ function* walkStrings(
   value: unknown,
   container: unknown,
   key: string | number,
+  visited: WeakSet<object> = new WeakSet(),
 ): Generator<{ text: string; container: unknown; key: string | number }> {
   if (typeof value === 'string') {
     yield { text: value, container, key };
     return;
   }
+  if (typeof value !== 'object' || value === null) return;
+  // YAML のアンカーは循環参照を作れる。訪問済みを覚えて無限再帰を防ぐ。
+  if (visited.has(value)) return;
+  visited.add(value);
   if (Array.isArray(value)) {
     for (let i = 0; i < value.length; i += 1) {
-      yield* walkStrings(value[i], value, i);
+      yield* walkStrings(value[i], value, i, visited);
     }
     return;
   }
-  if (isObj(value)) {
-    for (const name of Object.keys(value)) {
-      yield* walkStrings(value[name], value, name);
-    }
+  for (const name of Object.keys(value)) {
+    yield* walkStrings((value as Obj)[name], value, name, visited);
   }
 }
 
-function* walkObjects(value: unknown): Generator<Obj> {
+function* walkObjects(value: unknown, visited: WeakSet<object> = new WeakSet()): Generator<Obj> {
+  if (typeof value !== 'object' || value === null) return;
+  if (visited.has(value)) return;
+  visited.add(value);
   if (Array.isArray(value)) {
-    for (const item of value) yield* walkObjects(item);
+    for (const item of value) yield* walkObjects(item, visited);
     return;
   }
-  if (isObj(value)) {
-    yield value;
-    for (const name of Object.keys(value)) {
-      yield* walkObjects(value[name]);
-    }
+  yield value as Obj;
+  for (const name of Object.keys(value)) {
+    yield* walkObjects((value as Obj)[name], visited);
   }
 }
 
@@ -935,6 +939,37 @@ export function checkC15(project: Project): Issue[] {
 
 // ---------------- C16 実名の混入 / C20 実在企業との比較 ----------------
 
+/** 照合用に正規化する（NFKC・空白とゼロ幅文字を除去・小文字化）。 */
+export function normalizeForMatch(text: string): string {
+  return text.normalize('NFKC').replace(/[\s\u200b-\u200d\ufeff]/gu, '').toLowerCase();
+}
+
+interface ScanTarget {
+  root: unknown;
+  file: string;
+}
+
+/** C16・C17・C20 が走査する範囲（シナリオ・locales・音素材）。 */
+function scanTargets(project: Project, includeScenarios = true): ScanTarget[] {
+  const targets: ScanTarget[] = [];
+  if (includeScenarios) {
+    for (const sc of project.scenarios) targets.push({ root: sc.scenario, file: sc.file });
+  }
+  for (const lang of LANGS) {
+    const data = project.locales[lang];
+    if (!data) continue;
+    targets.push({ root: data.notices, file: `locales/${lang}/notices.yaml` });
+    targets.push({ root: data.strings, file: `locales/${lang}/ui` });
+  }
+  if (project.audioManifest) {
+    targets.push({ root: project.audioManifest.data, file: project.audioManifest.file });
+  }
+  return targets;
+}
+
+/** クレジットの作者名と、作品名そのものは C16 の対象外にする。 */
+const C16_SKIP_KEYS: ReadonlySet<string> = new Set(['author', 'creditText', 'sa.title.product']);
+
 function denyTerms(project: Project): { label: string; term: string }[] {
   const list: { label: string; term: string }[] = [];
   for (const term of project.denylist.companies) list.push({ label: '企業名', term });
@@ -946,14 +981,17 @@ function denyTerms(project: Project): { label: string; term: string }[] {
 
 export function checkC16(project: Project): Issue[] {
   const out: Issue[] = [];
-  const terms = denyTerms(project);
+  const terms = denyTerms(project)
+    .map(({ label, term }) => ({ label, term, normalized: normalizeForMatch(term) }))
+    .filter(({ normalized }) => normalized.length > 0);
   if (terms.length === 0) return out;
-  for (const sc of project.scenarios) {
-    for (const { text, container, key } of walkStrings(sc.scenario, null, '')) {
-      const lowered = text.toLowerCase();
-      for (const { label, term } of terms) {
-        if (term.length > 0 && lowered.includes(term.toLowerCase())) {
-          report(out, sc.file, container, key, 'C16', `${label}の禁止語が含まれる: ${term}`);
+  for (const target of scanTargets(project)) {
+    for (const { text, container, key } of walkStrings(target.root, null, '')) {
+      if (typeof key === 'string' && C16_SKIP_KEYS.has(key)) continue;
+      const normalized = normalizeForMatch(text);
+      for (const { label, term, normalized: needle } of terms) {
+        if (normalized.includes(needle)) {
+          report(out, target.file, container, key, 'C16', `${label}の禁止語が含まれる: ${term}`);
         }
       }
     }
@@ -967,7 +1005,7 @@ function validComparisons(project: Project): RegExp[] {
     try {
       result.push(new RegExp(pattern));
     } catch {
-      // 不正な正規表現は C20 の対象外（denylist の書式は人手で直す）
+      // 不正な正規表現は loadDenylist が C20 として報告する
     }
   }
   return result;
@@ -977,10 +1015,11 @@ export function checkC20(project: Project): Issue[] {
   const out: Issue[] = [];
   const patterns = validComparisons(project);
   if (patterns.length === 0) return out;
-  for (const sc of project.scenarios) {
-    for (const { text, container, key } of walkStrings(sc.scenario, null, '')) {
-      if (patterns.some((pattern) => pattern.test(text))) {
-        report(out, sc.file, container, key, 'C20', '実在企業との比較表現がある');
+  for (const target of scanTargets(project)) {
+    for (const { text, container, key } of walkStrings(target.root, null, '')) {
+      const normalized = normalizeForMatch(text);
+      if (patterns.some((pattern) => pattern.test(normalized))) {
+        report(out, target.file, container, key, 'C20', '実在企業との比較表現がある');
       }
     }
   }
@@ -1000,6 +1039,10 @@ export function checkC17(project: Project): Issue[] {
   };
   for (const sc of project.scenarios) scan(sc.scenario, sc.file);
   if (project.references) scan(project.references.data, project.references.file);
+  for (const target of scanTargets(project, false)) {
+    if (target.root === undefined || target.root === null) continue;
+    scan(target.root, target.file);
+  }
   return out;
 }
 

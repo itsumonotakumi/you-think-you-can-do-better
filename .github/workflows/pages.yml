@@ -2,16 +2,17 @@ name: Deploy to GitHub Pages
 # リリースまでは手動起動のみ（本番配信）
 on:
   workflow_dispatch:
+# ワークフロー全体は読み取りだけ。書き込み権限は deploy ジョブにだけ与える
 permissions:
   contents: read
-  pages: write
-  id-token: write
 concurrency: { group: pages, cancel-in-progress: false }
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: npm }
       - run: npm ci
@@ -22,6 +23,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment: { name: github-pages, url: '${{ steps.d.outputs.page_url }}' }
     steps:
       - id: d

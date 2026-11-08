@@ -3,7 +3,13 @@
 # git worktree を作り、OpenCode を非対話で実行してログを残す。
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-NAME="$1"; PROMPT_FILE="$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"; MODEL="${3:-opencode-go/deepseek-v4.1-flash}"
+NAME="${1:-}"
+# NAME は作業フォルダ名とブランチ名に使う。パス脱出やシェル注入を拒否する
+if ! [[ "$NAME" =~ ^[A-Za-z0-9._-]+$ ]] || [[ "$NAME" == *..* ]]; then
+  echo "NAME は英数字と . _ - だけで指定する（.. は不可）: ${NAME}" >&2
+  exit 2
+fi
+PROMPT_FILE="$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"; MODEL="${3:-opencode-go/deepseek-v4.1-flash}"
 WT="$ROOT/.worktrees/$NAME"; BR="agent/$NAME"
 LOG_DIR="$ROOT/.worktrees/_logs"; mkdir -p "$LOG_DIR"
 if [ ! -d "$WT" ]; then

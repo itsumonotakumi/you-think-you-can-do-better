@@ -1,7 +1,8 @@
 // 入力（シナリオ・根拠・文言・音素材）をまとめて読む。validate と build-data の共通入口。
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, basename } from 'node:path';
-import { readYaml, locate } from './source.ts';
+import { fileURLToPath } from 'node:url';
+import { readYaml, readYamlFile, locate } from './source.ts';
 import type { ParsedSource } from './source.ts';
 import { LANGS, ROLES } from '../../src/engine/types.ts';
 
@@ -57,6 +58,20 @@ function issue(file: string, line: number, code: string, message: string): Issue
   return { file, line, code, message, severity: 'error' };
 }
 
+function warning(file: string, line: number, code: string, message: string): Issue {
+  return { file, line, code, message, severity: 'warning' };
+}
+
+/** YAML の構文エラーと警告を C17 として積む。 */
+function pushYamlIssues(source: ParsedSource, issues: Issue[], code = 'C17'): void {
+  for (const e of source.errors) {
+    issues.push(issue(source.file, e.line, code, `YAML の書式エラー: ${e.message}`));
+  }
+  for (const w of source.warnings) {
+    issues.push(issue(source.file, w.line, 'C17', `YAML の警告: ${w.message}`));
+  }
+}
+
 function asObject(value: unknown): Obj | null {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return null;
   return value as Obj;
@@ -104,23 +119,61 @@ function collectAudioFiles(absDir: string, prefix: string, out: string[]): void 
   }
 }
 
+const DENYLIST_KEYS = ['companies', 'services', 'people', 'countries', 'comparisons'] as const;
+
 function loadDenylist(root: string, issues: Issue[]): Denylist {
   const relative = 'tools/validate/denylist.yaml';
-  const source = readYaml(root, relative);
   const empty: Denylist = { companies: [], services: [], people: [], countries: [], comparisons: [] };
-  if (!source) return empty;
-  for (const e of source.errors) issues.push(issue(source.file, e.line, 'C17', `YAML の書式エラー: ${e.message}`));
+  let source = readYaml(root, relative);
+  let fallback = false;
+  if (!source) {
+    // 禁止リストが無いまま素通りさせない（fail-closed）。
+    // まず道具に同梱した既定リストで検査し、それも読めないときだけエラーにする。
+    const bundled = fileURLToPath(new URL('./denylist.yaml', import.meta.url));
+    source = readYamlFile(bundled, relative);
+    fallback = true;
+  }
+  if (!source) {
+    issues.push(issue(relative, 1, 'C16', '禁止リスト（denylist.yaml）がない'));
+    return empty;
+  }
+  pushYamlIssues(source, issues, 'C16');
   const data = asObject(source.data);
-  if (!data) return empty;
-  const strings = (v: unknown): string[] =>
-    Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && x.length > 0) : [];
-  return {
-    companies: strings(data.companies),
-    services: strings(data.services),
-    people: strings(data.people),
-    countries: strings(data.countries),
-    comparisons: strings(data.comparisons),
-  };
+  if (!data) {
+    issues.push(issue(source.file, 1, 'C16', 'denylist.yaml はキーと配列のオブジェクトで書く'));
+    return empty;
+  }
+  if (fallback) {
+    issues.push(warning(relative, 1, 'C16',
+      'denylist.yaml がないため同梱の既定リストで検査する'));
+  }
+  const result: Denylist = { companies: [], services: [], people: [], countries: [], comparisons: [] };
+  for (const key of DENYLIST_KEYS) {
+    const value = data[key];
+    if (!Array.isArray(value)) {
+      issues.push(issue(source.file, locate(data, key)?.line ?? 1, 'C16',
+        `denylist の ${key} は配列で書く`));
+      continue;
+    }
+    for (const entry of value) {
+      if (typeof entry !== 'string' || entry.length === 0) {
+        issues.push(issue(source.file, locate(data, key)?.line ?? 1, 'C16',
+          `denylist の ${key} は空でない文字列だけにする`));
+        continue;
+      }
+      if (key === 'comparisons') {
+        try {
+          new RegExp(entry);
+        } catch {
+          issues.push(issue(source.file, locate(data, key)?.line ?? 1, 'C20',
+            `denylist の comparisons に不正な正規表現がある: ${entry}`));
+          continue;
+        }
+      }
+      result[key].push(entry);
+    }
+  }
+  return result;
 }
 
 function loadLocales(root: string, issues: Issue[]): Record<string, LocaleData> {
@@ -134,9 +187,7 @@ function loadLocales(root: string, issues: Issue[]): Record<string, LocaleData> 
     const noticesRel = `locales/${lang}/notices.yaml`;
     const noticesSource = readYaml(root, noticesRel);
     if (noticesSource) {
-      for (const e of noticesSource.errors) {
-        issues.push(issue(noticesSource.file, e.line, 'C17', `YAML の書式エラー: ${e.message}`));
-      }
+      pushYamlIssues(noticesSource, issues);
       const notices = asObject(noticesSource.data);
       if (notices) {
         for (const [rawKey, value] of Object.entries(notices)) {
@@ -162,12 +213,15 @@ function loadLocales(root: string, issues: Issue[]): Record<string, LocaleData> 
       const rel = `locales/${lang}/ui/${name}`;
       const source = readYaml(root, rel);
       if (!source) continue;
-      for (const e of source.errors) issues.push(issue(source.file, e.line, 'C17', `YAML の書式エラー: ${e.message}`));
+      pushYamlIssues(source, issues);
       const strings = asObject(source.data);
       if (!strings) continue;
-      // ネストしたキーは "a.b.c" に平坦化する
+      // ネストしたキーは "a.b.c" に平坦化する。循環参照でも止まるよう訪問済みを持つ。
       const flat: [string, unknown, number][] = [];
+      const visited = new WeakSet<object>();
       const walk = (obj: Record<string, unknown>, prefix: string, parentLine: number): void => {
+        if (visited.has(obj)) return;
+        visited.add(obj);
         for (const [k, v] of Object.entries(obj)) {
           const line = locate(obj, k)?.line ?? parentLine;
           const sub = typeof v === 'object' && v !== null && !Array.isArray(v) ? asObject(v) : null;
@@ -197,7 +251,7 @@ function loadLocales(root: string, issues: Issue[]): Record<string, LocaleData> 
 function loadReferences(root: string, issues: Issue[]): ParsedSource | null {
   const source = readYaml(root, 'references/references.yaml');
   if (!source) return null;
-  for (const e of source.errors) issues.push(issue(source.file, e.line, 'C17', `YAML の書式エラー: ${e.message}`));
+  pushYamlIssues(source, issues);
   return source;
 }
 
@@ -215,6 +269,9 @@ function loadScenarios(root: string, issues: Issue[]): LoadedScenario[] {
     for (const e of sceneSource.errors) {
       issues.push(issue(sceneSource.file, e.line, 'C17', `YAML の書式エラー: ${e.message}`));
     }
+    for (const w of sceneSource.warnings) {
+      issues.push(issue(sceneSource.file, w.line, 'C17', `YAML の警告: ${w.message}`));
+    }
     const sceneData = asObject(sceneSource.data) ?? {};
     const roles: Obj = {};
     const roleSources = new Map<string, ParsedSource>();
@@ -225,9 +282,7 @@ function loadScenarios(root: string, issues: Issue[]): LoadedScenario[] {
       const rel = `scenarios/${dir}/roles/${name}`;
       const source = readYaml(root, rel);
       if (!source) continue;
-      for (const e of source.errors) {
-        issues.push(issue(source.file, e.line, 'C17', `YAML の書式エラー: ${e.message}`));
-      }
+      pushYamlIssues(source, issues);
       if (!ROLES.includes(roleId as (typeof ROLES)[number])) {
         issues.push(issue(rel, 1, 'C01', `未知のロール: ${roleId}`));
         continue;
@@ -273,11 +328,7 @@ export function loadProject(options: LoadProjectOptions): Project {
   }
   const locales = loadLocales(root, loadIssues);
   const audioManifest = readYaml(root, 'audio/audio-manifest.yaml');
-  if (audioManifest) {
-    for (const e of audioManifest.errors) {
-      loadIssues.push(issue(audioManifest.file, e.line, 'C17', `YAML の書式エラー: ${e.message}`));
-    }
-  }
+  if (audioManifest) pushYamlIssues(audioManifest, loadIssues);
   const audioFiles: string[] = [];
   collectAudioFiles(join(root, 'audio'), '', audioFiles);
   audioFiles.sort();
