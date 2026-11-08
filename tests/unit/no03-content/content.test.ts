@@ -2,12 +2,13 @@
 // 対象は roles/*.yaml の4ファイル。判断ポイント数・配点・細目数は変えていない前提で検査する。
 import { describe, it, expect } from 'vitest';
 import { parse } from 'yaml';
+import scenarioYaml from '../../../scenarios/no03-yamabiko/scenario.yaml?raw';
 import leadYaml from '../../../scenarios/no03-yamabiko/roles/lead.yaml?raw';
 import analystYaml from '../../../scenarios/no03-yamabiko/roles/analyst.yaml?raw';
 import officerYaml from '../../../scenarios/no03-yamabiko/roles/officer.yaml?raw';
 import executiveYaml from '../../../scenarios/no03-yamabiko/roles/executive.yaml?raw';
 import referencesYaml from '../../../references/references.yaml?raw';
-import type { Reference, RoleScript } from '../../../src/engine/types';
+import type { Reference, RoleScript, Scenario } from '../../../src/engine/types';
 
 const sources: Record<string, string> = {
   lead: leadYaml,
@@ -20,6 +21,7 @@ const roles = Object.fromEntries(
 ) as Record<string, RoleScript>;
 const references = parse(referencesYaml) as Reference[];
 const referencesById = new Map(references.map((ref) => [ref.id, ref]));
+const scenario = { ...(parse(scenarioYaml) as unknown as Omit<Scenario, 'roles'>), roles } as Scenario;
 
 /** ja の文章をすべて集める */
 function collectJa(node: unknown, out: string[] = []): string[] {
@@ -141,11 +143,11 @@ describe('no03-yamabiko / シナリオ内容の整合', () => {
     }
   });
 
-  it('法定期限の本数は変えていない', () => {
+  it('法定期限の本数は、全ロールが速報と確報の2本を持つ', () => {
     expect(roles.lead?.deadlines?.length).toBe(2);
     expect(roles.analyst?.deadlines?.length).toBe(2);
     expect(roles.officer?.deadlines?.length).toBe(2);
-    expect(roles.executive?.deadlines?.length).toBe(1);
+    expect(roles.executive?.deadlines?.length).toBe(2);
   });
 
   it('判断ポイント数と細目数は従来どおり', () => {
@@ -153,5 +155,50 @@ describe('no03-yamabiko / シナリオ内容の整合', () => {
     expect(roles.analyst?.points.length).toBe(18);
     expect(roles.officer?.points.length).toBe(18);
     expect(roles.executive?.points.length).toBe(16);
+  });
+
+  it('証拠を消す選択が加点されない', () => {
+    const evidenceLoss = [
+      ['lead', 'p02-remove'],
+      ['officer', 'p02-erase'],
+      ['executive', 'p05-cheap'],
+      ['analyst', 'a03-delete'],
+    ] as const;
+    for (const [name, choiceId] of evidenceLoss) {
+      const choice = roles[name]?.points.flatMap((point) => point.choices).find((c) => c.id === choiceId);
+      expect(choice, `${name} に ${choiceId} がない`).toBeTruthy();
+      expect(choice?.points, `${name} の ${choiceId} が加点されている`).toBeLessThan(0);
+    }
+  });
+
+  it('スナップショット後の復旧手段の誤りは致命ではなく減点に収める', () => {
+    for (const [name, role] of Object.entries(roles)) {
+      for (const choice of role.points.flatMap((point) => point.choices)) {
+        if (!choice.text.ja.includes('バックアップから戻す')) continue;
+        expect(choice.category, `${name} の ${choice.id} が致命扱い`).toBe('hurt');
+      }
+    }
+  });
+
+  it('記者会見の回答は、旗が立たないと選べないものがあっても条件なしの回答を残す', () => {
+    for (const question of scenario.press?.questions ?? []) {
+      expect(
+        question.answers.some((answer) => !answer.when && !answer.requiresNote),
+        `${question.id} に条件なしで選べる回答がない`,
+      ).toBe(true);
+    }
+    const oldQuestion = scenario.press?.questions.find((question) => question.id === 'q-old');
+    const oldRecord = oldQuestion?.answers.find((answer) => answer.id === 'a-old-record');
+    expect(oldRecord?.when, 'a-old-record が古い複製の削除を確認していなくても選べる').toEqual({
+      flags: { oldCopyRemoved: true },
+    });
+  });
+
+  it('会見の時系列がゲーム内の公表日と合っている', () => {
+    for (const question of scenario.press?.questions ?? []) {
+      for (const answer of question.answers) {
+        expect(answer.text.ja.includes('3日前'), `${answer.id} が検知日を3日前としている`).toBe(false);
+      }
+    }
   });
 });

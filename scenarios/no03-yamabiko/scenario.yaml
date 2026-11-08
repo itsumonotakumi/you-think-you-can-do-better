@@ -9,7 +9,7 @@ difficulty: 2
 languages: [ja]
 referencesVersion: '2026-11-08'
 legalPack: jp
-title: { ja: '予算も人もない。あるのは社長の男だけ', en: '' }
+title: { ja: '予算も人もない。あるのは社長の甥だけ', en: '' }
 tagline: { ja: '止めれば売上の6割が消える。12人の店の、いつもの朝に電話が鳴る。', en: '' }
 company:
   name: { ja: 'やまびこ商店', en: '' }
@@ -60,15 +60,15 @@ press:
       answers:
         - { id: a-old-cost, text: { ja: '予算がなかったからです。', en: '' }, points: -50 }
         - { id: a-old-own, text: { ja: '更新の判断を先送りしました。', en: '' }, points: 30 }
-        - { id: a-old-record, text: { ja: '制作会社に古い複製が残っていたことも分かりました。削除を確認し、パスワードを変えています。', en: '' }, points: 80, requiresNote: note-old-site }
+        - { id: a-old-record, text: { ja: '制作会社に古い複製が残っていたことも分かりました。削除を確認し、パスワードを変えています。', en: '' }, points: 80, requiresNote: note-old-site, when: { flags: { oldCopyRemoved: true } } }
     - id: q-detect
       seconds: 30
       timeoutPoints: -30
       text: { ja: 'いつ気づいたのですか。公表が遅くありませんか。', en: '' }
       answers:
         - { id: a-detect-fast, text: { ja: 'すぐに公表しました。', en: '' }, points: -30 }
-        - { id: a-detect-late, text: { ja: '最初の連絡は3日前でした。公表は遅れました。', en: '' }, points: 30 }
-        - { id: a-detect-verify, text: { ja: '最初の連絡は3日前です。何を出すかを決めるのに時間を使い、公表が遅れました。経緯を検証して公表します。', en: '' }, points: 80, requiresNote: note-first-call }
+        - { id: a-detect-late, text: { ja: '最初の連絡から4日後に公表しました。遅くなりました。', en: '' }, points: 30 }
+        - { id: a-detect-verify, text: { ja: '最初の連絡から公表まで4日かかりました。何を出すかを決めるのに時間を使い、遅れました。経緯を検証して公表します。', en: '' }, points: 80, requiresNote: note-first-call }
     - id: q-comp
       seconds: 30
       timeoutPoints: -30

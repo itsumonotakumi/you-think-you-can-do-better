@@ -3,7 +3,7 @@
 # 見えるのは、管理画面、レンタルサーバーのログ、決済画面、事務所のパソコン、現場の声。
 # 判断ポイント18、細目は choices[].items と drafts の合計で80以上。
 estimateMinutes: 35
-intro: { ja: 'あなたはやまびこ商店の倉庫・出荷担当。専任の情報システム担当はいないので、サイトと事務所のパソコンの面倒はあなたが見ている。管理画面のパスワードは、社長と事務の村瀬と3人で同じものを使っている。午前10時、カード会社からの電話が、あなたのところに回ってくる。', en: '' }
+intro: { ja: 'あなたはやまびこ商店の倉庫・出荷担当で、社長の甥。専任の情報システム担当はいないので、サイトと事務所のパソコンの面倒はあなたが見ている。管理画面のパスワードは、社長と事務の村瀬と3人で同じものを使っている。午前10時、カード会社からの電話が、あなたのところに回ってくる。', en: '' }
 pressEnabled: true
 cowardVoices:
   '2': v-coward-2
@@ -339,7 +339,7 @@ points:
     at: { day: 1, minutes: 720 }
     phase: organize
     sound: { se: [phone_ring] }
-    text: { ja: '昼。商工会議所の小柳から電話。「専門家派遣の枠が空いた。警察への相談も、今のうちにやっておいたほうがいい」。費用は1時間あたりで、店の年間利益の何割かに相当する。', en: '' }
+    text: { ja: '昼。商工会議所の小柳から電話。「専門家派遣の枠が空いた。警察への相談も、今のうちにやっておいたほうがいい」。費用はかからないが、回数に限りがある。', en: '' }
     voices: [v06-law, v06-vendor, v06-ok]
     choices:
       - id: a06-alone
@@ -360,7 +360,7 @@ points:
         points: 30
         refs: [ipa-sme-guideline, jpcert-handling]
         gauges: { trust: 5, stamina: -10 }
-        setFlags: { expertRequested: true }
+        setFlags: { expertRequested: true, cardCompanyInformed: true }
         items:
           - { id: a06-b-order, points: 8, axis: order, refs: [ipa-sme-guideline] }
           - { id: a06-b-record, points: 8, axis: record, refs: [jpcert-handling] }
@@ -770,8 +770,8 @@ points:
       - id: a13-restore
         text: { ja: '3か月前のバックアップから戻す。設定はそのまま使う。', en: '' }
         minutes: 120
-        category: fatal
-        points: -230
+        category: hurt
+        points: -150
         refs: [nist-sp800-61r3]
         gauges: { damage: 15, flame: 10, trust: -15 }
         setFlags: { restoredOld: true }
@@ -1273,7 +1273,7 @@ drafts:
           - { id: oc-e-order, text: { ja: '止める判断をする人と、連絡する順番を決める', en: '' }, points: 8, axis: care, refs: [jpcert-handling] }
           - { id: oc-e-none, text: { ja: '緊急時の決まりは作らない', en: '' }, points: -5, axis: care, refs: [jpcert-handling] }
 voices:
-  - { id: v01-card, media: vendor, misleading: true, type: vendor-interest, text: { ja: '原因は御社側です。至急、決済画面を確認してください。', en: '' }, trigger: { at: point } }
+  - { id: v01-card, media: vendor, misleading: false, text: { ja: 'カード会社「御社の決済画面から、カード番号が外部に送られている可能性があります」。', en: '' }, trigger: { at: point } }
   - { id: v01-owner, media: boss, misleading: true, type: boss-pressure, text: { ja: '今日は出荷が多い。電話に出るのは後にしてくれ。', en: '' }, trigger: { at: point } }
   - { id: v01-field, media: chat, misleading: true, type: well-meant-field, text: { ja: 'とりあえず再起動してみますか。いつもそれで直っています。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: 'レンタルサーバーのサポート「まず管理画面の操作履歴を確認してください」。', en: '' }, trigger: { at: point } }
@@ -1286,7 +1286,7 @@ voices:
   - { id: v03-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '消してしまえば、お客さんも安心ですよね。', en: '' }, trigger: { at: point } }
   - { id: v03-ok, media: chat, misleading: false, text: { ja: 'サポート「消す前に、ファイルと画面をそのまま保存してください」。', en: '' }, trigger: { at: point } }
   - { id: v03-after, media: news, misleading: false, text: { ja: '調査のために、サイトを触らないままにするのか。', en: '' }, trigger: { at: after, choice: a03-snapshot } }
-  - { id: v04-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '出荷が止まる。パソコンを触るのは後にしてくれ。', en: '' }, trigger: { at: point } }
+  - { id: v04-coward, media: sns, misleading: true, type: well-meant-field, text: { ja: '出荷が止まる。パソコンを触るのは後にしてくれ。', en: '' }, trigger: { at: point } }
   - { id: v04-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '再起動すれば、拡張機能は消えますよ。', en: '' }, trigger: { at: point } }
   - { id: v04-ok, media: chat, misleading: false, text: { ja: 'サポート「そのパソコンはネットワークから外して、何が入ったかを見てください」。', en: '' }, trigger: { at: point } }
   - { id: v04-after, media: chat, misleading: false, text: { ja: '事務所のパソコンを止めて、注文の確認は誰がやるんですか。', en: '' }, trigger: { at: after, choice: a04-isolate } }
@@ -1303,7 +1303,7 @@ voices:
   - { id: v07-ok, media: chat, misleading: false, text: { ja: '小柳「残った記録を突き合わせて、分かる範囲と不明な範囲を分けましょう」。', en: '' }, trigger: { at: point } }
   - { id: v07-after, media: news, misleading: false, text: { ja: '推測をつなぎ合わせて、分かったふりをしている。', en: '' }, trigger: { at: after, choice: a07-piece } }
   - { id: v08-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '消せば済みます。うちで処理しておきます。', en: '' }, trigger: { at: point } }
-  - { id: v08-law, media: board, misleading: true, type: law-ish, text: { ja: 'こちらのパスワードを変えると、先方の他のお客様のサイトも止まりますよ。', en: '' }, trigger: { at: point } }
+  - { id: v08-law, media: board, misleading: true, type: vendor-interest, text: { ja: 'こちらのパスワードを変えると、先方の他のお客様のサイトも止まりますよ。', en: '' }, trigger: { at: point } }
   - { id: v08-irony, media: vendor, misleading: false, text: { ja: '制作会社の留守電「御社のおかげで、当社も安全になりました」。', en: '' }, trigger: { at: point } }
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '小柳「消してもらう前に、何が残っていたかを書面で確認しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v08-after, media: boss, misleading: false, text: { ja: '先方に無理を言って、関係が悪くなったじゃないか。', en: '' }, trigger: { at: after, choice: a08-all } }
@@ -1315,7 +1315,7 @@ voices:
   - { id: v10-law, media: board, misleading: true, type: law-ish, text: { ja: '1000件未満なら、報告はいらないと聞きましたよ。', en: '' }, trigger: { at: point } }
   - { id: v10-ok, media: chat, misleading: false, text: { ja: '小柳「分かっている範囲で出して、不明点は調査中と書けばいい」。', en: '' }, trigger: { at: point } }
   - { id: v10-after, media: boss, misleading: false, text: { ja: 'まだ確定していないのに、窓口の電話番号まで決めたのか。', en: '' }, trigger: { at: after, choice: a10-file-full } }
-  - { id: v11-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '問い合わせが来た人だけに説明すれば、費用も人手もかからない。', en: '' }, trigger: { at: point } }
+  - { id: v11-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '問い合わせが来た人だけに説明すれば、費用も人手もかからない。', en: '' }, trigger: { at: point } }
   - { id: v11-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '一斉送信は、まとめて業者に頼めば安いですよ。', en: '' }, trigger: { at: point } }
   - { id: v11-ok, media: chat, misleading: false, text: { ja: '小柳「送信元の設定を先に確認して、届いたかどうかを数えましょう」。', en: '' }, trigger: { at: point } }
   - { id: v11-after, media: chat, misleading: false, text: { ja: '全員に連絡したら、問い合わせが殺到して回りません。', en: '' }, trigger: { at: after, choice: a11-domain } }
@@ -1335,7 +1335,7 @@ voices:
   - { id: v15-past, media: boss, misleading: true, type: past-success, text: { ja: '今まで大きな事故はなかった。年1回で十分だ。', en: '' }, trigger: { at: point } }
   - { id: v15-ok, media: chat, misleading: false, text: { ja: '小柳「誰が、いつ、何を見るかを、紙1枚にしておきましょう」。', en: '' }, trigger: { at: point } }
   - { id: v15-after, media: chat, misleading: false, text: { ja: '手順書を作る時間があるなら、荷物を出してくれ。', en: '' }, trigger: { at: after, choice: a15-budget } }
-  - { id: v16-law, media: board, misleading: true, type: law-ish, text: { ja: '自分の見落としは、わざわざ書かなくても分かりませんよ。', en: '' }, trigger: { at: point } }
+  - { id: v16-law, media: board, misleading: true, type: boss-pressure, text: { ja: '自分の見落としは、わざわざ書かなくても分かりませんよ。', en: '' }, trigger: { at: point } }
   - { id: v16-owner, media: boss, misleading: true, type: boss-pressure, text: { ja: '都合の悪いところは省け。', en: '' }, trigger: { at: point } }
   - { id: v16-popular, media: sns, misleading: true, type: popular, text: { ja: '他の店の担当者も、自分の見落としは報告していないそうです。', en: '' }, trigger: { at: point } }
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '小柳「事実と判断を分けて、見落としも含めて出しましょう」。', en: '' }, trigger: { at: point } }
