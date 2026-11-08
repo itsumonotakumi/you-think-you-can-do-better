@@ -1,0 +1,121 @@
+# No.5 コガネ酒造HD（酒類・飲料メーカー）
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+id: no05-kogane
+version: '1.0.0'
+status: latest
+published: '2026-11-08'
+sourcePeriod: { ja: '2020年代半ばの飲料業界の事件の構造を参考にしたフィクション', en: '' }
+difficulty: 4
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: 'システムが止まっても、酒場は待ってくれない', en: '' }
+tagline: { ja: '受注も出荷も止まった月曜の朝。年末商戦を前に、経営者は何を守るのか。', en: '' }
+company:
+  name: { ja: 'コガネ酒造ホールディングス株式会社', en: '' }
+  industry: { ja: '酒類・飲料の製造と販売', en: '' }
+  size: { ja: '従業員1,600名、グループ8社、国内証券取引所に上場', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '鷹岡 廉太郎', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: coo
+      name: { ja: '真壁 千夏', en: '' }
+      title: { ja: '取締役副社長（生産・物流担当）', en: '' }
+    - id: cfo
+      name: { ja: '苅田 亮介', en: '' }
+      title: { ja: '取締役CFO', en: '' }
+    - id: cio
+      name: { ja: '瀬川 学', en: '' }
+      title: { ja: '執行役員情報システム部長', en: '' }
+    - id: pr
+      name: { ja: '名瀬 沙耶', en: '' }
+      title: { ja: '広報部長', en: '' }
+    - id: group
+      name: { ja: '遠野 修平', en: '' }
+      title: { ja: '北陸コガネ飲料 社長', en: '' }
+    - id: hr
+      name: { ja: '祝田 みのり', en: '' }
+      title: { ja: '人事部長', en: '' }
+start: { day: 0, minutes: 450 }
+initialGauges: { damage: 20, flame: 0, trust: 70, stamina: 100 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-ransom
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '身代金を支払わないと決めた根拠を教えてください。', en: '' }
+      answers:
+        - { id: a-ransom-none, text: { ja: '特に決めていません。', en: '' }, points: -40 }
+        - { id: a-ransom-risk, text: { ja: '支払っても復号も削除も保証されないためです。', en: '' }, points: 30 }
+        - { id: a-ransom-police, text: { ja: '犯罪組織への資金提供を避けるため、警察に相談して決めました。', en: '' }, points: 80 }
+    - id: q-backup
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: 'バックアップの状態を、いつ把握しましたか。', en: '' }
+      answers:
+        - { id: a-backup-none, text: { ja: '今も把握していません。', en: '' }, points: -50 }
+        - { id: a-backup-some, text: { ja: '一部が暗号化されていたことは、調査の途中で分かりました。', en: '' }, points: 30 }
+        - { id: a-backup-check, text: { ja: '三世代のうち二つが暗号化され、一つだけ健全でした。その確認を復旧の前提にしました。', en: '' }, points: 80, requiresNote: note-backup }
+    - id: q-partner
+      seconds: 25
+      timeoutPoints: -30
+      text: { ja: '取引先への説明が遅れたのではありませんか。', en: '' }
+      answers:
+        - { id: a-partner-fast, text: { ja: 'できるだけ早く伝えました。', en: '' }, points: -30 }
+        - { id: a-partner-late, text: { ja: '手作業の受注を始めた後に伝えました。', en: '' }, points: 30 }
+        - { id: a-partner-verify, text: { ja: '遅れの原因を検証し、再発防止策とあわせて公表します。', en: '' }, points: 80 }
+    - id: q-launch
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '新商品の発売と、被害の説明を分けたのはなぜですか。', en: '' }
+      answers:
+        - { id: a-launch-none, text: { ja: '関係がないからです。', en: '' }, points: -30 }
+        - { id: a-launch-delay, text: { ja: '発売を延期し、理由を説明しました。', en: '' }, points: 30 }
+        - { id: a-launch-order, text: { ja: '延期の判断と理由を先に取引先と従業員へ伝え、発表は別の機会にしました。', en: '' }, points: 80 }
+    - id: q-supply
+      seconds: 25
+      timeoutPoints: -30
+      text: { ja: '年末商戦に間に合わなかった責任は、どこにありますか。', en: '' }
+      answers:
+        - { id: a-supply-attack, text: { ja: '攻撃者のせいです。当社に落ち度はありません。', en: '' }, points: -50 }
+        - { id: a-supply-own, text: { ja: '更新を先送りした経営にあります。', en: '' }, points: 30 }
+        - { id: a-supply-fix, text: { ja: '更新の先送りと、復旧の順番の判断にありました。取引先への補償も進めます。', en: '' }, points: 80 }
+  extraQuestions:
+    - when: { flags: { hidFacts: true } }
+      question:
+        id: q-hidden
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '当初「システム障害」とだけ説明したのはなぜですか。', en: '' }
+        answers:
+          - { id: a-hidden-avoid, text: { ja: '混乱を避けるためです。', en: '' }, points: -100 }
+          - { id: a-hidden-late, text: { ja: '公表の判断が遅れました。', en: '' }, points: 30 }
+          - { id: a-hidden-correct, text: { ja: '隠す意図はありませんでしたが、説明は不正確でした。訂正と経緯を公表します。', en: '' }, points: 80 }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '事件前より信頼も売上も伸びた。復旧の手順と取引先への説明は業界の手本として引用され、年明けの受注は過去最高になった。現場からは「あの一か月で会社が変わった」という短い言葉が届いた。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが信頼を取り戻し、売上は事件前の水準に戻った。年末商戦の遅れは取り返せなかったが、主要な取引先は離れずに残った。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '会社は立ち直ったが、大口の取引先を一つ失った。残った酒場と販売店との関係を、時間をかけて作り直すことになった。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '第三者委員会は初動と説明の不備を指摘し、経営陣は辞任した。残された社員が、限られた予算で再発防止策を進めている。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '行政指導と集団訴訟が重なり、一部の事業から撤退した。被害の責任は攻撃者にある。問われたのは、被害を広げないための対応だった。どこで判断を誤ったのか、記録を読み返す日が続く。', en: '' }
+salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 10, min: 40, max: 130 }
