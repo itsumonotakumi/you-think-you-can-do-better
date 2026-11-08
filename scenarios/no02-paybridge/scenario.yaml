@@ -1,0 +1,113 @@
+# No.2 ペイブリッジ（決済代行）
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+id: no02-paybridge
+version: '1.0.0'
+status: latest
+published: '2026-11-08'
+sourcePeriod: { ja: '2010年代後半の事件の構造を参考にしたフィクション', en: '' }
+difficulty: 3
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: '注意喚起を読んだ日に、もう入られていた', en: '' }
+tagline: { ja: '決済を止めれば、街の支払いが止まる。委託元の自治体、カード会社、そして上場企業としての説明。順番を間違えれば、信頼は一気に崩れる。', en: '' }
+company:
+  name: { ja: 'ペイブリッジ株式会社', en: '' }
+  industry: { ja: '決済代行・収納代行', en: '' }
+  size: { ja: '従業員700名、国内市場に上場', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '相馬 慎一', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: cfo
+      name: { ja: '城戸 沙耶', en: '' }
+      title: { ja: '取締役CFO', en: '' }
+    - id: ciso
+      name: { ja: '黒瀬 亮', en: '' }
+      title: { ja: '執行役員セキュリティ責任者', en: '' }
+    - id: pr
+      name: { ja: '早瀬 みどり', en: '' }
+      title: { ja: '広報部長', en: '' }
+    - id: ops
+      name: { ja: '曽根 健吾', en: '' }
+      title: { ja: '決済基盤部長', en: '' }
+    - id: gov
+      name: { ja: '藤崎 律子', en: '' }
+      title: { ja: '公共事業部長', en: '' }
+    - id: legal
+      name: { ja: '大賀 誠', en: '' }
+      title: { ja: '法務部長', en: '' }
+start: { day: 0, minutes: 960 }
+initialGauges: { damage: 15, flame: 0, trust: 70, stamina: 100 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-gov
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '委託元の自治体より先に公表したのは、無視したのではありませんか。', en: '' }
+      answers:
+        - { id: a-gov-wait, text: { ja: '自治体の準備を待つべきでした。', en: '' }, points: -30 }
+        - { id: a-gov-share, text: { ja: '文面は事前に共有し、事実は当社から出しました。', en: '' }, points: 30 }
+        - { id: a-gov-record, text: { ja: '共有した時刻と文面の記録があります。順番と理由を説明します。', en: '' }, points: 80, requiresNote: note-gov-share }
+    - id: q-code
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: '保存してはいけないセキュリティコードが、なぜ漏れたのですか。', en: '' }
+      answers:
+        - { id: a-code-spec, text: { ja: '業務上、必要だったためです。', en: '' }, points: -80 }
+        - { id: a-code-miss, text: { ja: '保存しない設計にできていませんでした。', en: '' }, points: 30 }
+        - { id: a-code-fix, text: { ja: '保存を廃止し、取引先への確認を終えました。経緯と再発防止を公表します。', en: '' }, points: 80 }
+    - id: q-count
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '件数が二転三転したのはなぜですか。', en: '' }
+      answers:
+        - { id: a-count-hide, text: { ja: '確認が足りませんでした。', en: '' }, points: -30 }
+        - { id: a-count-divide, text: { ja: '概数と確定値を分けて出し、訂正の経緯も公表しました。', en: '' }, points: 30 }
+        - { id: a-count-record, text: { ja: '訂正の時刻と理由をすべて記録しています。公開します。', en: '' }, points: 80, requiresNote: note-count }
+    - id: q-market
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '上場企業としての適時開示が遅れたのではありませんか。', en: '' }
+      answers:
+        - { id: a-market-fast, text: { ja: '速やかに開示しました。', en: '' }, points: -30 }
+        - { id: a-market-late, text: { ja: '初動の判断が遅れました。', en: '' }, points: 30 }
+        - { id: a-market-record, text: { ja: '開示までの判断を記録しています。検証結果とともに公表します。', en: '' }, points: 80, requiresNote: note-timely }
+  extraQuestions:
+    - when: { flags: { hidFacts: true } }
+      question:
+        id: q-hidden
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '当初「メンテナンス」と説明したのはなぜですか。', en: '' }
+        answers:
+          - { id: a-hidden-avoid, text: { ja: '混乱を避けるためです。', en: '' }, points: -100 }
+          - { id: a-hidden-late, text: { ja: '公表の判断が遅れました。', en: '' }, points: 30 }
+          - { id: a-hidden-correct, text: { ja: '隠す意図はありませんでしたが、説明は不正確でした。訂正と経緯を公表します。', en: '' }, points: 80 }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '事件前より信頼も売上も伸びた。調査報告書は決済業界の手本として引用され、再開した窓口には、委託元の担当者から短い礼の電話が届いた。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが信頼を取り戻し、売上は事件前の水準に戻った。カード会社との取引は、条件の見直しのうえで続いている。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '会社は立ち直ったが、大口の委託元を一つ失った。残った取引先との関係を、時間をかけて作り直すことになった。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '第三者委員会は対応の不備を指摘し、経営陣は辞任した。残された社員が、限られた予算で再発防止策を進めている。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '行政指導と集団訴訟が重なり、決済代行の一部から撤退した。どこで判断を誤ったのか、記録を読み返す日が続く。', en: '' }
+salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 10, min: 40, max: 130 }
