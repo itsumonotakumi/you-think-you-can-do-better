@@ -1,0 +1,118 @@
+# No.4 ゴーライド（カーシェア・レンタカー）
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+id: no04-goride
+version: '1.0.0'
+status: latest
+published: '2026-11-08'
+sourcePeriod: { ja: '2026年秋の事件の構造を参考にしたフィクション', en: '' }
+difficulty: 4
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: '退会したはずのあなたの免許証が、まだここにある', en: '' }
+tagline: { ja: '止めれば車は動かない。止めなければ、免許証が動く。', en: '' }
+company:
+  name: { ja: 'ゴーライド株式会社', en: '' }
+  industry: { ja: 'カーシェア・レンタカー', en: '' }
+  size: { ja: '従業員1,200名、上場企業の子会社', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '榊原 透', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: cfo
+      name: { ja: '水無瀬 環', en: '' }
+      title: { ja: '取締役CFO', en: '' }
+    - id: ciso
+      name: { ja: '八木 慎一', en: '' }
+      title: { ja: '執行役員セキュリティ責任者', en: '' }
+    - id: pr
+      name: { ja: '桜庭 美冬', en: '' }
+      title: { ja: '広報部長', en: '' }
+    - id: ops
+      name: { ja: '国枝 亮', en: '' }
+      title: { ja: 'サービス運用本部長', en: '' }
+    - id: legal
+      name: { ja: '瀬川 律子', en: '' }
+      title: { ja: '法務部長', en: '' }
+start: { day: 0, minutes: 540 }
+initialGauges: { damage: 20, flame: 0, trust: 70, stamina: 100 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-retention
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '退会した人の免許証画像まで残っていたのはなぜですか。', en: '' }
+      answers:
+        - { id: a-retention-vague, text: { ja: '確認しておりません。', en: '' }, points: -30 }
+        - { id: a-retention-admit, text: { ja: '保存方針が残っていました。見直しが遅れました。', en: '' }, points: 30 }
+        - { id: a-retention-own, text: { ja: '保存方針を決めたのは経営です。対象者への説明と削除を進めます。', en: '' }, points: 80, requiresNote: note-retention }
+    - id: q-delay
+      seconds: 25
+      timeoutPoints: -30
+      text: { ja: '午前9時に検知して、なぜ公表はその日の午後になったのですか。', en: '' }
+      answers:
+        - { id: a-delay-fast, text: { ja: 'できるだけ早く出しました。', en: '' }, points: -30 }
+        - { id: a-delay-admit, text: { ja: '初動の確認に時間がかかりました。', en: '' }, points: 30 }
+        - { id: a-delay-verify, text: { ja: '検知から公表までの判断を検証し、再発防止策とあわせて公表します。', en: '' }, points: 80, requiresNote: note-first-call }
+    - id: q-count
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '件数が二転三転したのはなぜですか。', en: '' }
+      answers:
+        - { id: a-count-attack, text: { ja: '外部からの攻撃で、正確な把握が難しかったためです。', en: '' }, points: -80 }
+        - { id: a-count-admit, text: { ja: '調査の設計が不十分でした。', en: '' }, points: 30 }
+        - { id: a-count-verify, text: { ja: '調査範囲の広げ方と公表の区切り方を検証し、次の報告で説明します。', en: '' }, points: 80, requiresNote: note-scope }
+    - id: q-money
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: '見舞金の金額の根拠を教えてください。', en: '' }
+      answers:
+        - { id: a-money-flat, text: { ja: '気持ちとして一律に決めました。', en: '' }, points: -50 }
+        - { id: a-money-tier, text: { ja: '被害の重さに応じた段階を設けました。', en: '' }, points: 30 }
+        - { id: a-money-public, text: { ja: '対象と根拠を公表し、追加の請求にも誠実に対応します。', en: '' }, points: 80 }
+    - id: q-leak
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '免許証画像が闇サイトで売られているというのは事実ですか。', en: '' }
+      answers:
+        - { id: a-leak-deny, text: { ja: '事実ではありません。', en: '' }, points: -100 }
+        - { id: a-leak-unknown, text: { ja: '確認中です。', en: '' }, points: -30 }
+        - { id: a-leak-admit, text: { ja: '情報を得ています。対象者の特定と警察への相談を進めています。', en: '' }, points: 80, requiresNote: note-leak }
+  extraQuestions:
+    - when: { flags: { hidRetention: true } }
+      question:
+        id: q-hidden
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '保存方針を隠していたのですか。', en: '' }
+        answers:
+          - { id: a-hidden-avoid, text: { ja: '混乱を避けるためです。', en: '' }, points: -100 }
+          - { id: a-hidden-late, text: { ja: '公表の判断が遅れました。', en: '' }, points: 30 }
+          - { id: a-hidden-correct, text: { ja: '隠す意図はありませんでしたが、説明は不正確でした。訂正と経緯を公表します。', en: '' }, points: 80 }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '事件前より信頼も売上も伸びた。調査報告書は本人確認書類の扱いの手本として業界で引用され、復旧の朝に現場から短い感謝の言葉が届いた。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが信頼を取り戻し、売上は事件前の水準に戻った。次の四半期の契約更新は、大きな解約なしで終わる。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '会社は立ち直ったが、大口の取引先を一つ失った。残った顧客との関係を、時間をかけて作り直すことになった。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '第三者委員会は保存方針と公表の遅れを指摘し、経営陣は辞任した。残された社員が、限られた予算で再発防止策を進めている。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '行政指導と集団訴訟が重なり、一部の事業から撤退した。どこで判断を誤ったのか、記録を読み返す日が続く。', en: '' }
+salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 10, min: 40, max: 130 }
