@@ -68,25 +68,25 @@
   .caption {
     margin: 0;
     padding: 0.3rem 0.6rem;
-    border-left: 3px solid var(--accent, #7fb2d9);
+    border-left: 3px solid var(--accent);
     border-radius: 0 6px 6px 0;
-    background: var(--panel-2, #1d2530);
-    color: var(--text, #e6eaef);
+    background: var(--panel-hover);
+    color: var(--text);
     font-size: 0.9rem;
   }
   .history-box {
     padding: 0.15rem 0.35rem 0.3rem;
-    border: 1px solid var(--line, #2a333e);
+    border: 1px solid var(--line);
     border-radius: 8px;
-    background: var(--panel, #171d25);
+    background: var(--panel);
   }
   .history-summary {
-    color: var(--muted, #97a2ae);
+    color: var(--muted);
     font-size: 0.75rem;
     cursor: pointer;
   }
   .history-summary:focus-visible {
-    outline: 2px solid var(--focus, #a9d1ff);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
   .history {
@@ -97,9 +97,9 @@
     list-style: none;
   }
   .history-item {
-    border-left-color: var(--line-strong, #3a4654);
+    border-left-color: var(--line-strong);
     background: none;
-    color: var(--muted, #97a2ae);
+    color: var(--muted);
     font-size: 0.75rem;
   }
 </style>

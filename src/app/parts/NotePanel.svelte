@@ -86,7 +86,7 @@
   h3 {
     margin: 0;
     font-size: 0.9rem;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
     font-weight: 600;
   }
   .notable,
@@ -112,36 +112,36 @@
   }
   label {
     font-size: 0.85rem;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
   }
   textarea {
     width: 100%;
     box-sizing: border-box;
     resize: vertical;
     padding: 0.4rem 0.5rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 5px;
-    background: var(--panel-2, #222731);
-    color: var(--text, #e8e6e1);
+    background: var(--panel-hover);
+    color: var(--text);
     font: inherit;
   }
   button {
     justify-self: start;
     padding: 0.35rem 0.7rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 5px;
-    background: var(--panel-2, #222731);
-    color: var(--text, #e8e6e1);
+    background: var(--panel-hover);
+    color: var(--text);
     font: inherit;
     font-size: 0.85rem;
     cursor: pointer;
   }
   button:hover:not(:disabled) {
-    border-color: var(--accent, #d8b26a);
+    border-color: var(--accent);
   }
   button:focus-visible,
   textarea:focus-visible {
-    outline: 2px solid var(--focus, #8ab4f8);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
   button:disabled {
@@ -152,7 +152,7 @@
   .status,
   .empty {
     margin: 0;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
     font-size: 0.8rem;
   }
   .status {
@@ -163,12 +163,12 @@
     gap: 0.5rem;
     align-items: baseline;
     padding: 0.3rem 0.4rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 5px;
   }
   .time {
     flex: 0 0 auto;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
     font-variant-numeric: tabular-nums;
     font-size: 0.8rem;
   }

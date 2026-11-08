@@ -13,7 +13,8 @@ html.fx-shake body {
   80% { transform: translate3d(1px, 0, 0); }
 }
 
-/* 記者会見のフラッシュ。白い面の明滅を弱め、1回だけにする */
+/* 記者会見のフラッシュ。白い面の明滅を弱め、1回だけにする。
+   演出として白が要る箇所なので、テーマ変数にせず直書きする */
 html.fx-flash::after {
   content: '';
   position: fixed;
@@ -58,7 +59,7 @@ html.fx-fastforward::before {
   pointer-events: none;
   background: repeating-linear-gradient(
     0deg,
-    rgba(255, 255, 255, 0.05) 0 2px,
+    var(--fx-stripe) 0 2px,
     transparent 2px 10px
   );
   animation: fx-fastforward 0.6s linear infinite;
@@ -71,12 +72,12 @@ html.fx-fastforward::before {
 
 /* 期限の赤。点滅させず、色と太さで伝える */
 html.fx-deadline {
-  --fx-deadline-color: #e5484d;
+  --fx-deadline-color: var(--danger);
 }
 
 html.fx-deadline [data-fx='deadline'],
 html.fx-deadline .deadline {
-  color: #e5484d;
+  color: var(--danger);
   font-weight: 700;
 }
 

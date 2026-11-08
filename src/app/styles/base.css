@@ -1,10 +1,45 @@
 /*
-  全体の見た目。暗めで落ち着いた業務画面風。
+  全体の見た目。既定は白背景。設定でダークに切り替え可。
   外部フォントは読み込まない（OS のフォントだけを使う）。
   文字サイズは .font-small / .font-medium / .font-large の3段階。
+  色は必ずここの変数を使い、部品側に直書きしない。
 */
 
+/* 白背景（既定）。文字と背景は WCAG AA（4.5:1）以上 */
 :root {
+  color-scheme: light;
+
+  --bg: #ffffff;
+  --bg-soft: #f5f7fa;
+  --panel: #f5f7fa;
+  --panel-hover: #eaeef3;
+  --line: #d5dbe2;
+  --line-strong: #b8c2cc;
+  --text: #1d232b;
+  --text-soft: #414b57;
+  --muted: #5c6672;
+  --accent: #1f5f99;
+  --accent-strong: #164b7a;
+  --accent-dim: rgba(31, 95, 153, 0.12);
+  --on-accent: #ffffff;
+  --danger: #b3412e;
+  --danger-dim: rgba(179, 65, 46, 0.1);
+  --warn: #8a6200;
+  --warn-dim: rgba(138, 98, 0, 0.1);
+  --ok: #2f7a4a;
+  --focus: #1a73e8;
+  --overlay: rgba(17, 24, 32, 0.45);
+  --gauge-flame: #b4552f;
+  --gauge-trust: #2f7a4a;
+  --gauge-stamina: #4a6591;
+  --gauge-coward: #6c5a92;
+  /* 早送り演出の走査線。白背景では黒、暗い背景では白を使う */
+  --fx-stripe: rgba(15, 23, 32, 0.06);
+  --radius: 10px;
+}
+
+/* ダーク（設定で切り替え） */
+:root[data-theme='dark'] {
   color-scheme: dark;
 
   --bg: #0e1115;
@@ -19,11 +54,19 @@
   --accent: #7fb2d9;
   --accent-strong: #9cc8ef;
   --accent-dim: rgba(127, 178, 217, 0.14);
+  --on-accent: #0b1015;
   --danger: #e2907f;
   --danger-dim: rgba(226, 144, 127, 0.12);
   --warn: #d9b26a;
+  --warn-dim: rgba(217, 178, 106, 0.08);
   --ok: #8fbf9f;
   --focus: #a9d1ff;
+  --overlay: rgba(0, 0, 0, 0.6);
+  --gauge-flame: #c9663f;
+  --gauge-trust: #5f9e86;
+  --gauge-stamina: #7a8db8;
+  --gauge-coward: #8a7bb0;
+  --fx-stripe: rgba(255, 255, 255, 0.05);
   --radius: 10px;
 }
 
@@ -199,7 +242,7 @@ body {
 .btn--primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #0b1015;
+  color: var(--on-accent);
   font-weight: 700;
 }
 .btn--primary:hover {
@@ -246,7 +289,7 @@ body {
 }
 .notice--warn {
   border-left-color: var(--warn);
-  background: rgba(217, 178, 106, 0.08);
+  background: var(--warn-dim);
 }
 .notice-stack {
   display: flex;

@@ -80,7 +80,7 @@
     cursor: pointer;
   }
   .typewriter:focus-visible {
-    outline: 2px solid var(--focus, #8ab4f8);
+    outline: 2px solid var(--focus);
     outline-offset: 3px;
     border-radius: 4px;
   }

@@ -22,6 +22,9 @@
       fontSmall: t('sa.settings.fontSmall'),
       fontMedium: t('sa.settings.fontMedium'),
       fontLarge: t('sa.settings.fontLarge'),
+      theme: t('sa.settings.theme'),
+      themeLight: t('sa.settings.themeLight'),
+      themeDark: t('sa.settings.themeDark'),
       bgm: t('sa.settings.bgm'),
       se: t('sa.settings.se'),
       muted: t('sa.settings.muted'),
@@ -135,6 +138,21 @@
           <option value="small">{ui.fontSmall}</option>
           <option value="medium">{ui.fontMedium}</option>
           <option value="large">{ui.fontLarge}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="setting">
+      <label class="setting__label" for="set-theme">{ui.theme}</label>
+      <div class="setting__control">
+        <select
+          id="set-theme"
+          class="select"
+          value={$settings.theme}
+          onchange={(e) => apply({ theme: e.currentTarget.value as Settings['theme'] })}
+        >
+          <option value="light">{ui.themeLight}</option>
+          <option value="dark">{ui.themeDark}</option>
         </select>
       </div>
     </div>

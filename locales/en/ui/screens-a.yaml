@@ -80,6 +80,9 @@ sa.settings.fontSize: Text size
 sa.settings.fontSmall: Small
 sa.settings.fontMedium: Medium
 sa.settings.fontLarge: Large
+sa.settings.theme: Color theme
+sa.settings.themeLight: Light (default)
+sa.settings.themeDark: Dark
 sa.settings.bgm: BGM volume
 sa.settings.se: Sound effect volume
 sa.settings.muted: Mute

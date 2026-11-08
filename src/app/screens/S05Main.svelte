@@ -305,7 +305,7 @@
     max-width: 72rem;
     margin: 0 auto;
     padding: 0.8rem;
-    color: var(--text, #e8e6e1);
+    color: var(--text);
   }
   .body {
     display: grid;
@@ -328,22 +328,22 @@
   }
   .abort {
     padding: 0.3rem 0.7rem;
-    border: 1px solid var(--border, #2a333e);
+    border: 1px solid var(--line);
     border-radius: 6px;
     background: transparent;
-    color: var(--muted, #97a2ae);
+    color: var(--muted);
     font: inherit;
     font-size: 0.8rem;
     cursor: pointer;
   }
   .abort:hover {
-    border-color: var(--danger, #e2907f);
-    color: var(--danger, #e2907f);
+    border-color: var(--danger);
+    color: var(--danger);
   }
   .abort:focus-visible,
   .abort-cancel:focus-visible,
   .abort-confirm:focus-visible {
-    outline: 2px solid var(--focus, #a9d1ff);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
   .abort-overlay {
@@ -353,15 +353,15 @@
     display: grid;
     place-items: center;
     padding: 1rem;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--overlay);
   }
   .abort-dialog {
     width: min(28rem, 100%);
     padding: 1rem 1.1rem;
-    border: 1px solid var(--border, #2a333e);
+    border: 1px solid var(--line);
     border-radius: 10px;
-    background: var(--panel, #171d25);
-    color: var(--text, #e6eaef);
+    background: var(--panel);
+    color: var(--text);
   }
   .abort-dialog h2 {
     margin: 0 0 0.5rem;
@@ -369,7 +369,7 @@
   }
   .abort-dialog p {
     margin: 0 0 0.9rem;
-    color: var(--muted, #97a2ae);
+    color: var(--muted);
     font-size: 0.9rem;
     line-height: 1.7;
   }
@@ -381,30 +381,30 @@
   .abort-cancel,
   .abort-confirm {
     padding: 0.45rem 0.9rem;
-    border: 1px solid var(--border, #2a333e);
+    border: 1px solid var(--line);
     border-radius: 6px;
-    background: var(--panel-2, #1d2530);
-    color: var(--text, #e6eaef);
+    background: var(--panel-hover);
+    color: var(--text);
     font: inherit;
     font-size: 0.88rem;
     cursor: pointer;
   }
   .abort-confirm {
-    border-color: var(--danger, #e2907f);
-    color: var(--danger, #e2907f);
+    border-color: var(--danger);
+    color: var(--danger);
   }
   section.situation,
   section.choices,
   .panel {
     padding: 0.8rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 8px;
-    background: var(--panel, #1b1f27);
+    background: var(--panel);
   }
   h2 {
     margin: 0 0 0.5rem;
     font-size: 0.9rem;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
     font-weight: 600;
   }
   .situation :global(.typed) {
@@ -419,7 +419,7 @@
     border-radius: 6px;
   }
   figcaption {
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
     font-size: 0.75rem;
   }
   .side {
@@ -434,20 +434,20 @@
   .tabs button {
     flex: 1;
     padding: 0.45rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 5px;
-    background: var(--panel-2, #222731);
-    color: var(--muted, #a3a8b3);
+    background: var(--panel-hover);
+    color: var(--muted);
     font: inherit;
     cursor: pointer;
   }
   .tabs button.active {
-    border-color: var(--accent, #d8b26a);
-    color: var(--text, #e8e6e1);
+    border-color: var(--accent);
+    color: var(--text);
   }
   .tabs button:focus-visible,
   .resume:focus-visible {
-    outline: 2px solid var(--focus, #8ab4f8);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
   .panel h2 {
@@ -456,10 +456,10 @@
   .notice {
     margin-bottom: 0.5rem;
     padding: 0.5rem 0.6rem;
-    border: 1px solid var(--border, #3a3f4b);
-    border-left: 3px solid var(--accent, #d8b26a);
+    border: 1px solid var(--line-strong);
+    border-left: 3px solid var(--accent);
     border-radius: 5px;
-    background: var(--panel-2, #222731);
+    background: var(--panel-hover);
     font-size: 0.85rem;
   }
   .notice p {
@@ -467,31 +467,31 @@
     line-height: 1.6;
   }
   .notice--criminal {
-    border-left-color: var(--danger, #d46a6a);
+    border-left-color: var(--danger);
   }
   .notice button {
     padding: 0.25rem 0.5rem;
-    border: 1px solid var(--border, #3a3f4b);
+    border: 1px solid var(--line-strong);
     border-radius: 4px;
     background: none;
-    color: var(--text, #e8e6e1);
+    color: var(--text);
     font: inherit;
     font-size: 0.8rem;
     cursor: pointer;
   }
   .resume {
     padding: 0.55rem 0.9rem;
-    border: 1px solid var(--accent, #d8b26a);
+    border: 1px solid var(--accent);
     border-radius: 6px;
-    background: var(--panel-2, #222731);
-    color: var(--text, #e8e6e1);
+    background: var(--panel-hover);
+    color: var(--text);
     font: inherit;
     cursor: pointer;
   }
   .draft-pending,
   .empty {
     margin: 0 0 0.5rem;
-    color: var(--muted, #a3a8b3);
+    color: var(--muted);
   }
   .sr-only {
     position: absolute;
