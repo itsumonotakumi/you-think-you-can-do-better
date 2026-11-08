@@ -381,7 +381,7 @@ points:
           - { id: p06-d-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
 
   - id: p07-scope
-    at: { day: 1, minutes: 720 }
+    at: { day: 1, minutes: 780 }
     phase: investigate
     sound: { se: [notify_chat] }
     text: { ja: '13時。調査会社の第一報。端末は社内システムに接続し、設計部門の共有フォルダを閲覧していた。取引先担当者の連絡先一覧も、同じ場所に置かれていた。', en: '' }

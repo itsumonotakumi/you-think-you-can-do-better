@@ -666,10 +666,10 @@ points:
     at: { day: 4, minutes: 600 }
     phase: investigate
     sound: { se: [notify_chat] }
-    text: { ja: '午前10時。侵入は二か月半前と推定された。だが監査ログの保存は九十日で、当時の一部が上書きされている。', en: '' }
+    text: { ja: '午前10時。侵入は二か月半前と推定された。だが監査ログの保存は30日で、当時の記録は残っていない。', en: '' }
     voices: [v13-expert, v13-boss, v13-ok]
     notable:
-      - { id: note-scope, text: { ja: '侵入は二か月半前と推定。監査ログは九十日で、当時の一部が欠損。', en: '' } }
+      - { id: note-scope, text: { ja: '侵入は二か月半前と推定。監査ログは30日で、当時の記録は欠損。', en: '' } }
     choices:
       - id: p13-omit
         text: { ja: 'ログの欠損は報告書に書かない。分からないことは書かない。', en: '' }
@@ -882,7 +882,7 @@ points:
     at: { day: 20, minutes: 600 }
     phase: notify
     sound: { se: [typing] }
-    text: { ja: '午前10時。確報の期限が近づいている。件数はまだ動いているが、技術的には出せる状態になった。', en: '' }
+    text: { ja: '午前10時。確報を出せる状態になった。期限はまだ先だが、件数はまだ動いている。どう出すか。', en: '' }
     voices: [v18-law, v18-boss, v18-ok]
     popular: { choiceId: p18-wait, percent: 58 }
     choices:
