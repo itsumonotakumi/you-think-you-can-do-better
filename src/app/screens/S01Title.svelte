@@ -65,7 +65,7 @@
     try {
       const sc = await loadScenario(progress.scenarioId);
       scenario.set(sc);
-      play.set(progress);
+      play.set($state.snapshot(progress) as PlayState);
       selectedScenarioId.set(progress.scenarioId);
       screen.set('S05');
     } catch {

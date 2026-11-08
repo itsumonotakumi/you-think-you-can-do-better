@@ -39,7 +39,19 @@ services:
   - YOU CAN DO BETTER
   - So You Think You Can Test?
 people: []
-countries: []
+# 攻撃や工作に関与する国家は「某国」と書く（設計書 5.1）
+countries:
+  - 中国
+  - 中華人民共和国
+  - 北朝鮮
+  - 朝鮮民主主義人民共和国
+  - ロシア
+  - イラン
+  - China
+  - North Korea
+  - DPRK
+  - Russia
+  - Iran
 # C20: 実在企業との比較表現（正規表現）
 comparisons:
   - "社より(?:も)?(?:早|遅|まし|ひど)"
