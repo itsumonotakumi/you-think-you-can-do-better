@@ -1,0 +1,1372 @@
+# No.2 ペイブリッジ / セキュリティ担当者ロール
+# 見えるのは、監視画面のアラート、ログ、端末、現場からのチャット。
+# 判断ポイント19、細目は choices[].items と drafts の合計で80以上。
+estimateMinutes: 40
+intro: { ja: 'あなたはペイブリッジのセキュリティ担当者。監視画面のアラートとログ、そして現場からのチャットが、あなたの持ち場だ。決済を止める権限も、公表する権限もない。だが、最初に気づき、事実を記録し、上に渡すのはあなたの仕事である。注意喚起が出た日の夕方、監視画面の一行が目に入る。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-coward-2
+  '3': v-coward-3
+  '4': v-coward-4
+deadlines:
+  - id: dl-prelim-material
+    ref: ppc-report-prelim
+    label: { ja: '個人情報保護委員会への速報の材料提出', en: '' }
+    points: -120
+    doneFlag: prelimMaterialsSent
+  - id: dl-final-material
+    ref: ppc-report-final-malicious
+    label: { ja: '個人情報保護委員会への確報の材料提出', en: '' }
+    points: -100
+    doneFlag: finalMaterialsSent
+events:
+  - id: ev-a-night
+    at: { day: 1, minutes: 90 }
+    voices: [v-ev-night]
+    gauges: { stamina: -5 }
+    sound: { se: [notify_chat] }
+    caption: { ja: '深夜。監視画面のアラートが鳴り続けている。', en: '' }
+  - id: ev-a-board
+    at: { day: 3, minutes: 540 }
+    voices: [v-ev-board]
+    gauges: { flame: 5 }
+    caption: { ja: '社内掲示板に、現場からの書き込みが増えている。', en: '' }
+  - id: ev-a-client
+    at: { day: 5, minutes: 540 }
+    voices: [v-ev-client]
+    gauges: { flame: 5 }
+    sound: { se: [phone_ring] }
+    caption: { ja: '委託先から、調査状況の説明を求められている。', en: '' }
+points:
+  - id: a01-first-alert
+    at: { day: 0, minutes: 975 }
+    phase: detect
+    sound: { se: [notify_chat] }
+    text: { ja: '16時15分。広く使われている業務フレームワークの脆弱性が公表された三十分後、委託元の自治体の税金払いサイトで、外部への不審な通信を検知した。WAFの記録には、攻撃らしき文字列が並んでいる。影響の範囲はまだ分からない。', en: '' }
+    voices: [v01-field, v01-boss, v01-ok]
+    popular: { choiceId: a01-vendor, percent: 58 }
+    notable:
+      - { id: note-first-alert, text: { ja: '16時15分、自治体の税金払いサイトで外部への不審な通信を検知。宛先と時刻を記録した。', en: '' } }
+    choices:
+      - id: a01-poweroff
+        text: { ja: '危険なので、そのサーバーの電源を抜いて止める。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [nist-sp800-61r3]
+        gauges: { damage: -10, stamina: -5 }
+        items:
+          - { id: a01-a-record, points: -12, axis: record, refs: [nist-sp800-61r3] }
+          - { id: a01-a-content, points: -10, axis: content, refs: [jpcert-handling] }
+          - { id: a01-a-time, points: 3, axis: time, refs: [nist-sp800-61r3] }
+      - id: a01-isolate
+        text: { ja: '端末をネットワークから隔離し、検知時刻・通信の宛先・実行中のプロセスを記録して、メモリの保全を始める。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 30
+        refs: [nist-sp800-61r3, jpcert-handling]
+        gauges: { damage: -10, trust: 5, stamina: -5 }
+        setFlags: { isolateStart: true }
+        items:
+          - { id: a01-b-time, points: 5, axis: time, refs: [jpcert-handling] }
+          - { id: a01-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a01-b-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: a01-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+      - id: a01-vendor
+        text: { ja: '監視サービスのベンダーに誤検知かどうかを確認し、返事を待つ。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -80
+        refs: [meti-csm-guideline]
+        gauges: { damage: 5, trust: -5 }
+        coward: true
+        items:
+          - { id: a01-c-time, points: -10, axis: time, refs: [jpcert-handling] }
+          - { id: a01-c-order, points: -5, axis: order, refs: [meti-csm-guideline] }
+          - { id: a01-c-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: a01-delete
+        text: { ja: '不審なファイルを削除し、サーバーをきれいにしてから様子を見る。', en: '' }
+        minutes: 45
+        category: fatal
+        points: -250
+        refs: [nist-sp800-61r3, jpcert-handling]
+        gauges: { damage: 10, flame: 15, trust: -20 }
+        setFlags: { destroyedEvidence: true }
+        items:
+          - { id: a01-d-record, points: -20, axis: record, refs: [jpcert-handling] }
+          - { id: a01-d-content, points: -15, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a01-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+
+  - id: a02-scope
+    at: { day: 0, minutes: 1050 }
+    phase: contain
+    sound: { se: [notify_chat] }
+    text: { ja: '17時30分。同じフレームワークは、社内の決済サーバー、バックアップ系、委託先の接続装置にも残っている。修正を当てる候補は、台帳の上では三百台を超える。', en: '' }
+    voices: [v02-vendor, v02-popular, v02-ok]
+    popular: { choiceId: a02-one, percent: 61 }
+    choices:
+      - id: a02-one
+        text: { ja: '目の前の一台だけ修正し、ほかは監視を強めて様子を見る。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -100
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, flame: 5 }
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { damage: 15, trust: -10 }, reason: { ja: '直していないサーバーから、同じ手口の通信が再び出た。', en: '' } }
+        items:
+          - { id: a02-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a02-a-record, points: 3, axis: record, refs: [jpcert-handling] }
+          - { id: a02-a-time, points: -8, axis: time, refs: [nist-sp800-61r3] }
+      - id: a02-inventory
+        text: { ja: '台帳と実機を突き合わせ、影響する機器とバックアップ系を一覧にする。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 30
+        refs: [meti-csm-guideline, jpcert-handling]
+        gauges: { damage: -10, stamina: -10 }
+        items:
+          - { id: a02-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a02-b-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: a02-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: a02-inventory-plan
+        text: { ja: '一覧に加え、修正の適用順と、止められない決済の代替経路を設計して上に出す。', en: '' }
+        minutes: 180
+        category: recover
+        points: 100
+        refs: [meti-csm-guideline, nist-sp800-61r3]
+        gauges: { damage: -15, trust: 5, stamina: -15 }
+        setFlags: { scopeMapped: true }
+        items:
+          - { id: a02-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a02-c-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: a02-c-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: a02-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: a02-all-patch
+        text: { ja: '検証を飛ばし、全台に一斉に修正を当てる。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -80
+        refs: [nist-sp800-61r3]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: a02-d-order, points: -12, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a02-d-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+          - { id: a02-d-time, points: 5, axis: time, refs: [nist-sp800-61r3] }
+
+  - id: a03-logs
+    at: { day: 0, minutes: 1125 }
+    phase: contain
+    sound: { se: [typing] }
+    text: { ja: '18時45分。監視ログの保存期間は三十日で、今夜零時に古いものが消える。消える前の期間には、侵入の手口と、外部へ出た通信の記録が残っている。', en: '' }
+    voices: [v03-law, v03-expert, v03-ok]
+    notable:
+      - { id: note-log-retention, text: { ja: '監視ログの保存期間は三十日。今夜零時に古い記録が削除される。', en: '' } }
+    choices:
+      - id: a03-wait
+        text: { ja: '規程どおり、零時の削除に任せる。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -150
+        refs: [jpcert-handling]
+        gauges: { damage: 10, flame: 5, trust: -10 }
+        coward: true
+        delayed:
+          - { afterPhases: 1, points: -50, gauges: { damage: 10 }, reason: { ja: '必要なログが消え、侵入の手口を追えなくなった。', en: '' } }
+        items:
+          - { id: a03-a-record, points: -15, axis: record, refs: [jpcert-handling] }
+          - { id: a03-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a03-a-time, points: -8, axis: time, refs: [jpcert-handling] }
+      - id: a03-export
+        text: { ja: '調査対象の期間を切り出し、ハッシュと取得時刻を付けて保存する。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 30
+        refs: [nist-sp800-61r3, cissp-cbk-secops]
+        gauges: { damage: -5, trust: 5, stamina: -10 }
+        items:
+          - { id: a03-b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a03-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a03-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a03-b-time, points: 5, axis: time, refs: [jpcert-handling] }
+      - id: a03-export-plan
+        text: { ja: '保全に加え、保存期間の延長と、外部の調査会社への引き渡し手順を決める。', en: '' }
+        minutes: 120
+        category: recover
+        points: 80
+        refs: [nist-sp800-61r3, cissp-cbk-secops]
+        gauges: { damage: -10, trust: 10, stamina: -10 }
+        setFlags: { logsPreserved: true }
+        items:
+          - { id: a03-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a03-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a03-c-content, points: 5, axis: content, refs: [jpcert-handling] }
+          - { id: a03-c-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+      - id: a03-retention
+        text: { ja: '保存期間の設定だけを延ばし、今夜の削除は止めない。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -60
+        refs: [jpcert-handling]
+        gauges: { trust: -5 }
+        items:
+          - { id: a03-d-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a03-d-order, points: -8, axis: order, refs: [nist-sp800-61r3] }
+
+  - id: a04-first-report
+    at: { day: 0, minutes: 1200 }
+    phase: organize
+    sound: { se: [typing] }
+    text: { ja: '20時。セキュリティ責任者への一次報告の時間。影響の範囲はまだ分かっていない。決済基盤部長からは「決済だけは止めないでくれ」とだけ返ってきている。', en: '' }
+    voices: [v04-boss, v04-bold, v04-ok]
+    choices:
+      - id: a04-wait
+        text: { ja: '全容が分かってから報告する。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -100
+        refs: [jpcert-handling]
+        gauges: { flame: 10, trust: -10, damage: 5 }
+        coward: true
+        items:
+          - { id: a04-a-time, points: -10, axis: time, refs: [jpcert-handling] }
+          - { id: a04-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: a04-report
+        text: { ja: '30分以内に、事実・不明点・次の行動を分けて一次報告する。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 30
+        refs: [jpcert-handling, cissp-cbk-secops]
+        gauges: { trust: 5, stamina: -5 }
+        detail: first-note
+        setFlags: { firstReport: true }
+        items:
+          - { id: a04-b-time, points: 8, axis: time, refs: [jpcert-handling] }
+          - { id: a04-b-order, points: 5, axis: order, refs: [cissp-cbk-secops] }
+          - { id: a04-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a04-b-content, points: 5, axis: content, refs: [cissp-cbk-secops] }
+      - id: a04-sns
+        text: { ja: '自分のSNSに「大きな障害が出ている」と書いて、現場に知らせる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -120
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { flame: 15, trust: -10 }, reason: { ja: '担当者の投稿が特定され、会社の説明と食い違った。', en: '' } }
+        items:
+          - { id: a04-c-wording, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a04-c-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a04-c-care, points: -5, axis: care, refs: [meti-csm-guideline] }
+      - id: a04-oral
+        text: { ja: '口頭で短く伝え、書面は後回しにする。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -60
+        refs: [jpcert-handling]
+        gauges: { trust: -5 }
+        items:
+          - { id: a04-d-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a04-d-order, points: -5, axis: order, refs: [jpcert-handling] }
+
+  - id: a05-keys
+    at: { day: 0, minutes: 1335 }
+    phase: contain
+    sound: { se: [notify_chat] }
+    text: { ja: '22時15分。侵害されたサーバーから、決済基盤の管理APIキーと、委託先の連携用キーが読める状態だった。止めれば、委託先の収納処理も止まる。', en: '' }
+    voices: [v05-vendor, v05-law, v05-ok]
+    choices:
+      - id: a05-keep
+        text: { ja: '影響が確認できるまで、キーは有効のままにする。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -120
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -50, gauges: { damage: 20, flame: 10 }, reason: { ja: '止めなかったキーで、外部から顧客データへのアクセスが続いた。', en: '' } }
+        items:
+          - { id: a05-a-content, points: -12, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a05-a-record, points: -10, axis: record, refs: [jpcert-handling] }
+      - id: a05-rotate
+        text: { ja: '侵害されたキーを失効させ、新しいキーを発行して切替手順を案内する。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 30
+        refs: [nist-sp800-61r3, meti-csm-guideline]
+        gauges: { damage: -15, trust: 5, stamina: -10 }
+        setFlags: { keysRotated: true }
+        items:
+          - { id: a05-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a05-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a05-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: a05-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: a05-rotate-plan
+        text: { ja: '失効と再発行に加え、同じキーを使う全システムを洗い出し、切替の検証まで行う。', en: '' }
+        minutes: 180
+        category: recover
+        points: 100
+        refs: [nist-sp800-61r3, meti-csm-guideline]
+        gauges: { damage: -15, trust: 10, stamina: -15 }
+        setFlags: { keysRotated: true, keyScope: true }
+        items:
+          - { id: a05-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a05-c-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: a05-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a05-c-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+      - id: a05-share
+        text: { ja: '調査を急ぐため、新しい共通キーを担当者全員に配る。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [cissp-cbk-secops]
+        gauges: { damage: 10, trust: -10 }
+        items:
+          - { id: a05-d-content, points: -12, axis: content, refs: [cissp-cbk-secops] }
+          - { id: a05-d-record, points: -10, axis: record, refs: [cissp-cbk-secops] }
+
+  - id: a06-evidence
+    at: { day: 1, minutes: 30 }
+    phase: investigate
+    sound: { se: [typing] }
+    text: { ja: '零時30分。サーバーに残された不審なプログラムを確認した。起動の記録、外部との通信、実行された命令。メモリには、まだ消えていない痕跡がある。', en: '' }
+    voices: [v06-field, v06-expert, v06-ok]
+    choices:
+      - id: a06-reboot
+        text: { ja: '再起動して、様子を見る。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 10, trust: -5 }
+        delayed:
+          - { afterPhases: 1, points: -30, gauges: { damage: 10 }, reason: { ja: '再起動でメモリ上の痕跡が消え、侵入の手口が分からなくなった。', en: '' } }
+        items:
+          - { id: a06-a-record, points: -12, axis: record, refs: [nist-sp800-61r3] }
+          - { id: a06-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+      - id: a06-image
+        text: { ja: 'メモリ、ディスク、ネットワークログを順に保全し、ハッシュと取得者を記録する。', en: '' }
+        minutes: 150
+        category: maintain
+        points: 30
+        refs: [nist-sp800-61r3, cissp-cbk-secops]
+        gauges: { damage: -10, trust: 5, stamina: -10 }
+        detail: forensic-note
+        setFlags: { evidencePreserved: true }
+        items:
+          - { id: a06-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a06-b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a06-b-time, points: 5, axis: time, refs: [jpcert-handling] }
+          - { id: a06-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+      - id: a06-delete
+        text: { ja: '不審なプログラムを削除し、サーバーをきれいにして返す。', en: '' }
+        minutes: 45
+        category: fatal
+        points: -250
+        refs: [nist-sp800-61r3, jpcert-handling]
+        gauges: { damage: 10, flame: 15, trust: -20 }
+        setFlags: { destroyedEvidence: true }
+        items:
+          - { id: a06-c-record, points: -20, axis: record, refs: [jpcert-handling] }
+          - { id: a06-c-content, points: -15, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a06-c-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: a06-copy
+        text: { ja: '不審なファイルだけをUSBメモリにコピーし、元のファイルは消す。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -120
+        refs: [cissp-cbk-secops]
+        gauges: { damage: 5, trust: -10 }
+        items:
+          - { id: a06-d-record, points: -12, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a06-d-order, points: -8, axis: order, refs: [nist-sp800-61r3] }
+
+  - id: a07-muni-night
+    at: { day: 1, minutes: 180 }
+    phase: organize
+    sound: { se: [phone_ring] }
+    text: { ja: '3時。自治体の技術担当から電話が来た。「うちのサイトで、何か起きていますか」。まだ報道はない。相手は深夜の当直で、こちらも確たることは分かっていない。', en: '' }
+    voices: [v07-law, v07-coward, v07-ok]
+    choices:
+      - id: a07-wait
+        text: { ja: '朝まで待ち、正式な連絡ルートで伝える。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -80
+        refs: [jpcert-handling]
+        gauges: { trust: -5 }
+        coward: true
+        items:
+          - { id: a07-a-time, points: -8, axis: time, refs: [jpcert-handling] }
+          - { id: a07-a-order, points: -8, axis: order, refs: [jpcert-handling] }
+      - id: a07-share
+        text: { ja: '分かっている事実と時刻を伝え、朝に正式な連絡を入れると約束する。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 30
+        refs: [meti-csm-guideline, jpcert-handling]
+        gauges: { trust: 5, stamina: -5 }
+        setFlags: { muniTechInformed: true }
+        items:
+          - { id: a07-b-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: a07-b-care, points: 8, axis: care, refs: [jpcert-handling] }
+          - { id: a07-b-time, points: 5, axis: time, refs: [jpcert-handling] }
+      - id: a07-share-plan
+        text: { ja: '事実と時刻を伝え、相手側のログも保全してもらい、共同の調査手順を決める。', en: '' }
+        minutes: 90
+        category: recover
+        points: 80
+        refs: [meti-csm-guideline, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { muniTechInformed: true, jointInvestigation: true }
+        items:
+          - { id: a07-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: a07-c-care, points: 8, axis: care, refs: [jpcert-handling] }
+          - { id: a07-c-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a07-c-record, points: 5, axis: record, refs: [cissp-cbk-secops] }
+      - id: a07-sns
+        text: { ja: '自分のSNSに「委託先でも被害が出ている」と書く。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -150
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 20, trust: -15 }
+        items:
+          - { id: a07-d-wording, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a07-d-care, points: -10, axis: care, refs: [jpcert-handling] }
+          - { id: a07-d-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+
+  - id: a08-stop-recommend
+    at: { day: 1, minutes: 360 }
+    phase: contain
+    sound: { se: [notify_sns] }
+    text: { ja: '6時。税金払いサイトを止めるかどうか。窓口は8時に開く。あなたに決める権限はないが、止めるべきかどうかの材料は、あなたの手元にしかない。', en: '' }
+    voices: [v08-public, v08-coward, v08-ok]
+    choices:
+      - id: a08-keep
+        text: { ja: '止めずに、監視を強めて様子を見る。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 20, flame: 5 }
+        delayed:
+          - { afterPhases: 1, points: -60, gauges: { damage: 15, trust: -10 }, reason: { ja: '止めなかった経路から再び侵入され、被害が広がった。', en: '' } }
+        items:
+          - { id: a08-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a08-a-record, points: -8, axis: record, refs: [nist-sp800-61r3] }
+      - id: a08-escalate
+        text: { ja: '止める場合の影響、代替の支払い方法、復旧見込みをまとめて上に上げる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 100
+        refs: [meti-csm-guideline, jpcert-handling]
+        gauges: { flame: 5, trust: 10, stamina: -10 }
+        setFlags: { stopProposal: true }
+        items:
+          - { id: a08-b-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: a08-b-care, points: 8, axis: care, refs: [jpcert-handling] }
+          - { id: a08-b-time, points: 5, axis: time, refs: [jpcert-handling] }
+          - { id: a08-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+      - id: a08-stop-self
+        text: { ja: '権限を越えて、自分でサイトを止める。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -80
+        refs: [meti-csm-guideline]
+        gauges: { flame: 10, damage: -20, trust: -10 }
+        items:
+          - { id: a08-c-order, points: -10, axis: order, refs: [meti-csm-guideline] }
+          - { id: a08-c-care, points: -8, axis: care, refs: [jpcert-handling] }
+          - { id: a08-c-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+      - id: a08-partial
+        text: { ja: '問題の機能だけを止め、ほかの機能は動かしたままにする。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [nist-sp800-61r3]
+        gauges: { flame: 5, damage: -10, stamina: -5 }
+        items:
+          - { id: a08-d-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a08-d-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: a08-d-care, points: -5, axis: care, refs: [jpcert-handling] }
+
+  - id: a09-card-code
+    at: { day: 1, minutes: 600 }
+    phase: investigate
+    sound: { se: [notify_chat] }
+    text: { ja: '10時。侵害されたサーバーのデバッグログに、カードのセキュリティコードが残っていた。保存しない設計のはずだった。調査用のコピーは取ってあるが、同じ設定のサーバーは本番にも残っている。', en: '' }
+    voices: [v09-law, v09-vendor, v09-ok]
+    notable:
+      - { id: note-card-code, text: { ja: 'デバッグログにカードのセキュリティコードが保存されていた。同じ設定のサーバーが本番に残っている。', en: '' } }
+    choices:
+      - id: a09-delete
+        text: { ja: 'ログを削除し、保存の事実をなかったことにする。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [ppc-report-scope, jpcert-handling]
+        gauges: { flame: 25, trust: -25 }
+        setFlags: { hidFacts: true, destroyedEvidence: true }
+        items:
+          - { id: a09-a-record, points: -20, axis: record, refs: [jpcert-handling] }
+          - { id: a09-a-content, points: -15, axis: content, refs: [ppc-report-scope] }
+          - { id: a09-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: a09-report
+        text: { ja: '事実と保存されていた範囲を記録し、法務とカード会社の窓口に上げる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 100
+        refs: [ppc-report-scope, meti-csm-guideline]
+        gauges: { trust: 10, flame: -5, stamina: -10 }
+        setFlags: { cardCodeReported: true }
+        items:
+          - { id: a09-b-order, points: 8, axis: order, refs: [ppc-report-scope] }
+          - { id: a09-b-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: a09-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a09-b-care, points: 5, axis: care, refs: [ppc-notify-person] }
+      - id: a09-wait
+        text: { ja: '件数が確定してから報告する。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -100
+        refs: [ppc-report-scope]
+        gauges: { flame: 10, trust: -10 }
+        coward: true
+        items:
+          - { id: a09-c-time, points: -10, axis: time, refs: [ppc-report-scope] }
+          - { id: a09-c-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: a09-fix-only
+        text: { ja: '設定を直して保存を止める。報告は調査が終わってからにする。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -60
+        refs: [ppc-report-scope]
+        gauges: { damage: 5, trust: -5 }
+        items:
+          - { id: a09-d-content, points: 5, axis: content, refs: [meti-csm-guideline] }
+          - { id: a09-d-order, points: -10, axis: order, refs: [ppc-report-scope] }
+          - { id: a09-d-record, points: -8, axis: record, refs: [jpcert-handling] }
+
+  - id: a10-patch
+    at: { day: 1, minutes: 900 }
+    phase: contain
+    sound: { se: [notify_chat] }
+    text: { ja: '15時。修正を当てる時間。社内規程では、本番環境の変更は週次の定例メンテで行うことになっている。次の定例は六日後。脆弱性はすでに公表されている。', en: '' }
+    voices: [v10-law, v10-past, v10-ok]
+    choices:
+      - id: a10-wait
+        text: { ja: '定例メンテまで待ち、その間に監視を強める。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -150
+        refs: [meti-csm-guideline]
+        gauges: { flame: 10, damage: 15, trust: -10 }
+        coward: true
+        delayed:
+          - { afterPhases: 1, points: -50, gauges: { damage: 15, flame: 10 }, reason: { ja: '待つ間に、公表済みの脆弱性を突かれた形跡が別のサーバーで見つかった。', en: '' } }
+        items:
+          - { id: a10-a-time, points: -10, axis: time, refs: [jpcert-handling] }
+          - { id: a10-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a10-a-order, points: -8, axis: order, refs: [meti-csm-guideline] }
+      - id: a10-emergency
+        text: { ja: '緊急変更として承認を取り、検証環境で確認してから適用する。戻す手順も用意する。', en: '' }
+        minutes: 180
+        category: recover
+        points: 100
+        refs: [meti-csm-guideline, nist-sp800-61r3]
+        gauges: { damage: -20, trust: 10, stamina: -15 }
+        setFlags: { patched: true }
+        items:
+          - { id: a10-b-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: a10-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a10-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a10-b-time, points: 5, axis: time, refs: [jpcert-handling] }
+      - id: a10-bypass
+        text: { ja: '承認を待たず、全台に一斉に適用する。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -80
+        refs: [nist-sp800-61r3]
+        gauges: { flame: 10, trust: -10, stamina: -10 }
+        items:
+          - { id: a10-c-order, points: -10, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a10-c-care, points: -8, axis: care, refs: [meti-csm-guideline] }
+          - { id: a10-c-time, points: 8, axis: time, refs: [nist-sp800-61r3] }
+      - id: a10-mitigate
+        text: { ja: '修正の代わりに、該当機能を一時的に無効化して凌ぐ。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [nist-sp800-61r3]
+        gauges: { flame: 5, damage: -10 }
+        items:
+          - { id: a10-d-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a10-d-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: a10-d-care, points: -5, axis: care, refs: [meti-csm-guideline] }
+
+  - id: a11-vendor-account
+    at: { day: 1, minutes: 1200 }
+    phase: investigate
+    sound: { se: [mail_arrive] }
+    text: { ja: '20時。侵入に使われたのは、委託先の保守用アカウントだった。リモート保守の接続は、今も開いている。委託先の担当者は「うちの管理下では問題ない」と言う。', en: '' }
+    voices: [v11-vendor, v11-insider, v11-ok]
+    choices:
+      - id: a11-keep
+        text: { ja: '監視を強めて、アカウントは残す。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, trust: -5 }
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { damage: 15, trust: -10 }, reason: { ja: '残した保守用アカウントが、再び外部から使われた。', en: '' } }
+        items:
+          - { id: a11-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a11-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: a11-disable
+        text: { ja: '保守用アカウントを止め、委託先に連絡して接続履歴を共有してもらう。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 30
+        refs: [meti-csm-guideline, jpcert-handling]
+        gauges: { damage: -10, trust: 5, stamina: -5 }
+        setFlags: { vendorAccountStopped: true }
+        items:
+          - { id: a11-b-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: a11-b-content, points: 8, axis: content, refs: [jpcert-handling] }
+          - { id: a11-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+          - { id: a11-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: a11-disable-plan
+        text: { ja: '接続を止め、委託先と共同で接続履歴を確認し、再開の条件を決める。', en: '' }
+        minutes: 120
+        category: recover
+        points: 100
+        refs: [meti-csm-guideline, cissp-cbk-secops]
+        gauges: { damage: -15, trust: 10, stamina: -10 }
+        setFlags: { vendorAccountStopped: true, vendorJoint: true }
+        items:
+          - { id: a11-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: a11-c-content, points: 8, axis: content, refs: [cissp-cbk-secops] }
+          - { id: a11-c-care, points: 8, axis: care, refs: [meti-csm-guideline] }
+          - { id: a11-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: a11-blame
+        text: { ja: '委託先の責任だと社内に報告する。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -120
+        refs: [meti-csm-guideline]
+        gauges: { flame: 15, trust: -10 }
+        items:
+          - { id: a11-d-wording, points: -15, axis: wording, refs: [meti-csm-guideline] }
+          - { id: a11-d-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+          - { id: a11-d-content, points: -8, axis: content, refs: [cissp-cbk-secops] }
+
+  - id: a12-count
+    at: { day: 2, minutes: 540 }
+    phase: investigate
+    sound: { se: [notify_chat] }
+    text: { ja: '9時。侵入は三週間前まで遡る。攻撃者は社内の複数のサーバーを経由し、データを持ち出した形跡がある。件数を出す必要があるが、ログは完全ではない。', en: '' }
+    voices: [v12-boss, v12-insider, v12-ok]
+    notable:
+      - { id: note-count, text: { ja: '侵入は三週間前まで遡る。件数は概数で、ログが欠けている期間がある。', en: '' } }
+    choices:
+      - id: a12-round
+        text: { ja: '十万件と、丸い数字で報告する。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [ppc-report-prelim]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: a12-a-content, points: -12, axis: content, refs: [ppc-report-prelim] }
+          - { id: a12-a-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: a12-method
+        text: { ja: '数え方、対象期間、数えられない範囲を明記して、概数と確定値を分けて出す。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 30
+        refs: [ppc-report-prelim, jpcert-handling]
+        gauges: { trust: 5, stamina: -10 }
+        setFlags: { countMethod: true }
+        items:
+          - { id: a12-b-content, points: 8, axis: content, refs: [ppc-report-prelim] }
+          - { id: a12-b-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: a12-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a12-b-order, points: 5, axis: order, refs: [ppc-report-prelim] }
+      - id: a12-method-plan
+        text: { ja: '数え方に加え、重複を除く手順と、後で訂正するときの版管理を決める。', en: '' }
+        minutes: 180
+        category: recover
+        points: 80
+        refs: [ppc-report-prelim, cissp-cbk-secops]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { countMethod: true, countVersioned: true }
+        items:
+          - { id: a12-c-content, points: 8, axis: content, refs: [ppc-report-prelim] }
+          - { id: a12-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a12-c-order, points: 8, axis: order, refs: [ppc-report-prelim] }
+          - { id: a12-c-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: a12-wait
+        text: { ja: '正確な件数が出るまで、報告しない。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -120
+        refs: [ppc-report-prelim]
+        gauges: { flame: 15, trust: -10 }
+        coward: true
+        items:
+          - { id: a12-d-time, points: -10, axis: time, refs: [ppc-report-prelim] }
+          - { id: a12-d-record, points: -10, axis: record, refs: [jpcert-handling] }
+
+  - id: a13-extortion
+    at: { day: 2, minutes: 960 }
+    phase: notify
+    sound: { se: [mail_arrive] }
+    text: { ja: '16時。外部の研究者を名乗る人物から、メールが届いた。「御社の顧客データの一部を持っている。二十四時間以内に連絡がなければ公開する」。添付には、見覚えのある形式のファイルがあった。', en: '' }
+    voices: [v13-attacker, v13-public, v13-ok]
+    choices:
+      - id: a13-reply
+        text: { ja: '自分で返信して、公開を止める交渉をする。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [npa-consult]
+        gauges: { flame: 10, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { flame: 15 }, reason: { ja: '返信で担当者の存在が伝わり、要求が強まった。', en: '' } }
+        items:
+          - { id: a13-a-order, points: -10, axis: order, refs: [npa-consult] }
+          - { id: a13-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: a13-preserve
+        text: { ja: '返信せず、本文・ヘッダ・添付のハッシュと受信時刻を保全し、上と警察の相談窓口に渡す。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 30
+        refs: [jpcert-handling, npa-consult]
+        gauges: { flame: -5, trust: 5, stamina: -5 }
+        setFlags: { extortionPreserved: true }
+        items:
+          - { id: a13-b-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: a13-b-order, points: 8, axis: order, refs: [npa-consult] }
+          - { id: a13-b-care, points: 5, axis: care, refs: [npa-consult] }
+          - { id: a13-b-time, points: 5, axis: time, refs: [jpcert-handling] }
+      - id: a13-preserve-plan
+        text: { ja: '保全に加え、添付ファイルを安全な検証環境で調べ、自社データとの照合結果をまとめる。', en: '' }
+        minutes: 150
+        category: recover
+        points: 100
+        refs: [jpcert-handling, npa-consult]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { extortionPreserved: true, sampleVerified: true }
+        items:
+          - { id: a13-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: a13-c-content, points: 8, axis: content, refs: [npa-consult] }
+          - { id: a13-c-order, points: 5, axis: order, refs: [npa-consult] }
+          - { id: a13-c-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+      - id: a13-pay
+        text: { ja: '要求に応じて、公開を止めるための支払いを進める。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -250
+        refs: [npa-consult]
+        gauges: { flame: 20, trust: -20 }
+        setFlags: { paidAttacker: true }
+        items:
+          - { id: a13-d-record, points: -20, axis: record, refs: [npa-consult] }
+          - { id: a13-d-content, points: -15, axis: content, refs: [npa-consult] }
+          - { id: a13-d-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+
+  - id: a14-fatigue
+    at: { day: 3, minutes: 120 }
+    phase: organize
+    sound: { se: [notify_chat] }
+    text: { ja: '2時。対策本部は二日連続の夜通し。あなたはログの見落としを一度している。引き継ぎ書はまだない。朝には個人情報保護委員会向けの資料を作る必要がある。', en: '' }
+    voices: [v14-flattery, v14-public, v14-ok]
+    choices:
+      - id: a14-allnight
+        text: { ja: '自分が最後までやる。他の人に渡すと分からなくなる。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -60
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -20, damage: 10, trust: -5 }
+        delayed:
+          - { afterPhases: 2, points: -40, gauges: { stamina: -15, damage: 10 }, reason: { ja: '疲労から確認漏れが起き、資料の作り直しになった。', en: '' } }
+        items:
+          - { id: a14-a-care, points: -10, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a14-a-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+      - id: a14-handover
+        text: { ja: '調査状態と未確認事項を引き継ぎ書にまとめ、半日交代にする。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 30
+        refs: [ipa-sme-guideline, cissp-cbk-secops]
+        gauges: { stamina: 10, trust: 5, damage: -5 }
+        detail: handover-note
+        items:
+          - { id: a14-b-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a14-b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a14-b-order, points: 5, axis: order, refs: [cissp-cbk-secops] }
+          - { id: a14-b-content, points: 5, axis: content, refs: [ipa-sme-guideline] }
+      - id: a14-handover-plan
+        text: { ja: '引き継ぎ書に加え、見落としを防ぐ確認チェックリストを作り、全員で使う。', en: '' }
+        minutes: 150
+        category: recover
+        points: 100
+        refs: [ipa-sme-guideline, cissp-cbk-secops]
+        gauges: { stamina: 15, trust: 10, flame: -5 }
+        detail: handover-note
+        setFlags: { handoverDoc: true }
+        items:
+          - { id: a14-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a14-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a14-c-order, points: 8, axis: order, refs: [cissp-cbk-secops] }
+          - { id: a14-c-content, points: 5, axis: content, refs: [ipa-sme-guideline] }
+      - id: a14-hide
+        text: { ja: '疲れを隠して、いつも通りに装う。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -15, damage: 10 }
+        coward: true
+        items:
+          - { id: a14-d-care, points: -10, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a14-d-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+
+  - id: a15-ppc-material
+    at: { day: 3, minutes: 840 }
+    phase: notify
+    sound: { se: [typing] }
+    text: { ja: '14時。個人情報保護委員会への速報の材料を、法務に渡す時間。件数は概数で、確定していない。カードのセキュリティコードを保存していた事実も、まだ社内の一部しか知らない。', en: '' }
+    voices: [v15-law, v15-boss, v15-ok]
+    notable:
+      - { id: note-prelim-material, text: { ja: '速報の材料を渡した時刻と、その時点で確定していた範囲を記録した。', en: '' } }
+    choices:
+      - id: a15-wait
+        text: { ja: '件数が確定してから材料を出す。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -150
+        refs: [ppc-report-prelim]
+        gauges: { flame: 15, trust: -10, damage: 10 }
+        coward: true
+        setFlags: { delayedReport: true }
+        items:
+          - { id: a15-a-time, points: -10, axis: time, refs: [ppc-report-prelim] }
+          - { id: a15-a-record, points: -8, axis: record, refs: [ppc-report-prelim] }
+      - id: a15-submit
+        text: { ja: '分かっている範囲で材料を出し、不明点は調査中と明記する。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 30
+        refs: [ppc-report-prelim]
+        gauges: { trust: 5, stamina: -10 }
+        detail: ppc-note
+        setFlags: { prelimMaterialsSent: true }
+        items:
+          - { id: a15-b-content, points: 8, axis: content, refs: [ppc-report-prelim] }
+          - { id: a15-b-time, points: 5, axis: time, refs: [ppc-report-prelim] }
+          - { id: a15-b-record, points: 5, axis: record, refs: [ppc-report-prelim] }
+      - id: a15-submit-full
+        text: { ja: '材料に加え、カードのセキュリティコードの保存と廃止予定も書く。', en: '' }
+        minutes: 120
+        category: recover
+        points: 100
+        refs: [ppc-report-prelim, ppc-report-scope]
+        gauges: { trust: 10, flame: -5, stamina: -15 }
+        detail: ppc-note
+        setFlags: { prelimMaterialsSent: true, codeDisclosed: true }
+        items:
+          - { id: a15-c-content, points: 8, axis: content, refs: [ppc-report-scope] }
+          - { id: a15-c-record, points: 8, axis: record, refs: [ppc-report-prelim] }
+          - { id: a15-c-time, points: 5, axis: time, refs: [ppc-report-prelim] }
+          - { id: a15-c-order, points: 5, axis: order, refs: [meti-disclosure-guidance] }
+      - id: a15-omit
+        text: { ja: 'セキュリティコードのことは書かず、件数だけを出す。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [ppc-report-scope]
+        gauges: { flame: 10, trust: -10 }
+        setFlags: { prelimMaterialsSent: true }
+        items:
+          - { id: a15-d-content, points: -12, axis: content, refs: [ppc-report-scope] }
+          - { id: a15-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a15-d-record, points: -8, axis: record, refs: [jpcert-handling] }
+
+  - id: a16-expand-scope
+    at: { day: 4, minutes: 540 }
+    phase: investigate
+    sound: { se: [phone_ring] }
+    text: { ja: '9時。調査会社の報告。攻撃者は三週間前から社内にいて、同じ手口が複数の委託先でも使われている可能性がある。委託先の一つは、まだ調査に同意していない。', en: '' }
+    voices: [v16-past, v16-insider, v16-ok]
+    choices:
+      - id: a16-narrow
+        text: { ja: 'すでに公表した範囲だけを調査し、追加の調査は控える。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -120
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, trust: -10 }
+        items:
+          - { id: a16-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a16-a-content2, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a16-a-record, points: -5, axis: record, refs: [jpcert-handling] }
+      - id: a16-expand
+        text: { ja: '全委託先・全システムに調査を広げ、証拠を第三者委員会に渡せる形に整理して上に上げる。', en: '' }
+        minutes: 240
+        category: maintain
+        points: 30
+        refs: [meti-csm-guideline, nist-sp800-61r3]
+        gauges: { damage: -10, trust: 10, stamina: -15 }
+        setFlags: { thirdParty: true }
+        items:
+          - { id: a16-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a16-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: a16-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a16-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+      - id: a16-expand-plan
+        text: { ja: '調査を広げ、委託先ごとの連絡窓口と、被害者への説明材料を先に用意する。', en: '' }
+        minutes: 300
+        category: recover
+        points: 120
+        refs: [meti-csm-guideline, ppc-notify-person]
+        gauges: { damage: -10, trust: 15, stamina: -20 }
+        setFlags: { thirdParty: true, victimSupport: true }
+        items:
+          - { id: a16-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a16-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: a16-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: a16-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: a16-shift-blame
+        text: { ja: '委託先の調査を待ち、自社の調査範囲は変えない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -80
+        refs: [meti-csm-guideline]
+        gauges: { damage: 10, trust: -10 }
+        coward: true
+        items:
+          - { id: a16-d-order, points: -8, axis: order, refs: [meti-csm-guideline] }
+          - { id: a16-d-content, points: -8, axis: content, refs: [nist-sp800-61r3] }
+
+  - id: a17-notify-list
+    at: { day: 5, minutes: 660 }
+    phase: notify
+    sound: { se: [typing] }
+    text: { ja: '11時。本人通知の対象リストを作る時間。対象は数百万件にのぼる。退会した人、申込みの途中で止まった人も含まれる。メールアドレスが空の行も多い。', en: '' }
+    voices: [v17-field, v17-expert, v17-ok]
+    choices:
+      - id: a17-current
+        text: { ja: '現行の利用者だけを対象にする。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -120
+        refs: [ppc-notify-person]
+        gauges: { flame: 10, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -30, gauges: { flame: 10 }, reason: { ja: '退会者への通知漏れが指摘され、追加の通知が必要になった。', en: '' } }
+        items:
+          - { id: a17-a-content, points: -12, axis: content, refs: [ppc-notify-person] }
+          - { id: a17-a-care, points: -8, axis: care, refs: [ppc-notify-person] }
+      - id: a17-all
+        text: { ja: '退会者と申込み途中の人も含め、重複を除いて対象リストを作る。', en: '' }
+        minutes: 240
+        category: recover
+        points: 100
+        refs: [ppc-notify-person, ppc-report-scope]
+        gauges: { flame: -10, trust: 15, stamina: -20 }
+        setFlags: { victimListAll: true }
+        items:
+          - { id: a17-b-content, points: 8, axis: content, refs: [ppc-notify-person] }
+          - { id: a17-b-care, points: 8, axis: care, refs: [ppc-report-scope] }
+          - { id: a17-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a17-b-order, points: 5, axis: order, refs: [ppc-notify-person] }
+      - id: a17-all-plan
+        text: { ja: '対象リストに加え、宛先不明の人のための案内ページと、偽通知への注意を用意する。', en: '' }
+        minutes: 300
+        category: recover
+        points: 120
+        refs: [ppc-notify-person]
+        gauges: { flame: -10, trust: 15, stamina: -20 }
+        setFlags: { victimListAll: true, phishingWarn: true }
+        items:
+          - { id: a17-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: a17-c-care2, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: a17-c-content, points: 8, axis: content, refs: [ppc-notify-person] }
+          - { id: a17-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: a17-vendor-mail
+        text: { ja: '急ぐので、対象リストを外部の印刷会社に個人のメールで送る。', en: '' }
+        minutes: 45
+        category: fatal
+        points: -250
+        refs: [ppc-notify-person, meti-trade-secret]
+        gauges: { flame: 20, trust: -25 }
+        setFlags: { leakedInternals: true }
+        items:
+          - { id: a17-d-record, points: -20, axis: record, refs: [meti-trade-secret] }
+          - { id: a17-d-care, points: -15, axis: care, refs: [ppc-notify-person] }
+          - { id: a17-d-content, points: -10, axis: content, refs: [ppc-report-scope] }
+
+  - id: a18-resume
+    at: { day: 12, minutes: 600 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: '10時。復旧の準備。クリーンな環境を作り、侵害に使われた認証情報と、残された仕掛けを洗い出す。バックアップから戻す前に、確認すべきことがある。', en: '' }
+    voices: [v18-coward, v18-vendor, v18-ok]
+    choices:
+      - id: a18-restore
+        text: { ja: 'バックアップから一気に戻して、復旧を急ぐ。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -150
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 20, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -60, gauges: { damage: 15, trust: -15 }, reason: { ja: '戻した環境に古い認証情報が残り、再び不審な通信が起きた。', en: '' } }
+        items:
+          - { id: a18-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a18-a-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
+          - { id: a18-a-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+      - id: a18-verify
+        text: { ja: '侵害に使われた認証情報と永続化の仕掛けを洗い出し、クリーンな環境で検証してから段階的に戻す。', en: '' }
+        minutes: 300
+        category: maintain
+        points: 30
+        refs: [nist-sp800-61r3, cissp-cbk-secops]
+        gauges: { damage: -15, trust: 10, stamina: -15 }
+        setFlags: { cleanRestore: true }
+        items:
+          - { id: a18-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a18-b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a18-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: a18-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+      - id: a18-verify-plan
+        text: { ja: '検証に加え、再開後の監視ルールと、再発時の連絡手順を先に決める。', en: '' }
+        minutes: 360
+        category: recover
+        points: 100
+        refs: [nist-sp800-61r3, meti-csm-guideline]
+        gauges: { damage: -15, trust: 15, stamina: -20 }
+        setFlags: { cleanRestore: true, resumePlan: true }
+        items:
+          - { id: a18-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a18-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a18-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: a18-c-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+      - id: a18-normal-monitor
+        text: { ja: '再開に合わせて、監視を通常体制に戻す。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 10, trust: -5 }
+        delayed:
+          - { afterPhases: 1, points: -50, gauges: { damage: 15, trust: -10 }, reason: { ja: '監視を緩めた直後に、別のサーバーで不審な通信を見逃した。', en: '' } }
+        items:
+          - { id: a18-d-care, points: -10, axis: care, refs: [nist-sp800-61r3] }
+          - { id: a18-d-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+
+  - id: a19-final-report
+    at: { day: 45, minutes: 600 }
+    phase: after
+    sound: { se: [notify_news] }
+    text: { ja: '10時。第三者委員会の調査報告書と、個人情報保護委員会への確報の材料がそろった。攻撃に使える詳細を伏せて公開するか、得た教訓を業界に共有するか。あなたは技術的な事実を説明する立場にいる。', en: '' }
+    voices: [v19-expert, v19-law, v19-ok]
+    choices:
+      - id: a19-hide
+        text: { ja: '確報の材料だけを出し、報告書は公開しない案を上に出す。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -120
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -15 }
+        setFlags: { finalMaterialsSent: true }
+        items:
+          - { id: a19-a-content, points: -10, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: a19-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a19-a-record, points: -5, axis: record, refs: [meti-disclosure-guidance] }
+      - id: a19-publish
+        text: { ja: '攻撃に使える部分だけ伏せて、調査報告書を全文公開する案を上に出す。', en: '' }
+        minutes: 180
+        category: recover
+        points: 120
+        refs: [meti-disclosure-guidance, cissp-cbk-secops]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        setFlags: { finalMaterialsSent: true, fullDisclosure: true }
+        items:
+          - { id: a19-b-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: a19-b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a19-b-care, points: 5, axis: care, refs: [meti-disclosure-guidance] }
+      - id: a19-share
+        text: { ja: '全文公開に加え、検知と初動の教訓を業界に無償で共有する案を上に出す。', en: '' }
+        minutes: 240
+        category: increase
+        points: 300
+        fatalAlternate: 50
+        refs: [meti-disclosure-guidance, cissp-cbk-secops]
+        gauges: { flame: -15, trust: 20, stamina: -15 }
+        setFlags: { finalMaterialsSent: true, fullDisclosure: true, industryShare: true }
+        items:
+          - { id: a19-c-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: a19-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: a19-c-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: a19-c-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: a19-refuse
+        text: { ja: '委員会の意見は要約だけにして、詳細は社内にとどめる案を出す。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -60
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 5, trust: -10 }
+        setFlags: { finalMaterialsSent: true }
+        items:
+          - { id: a19-d-content, points: -8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: a19-d-record, points: -5, axis: record, refs: [cissp-cbk-secops] }
+
+drafts:
+  first-note:
+    title: { ja: '一次報告メモ', en: '' }
+    slots:
+      - id: detected
+        label: { ja: '検知時刻の書き方', en: '' }
+        options:
+          - { id: fn-t-split, text: { ja: '検知した時刻と、確認した時刻を分けて書く', en: '' }, points: 5, axis: time, refs: [jpcert-handling] }
+          - { id: fn-t-vague, text: { ja: '「夕方」とだけ書く', en: '' }, points: -8, axis: time, refs: [jpcert-handling] }
+      - id: scope
+        label: { ja: '影響範囲', en: '' }
+        options:
+          - { id: fn-s-known, text: { ja: '分かった範囲と、まだ分からない範囲を分けて書く', en: '' }, points: 8, axis: content, refs: [cissp-cbk-secops] }
+          - { id: fn-s-all, text: { ja: '「全システムが対象」と断定する', en: '' }, points: -15, axis: content, refs: [ppc-report-scope] }
+      - id: done
+        label: { ja: '実施したこと', en: '' }
+        options:
+          - { id: fn-d-list, text: { ja: '隔離した端末、止めたアカウント、保全したログを列挙する', en: '' }, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: fn-d-summary, text: { ja: '「初動対応済み」とだけ書く', en: '' }, points: -10, axis: content, refs: [jpcert-handling] }
+      - id: evidence
+        label: { ja: '証拠の扱い', en: '' }
+        options:
+          - { id: fn-e-chain, text: { ja: '保全したデータのハッシュと保管場所を書く', en: '' }, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: fn-e-none, text: { ja: '証拠のことは書かない', en: '' }, points: -10, axis: record, refs: [nist-sp800-61r3] }
+      - id: uncertain
+        label: { ja: '未確認事項', en: '' }
+        options:
+          - { id: fn-u-explicit, text: { ja: '未確認事項と、確認する期限を書く', en: '' }, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: fn-u-omit, text: { ja: '未確認事項には触れない', en: '' }, points: -8, axis: content, refs: [meti-disclosure-guidance] }
+      - id: next
+        label: { ja: '次の連絡', en: '' }
+        options:
+          - { id: fn-n-scheduled, text: { ja: '次に報告する時刻と相手を書く', en: '' }, points: 5, axis: order, refs: [jpcert-handling] }
+          - { id: fn-n-none, text: { ja: '次の連絡予定を書かない', en: '' }, points: -5, axis: order, refs: [jpcert-handling] }
+      - id: authority
+        label: { ja: '権限の範囲', en: '' }
+        options:
+          - { id: fn-a-within, text: { ja: '自分が決めたことと、上に上げたことを分けて書く', en: '' }, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: fn-a-over, text: { ja: '「自分で止めた」と書く', en: '' }, points: -10, axis: order, refs: [meti-csm-guideline] }
+      - id: version
+        label: { ja: '版の管理', en: '' }
+        options:
+          - { id: fn-v-versioned, text: { ja: '版番号と更新時刻を書く', en: '' }, points: 5, axis: record, refs: [cissp-cbk-secops] }
+          - { id: fn-v-plain, text: { ja: '版を書かない', en: '' }, points: -5, axis: record, refs: [cissp-cbk-secops] }
+  forensic-note:
+    title: { ja: '証拠保全の記録', en: '' }
+    slots:
+      - id: order
+        label: { ja: '保全の順序', en: '' }
+        options:
+          - { id: fo-o-memory, text: { ja: 'メモリ、ディスク、ネットワークログの順に保全する', en: '' }, points: 10, axis: order, refs: [nist-sp800-61r3] }
+          - { id: fo-o-disk, text: { ja: 'ディスクだけをイメージする', en: '' }, points: -10, axis: content, refs: [nist-sp800-61r3] }
+      - id: hash
+        label: { ja: '完全性の担保', en: '' }
+        options:
+          - { id: fo-h-hash, text: { ja: '取得時にハッシュ値を計算し、記録と照合する', en: '' }, points: 10, axis: record, refs: [cissp-cbk-secops] }
+          - { id: fo-h-none, text: { ja: 'ハッシュは取らない', en: '' }, points: -15, axis: record, refs: [cissp-cbk-secops] }
+      - id: who
+        label: { ja: '実施者と立会い', en: '' }
+        options:
+          - { id: fo-w-two, text: { ja: '実施者と立会人を記録に残す', en: '' }, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: fo-w-solo, text: { ja: '一人で実施し、記録しない', en: '' }, points: -10, axis: record, refs: [jpcert-handling] }
+      - id: store
+        label: { ja: '保管場所', en: '' }
+        options:
+          - { id: fo-s-locked, text: { ja: '書き込み不可の媒体に保存し、施錠した場所で管理する', en: '' }, points: 8, axis: order, refs: [cissp-cbk-secops] }
+          - { id: fo-s-share, text: { ja: '作業用の共有フォルダに置く', en: '' }, points: -12, axis: order, refs: [cissp-cbk-secops] }
+      - id: copy
+        label: { ja: '調査用コピー', en: '' }
+        options:
+          - { id: fo-c-copy, text: { ja: '原本と調査用コピーを分け、コピーだけを解析する', en: '' }, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: fo-c-original, text: { ja: '原本を直接開いて解析する', en: '' }, points: -10, axis: record, refs: [nist-sp800-61r3] }
+      - id: handover
+        label: { ja: '現場への説明', en: '' }
+        options:
+          - { id: fo-n-explain, text: { ja: '保全の理由と、再起動しない理由を現場に説明する', en: '' }, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: fo-n-silent, text: { ja: '何も説明せず端末を回収する', en: '' }, points: -10, axis: care, refs: [ipa-sme-guideline] }
+      - id: list
+        label: { ja: '記録の一覧', en: '' }
+        options:
+          - { id: fo-l-list, text: { ja: '保全した対象と時刻を一覧にする', en: '' }, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: fo-l-none, text: { ja: '一覧は作らない', en: '' }, points: -5, axis: record, refs: [jpcert-handling] }
+  handover-note:
+    title: { ja: '引き継ぎメモ', en: '' }
+    slots:
+      - id: state
+        label: { ja: '調査の状態', en: '' }
+        options:
+          - { id: ho-s-facts, text: { ja: '確定した事実と未確認事項を分けて書く', en: '' }, points: 8, axis: content, refs: [cissp-cbk-secops] }
+          - { id: ho-s-mixed, text: { ja: '思いつくままに全部書く', en: '' }, points: -10, axis: content, refs: [cissp-cbk-secops] }
+      - id: open
+        label: { ja: '次の作業', en: '' }
+        options:
+          - { id: ho-o-open, text: { ja: '次に確認する作業と担当を書く', en: '' }, points: 8, axis: order, refs: [jpcert-handling] }
+          - { id: ho-o-none, text: { ja: '次の作業は口頭で伝える', en: '' }, points: -8, axis: order, refs: [jpcert-handling] }
+      - id: evidence
+        label: { ja: '証拠の場所', en: '' }
+        options:
+          - { id: ho-e-loc, text: { ja: '保全したデータの場所と、触ってはいけない範囲を書く', en: '' }, points: 8, axis: record, refs: [nist-sp800-61r3] }
+          - { id: ho-e-any, text: { ja: '誰でも触ってよいと書く', en: '' }, points: -12, axis: record, refs: [nist-sp800-61r3] }
+      - id: authority
+        label: { ja: '上への報告', en: '' }
+        options:
+          - { id: ho-a-route, text: { ja: '上に上げた事項と、まだ上げていない事項を分ける', en: '' }, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: ho-a-none, text: { ja: '上に上げたかどうかは書かない', en: '' }, points: -5, axis: order, refs: [meti-csm-guideline] }
+      - id: care
+        label: { ja: '交代の連絡', en: '' }
+        options:
+          - { id: ho-c-rest, text: { ja: '交代の時刻と連絡先を書く', en: '' }, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: ho-c-none, text: { ja: '交代の連絡先は書かない', en: '' }, points: -8, axis: care, refs: [ipa-sme-guideline] }
+      - id: version
+        label: { ja: '版の管理', en: '' }
+        options:
+          - { id: ho-v-versioned, text: { ja: '更新時刻と版を書く', en: '' }, points: 5, axis: record, refs: [cissp-cbk-secops] }
+          - { id: ho-v-plain, text: { ja: '版を書かない', en: '' }, points: -5, axis: record, refs: [cissp-cbk-secops] }
+  ppc-note:
+    title: { ja: '速報の技術資料', en: '' }
+    slots:
+      - id: timing
+        label: { ja: '出す時刻', en: '' }
+        auto: true
+        items:
+          - { id: pn-t-24h, when: { withinHours: 24 }, points: 10, axis: time, refs: [ppc-report-prelim] }
+          - { id: pn-t-72h, when: { withinHours: 72 }, points: 3, axis: time, refs: [ppc-report-prelim] }
+          - { id: pn-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [ppc-report-prelim] }
+      - id: scope
+        label: { ja: '対象範囲', en: '' }
+        options:
+          - { id: pn-s-all, text: { ja: '委託元の全利用者（過去の利用者を含む）', en: '' }, points: 10, axis: content, refs: [ppc-report-scope] }
+          - { id: pn-s-current, text: { ja: '現行の利用者だけ', en: '' }, points: -20, axis: content, refs: [ppc-report-scope], delayed: { afterPhases: 1, points: -20, reason: { ja: '対象の訂正が必要になった。', en: '' } } }
+      - id: dates
+        label: { ja: '日時の書き方', en: '' }
+        options:
+          - { id: pn-d-split, text: { ja: '発生と検知の日時を分けて書く', en: '' }, points: 5, axis: content, refs: [jpcert-handling] }
+          - { id: pn-d-merge, text: { ja: '発生と検知をまとめて書く', en: '' }, points: -10, axis: wording, refs: [jpcert-handling] }
+      - id: certainty
+        label: { ja: '断定の強さ', en: '' }
+        options:
+          - { id: pn-c-maybe, text: { ja: '「漏えいの可能性」と「確認」を使い分ける', en: '' }, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: pn-c-confirm, text: { ja: 'すべて「漏えいを確認」と断定する', en: '' }, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: pn-c-none, text: { ja: '「漏えいはない」と書く', en: '' }, points: -20, axis: wording, refs: [ppc-report-scope] }
+      - id: leaked
+        label: { ja: '漏れた項目', en: '' }
+        options:
+          - { id: pn-l-specific, text: { ja: 'カード番号、有効期限、氏名、連絡先を具体的に列挙する', en: '' }, points: 10, axis: content, refs: [ppc-report-scope] }
+          - { id: pn-l-vague, text: { ja: '「一部の情報」とぼかす', en: '' }, points: -10, axis: content, refs: [ppc-report-scope] }
+      - id: code
+        label: { ja: 'セキュリティコードの扱い', en: '' }
+        options:
+          - { id: pn-k-admit, text: { ja: 'セキュリティコードを保存していた事実を書く', en: '' }, points: 10, axis: content, refs: [ppc-report-scope] }
+          - { id: pn-k-omit, text: { ja: 'セキュリティコードには触れない', en: '' }, points: -15, axis: content, refs: [ppc-report-scope] }
+      - id: cause
+        label: { ja: '原因の書き方', en: '' }
+        options:
+          - { id: pn-ca-known, text: { ja: '公表済みの脆弱性を突かれた可能性を、断定を避けて書く', en: '' }, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: pn-ca-blame, text: { ja: '「委託先の設定ミスが原因」と断定する', en: '' }, points: -12, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: record
+        label: { ja: '版の管理', en: '' }
+        options:
+          - { id: pn-r-versioned, text: { ja: '資料の版と作成時刻を書く', en: '' }, points: 5, axis: record, refs: [cissp-cbk-secops] }
+          - { id: pn-r-plain, text: { ja: '版を書かない', en: '' }, points: -5, axis: record, refs: [cissp-cbk-secops] }
+voices:
+  - { id: v01-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '危なそうだったので、そのサーバーの電源を抜いておきました。これで安全です。', en: '' }, trigger: { at: point } }
+  - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '誤検知かもしれない。明日の朝、正常性を確認してから報告してくれ。', en: '' }, trigger: { at: point } }
+  - { id: v01-ok, media: chat, misleading: false, text: { ja: '監視運用「まず通信の宛先と時刻を記録して、端末は隔離だけで止めましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v01-after, media: sns, misleading: false, text: { ja: '端末を勝手に止めるのか。業務が止まったらどうする。', en: '' }, trigger: { at: after, choice: a01-isolate } }
+  - { id: v02-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '弊社の監視製品では検知できませんでした。製品の問題ではありません。修正は検証を待たずに全台へ当てるのが早いですよ。', en: '' }, trigger: { at: point } }
+  - { id: v02-popular, media: sns, misleading: true, type: popular, text: { ja: '他の担当者の多くは、まず目の前の一台を直す選択をしています。', en: '' }, trigger: { at: point } }
+  - { id: v02-ok, media: chat, misleading: false, text: { ja: '基盤運用「影響しうる機器の棚卸しを先に。台帳と実機を突き合わせましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v02-after, media: news, misleading: false, text: { ja: '台帳を見ている間に、攻撃者は動いている。', en: '' }, trigger: { at: after, choice: a02-inventory-plan } }
+  - { id: v03-law, media: board, misleading: true, type: law-ish, text: { ja: '保存期間は規程で決まっています。過ぎたログは消えて当然です。', en: '' }, trigger: { at: point } }
+  - { id: v03-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'ログは容量を食うだけです。消えたら消えたで、調査はできますよ。', en: '' }, trigger: { at: point } }
+  - { id: v03-ok, media: chat, misleading: false, text: { ja: '監視運用「調査対象の期間を切り出して、ハッシュと時刻を付けて保全しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v03-after, media: sns, misleading: false, text: { ja: 'ログを保全する時間があるなら、原因を出せ。', en: '' }, trigger: { at: after, choice: a03-export-plan } }
+  - { id: v04-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '確定したことだけ報告してくれ。中途半端だと、上も動けない。', en: '' }, trigger: { at: point } }
+  - { id: v04-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: 'SNSで一言書けば、社内もすぐ動きますよ。', en: '' }, trigger: { at: point } }
+  - { id: v04-ok, media: chat, misleading: false, text: { ja: 'セキュリティ責任者「分かったこと、分からないこと、次にやることを分けて出してくれ」。', en: '' }, trigger: { at: point } }
+  - { id: v04-after, media: boss, misleading: false, text: { ja: 'まだ分かっていないのに、上に報告するのか。', en: '' }, trigger: { at: after, choice: a04-report } }
+  - { id: v05-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: 'キーを止めると取引先の業務が止まります。影響が確認できてからでいいのでは。', en: '' }, trigger: { at: point } }
+  - { id: v05-law, media: board, misleading: true, type: law-ish, text: { ja: '契約上、キーの失効は委託先の同意が必要です。今は動かさないほうが安全です。', en: '' }, trigger: { at: point } }
+  - { id: v05-ok, media: chat, misleading: false, text: { ja: '基盤運用「侵害されたキーは止めて、新しいキーに切り替える手順を用意しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v05-after, media: sns, misleading: false, text: { ja: 'キーを止められて、こちらの連携が止まった。説明しろ。', en: '' }, trigger: { at: after, choice: a05-rotate-plan } }
+  - { id: v06-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '再起動すれば直りますよ。いつもそうしてます。', en: '' }, trigger: { at: point } }
+  - { id: v06-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'メモリを取っても分かりません。初期化して作り直すのが一番です。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '調査担当「メモリ、ディスク、ログの順で保全し、ハッシュを記録しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v06-after, media: sns, misleading: false, text: { ja: '調査を優先して、サーバーを返さないのか。', en: '' }, trigger: { at: after, choice: a06-image } }
+  - { id: v07-law, media: board, misleading: true, type: law-ish, text: { ja: '公表前の情報は、口外しないのが筋です。', en: '' }, trigger: { at: point } }
+  - { id: v07-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '深夜に下手に連絡すると、こちらが疑われますよ。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '公共事業部「分かっている事実だけを伝えて、朝に正式な連絡を入れましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v07-after, media: news, misleading: false, text: { ja: '深夜に委託先へ連絡して、何を話したのか。', en: '' }, trigger: { at: after, choice: a07-share-plan } }
+  - { id: v08-public, media: sns, misleading: true, type: public-opinion, text: { ja: '止めるな。月末の納付があるんだ。', en: '' }, trigger: { at: point } }
+  - { id: v08-coward, media: news, misleading: true, type: coward-critique, text: { ja: '止める判断が遅い。経営は何をしていた。', en: '' }, trigger: { at: point } }
+  - { id: v08-ok, media: chat, misleading: false, text: { ja: '公共事業部「止める場合の影響と復旧見込みを添えて、上に上げましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v08-after, media: sns, misleading: false, text: { ja: '上に上げるだけか。自分で決められないのか。', en: '' }, trigger: { at: after, choice: a08-escalate } }
+  - { id: v09-law, media: board, misleading: true, type: law-ish, text: { ja: '保存していないことになっているなら、言わなくて大丈夫です。', en: '' }, trigger: { at: point } }
+  - { id: v09-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: 'ログを消せば、余計な混乱を避けられますよ。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '法務「保存していた事実は、こちらから言うべきです」。', en: '' }, trigger: { at: point } }
+  - { id: v09-after, media: news, misleading: false, text: { ja: 'カード会社に言ったら、うちの決済は止まるのか。', en: '' }, trigger: { at: after, choice: a09-report } }
+  - { id: v10-law, media: board, misleading: true, type: law-ish, text: { ja: '規程を破ると、監査で指摘されます。定例まで待つのが筋です。規程遵守の社内表彰も近いですよ。', en: '' }, trigger: { at: point } }
+  - { id: v10-past, media: boss, misleading: true, type: past-success, text: { ja: '前回の障害も、定例メンテでまとめて直して間に合いました。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '基盤運用「緊急変更の手続きと、戻せる手順を用意しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v10-after, media: news, misleading: false, text: { ja: '定例を待たずに触るのか。障害が出たらどうする。', en: '' }, trigger: { at: after, choice: a10-emergency } }
+  - { id: v11-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '弊社の管理下では問題ありません。アカウントは止めないでください。', en: '' }, trigger: { at: point } }
+  - { id: v11-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、別の委託先にも同じ穴がある。調べても終わらないぞ。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '委託先窓口「いったん接続を止めて、一緒に履歴を確認しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v11-after, media: vendor, misleading: false, text: { ja: '保守を止められて、こちらの作業が止まった。', en: '' }, trigger: { at: after, choice: a11-disable-plan } }
+  - { id: v12-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '丸い数字でいい。細かい数字は後で直せ。', en: '' }, trigger: { at: point } }
+  - { id: v12-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、本当は十倍漏れている。今すぐ全部公表しろ。', en: '' }, trigger: { at: point } }
+  - { id: v12-ok, media: chat, misleading: false, text: { ja: '調査担当「数え方と、数えられない範囲を分けて出しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v12-after, media: news, misleading: false, text: { ja: '概数しか出せないのか。', en: '' }, trigger: { at: after, choice: a12-method-plan } }
+  - { id: v13-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '24時間以内に連絡しなければ、すべて公開する。', en: '' }, trigger: { at: point } }
+  - { id: v13-public, media: sns, misleading: true, type: public-opinion, text: { ja: '払ってでも止めろ。顧客を守るのが先だ。', en: '' }, trigger: { at: point } }
+  - { id: v13-ok, media: chat, misleading: false, text: { ja: '法務「返信せず、メールと添付を保全して上と警察の窓口に渡しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v13-after, media: news, misleading: false, text: { ja: '返信もしないのか。顧客情報が公開されたらどうする。', en: '' }, trigger: { at: after, choice: a13-preserve-plan } }
+  - { id: v14-flattery, media: chat, misleading: true, type: flattery, text: { ja: 'あなたしか分からない。最後までやってください。', en: '' }, trigger: { at: point } }
+  - { id: v14-public, media: sns, misleading: true, type: public-opinion, text: { ja: '休んでいる場合か。早く件数を出せ。', en: '' }, trigger: { at: point } }
+  - { id: v14-ok, media: chat, misleading: false, text: { ja: '対策本部「引き継ぎ書を作って、短くても交代しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v14-after, media: sns, misleading: false, text: { ja: '引き継ぎ書を作る時間があるなら、調査を進めろ。', en: '' }, trigger: { at: after, choice: a14-handover-plan } }
+  - { id: v15-law, media: board, misleading: true, type: law-ish, text: { ja: '確定していない数字は、書かないほうが安全です。', en: '' }, trigger: { at: point } }
+  - { id: v15-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: 'セキュリティコードのことは、今は書くな。', en: '' }, trigger: { at: point } }
+  - { id: v15-ok, media: chat, misleading: false, text: { ja: '法務「分かっている範囲と、まだ確認中の範囲を分けて書きましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v15-after, media: news, misleading: false, text: { ja: '確定していない数字を出すのか。', en: '' }, trigger: { at: after, choice: a15-submit-full } }
+  - { id: v16-past, media: boss, misleading: true, type: past-success, text: { ja: '前の障害は範囲を絞って収まった。今回も同じでいい。', en: '' }, trigger: { at: point } }
+  - { id: v16-insider, media: board, misleading: true, type: fake-insider, text: { ja: '別の委託先でも同じ穴がある。調べれば終わらないぞ。', en: '' }, trigger: { at: point } }
+  - { id: v16-ok, media: chat, misleading: false, text: { ja: '調査担当「事実を整理して、調査範囲の拡大を上に上げましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v16-after, media: news, misleading: false, text: { ja: '調査範囲を広げて、いつ終わるのか。', en: '' }, trigger: { at: after, choice: a16-expand-plan } }
+  - { id: v17-field, media: chat, misleading: true, type: well-meant-field, text: { ja: 'メールで一斉に送れば十分です。書面は費用がかかります。', en: '' }, trigger: { at: point } }
+  - { id: v17-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '通知するとパニックになります。公表だけで十分です。', en: '' }, trigger: { at: point } }
+  - { id: v17-ok, media: chat, misleading: false, text: { ja: '顧客対応「退会者と申込み途中の人も含めて、重複を除いて数えましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v17-after, media: sns, misleading: false, text: { ja: '書面が届くまで、何をすればいいか分からない。', en: '' }, trigger: { at: after, choice: a17-all-plan } }
+  - { id: v18-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '二週間も止めているのは臆病すぎる。他社ならもう再開している。', en: '' }, trigger: { at: point } }
+  - { id: v18-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '検証に時間をかけると、復旧費用が増えますよ。', en: '' }, trigger: { at: point } }
+  - { id: v18-ok, media: chat, misleading: false, text: { ja: '技術責任者「クリーンな環境で検証してから、段階的に戻しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v18-after, media: sns, misleading: false, text: { ja: 'まだ止め続けるのか。大げさだ。', en: '' }, trigger: { at: after, choice: a18-verify-plan } }
+  - { id: v19-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '報告書を出すと攻撃者に手の内が分かります。伏せましょう。', en: '' }, trigger: { at: point } }
+  - { id: v19-law, media: news, misleading: true, type: law-ish, text: { ja: '報告書は任意です。出さなくても違法ではありません。', en: '' }, trigger: { at: point } }
+  - { id: v19-ok, media: chat, misleading: false, text: { ja: '調査委員「攻撃に使える部分だけ伏せれば、公開できます」。', en: '' }, trigger: { at: point } }
+  - { id: v19-after, media: news, misleading: false, text: { ja: '今さら報告書を出して、宣伝か。', en: '' }, trigger: { at: after, choice: a19-share } }
+  - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「調査中」なんだ。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-3, media: sns, misleading: false, text: { ja: '担当者は何も決められないのか。事なかれ主義だ。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-4, media: news, misleading: false, text: { ja: '臆病な対応が被害を広げた。担当者の上も責任を問うべきだ。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-night, media: chat, misleading: false, text: { ja: '現場「アラートが多すぎて、どれが本物か分かりません」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-board, media: board, misleading: false, text: { ja: '社内掲示板「現場は何をしている。説明が欲しい」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-client, media: news, misleading: false, text: { ja: '委託先「調査の状況と、情報の取り扱いを説明してほしい」。', en: '' }, trigger: { at: manual } }
