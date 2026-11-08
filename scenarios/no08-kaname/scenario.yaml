@@ -1,0 +1,118 @@
+# No.8 カナメ精工（自動車部品）
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+id: no08-kaname
+version: '1.0.0'
+status: latest
+published: '2026-11-08'
+sourcePeriod: { ja: '2020年代前半の部品供給網を巡る事件の構造を参考にしたフィクション', en: '' }
+difficulty: 3
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: 'うちが止まると、取引先のラインが止まる', en: '' }
+tagline: { ja: '土曜の夜の電話。自社を守る判断が、取引先の工場を止める。', en: '' }
+company:
+  name: { ja: 'カナメ精工株式会社', en: '' }
+  industry: { ja: '自動車部品（精密プレス・樹脂成形）', en: '' }
+  size: { ja: '従業員480名、国内3拠点、非上場', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '佐倉 恒一', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: coo
+      name: { ja: '東海林 真紀', en: '' }
+      title: { ja: '取締役 生産本部長', en: '' }
+    - id: cfo
+      name: { ja: '早瀬 康平', en: '' }
+      title: { ja: '取締役 管理本部長', en: '' }
+    - id: cio
+      name: { ja: '三隅 直人', en: '' }
+      title: { ja: '情報システム課長', en: '' }
+    - id: pr
+      name: { ja: '柏木 千尋', en: '' }
+      title: { ja: '総務・広報課長', en: '' }
+    - id: sales
+      name: { ja: '苅谷 誠', en: '' }
+      title: { ja: '営業本部長', en: '' }
+start: { day: 0, minutes: 1275 }
+initialGauges: { damage: 20, flame: 0, trust: 65, stamina: 100 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-link
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '取引先との接続を切ったのは、なぜですか。', en: '' }
+      answers:
+        - { id: a-link-none, text: { ja: '取引先の了解は得ていません。', en: '' }, points: -50 }
+        - { id: a-link-explain, text: { ja: '広げないための判断でした。', en: '' }, points: 30 }
+        - { id: a-link-own, text: { ja: '止まった分の影響は当社が負います。判断と連絡の時刻はこちらの記録のとおりです。', en: '' }, points: 80, requiresNote: note-link }
+    - id: q-check
+      seconds: 25
+      timeoutPoints: -30
+      text: { ja: '先月のセキュリティチェックシートは、すべて「はい」でした。', en: '' }
+      answers:
+        - { id: a-check-form, text: { ja: '書式どおりに回答しました。', en: '' }, points: -30 }
+        - { id: a-check-admit, text: { ja: '実態が伴っていませんでした。', en: '' }, points: 30 }
+        - { id: a-check-verify, text: { ja: '回答の根拠を、取引先と一つずつ確認し直します。', en: '' }, points: 80, requiresNote: note-check }
+    - id: q-scope
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '侵入経路は、いつ分かったのですか。', en: '' }
+      answers:
+        - { id: a-scope-unknown, text: { ja: '調査中です。', en: '' }, points: -30 }
+        - { id: a-scope-vpn, text: { ja: '取引先とつながるVPN機器の更新漏れでした。', en: '' }, points: 30 }
+        - { id: a-scope-timeline, text: { ja: '判明した時刻と範囲は、こちらの資料にまとめています。', en: '' }, points: 80, requiresNote: note-scope }
+    - id: q-ransom
+      seconds: 20
+      timeoutPoints: -30
+      text: { ja: '身代金は支払ったのですか。', en: '' }
+      answers:
+        - { id: a-ransom-paid, text: { ja: '支払いました。', en: '' }, points: -100 }
+        - { id: a-ransom-none, text: { ja: '答えられません。', en: '' }, points: -30 }
+        - { id: a-ransom-refuse, text: { ja: '支払っていません。警察に相談し、取引先にも説明しました。', en: '' }, points: 80 }
+    - id: q-parts
+      seconds: 25
+      timeoutPoints: -30
+      text: { ja: '取引先の減産分は、どう補償するのですか。', en: '' }
+      answers:
+        - { id: a-parts-none, text: { ja: '不可抗力なので補償しません。', en: '' }, points: -80 }
+        - { id: a-parts-wait, text: { ja: '金額が決まってから決めます。', en: '' }, points: -30 }
+        - { id: a-parts-plan, text: { ja: '止まった日数と規模に応じた基準を決め、窓口を置いています。', en: '' }, points: 80, requiresNote: note-line }
+  extraQuestions:
+    - when: { flags: { hidCheck: true } }
+      question:
+        id: q-hidden
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: 'チェックシートの回答が形だけだったことを、隠していたのですか。', en: '' }
+        answers:
+          - { id: a-hidden-avoid, text: { ja: '混乱を避けるためです。', en: '' }, points: -100 }
+          - { id: a-hidden-late, text: { ja: '調査の対象から外していました。', en: '' }, points: 30 }
+          - { id: a-hidden-correct, text: { ja: '隠す意図はありませんでしたが、調査から外したのは誤りでした。経緯を公表します。', en: '' }, points: 80 }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '取引先のラインは、事件前より早く戻った。調査報告書は部品業界の手本として引用され、取引先の調達担当から「次も頼む」と言われた。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが、取引先の信頼は戻った。売上は事件前の水準に戻り、更新の季節を大きな解約なしで越えた。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '会社は立ち直ったが、大口の取引先を一つ失った。残った取引先との関係を、時間をかけて作り直すことになった。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '第三者委員会は初動と公表の遅れを指摘し、経営陣は辞任した。残された社員が、限られた予算で再建を進めている。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '取引先からの損害賠償と行政指導が重なり、主力工場の一つを閉じた。どこで判断を誤ったのか、記録を読み返す日が続く。', en: '' }
+salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 10, min: 40, max: 130 }
