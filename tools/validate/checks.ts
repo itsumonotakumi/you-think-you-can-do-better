@@ -623,7 +623,14 @@ function checkPress(press: unknown, out: Issue[], fallbackFile: string): void {
         if (a.requiresNote !== undefined && a.requiresNote !== false && !isStr(a.requiresNote)) {
           add(answer, 'requiresNote', 'requiresNote は文字列か false');
         }
+        if (a.when !== undefined) checkCondition(a.when, (_v, k, m) => add(answer, k, m));
       }
+      // 条件なしで必ず選べる回答が1つ以上あること（全員に出る質問で行き止まりにしない）
+      const always = q.answers.filter((answer) => {
+        const a = asObj(answer);
+        return a.when === undefined && (a.requiresNote === undefined || a.requiresNote === false);
+      });
+      if (always.length === 0) add(value, 'answers', '条件なしで選べる回答が1つもない');
     }
   };
   for (const question of p.questions) checkQuestion(question);

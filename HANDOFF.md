@@ -47,10 +47,10 @@
 2. references.yaml の原典確認（条文番号・版・日付）
 3. 内容レビュー（テスト計画書 7章）とセルフチェックリスト（8章）。シナリオ本文は安価モデルの執筆のため要通読
 4. プレイテスト（9章）。配点の手触り、所要時間
-5. origin への push（ローカル main が origin より大きく先行）と、Pages の手動配信（Settings → Pages で GitHub Actions を選択後、Deploy to GitHub Pages を手動実行）
+5. ✅ origin への push は完了（2026-11-08）。残りは Pages の手動配信（Settings → Pages で GitHub Actions を選択後、Deploy to GitHub Pages を手動実行）
 6. 任意: 英語本文（v1 は日本語のみ、UI は日英）、挿絵、クリックジャッキング対策（Pages ではヘッダを付けられない）
 - 簡略化: シナリオの版が変わった時は「はじめから」のみ（旧版の続きは作らない）
-- Wave4〜: No.2〜No.10 の残りロール、英語本文、音声素材
+-、英語本文、音声素材
 
 ## 運用メモ
 - 注意: エージェントが worktree の外（main の作業ツリー）に書いたことが1回あった（r05-officer）。共通指示に禁止を追記済み。マージ前に main で `git status` を確認する

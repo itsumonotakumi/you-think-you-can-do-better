@@ -1,5 +1,6 @@
 // 記者会見（設計書 5.6・6.8、テスト計画書 5.2）
 import { finalizeBeforeEnding } from "./deadlines";
+import { conditionMet } from "./events";
 import type {
   Cue, Flags, PlayState, PressAnswer, PressQuestion, Scenario, StepResult,
 } from "./types";
@@ -33,7 +34,10 @@ export function availableAnswers(state: PlayState, scenario: Scenario): PressAns
   const question = currentQuestion(state, scenario);
   if (!question) return [];
   const noteIds = new Set(state.notes.map((note) => note.id));
-  return question.answers.filter((answer) => !answer.requiresNote || noteIds.has(answer.requiresNote));
+  return question.answers.filter(
+    (answer) =>
+      (!answer.requiresNote || noteIds.has(answer.requiresNote)) && conditionMet(answer.when, state.flags),
+  );
 }
 
 /** 質問を表示する演出（設計書 10.3・10.4） */

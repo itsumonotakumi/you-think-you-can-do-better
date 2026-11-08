@@ -178,7 +178,8 @@ export interface ScenarioEvent {
   caption?: Localized;
 }
 
-export interface PressAnswer { id: string; text: Localized; points: number; requiresNote?: string | false }
+/** when: 旗の条件を満たす時だけ出す回答（例: 身代金を払った時だけ「支払った」と答えられる） */
+export interface PressAnswer { id: string; text: Localized; points: number; requiresNote?: string | false; when?: Condition }
 export interface PressQuestion { id: string; text: Localized; seconds?: number; answers: PressAnswer[]; timeoutPoints?: number }
 export interface Press {
   questions: PressQuestion[];
