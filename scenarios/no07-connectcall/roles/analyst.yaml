@@ -85,7 +85,7 @@ points:
           - { id: a01-b-record, points: 5, axis: record, refs: [jpcert-handling] }
       - id: a01-check-report
         text: { ja: '履歴を確認し、部長への一次連絡と、外部の相談窓口への相談の予約を同時に進める。', en: '' }
-        minutes: 120
+        minutes: 45
         category: recover
         points: 100
         refs: [jpcert-handling, meti-csm-guideline]
@@ -101,7 +101,7 @@ points:
     at: { day: 0, minutes: 645 }
     phase: contain
     sound: { se: [notify_chat] }
-    text: { ja: '午前10時45分。保守用の管理者アカウントは、10年分のログイン履歴を持っていた。昨夜も外部媒体への書き出しの形跡がある。そのアカウントは、いまも生きている。', en: '' }
+    text: { ja: '午前10時45分。保守用の管理者アカウントは、10年前から同じものが使われていた。直近の記録には昨夜も外部媒体への書き出しの形跡がある。そのアカウントは、いまも生きている。', en: '' }
     voices: [v02-expert, v02-field, v02-popular, v02-ok]
     popular: { choiceId: a02-wait, percent: 61 }
     choices:
@@ -144,7 +144,7 @@ points:
           - { id: a02-c-record, points: 8, axis: record, refs: [jpcert-handling] }
       - id: a02-stop-rotate
         text: { ja: '停止と隔離に加え、同じ派遣元の全アカウントを棚卸しし、パスワードの再発行を当日中に始める。', en: '' }
-        minutes: 150
+        minutes: 45
         category: recover
         points: 120
         refs: [no07-ipa-insider, jpcert-handling]
@@ -164,13 +164,12 @@ points:
     voices: [v03-field, v03-past, v03-ok]
     choices:
       - id: a03-return
-        text: { ja: '端末を拭いて、午後から別の担当者に貸し出す。', en: '' }
+        text: { ja: '初期化はせず、そのまま午後から別の担当者に貸し出す。', en: '' }
         minutes: 60
-        category: fatal
-        points: -250
+        category: hurt
+        points: -120
         refs: [jpcert-handling]
         gauges: { damage: 5, trust: -10 }
-        setFlags: { destroyedEvidence: true }
         items:
           - { id: a03-a-record, points: -20, axis: record, refs: [jpcert-handling] }
           - { id: a03-a-content, points: -12, axis: content, refs: [nist-sp800-61r3] }
@@ -178,13 +177,14 @@ points:
       - id: a03-poweron
         text: { ja: '電源を入れて、いつもの手順で初期化する。', en: '' }
         minutes: 90
-        category: hurt
-        points: -80
+        category: fatal
+        points: -250
         refs: [nist-sp800-61r3]
         gauges: { damage: 5, trust: -5 }
+        setFlags: { destroyedEvidence: true }
         items:
-          - { id: a03-b-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
-          - { id: a03-b-order, points: -6, axis: order, refs: [jpcert-handling] }
+          - { id: a03-b-record, points: -20, axis: record, refs: [nist-sp800-61r3] }
+          - { id: a03-b-order, points: -10, axis: order, refs: [jpcert-handling] }
       - id: a03-preserve
         text: { ja: '端末は電源を入れずに保全し、ディスクのイメージと取得時刻を記録する。', en: '' }
         minutes: 90
@@ -198,7 +198,7 @@ points:
           - { id: a03-c-time, points: 5, axis: time, refs: [jpcert-handling] }
       - id: a03-preserve-plus
         text: { ja: '保全に加え、外部媒体に書き込める端末を全部リスト化し、書き出しを止める。', en: '' }
-        minutes: 150
+        minutes: 60
         category: recover
         points: 120
         refs: [no07-ipa-insider, nist-sp800-61r3]
@@ -212,9 +212,9 @@ points:
 
   - id: a04-logs
     at: { day: 0, minutes: 780 }
-    phase: investigate
+    phase: organize
     sound: { se: [typing] }
-    text: { ja: '午後1時。持ち出しは10年に及ぶ可能性がある。だが管理者権限の監査ログは半年で上書きされ、外部媒体への書き出しの記録も残っていない。残っているのは、ファイルサーバーの更新履歴、入退室の記録、数台の端末のログだけだ。', en: '' }
+    text: { ja: '午後1時。持ち出しは10年に及ぶ可能性がある。だが管理者権限の監査ログは半年で上書きされ、外部媒体への書き出しの記録は直近の分しか残っていない。残っているのは、ファイルサーバーの更新履歴、入退室の記録、数台の端末のログだけだ。', en: '' }
     voices: [v04-expert, v04-insider, v04-ok]
     notable:
       - { id: note-scale, text: { ja: '持ち出しは10年に及ぶ可能性がある。影響するクライアントは確認済みと調査中に分ける必要がある。', en: '' } }
@@ -257,7 +257,7 @@ points:
           - { id: a04-c-time, points: 4, axis: time, refs: [jpcert-handling] }
       - id: a04-piece-plus
         text: { ja: '突き合わせに加え、同じ期間に大量の書き出しがあった端末を洗い出し、影響しうるクライアントの候補を一覧にする。', en: '' }
-        minutes: 300
+        minutes: 60
         category: recover
         points: 120
         refs: [no07-ipa-insider, jpcert-handling]
@@ -302,7 +302,7 @@ points:
           - { id: a05-b-record, points: -8, axis: record, refs: [jpcert-handling] }
       - id: a05-report
         text: { ja: '30分以内に、分かったこと、不明点、次にやることを分けて一次報告する。', en: '' }
-        minutes: 45
+        minutes: 30
         category: maintain
         points: 30
         refs: [jpcert-handling, cissp-cbk-secops]
@@ -359,7 +359,7 @@ points:
           - { id: a06-d-order, points: -8, axis: order, refs: [no07-dispatch-law] }
           - { id: a06-d-care, points: -8, axis: care, refs: [meti-csm-guideline] }
       - id: a06-joint
-        text: { ja: '派遣元と共同で事実確認を進め、端末は自社で保全したまま、複製を渡す。', en: '' }
+        text: { ja: '派遣元と共同で事実確認を進め、端末は自社で保全したまま、派遣元には事実確認に必要な範囲の記録だけを弁護士を通じて渡す。', en: '' }
         minutes: 120
         category: maintain
         points: 30
@@ -371,13 +371,13 @@ points:
           - { id: a06-b-record, points: 8, axis: record, refs: [meti-trade-secret] }
           - { id: a06-b-wording, points: 4, axis: wording, refs: [meti-csm-guideline] }
       - id: a06-joint-police
-        text: { ja: '共同確認に加え、証拠の保全手順を文書化し、警察への相談を弁護士と進める。', en: '' }
+        text: { ja: '共同確認に加え、証拠の保全手順を文書化し、弁護士に渡す記録の一覧を作る。', en: '' }
         minutes: 150
         category: recover
         points: 120
         refs: [npa-consult, meti-trade-secret, no07-dispatch-law]
         gauges: { trust: 10, stamina: -10 }
-        setFlags: { agencyJoint: true, policeConsulted: true }
+        setFlags: { agencyJoint: true, policeReady: true }
         items:
           - { id: a06-c-order, points: 8, axis: order, refs: [no07-dispatch-law] }
           - { id: a06-c-record, points: 8, axis: record, refs: [meti-trade-secret] }
@@ -386,7 +386,7 @@ points:
 
   - id: a07-usb
     at: { day: 1, minutes: 840 }
-    phase: contain
+    phase: investigate
     sound: { se: [notify_chat] }
     text: { ja: '午後2時。同じフロアの別の端末で、私物のUSBメモリへの書き出しが試された記録がある。操作したのは、別の派遣の保守担当者。本人は「昨日、先輩に頼まれた」と言っている。', en: '' }
     voices: [v07-public, v07-past, v07-ok]
@@ -658,9 +658,9 @@ points:
 
   - id: a12-threat
     at: { day: 4, minutes: 600 }
-    phase: contain
+    phase: notify
     sound: { se: [mail_arrive] }
-    text: { ja: '午前10時。会社の代表アドレスに、差出人不明のメールが届いた。「警察に出すなら、持っている名簿を全部公開する。君の名前も出す」。同じメールが、自分の端末にも転送されている。', en: '' }
+    text: { ja: '午前10時。会社の代表アドレスに、差出人不明のメールが届いた。「警察に出すなら、持っている名簿を全部公開する。君の名前も出す」。同じメールが、自分の端末にも転送されている。名簿の公開と脅迫は犯罪です。', en: '' }
     voices: [v12-attacker, v12-public, v12-ok]
     choices:
       - id: a12-reply
@@ -741,7 +741,7 @@ points:
           - { id: a13-b-order, points: -10, axis: order, refs: [no07-dispatch-law] }
           - { id: a13-b-care, points: -8, axis: care, refs: [ppc-notify-person] }
       - id: a13-script
-        text: { ja: '確認できた事実、言ってはいけないこと、転送先をまとめた応答台本を作る。', en: '' }
+        text: { ja: '確認できた事実、言ってはいけないこと、転送先の案をまとめ、オペレーション統括と広報に渡す。', en: '' }
         minutes: 120
         category: maintain
         points: 30
@@ -754,7 +754,7 @@ points:
           - { id: a13-c-content, points: 8, axis: content, refs: [meti-csm-guideline] }
           - { id: a13-c-order, points: 4, axis: order, refs: [jpcert-handling] }
       - id: a13-script-plus
-        text: { ja: '台本に加え、問い合わせの記録様式と、急増に備えた応援要員の配置を決める。', en: '' }
+        text: { ja: '事実の整理に加え、問い合わせの記録様式と、応援要員の必要性をオペレーション統括に提案する。', en: '' }
         minutes: 180
         category: recover
         points: 120
@@ -800,7 +800,7 @@ points:
           - { id: a14-b-time, points: -8, axis: time, refs: [no07-ipa-insider] }
           - { id: a14-b-care, points: -6, axis: care, refs: [meti-csm-guideline] }
       - id: a14-step
-        text: { ja: '権限を絞った状態で段階的に再開し、監視を強化する。', en: '' }
+        text: { ja: '段階再開の条件と、監視を強める案を作り、部長に提案する。', en: '' }
         minutes: 150
         category: maintain
         points: 30
@@ -812,7 +812,7 @@ points:
           - { id: a14-c-record, points: 8, axis: record, refs: [jpcert-handling] }
           - { id: a14-c-content, points: 4, axis: content, refs: [nist-sp800-61r3] }
       - id: a14-step-verify
-        text: { ja: '段階再開に加え、再開前のチェックリストを第三者が確認し、結果をクライアントに共有する。', en: '' }
+        text: { ja: '段階再開の条件に加え、再開前のチェックリストを第三者が確認する案を作り、部長を通じてクライアントに共有する。', en: '' }
         minutes: 210
         category: recover
         points: 120
@@ -948,7 +948,7 @@ points:
     voices: [v17-bold, v17-flattery, v17-ok]
     choices:
       - id: a17-full
-        text: { ja: '持ち出しの手口と、犯人の属性まで話す。', en: '' }
+        text: { ja: '持ち出しの手口と、持ち出したとされる担当者の属性まで話す。', en: '' }
         minutes: 90
         category: hurt
         points: -100
@@ -968,7 +968,7 @@ points:
           - { id: a17-b-care, points: -6, axis: care, refs: [meti-csm-guideline] }
           - { id: a17-b-content, points: -6, axis: content, refs: [no07-ipa-insider] }
       - id: a17-sanitized
-        text: { ja: '権限管理と監査ログの設計、見落としの理由を、固有名詞を伏せて共有する。', en: '' }
+        text: { ja: '広報と法務の確認を経て、権限管理と監査ログの設計、見落としの理由を、固有名詞を伏せて共有する。', en: '' }
         minutes: 120
         category: recover
         points: 120
@@ -981,7 +981,7 @@ points:
           - { id: a17-c-wording, points: 6, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: a17-c-order, points: 4, axis: order, refs: [cissp-cbk-secops] }
       - id: a17-sanitized-plus
-        text: { ja: '共有に加え、参加社がそのまま使える権限棚卸しのチェックリストを配る。', en: '' }
+        text: { ja: '共有に加え、参加社がそのまま使える権限棚卸しのチェックリストを用意し、広報と法務の確認を経て配る。', en: '' }
         minutes: 150
         category: recover
         points: 150
@@ -999,7 +999,7 @@ points:
     at: { day: 40, minutes: 600 }
     phase: after
     sound: { se: [notify_chat] }
-    text: { ja: '午前10時。全社の情報セキュリティ研修の見直しを任された。犯人は10年連続で満点だった。研修の資料には、今回の事実はまだ反映されていない。本来の仕事に戻る日も、近づいている。', en: '' }
+    text: { ja: '午前10時。全社の情報セキュリティ研修の見直しを任された。持ち出したとされる担当者は10年連続で満点だった。研修の資料には、今回の事実はまだ反映されていない。本来の仕事に戻る日も、近づいている。', en: '' }
     voices: [v18-past, v18-public, v18-ok]
     choices:
       - id: a18-more
@@ -1037,7 +1037,7 @@ points:
           - { id: a18-c-care, points: 5, axis: care, refs: [ipa-sme-guideline] }
           - { id: a18-c-time, points: 4, axis: time, refs: [jpcert-handling] }
       - id: a18-design-plus
-        text: { ja: '仕組みに加え、委託先の受け入れ時の権限審査と、退場時の権限削除を契約に書き込み、半年ごとに検証する。', en: '' }
+        text: { ja: '仕組みに加え、委託先の受け入れ時の権限審査と、退場時の権限削除を契約に盛り込むよう人事・法務に提案し、半年ごとの検証を続ける。', en: '' }
         minutes: 240
         category: increase
         points: 400
@@ -1198,12 +1198,12 @@ voices:
   - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '今日は経理の更新が優先だ。調査は明日でいい。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: '受付の現場「同じ名簿の項目を、さっき別の会社からも聞かれました」。', en: '' }, trigger: { at: point } }
   - { id: v01-after, media: news, misleading: false, text: { ja: '先に謝るとは、責任を認めたことになる。', en: '' }, trigger: { at: after, choice: a01-check-report } }
-  - { id: v02-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'アカウントを消して端末を初期化すれば、痕跡も消えて丸く収まりますよ。', en: '' }, trigger: { at: point } }
+  - { id: v02-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '端末を新品に替えれば同じ経路はもう使えません。クライアントにも早く安心してもらえます。', en: '' }, trigger: { at: point } }
   - { id: v02-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '怪しい端末は電源を抜いて倉庫にしまっておきました。これで安全です。', en: '' }, trigger: { at: point } }
-  - { id: v02-popular, media: sns, misleading: true, type: popular, text: { ja: '他のプレイヤーの多くは、様子を見るを選んでいます。', en: '' }, trigger: { at: point } }
+  - { id: v02-popular, media: sns, misleading: true, type: popular, text: { ja: '他のプレイヤーの多くは、『様子を見る』を選んでいます。', en: '' }, trigger: { at: point } }
   - { id: v02-ok, media: chat, misleading: false, text: { ja: '情シスの同僚「止める前に、ログイン中のセッションと接続元を控えましょう」。', en: '' }, trigger: { at: point } }
   - { id: v02-after, media: sns, misleading: false, text: { ja: '現場の仕事を止めるのか。他のセンターは動いている。', en: '' }, trigger: { at: after, choice: a02-stop-rotate } }
-  - { id: v03-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '電源を抜いておきました。熱も持たないし、安全です。', en: '' }, trigger: { at: point } }
+  - { id: v03-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '保証が切れる前に、メーカーに点検に出しましょう。触らないほうが安全です。', en: '' }, trigger: { at: point } }
   - { id: v03-past, media: boss, misleading: true, type: past-success, text: { ja: '前回も端末を初期化して済んだ。今回も同じでいい。', en: '' }, trigger: { at: point } }
   - { id: v03-ok, media: chat, misleading: false, text: { ja: '外部の相談窓口「電源を入れ直す前に、保全の順序を決めましょう」。', en: '' }, trigger: { at: point } }
   - { id: v03-after, media: news, misleading: false, text: { ja: '端末を返さないのか。業務が回らない。', en: '' }, trigger: { at: after, choice: a03-preserve-plus } }
@@ -1217,7 +1217,7 @@ voices:
   - { id: v05-after, media: boss, misleading: false, text: { ja: 'まだ分かっていないのに、上に報告するのか。', en: '' }, trigger: { at: after, choice: a05-report-plus } }
   - { id: v06-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '証拠は弊社で預かります。御社は業務に集中してください。', en: '' }, trigger: { at: point } }
   - { id: v06-law, media: board, misleading: true, type: law-ish, text: { ja: '派遣先に捜査権はありません。端末は持ち帰らせるのが筋です。', en: '' }, trigger: { at: point } }
-  - { id: v06-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「端末はこちらの管理下に置いたまま、複製を渡す形にしましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「端末はこちらの管理下に置いたまま、事実確認に必要な記録だけを弁護士を通じて渡しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v06-after, media: vendor, misleading: false, text: { ja: '派遣元に証拠を渡さないのか。角が立つぞ。', en: '' }, trigger: { at: after, choice: a06-joint-police } }
   - { id: v07-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'もう一人いるなら、全員を即刻退場させろ。それが一番早い。', en: '' }, trigger: { at: point } }
   - { id: v07-past, media: boss, misleading: true, type: past-success, text: { ja: '前回の情報漏えいも、注意すれば収まった。今回は大ごとにしないでいい。', en: '' }, trigger: { at: point } }
@@ -1228,17 +1228,17 @@ voices:
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '人事「事実確認の前に名前を出すと、こちらが加害者になります」。', en: '' }, trigger: { at: point } }
   - { id: v08-after, media: news, misleading: false, text: { ja: '社員を疑うのか。証拠もないのに。', en: '' }, trigger: { at: after, choice: a08-verify-plus } }
   - { id: v09-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '担当者の個人アカウントで反論すれば、現場の声として響きます。', en: '' }, trigger: { at: point } }
-  - { id: v09-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '黙ってれば収まる。反応するから注目されるんだ。', en: '' }, trigger: { at: point } }
+  - { id: v09-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '黙ってれば収まる。反応するから注目されるんだ。', en: '' }, trigger: { at: point } }
   - { id: v09-ok, media: chat, misleading: false, text: { ja: '広報「確認できた事実だけを、会社の窓口から出しましょう」。', en: '' }, trigger: { at: point } }
   - { id: v09-after, media: sns, misleading: false, text: { ja: '会社の窓口だけでは、現場の声は届かない。', en: '' }, trigger: { at: after, choice: a09-facts-window } }
   - { id: v10-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が固まるまで出さない。中途半端な数字は後で響く。', en: '' }, trigger: { at: point } }
-  - { id: v10-law, media: board, misleading: true, type: law-ish, text: { ja: '委託先の事件だから、報告はクライアント側だけで足ります。', en: '' }, trigger: { at: point } }
-  - { id: v10-ok, media: chat, misleading: false, text: { ja: '法務「自社が保有する個人データも対象です。分かった範囲で書けます」。', en: '' }, trigger: { at: point } }
+  - { id: v10-law, media: board, misleading: true, type: law-ish, text: { ja: '委託先なんだから、うちは何も出さなくていい。クライアントへの連絡も急がなくていい。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '法務「クライアントへ速やかに通知すれば当社の報告は免除されます（施行規則第9条）。通知が済んでいない社の分と、自社が保有するデータは当社が速報を出します」。', en: '' }, trigger: { at: point } }
   - { id: v10-after, media: news, misleading: false, text: { ja: '件数も分からないのに、速報の材料を出すのか。', en: '' }, trigger: { at: after, choice: a10-material-plus } }
   - { id: v11-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '警察に出すと、派遣元の評判が落ちます。内々にしましょう。', en: '' }, trigger: { at: point } }
   - { id: v11-flattery, media: chat, misleading: true, type: flattery, text: { ja: 'あなたが一人で説明すれば十分です。資料はいりません。', en: '' }, trigger: { at: point } }
   - { id: v11-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「時系列と保全の記録を、そのまま渡せる形にしましょう」。', en: '' }, trigger: { at: point } }
-  - { id: v11-after, media: news, misleading: false, text: { ja: '警察に資料を渡すとは、会社を売る気か。', en: '' }, trigger: { at: after, choice: a11-pack-plus } }
+  - { id: v11-after, media: boss, misleading: false, text: { ja: '警察に資料を渡すとは、会社を売る気か。', en: '' }, trigger: { at: after, choice: a11-pack-plus } }
   - { id: v12-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '24時間以内に連絡しなければ、全部公開する。', en: '' }, trigger: { at: point } }
   - { id: v12-public, media: sns, misleading: true, type: public-opinion, text: { ja: '払ってでも止めろ。名簿を守るのが先だ。', en: '' }, trigger: { at: point } }
   - { id: v12-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「返信せず、メールを保全して警察に渡しましょう」。', en: '' }, trigger: { at: point } }
@@ -1264,7 +1264,7 @@ voices:
   - { id: v17-ok, media: chat, misleading: false, text: { ja: '広報「再発防止に効く範囲で、固有名詞は伏せましょう」。', en: '' }, trigger: { at: point } }
   - { id: v17-after, media: sns, misleading: false, text: { ja: '手口を伏せるなんて、責任逃れだ。', en: '' }, trigger: { at: after, choice: a17-sanitized-plus } }
   - { id: v18-past, media: boss, misleading: true, type: past-success, text: { ja: '研修を増やせば防げる。前回もそうやって乗り切った。', en: '' }, trigger: { at: point } }
-  - { id: v18-public, media: sns, misleading: true, type: public-opinion, text: { ja: '犯人を厳しく処分すれば、次は起きない。', en: '' }, trigger: { at: point } }
+  - { id: v18-public, media: sns, misleading: true, type: public-opinion, text: { ja: '持ち出した本人を厳しく処分すれば、次は起きない。', en: '' }, trigger: { at: point } }
   - { id: v18-ok, media: chat, misleading: false, text: { ja: '人事「研修の点数と、権限の設計は別ですね」。', en: '' }, trigger: { at: point } }
   - { id: v18-after, media: sns, misleading: false, text: { ja: '研修を仕組みで置き換えるとは、人を信じていないのか。', en: '' }, trigger: { at: after, choice: a18-design-plus } }
   - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「調査中」なんだ。', en: '' }, trigger: { at: manual } }

@@ -3,7 +3,7 @@
 # 視点: 専任のセキュリティ部署がない会社で、情報システム部の兼任として対応を組み立てる部門長。
 #       技術の事実を経営の言葉に訳し、証拠の保全と復旧の両立を判断する。
 estimateMinutes: 45
-intro: { ja: 'あなたはコネクトコール情報システム部のセキュリティ責任者で、CSIRTのリーダーを兼ねる。専任のセキュリティ部署はない。情報システム部長の下で、外部の相談先と現場の兼任メンバーを束ね、技術の事実を経営の言葉に訳す。午前10時の一本の電話から、あなたの三週間が始まる。', en: '' }
+intro: { ja: 'あなたはコネクトコール情報システム部のセキュリティ責任者で、CSIRTのリーダーを兼ねる。専任のセキュリティ部署はない。情報システム部長の下で、外部の相談先と現場の兼任メンバーを束ね、技術の事実を経営の言葉に訳す。午前10時の一本の電話から、あなたの一か月が始まる。', en: '' }
 pressEnabled: true
 cowardVoices:
   '2': v-coward-2
@@ -118,7 +118,7 @@ points:
           - { id: p02-b-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
           - { id: p02-b-time, points: -8, axis: time, refs: [jpcert-handling] }
       - id: p02-image
-        text: { ja: 'メモリとディスクのイメージを取得し、ハッシュ値と保管場所を記録してから端末を隔離する。', en: '' }
+        text: { ja: 'ディスクのイメージを取得し、ハッシュ値と保管場所を記録してから端末を隔離する。', en: '' }
         minutes: 90
         category: maintain
         points: 10
@@ -132,8 +132,8 @@ points:
       - id: p02-chain
         text: { ja: 'イメージの取得に加え、外部媒体と接続記録も同じ手順で保全し、取得の担当と時刻を管理の連鎖として残す。', en: '' }
         minutes: 150
-        category: recover
-        points: 100
+        category: maintain
+        points: 30
         refs: [nist-sp800-61r3, cissp-cbk-secops]
         gauges: { damage: -10, stamina: -20, trust: 5 }
         setFlags: { evidencePreserved: true, evidenceChain: true }
@@ -291,7 +291,7 @@ points:
     at: { day: 1, minutes: 900 }
     phase: organize
     sound: { se: [mail_arrive] }
-    text: { ja: '午後3時。派遣元の技術担当が来た。「端末は弊社が管理しています。ログも弊社にあります。御社には渡せません」。責任分界と、調査への協力をどう求めるか。', en: '' }
+    text: { ja: '午後3時。派遣元の技術担当が来た。「本人の貸与PCと作業日報は弊社の管理です。御社には渡せません」。責任分界と、調査への協力をどう求めるか。', en: '' }
     voices: [v06-vendor, v06-law, v06-ok]
     choices:
       - id: p06-leave
@@ -338,6 +338,7 @@ points:
     voices: [v07-expert, v07-boss, v07-ok]
     notable:
       - { id: note-range, text: { ja: '持ち出しは10年に及ぶ可能性があり、ログは半年で上書きされていた。', en: '' } }
+      - { id: note-scale, text: { ja: '持ち出しは10年に及ぶ可能性がある。影響するクライアントは確認済みと調査中に分けて把握している。', en: '' } }
     choices:
       - id: p07-recent
         text: { ja: '直近一年だけを調べ、それ以前は不明として扱う。', en: '' }
@@ -434,7 +435,7 @@ points:
 
   - id: p09-ppc
     at: { day: 2, minutes: 1020 }
-    phase: notify
+    phase: investigate
     sound: { se: [typing] }
     text: { ja: '午後5時。個人情報保護委員会への速報の期限が近い。法務と広報が、書く技術的事実を待っている。確定したことと、まだ分からないことが混ざっている。', en: '' }
     voices: [v09-law, v09-boss, v09-ok]
@@ -482,7 +483,7 @@ points:
     at: { day: 3, minutes: 600 }
     phase: investigate
     sound: { se: [phone_ring] }
-    text: { ja: '午前10時。名簿を買った業者から社長宛に電話があった。「こちらの顧客に電話している。止めてほしいなら、それなりの額を用意しろ」。同じ権限を持つ同僚たちは、まだ通常の業務に入っている。', en: '' }
+    text: { ja: '午前10時。名簿を買った業者から社長宛に電話があった。「こちらの顧客に電話している。止めてほしいなら、それなりの額を用意しろ」。アカウントを止めた同権限の同僚たちは、別の業務に移って待機している。名簿の不正な売買と金銭の要求は犯罪です。', en: '' }
     voices: [v10-attacker, v10-insider, v10-ok]
     choices:
       - id: p10-pay
@@ -594,7 +595,7 @@ points:
 
   - id: p12-field
     at: { day: 4, minutes: 600 }
-    phase: organize
+    phase: investigate
     sound: { se: [notify_chat] }
     text: { ja: '午前10時。対策本部は四日目。情報システム部の三人は寝ていない。受電の現場からは「また研修か」と反発が出ている。交代と社内への説明をどうするか。', en: '' }
     voices: [v12-flattery, v12-public, v12-ok]
@@ -812,7 +813,7 @@ points:
 
   - id: p17-final
     at: { day: 20, minutes: 600 }
-    phase: notify
+    phase: recover
     sound: { se: [clock_tick] }
     text: { ja: '午前10時。確報を出せる状態になった。期限はまだ先だが、対象者数はまだ動いている。どう出すか。', en: '' }
     voices: [v17-law, v17-boss, v17-ok]
@@ -942,7 +943,7 @@ points:
     at: { day: 31, minutes: 540 }
     phase: after
     sound: { se: [shutter] }
-    text: { ja: '午前9時。明日の記者会見。技術的な質問が来るのは分かっている。どの資料を手元に置き、何を最初に述べるか。', en: '' }
+    text: { ja: '午前9時。今日の記者会見。技術的な質問が来るのは分かっている。どの資料を手元に置き、何を最初に述べるか。', en: '' }
     voices: [v20-bold, v20-popular, v20-ok]
     popular: { choiceId: p20-script, percent: 55 }
     choices:
@@ -1094,7 +1095,7 @@ voices:
   - { id: v01-ok, media: chat, misleading: false, text: { ja: '運用統括「該当の保守アカウントは、夜間も使える状態です」。', en: '' }, trigger: { at: point } }
   - { id: v01-after, media: sns, misleading: false, text: { ja: 'アカウントを止めたところで、顧客は何が起きたか分からないままだ。', en: '' }, trigger: { at: after, choice: p01-stop-preserve } }
   - { id: v02-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '怪しかったので、端末の電源は抜いて、机の下にしまっておきました。', en: '' }, trigger: { at: point } }
-  - { id: v02-expert, media: news, misleading: true, type: fake-expert, text: { ja: '端末は初期化して作り直すのが一番安全です。証拠も残りませんから。', en: '' }, trigger: { at: point } }
+  - { id: v02-expert, media: news, misleading: true, type: fake-expert, text: { ja: '端末は初期化して作り直すのが一番安全です。同じ端末を使い続けるほうが危ない。', en: '' }, trigger: { at: point } }
   - { id: v02-ok, media: chat, misleading: false, text: { ja: '情報システム「夜間に外部媒体へ書き出した形跡が、ログに残っています」。', en: '' }, trigger: { at: point } }
   - { id: v03-ops, media: boss, misleading: true, type: boss-pressure, text: { ja: '全員止めると受電が回らない。本人のアカウントだけで済ませてくれ。', en: '' }, trigger: { at: point } }
   - { id: v03-public, media: sns, misleading: true, type: coward-critique, text: { ja: 'まだ止めていないのか。のんびりした会社だな。', en: '' }, trigger: { at: point } }
@@ -1109,7 +1110,7 @@ voices:
   - { id: v06-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '調査は弊社でやります。御社は関わらないほうがいい。', en: '' }, trigger: { at: point } }
   - { id: v06-law, media: board, misleading: true, type: law-ish, text: { ja: '派遣契約に免責条項があるので、御社は何もしなくて大丈夫です。', en: '' }, trigger: { at: point } }
   - { id: v06-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「秘密保持条項と、個人情報の取扱いの別紙を確認しましょう」。', en: '' }, trigger: { at: point } }
-  - { id: v07-expert, media: news, misleading: true, type: fake-expert, text: { ja: 'ログが無いなら、分からなかったことでいいじゃないですか。報告書は直近一年で作りましょう。', en: '' }, trigger: { at: point } }
+  - { id: v07-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'ログが無いなら、分からなかったことでいいじゃないですか。報告書は直近一年で作りましょう。', en: '' }, trigger: { at: point } }
   - { id: v07-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '10年分なんて調べきれない。直近だけで十分だ。', en: '' }, trigger: { at: point } }
   - { id: v07-ok, media: chat, misleading: false, text: { ja: '調査担当「当時のバックアップ媒体が、倉庫に残っているかもしれません」。', en: '' }, trigger: { at: point } }
   - { id: v08-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '弊社に一括で任せれば、原因も範囲も全部分かります。追加費用はかかりません。', en: '' }, trigger: { at: point } }
@@ -1117,7 +1118,7 @@ voices:
   - { id: v08-ok, media: chat, misleading: false, text: { ja: '経理「保険の対象になるなら、着手の前に連絡が必要です」。', en: '' }, trigger: { at: point } }
   - { id: v09-law, media: board, misleading: true, type: law-ish, text: { ja: '不正の目的かどうか分からないうちは、報告しなくていい。', en: '' }, trigger: { at: point } }
   - { id: v09-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が固まるまで待て。中途半端な数字は出すな。', en: '' }, trigger: { at: point } }
-  - { id: v09-ok, media: chat, misleading: false, text: { ja: '法務「不正の目的のおそれがあれば、件数に関係なく報告対象です」。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '法務「クライアントへ速やかに通知すれば当社の報告は免除されます（施行規則第9条）。通知が済んでいない社の分と、自社が保有するデータは当社が速報を出します」。', en: '' }, trigger: { at: point } }
   - { id: v09-after, media: news, misleading: false, text: { ja: '件数も分からないのに速報を出すのか。また訂正か。', en: '' }, trigger: { at: after, choice: p09-file-split } }
   - { id: v10-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '今日中に連絡がなければ、買い手に全部渡す。', en: '' }, trigger: { at: point } }
   - { id: v10-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の者だけど、実は社内にもう一人協力者がいる。今すぐ全員を切らないと間に合わない。', en: '' }, trigger: { at: point } }
@@ -1129,7 +1130,7 @@ voices:
   - { id: v12-public, media: sns, misleading: true, type: public-opinion, text: { ja: '休んでいる暇があるのか。顧客は待っている。', en: '' }, trigger: { at: point } }
   - { id: v12-ok, media: chat, misleading: false, text: { ja: '人事「交代制にしないと、三日目に人が倒れます」。', en: '' }, trigger: { at: point } }
   - { id: v13-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '原因は弊社の製品ではありません。運用の問題と書いてください。', en: '' }, trigger: { at: point } }
-  - { id: v13-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '「絶対に許さない」と書けば、支持が集まりますよ。', en: '' }, trigger: { at: point } }
+  - { id: v13-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '公表文に『絶対に許さない』と入れれば、同情が集まりますよ。', en: '' }, trigger: { at: point } }
   - { id: v13-ok, media: chat, misleading: false, text: { ja: '広報「数字と日付は、記録と一致させたい」。', en: '' }, trigger: { at: point } }
   - { id: v14-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '既存の環境を再起動すれば、半日で戻せます。', en: '' }, trigger: { at: point } }
   - { id: v14-coward, media: news, misleading: true, type: coward-critique, text: { ja: '一週間も止めているのは臆病すぎる。他社はもう再開している。', en: '' }, trigger: { at: point } }
@@ -1139,7 +1140,7 @@ voices:
   - { id: v15-ops, media: boss, misleading: true, type: boss-pressure, text: { ja: '受電の数字が落ちている。権限を戻せ。', en: '' }, trigger: { at: point } }
   - { id: v15-ok, media: chat, misleading: false, text: { ja: '現場リーダー「絞った権限でも、回せないことはありません」。', en: '' }, trigger: { at: point } }
   - { id: v16-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '監視は弊社のサービスを入れれば全部見えます。今日から契約できます。', en: '' }, trigger: { at: point } }
-  - { id: v16-coward, media: news, misleading: true, type: coward-critique, text: { ja: '二次被害は自社の責任ではない。下手に認めるな。', en: '' }, trigger: { at: point } }
+  - { id: v16-coward, media: board, misleading: true, type: law-ish, text: { ja: '二次被害まで自社の責任にすると、後の賠償に響きます。認めないほうが安全です。', en: '' }, trigger: { at: point } }
   - { id: v16-ok, media: chat, misleading: false, text: { ja: '現場「同じ番号から、何件も問い合わせが来ています」。', en: '' }, trigger: { at: point } }
   - { id: v17-law, media: board, misleading: true, type: law-ish, text: { ja: '件数が確定するまで待って、それから出せばいい。', en: '' }, trigger: { at: point } }
   - { id: v17-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '数字が増えると取引先に響く。もう少し待とう。', en: '' }, trigger: { at: point } }
