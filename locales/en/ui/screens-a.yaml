@@ -16,7 +16,7 @@ sa.title.sub: Everyone has an opinion during an incident. What if you were the o
 sa.title.start: Start
 sa.title.continue: Continue
 sa.title.resumeTarget: "Continue: {scenario} / {role}"
-sa.title.about: About this tool
+sa.title.about: About this simulator
 sa.title.soundNotice: Sound is on. You can change the volume in Settings.
 sa.title.langJa: 日本語
 sa.title.langEn: English

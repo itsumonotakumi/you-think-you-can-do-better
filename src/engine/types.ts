@@ -111,6 +111,8 @@ export interface DecisionPoint {
   /** プレイヤーが記録に残せる事実 */
   notable?: { id: string; text: Localized }[];
   choices: Choice[];
+  /** 振り返り用: この場面でどうあるべきか（模範の考え方）。80〜200字 */
+  lesson?: Localized;
 }
 
 export interface DetailItem {
@@ -135,6 +137,8 @@ export interface Choice {
   fatalAlternate?: number;
   /** 選ぶと取れる細目 */
   items?: DetailItem[];
+  /** 振り返り用: なぜこの点数か（良い点・悪い点）。40〜120字。正誤を示すので本編では表示しない */
+  explain?: Localized;
 }
 
 export interface DelayedSpec {

@@ -16,7 +16,7 @@ test.describe('タイトル', () => {
     await expect(notices).toContainText('サイバー攻撃で悪いのは、攻撃した犯罪者です');
     await expect(notices).toContainText('被害に遭った企業や人を責めるためのツールではありません');
     await expect(notices).toContainText('高得点が取れても、現実の対応が正しいとは限りません');
-    await expect(notices).toContainText('このツールについて');
+    await expect(notices).toContainText('このシミュレーターについて');
 
     // 設定・クレジットへ入れる
     await expect(page.getByRole('button', { name: '設定' })).toBeVisible();

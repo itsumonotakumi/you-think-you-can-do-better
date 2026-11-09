@@ -16,7 +16,7 @@ sa.title.sub: 事件のとき、外野は好きなことを言う。では、あ
 sa.title.start: はじめる
 sa.title.continue: 続きから
 sa.title.resumeTarget: "続きから：{scenario} / {role}"
-sa.title.about: このツールについて
+sa.title.about: このシミュレーターについて
 sa.title.soundNotice: 音が出ます。設定で音量を変えられます。
 sa.title.langJa: 日本語
 sa.title.langEn: English
