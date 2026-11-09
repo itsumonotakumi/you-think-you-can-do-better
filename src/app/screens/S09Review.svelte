@@ -38,6 +38,7 @@
 </script>
 
 <script lang="ts">
+  import { mediaLabelKey } from '../parts/logic';
   // S09 振り返り: 各判断・細目・根拠・誘導の声をまとめて出す
   import { onMount } from 'svelte';
   import { buildReport } from '../../engine';
@@ -152,7 +153,7 @@
   }
 
   function mediaKey(media: Media): string {
-    return `sc.media.${media}`;
+    return mediaLabelKey(media, $play?.role, 'sc');
   }
 
   function hoursText(hours: number): string {

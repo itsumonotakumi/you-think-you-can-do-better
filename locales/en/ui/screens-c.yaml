@@ -7,6 +7,8 @@ sc:
     board: "Forum"
     chat: "Internal chat"
     boss: "Boss"
+    boss_executive: "Executives / staff"
+    boss_officer: "Parent company / staff"
     vendor: "Client"
     attacker: "Attacker"
   notes:
@@ -104,7 +106,7 @@ sc:
       coward-critique: "Cowardice critique"
       fake-expert: "Self-proclaimed expert"
       well-meant-field: "Well-meant field"
-      boss-pressure: "Boss pressure"
+      boss-pressure: "Internal pressure"
       law-ish: "Law-ish"
       vendor-interest: "Vendor interest"
       attacker-shake: "Attacker's shake"

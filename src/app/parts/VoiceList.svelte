@@ -1,6 +1,7 @@
 <script lang="ts">
   // 世間の声。媒体アイコンと文字だけ。誘導かどうかで見た目を変えない
   import { t, loc } from '../../i18n';
+  import { play } from '../store';
   import { formatClock, mediaGlyph, mediaLabelKey, splitVoices, type VoiceItem } from './logic';
 
   let { voices }: { voices: VoiceItem[] } = $props();
@@ -15,7 +16,7 @@
       <li class="voice" data-media={voice.media}>
         <span class="meta">
           <span class="badge" data-media={voice.media} aria-hidden="true">{mediaGlyph(voice.media)}</span>
-          <span class="media">{t(mediaLabelKey(voice.media))}</span>
+          <span class="media">{t(mediaLabelKey(voice.media, $play?.role))}</span>
           <time class="time">{formatClock(voice.at)}</time>
         </span>
         <p class="text">{loc(voice.text)}</p>

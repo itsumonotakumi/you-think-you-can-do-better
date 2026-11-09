@@ -7,6 +7,8 @@ sc:
     board: "掲示板"
     chat: "社内チャット"
     boss: "上司"
+    boss_executive: "役員・社内"
+    boss_officer: "親会社・社内"
     vendor: "取引先"
     attacker: "攻撃者"
   notes:
@@ -104,7 +106,7 @@ sc:
       coward-critique: "臆病への批判"
       fake-expert: "自称専門家"
       well-meant-field: "善意の現場"
-      boss-pressure: "上司の圧力"
+      boss-pressure: "社内の圧力"
       law-ish: "それっぽい法律"
       vendor-interest: "ベンダーの都合"
       attacker-shake: "攻撃者の揺さぶり"

@@ -40,6 +40,6 @@ describe('カードの色分け', () => {
   });
 
   it('色だけに頼らず、声の媒体名を文字でも出す', () => {
-    expect(read('/parts/VoiceList.svelte')).toContain('mediaLabelKey(voice.media)');
+    expect(read('/parts/VoiceList.svelte')).toContain('mediaLabelKey(voice.media');
   });
 });

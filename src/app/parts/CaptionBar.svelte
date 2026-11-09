@@ -4,6 +4,7 @@
   // 表示待ちは store の captions、表示し終えたものは captionHistory に残す。
   import { t, loc } from '../../i18n';
   import { captionHistory, captions } from '../store';
+  import { play } from '../store';
   import { formatClock, groupCaptions, isKnownSe, mediaLabelKey, type ShownCaption } from './logic';
 
   /** 履歴として並べる件数（同じ文言は1件にまとめた後で数える） */
@@ -20,12 +21,12 @@
     }
     if (caption.kind === 'voice') {
       if (caption.media === 'boss' || caption.media === 'vendor') {
-        return t('sb.caption.call', { who: t(mediaLabelKey(caption.media)) });
+        return t('sb.caption.call', { who: t(mediaLabelKey(caption.media, $play?.role)) });
       }
       if (caption.media === 'attacker') {
-        return t('sb.caption.mail', { who: t(mediaLabelKey(caption.media)) });
+        return t('sb.caption.mail', { who: t(mediaLabelKey(caption.media, $play?.role)) });
       }
-      return t('sb.caption.notify', { media: t(mediaLabelKey(caption.media)) });
+      return t('sb.caption.notify', { media: t(mediaLabelKey(caption.media, $play?.role)) });
     }
     if (caption.kind === 'clock') return t('sb.caption.clock', { time: formatClock(caption.to) });
     const prefix = caption.prefixKey ? `${t(caption.prefixKey)}：` : '';

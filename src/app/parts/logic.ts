@@ -125,8 +125,10 @@ export function splitForFatigue(text: string, stamina: number): SplitText {
 
 // ---------------- 世間の声 ----------------
 
-export function mediaLabelKey(media: Media): string {
-  return `sb.media.${media}`;
+/** 媒体の表示名のキー。「上司」は経営者・グループ会社社長には不自然なので、ロールで呼び名を変える */
+export function mediaLabelKey(media: Media, role?: string, prefix = 'sb'): string {
+  if (media === 'boss' && (role === 'executive' || role === 'officer')) return `${prefix}.media.boss_${role}`;
+  return `${prefix}.media.${media}`;
 }
 
 export function mediaGlyph(media: Media): string {

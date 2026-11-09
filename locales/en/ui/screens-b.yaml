@@ -77,6 +77,8 @@ sb:
     board: "Forum"
     chat: "Internal chat"
     boss: "Boss"
+    boss_executive: "Executives / staff"
+    boss_officer: "Parent company / staff"
     vendor: "Client"
     attacker: "Attacker"
   notes:
