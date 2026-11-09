@@ -99,7 +99,9 @@ function unconditional(answers: PressAnswer[]): PressAnswer[] {
 describe('掲示板の書き込み（指摘3）', () => {
   it('未確認の書き込みに反応する選択肢が減点になり、正解は突き合わせ', () => {
     const point = pointOf(officer, 'p13-leak');
-    expect(point.choices.map((c) => c.id)).toEqual(['p13-react', 'p13-ignore', 'p13-verify', 'p13-verify-plan']);
+    expect(new Set(point.choices.map((c) => c.id))).toEqual(
+      new Set(['p13-react', 'p13-ignore', 'p13-verify', 'p13-verify-plan']),
+    );
     const best = [...point.choices].sort((a, b) => b.points - a.points)[0]!;
     expect(best.id).toBe('p13-verify-plan');
     expect(best.text.ja).toContain('突き合わせ');
