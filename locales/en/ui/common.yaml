@@ -7,6 +7,7 @@ common.next: Next
 common.confirm: Confirm
 common.cancel: Cancel
 common.ok: OK
+common.debugMode: Debug view
 common.settings: Settings
 common.credits: Credits
 common.close: Close

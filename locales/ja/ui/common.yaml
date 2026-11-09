@@ -7,6 +7,7 @@ common.next: 次へ
 common.confirm: 確定
 common.cancel: キャンセル
 common.ok: OK
+common.debugMode: デバッグ表示
 common.settings: 設定
 common.credits: クレジット
 common.close: 閉じる

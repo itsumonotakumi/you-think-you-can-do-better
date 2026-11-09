@@ -48,6 +48,10 @@
   import { loadReferences } from '../../data/loader';
   import { loc, notice, t } from '../../i18n';
   import { play, scenario, screen, settings } from '../store';
+  import { isDebug } from '../debug';
+  import {
+    bestChoiceOf, draftReviews, hasLocalized, isBestChoice,
+  } from '../parts/review';
   import {
     formatClock, mediaGlyph, minutesBetween,
   } from '../parts/logic';
@@ -73,6 +77,8 @@
     $play && $scenario ? Math.max(0, minutesBetween($scenario.start, $play.clock)) / 60 : 0,
   );
   const shownHours = $derived(publishedHours ?? elapsedHours);
+  // 細目は通常隠す。?debug=1 または #debug のときだけ出す
+  const debug = isDebug();
 
   const pointsById = $derived(new Map(
     (role?.points ?? []).map((point) => [point.id, point] as const),
@@ -87,6 +93,9 @@
     ...($scenario?.press?.questions ?? []),
     ...(($scenario?.press?.extraQuestions ?? []).map((entry) => entry.question)),
   ].map((question) => [question.id, question] as const)));
+  const draftGroups = $derived(
+    report && role ? draftReviews(role, report.itemsEarned.map((item) => item.id)) : [],
+  );
 
   $effect(() => {
     audio.setVolumes({ bgm: $settings.bgmVolume, se: $settings.seVolume, muted: $settings.muted });
@@ -151,12 +160,15 @@
   }
 </script>
 
-<section class="screen review" data-screen="S09Review">
+<section class="screen review" data-screen="S09Review" data-debug={debug ? 'on' : 'off'}>
   <header class="review-head">
     <p class="eyebrow">{t('sc.review.title')}</p>
     <h1>{t('sc.review.title')}</h1>
     {#if report}
       <p class="play-count">{t('sc.playCount', { n: report.playCount })}</p>
+    {/if}
+    {#if debug}
+      <p class="debug-badge">{t('common.debugMode')}</p>
     {/if}
   </header>
 
@@ -188,6 +200,8 @@
           {#each report.entries as entry (entry.pointId + ':' + entry.choiceId + ':' + entry.at.day + ':' + entry.at.minutes)}
             {@const point = pointOf(entry.pointId)}
             {@const choice = choiceOf(entry.choiceId)}
+            {@const best = point ? bestChoiceOf(point) : null}
+            {@const notBest = point !== null && choice !== null && !isBestChoice(point, choice)}
             <li class="entry">
               <div class="entry-head">
                 <span class="entry-time">{formatClock(entry.at)}</span>
@@ -200,11 +214,37 @@
                   <dt>{t('sc.review.policyPoints')}</dt>
                   <dd>{signed(entry.policyPoints)}</dd>
                 </div>
-                <div>
-                  <dt>{t('sc.review.itemPoints')}</dt>
-                  <dd>{signed(entry.itemPoints)}</dd>
-                </div>
+                {#if debug}
+                  <div>
+                    <dt>{t('sc.review.itemPoints')}</dt>
+                    <dd>{signed(entry.itemPoints)}</dd>
+                  </div>
+                {/if}
               </dl>
+
+              {#if hasLocalized(choice?.explain)}
+                <div class="entry-block explanation">
+                  <h3>{t('sc.review.explainHeading')}</h3>
+                  <p>{loc(choice.explain)}</p>
+                </div>
+              {/if}
+
+              {#if hasLocalized(point?.lesson)}
+                <div class="entry-block lesson">
+                  <h3>{t('sc.review.lessonHeading')}</h3>
+                  <p>{loc(point.lesson)}</p>
+                </div>
+              {/if}
+
+              {#if notBest && best}
+                <div class="entry-block model-choice">
+                  <h3>{t('sc.review.bestHeading')}</h3>
+                  <p class="model-choice-text">{loc(best.text)}</p>
+                  {#if hasLocalized(best.explain)}
+                    <p>{loc(best.explain)}</p>
+                  {/if}
+                </div>
+              {/if}
 
               <div class="entry-block">
                 <h3>{t('sc.review.refsHeading')}</h3>
@@ -227,10 +267,9 @@
                 {/if}
               </div>
 
-              {#if entry.movedBy.some((moved) => moved.misleading)}
+              {#if notBest && entry.movedBy.some((moved) => moved.misleading)}
                 <div class="entry-block moved">
                   <h3>{t('sc.review.movedHeading')}</h3>
-                  <p class="hint">{t('sc.review.movedNote')}</p>
                   <ul class="voice-list">
                     {#each entry.movedBy.filter((moved) => moved.misleading) as moved}
                       {@const voice = voiceOf(moved.voiceId)}
@@ -267,43 +306,77 @@
       {/if}
     </section>
 
-    <section class="panel" aria-labelledby="review-items-heading">
-      <h2 id="review-items-heading">{t('sc.review.itemsHeading')}</h2>
-      <div class="item-cols">
-        <section>
-          <h3>{t('sc.review.itemsEarned')}</h3>
-          {#if report.itemsEarned.length === 0}
-            <p class="muted">{t('sc.review.itemsEarnedEmpty')}</p>
-          {:else}
-            <ul class="item-list">
-              {#each report.itemsEarned as item (item.id)}
-                <li>
-                  <span class="axis">{t(axisLabelKey(item.axis))}</span>
-                  <span class="item-id">{item.id}</span>
-                  <span class="pts">{signed(item.points)}</span>
-                </li>
+    {#if draftGroups.length > 0}
+      <section class="panel" aria-labelledby="review-drafts-heading">
+        <h2 id="review-drafts-heading">{t('sc.review.draftsHeading')}</h2>
+        <div class="draft-reviews">
+          {#each draftGroups as group (group.key)}
+            <section class="draft-review">
+              <h3>{loc(group.draft.title)}</h3>
+              {#each group.slots as slotReview (slotReview.slot.id)}
+                <div class="draft-slot">
+                  <h4>{loc(slotReview.slot.label)}</h4>
+                  <p class="label">{t('sc.review.draftChosen')}</p>
+                  <p class="draft-option">{loc(slotReview.chosen.text)}</p>
+                  {#if hasLocalized(slotReview.chosen.explain)}
+                    <p class="label">{t('sc.review.explainHeading')}</p>
+                    <p class="explain">{loc(slotReview.chosen.explain)}</p>
+                  {/if}
+                  {#if slotReview.best}
+                    <p class="label">{t('sc.review.bestHeading')}</p>
+                    <p class="draft-option">{loc(slotReview.best.text)}</p>
+                    {#if hasLocalized(slotReview.best.explain)}
+                      <p class="label">{t('sc.review.explainHeading')}</p>
+                      <p class="explain">{loc(slotReview.best.explain)}</p>
+                    {/if}
+                  {/if}
+                </div>
               {/each}
-            </ul>
-          {/if}
-        </section>
-        <section>
-          <h3>{t('sc.review.itemsMissed')}</h3>
-          {#if report.itemsMissed.length === 0}
-            <p class="muted">{t('sc.review.itemsMissedEmpty')}</p>
-          {:else}
-            <ul class="item-list">
-              {#each report.itemsMissed as item (item.id)}
-                <li>
-                  <span class="axis">{t(axisLabelKey(item.axis))}</span>
-                  <span class="item-id">{item.id}</span>
-                  <span class="pts">{t('sc.review.ifChosen', { points: item.points })}</span>
-                </li>
-              {/each}
-            </ul>
-          {/if}
-        </section>
-      </div>
-    </section>
+            </section>
+          {/each}
+        </div>
+      </section>
+    {/if}
+
+    {#if debug}
+      <section class="panel" aria-labelledby="review-items-heading">
+        <h2 id="review-items-heading">{t('sc.review.itemsHeading')}</h2>
+        <div class="item-cols">
+          <section>
+            <h3>{t('sc.review.itemsEarned')}</h3>
+            {#if report.itemsEarned.length === 0}
+              <p class="muted">{t('sc.review.itemsEarnedEmpty')}</p>
+            {:else}
+              <ul class="item-list">
+                {#each report.itemsEarned as item (item.id)}
+                  <li>
+                    <span class="axis">{t(axisLabelKey(item.axis))}</span>
+                    <span class="item-id">{item.id}</span>
+                    <span class="pts">{signed(item.points)}</span>
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+          </section>
+          <section>
+            <h3>{t('sc.review.itemsMissed')}</h3>
+            {#if report.itemsMissed.length === 0}
+              <p class="muted">{t('sc.review.itemsMissedEmpty')}</p>
+            {:else}
+              <ul class="item-list">
+                {#each report.itemsMissed as item (item.id)}
+                  <li>
+                    <span class="axis">{t(axisLabelKey(item.axis))}</span>
+                    <span class="item-id">{item.id}</span>
+                    <span class="pts">{t('sc.review.ifChosen', { points: item.points })}</span>
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+          </section>
+        </div>
+      </section>
+    {/if}
 
     <section class="panel" aria-labelledby="review-press-heading">
       <h2 id="review-press-heading">{t('sc.review.pressHeading')}</h2>
@@ -488,6 +561,76 @@
   .entry-block {
     margin-top: 0.5rem;
   }
+  .entry-block p {
+    margin: 0.2rem 0 0;
+    line-height: 1.8;
+  }
+  .entry-block h3 {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.78em;
+    font-weight: 600;
+  }
+  .explanation,
+  .lesson {
+    padding: 0.45rem 0.6rem;
+    border-left: 3px solid var(--line-strong);
+    background: var(--bg-soft);
+  }
+  .model-choice {
+    padding: 0.45rem 0.6rem;
+    border-left: 3px solid var(--accent);
+    background: var(--bg-soft);
+  }
+  .model-choice-text {
+    font-weight: 600;
+  }
+  .draft-reviews {
+    display: grid;
+    gap: 0.7rem;
+  }
+  .draft-review {
+    padding: 0.6rem 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg-soft);
+  }
+  .draft-review h3 {
+    margin: 0 0 0.4rem;
+    font-size: 0.95em;
+  }
+  .draft-slot + .draft-slot {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--line);
+  }
+  .draft-slot h4 {
+    margin: 0;
+    font-size: 0.85em;
+    color: var(--text-soft);
+  }
+  .draft-option {
+    margin: 0.15rem 0 0;
+    line-height: 1.7;
+  }
+  .draft-slot .explain {
+    margin: 0.2rem 0 0;
+    color: var(--text-soft);
+    font-size: 0.9em;
+    line-height: 1.8;
+  }
+  .draft-slot .label {
+    display: block;
+    margin: 0.35rem 0 0;
+  }
+  .debug-badge {
+    margin: 0;
+    padding: 0.1rem 0.5rem;
+    border: 1px dashed var(--warn);
+    border-radius: 999px;
+    color: var(--warn);
+    font-size: 0.75em;
+  }
   .ref-list,
   .voice-list,
   .delayed-list,
@@ -658,9 +801,16 @@
     .panel,
     .entry,
     .quote,
-    .time-grid div {
+    .time-grid div,
+    .draft-review,
+    .explanation,
+    .lesson,
+    .model-choice {
       border-color: #999;
       background: #fff;
+    }
+    .debug-badge {
+      display: none;
     }
     .entry,
     .panel {
