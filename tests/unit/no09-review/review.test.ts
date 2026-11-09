@@ -102,7 +102,9 @@ describe('no09 レビュー修正', () => {
       if (next === 'point') {
         const current = currentPoint(state, scenario);
         if (!current) throw new Error('判断ポイントがない');
-        const picked = current.id === 'p05-ransom' ? 'p05-a-pay' : current.choices[0]!.id;
+        // 並び順に依存しないよう、文案（draft）を挟まない選択肢を選ぶ
+        const plain = current.choices.find((c) => !c.detail) ?? current.choices[0]!;
+        const picked = current.id === 'p05-ransom' ? 'p05-a-pay' : plain.id;
         const step = choose(state, scenario, picked);
         state = step.state;
         next = step.next;
