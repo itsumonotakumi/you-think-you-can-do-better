@@ -43,8 +43,22 @@ points:
     notable:
       - { id: note-interview, text: { ja: '最終面接の評価シートに、自分の字で「人物に問題なし。採用を推薦」と書いた。', en: '' } }
     choices:
+      - id: p01-open
+        text: { ja: '記録を保全して共有し、同じ採用の経路で進む応募者と内定者の名簿を止めて、本人確認のやり直しを指揮する。', en: '' }
+        explain: { ja: '記録の保全と共有に加え、同じ経路の応募者と内定者の確認まで進めている。採用の穴を広げない判断として評価できる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 100
+        refs: [no06-government-advisory, meti-csm-guideline]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { hiringFileKept: true, recheckStarted: true }
+        items:
+          - { id: p01-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p01-c-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+          - { id: p01-c-record, points: 4, axis: record, refs: [jpcert-handling] }
       - id: p01-quiet
-        text: { ja: 'まず自分の評価コメントを確かめ、社長への報告は事実が固まってからにする。', en: '' }
+        text: { ja: 'まず自分の評価コメントを確かめ、社長への報告は事実が固まってからにすると決めて、時間をかけて調べる。', en: '' }
+        explain: { ja: '報告を待つ間に、社長は現場から先に事情を聞く。評価コメントを確かめること自体は必要だが、共有を遅らせた点が減点。', en: '' }
         minutes: 60
         category: hurt
         points: -70
@@ -57,7 +71,8 @@ points:
           - { id: p01-a-time, points: -7, axis: time, refs: [jpcert-handling] }
           - { id: p01-a-record, points: -6, axis: record, refs: [jpcert-handling] }
       - id: p01-share
-        text: { ja: '採用の記録をそのまま保全し、面接三回の評価、経歴確認の委託先、端末の送付先を、社長とセキュリティ責任者に事実として共有する。', en: '' }
+        text: { ja: '採用の記録をそのまま保全し、面接三回の評価、経歴確認の委託先、端末の送付先を社長と共有する。', en: '' }
+        explain: { ja: '記録を保全して事実を共有しており、初動として妥当。同じ経路の応募者の確認までは踏み込んでいない。', en: '' }
         minutes: 45
         category: maintain
         points: 25
@@ -68,20 +83,9 @@ points:
           - { id: p01-b-record, points: 6, axis: record, refs: [jpcert-handling] }
           - { id: p01-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
           - { id: p01-b-content, points: 4, axis: content, refs: [no06-government-advisory] }
-      - id: p01-open
-        text: { ja: '記録を保全して共有し、同じ採用の経路で進んでいる応募者と内定者の名簿を止めて、本人確認のやり直しを自分が指揮する。', en: '' }
-        minutes: 90
-        category: recover
-        points: 100
-        refs: [no06-government-advisory, meti-csm-guideline]
-        gauges: { flame: -5, trust: 10, stamina: -10 }
-        setFlags: { hiringFileKept: true, recheckStarted: true }
-        items:
-          - { id: p01-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
-          - { id: p01-c-order, points: 6, axis: order, refs: [meti-csm-guideline] }
-          - { id: p01-c-record, points: 4, axis: record, refs: [jpcert-handling] }
       - id: p01-rewrite
-        text: { ja: '評価シートの自分のコメントを「慎重に審査した」と書き換え、記録を整える。', en: '' }
+        text: { ja: '評価シートの自分のコメントを「慎重に審査した」と書き換え、記録を整えて社内に提出する。', en: '' }
+        explain: { ja: '評価を書き換えると、採用の判断の誤りを隠すことになる。後から必ず整合が取れなくなり、信用を大きく失う。', en: '' }
         minutes: 30
         category: fatal
         points: -200
@@ -91,6 +95,7 @@ points:
         items:
           - { id: p01-d-record, points: -14, axis: record, refs: [jpcert-handling] }
           - { id: p01-d-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+    lesson: { ja: '採用の記録を止めずに保全し、面接の評価、委託先、端末の送付先を事実として共有する。同じ経路の応募者と内定者の確認も並行させる。自分の評価を書き換えるのは論外で、採用の判断そのものを消す行為になる。', en: '' }
 
   - id: p02-onboarding
     at: { day: 0, minutes: 660 }
@@ -102,7 +107,8 @@ points:
       - { id: note-hiring, text: { ja: '採用は遠隔の面接3回のみ。本人確認は人材紹介会社に委託し、対面では一度もしていない。', en: '' } }
     choices:
       - id: p02-keep
-        text: { ja: '止めずに様子を見る。仕事を止めれば、新入社員が辞めてしまう。', en: '' }
+        text: { ja: '止めずに様子を見て、仕事を止めれば新入社員が辞めてしまうとして、監視だけを強めてしのぐ。', en: '' }
+        explain: { ja: '監視だけでは同じ手口の端末が動き続ける。辞めさせない配慮に見えるが、被害の拡大を止める判断がない。', en: '' }
         minutes: 90
         category: hurt
         points: -90
@@ -114,19 +120,9 @@ points:
         items:
           - { id: p02-a-content, points: -7, axis: content, refs: [nist-sp800-61r3] }
           - { id: p02-a-time, points: -7, axis: time, refs: [nist-sp800-61r3] }
-      - id: p02-stop
-        text: { ja: '新しい端末の送付と、入社手続きを止める。', en: '' }
-        minutes: 60
-        category: maintain
-        points: 25
-        refs: [jpcert-handling]
-        gauges: { flame: 5, trust: 5, stamina: -5 }
-        setFlags: { onboardingStopped: true }
-        items:
-          - { id: p02-b-order, points: 6, axis: order, refs: [jpcert-handling] }
-          - { id: p02-b-record, points: 5, axis: record, refs: [jpcert-handling] }
       - id: p02-stop-care
         text: { ja: '送付と手続きを止め、対象の十二名に理由と見通しを書面で伝え、不安の相談窓口を設ける。', en: '' }
+        explain: { ja: '停止と説明、相談窓口を同時に整えており、対象者への配慮がある。被害を止めながら不安も減らす対応。', en: '' }
         minutes: 120
         category: recover
         points: 100
@@ -137,8 +133,21 @@ points:
           - { id: p02-c-order, points: 6, axis: order, refs: [jpcert-handling] }
           - { id: p02-c-care, points: 6, axis: care, refs: [no06-telework-guideline] }
           - { id: p02-c-record, points: 4, axis: record, refs: [jpcert-handling] }
+      - id: p02-stop
+        text: { ja: '新しい端末の送付と入社手続きを止め、対象者には理由を伝えずに待ってもらう。', en: '' }
+        explain: { ja: '送付と手続きを止める判断は妥当。ただし理由を伝えず、相談窓口もないため、対象者の不安を残す。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 25
+        refs: [jpcert-handling]
+        gauges: { flame: 5, trust: 5, stamina: -5 }
+        setFlags: { onboardingStopped: true }
+        items:
+          - { id: p02-b-order, points: 6, axis: order, refs: [jpcert-handling] }
+          - { id: p02-b-record, points: 5, axis: record, refs: [jpcert-handling] }
       - id: p02-fire
-        text: { ja: '遠隔採用の十二名全員の内定と雇用を取り消す。', en: '' }
+        text: { ja: '遠隔採用の十二名全員の内定と雇用を取り消し、他の社員にも同じ扱いを徹底する。', en: '' }
+        explain: { ja: '全員の内定を取り消すと、被害と無関係な人まで不利益を受ける。採用の穴を埋める代わりに、人を切り捨てている。', en: '' }
         minutes: 45
         category: hurt
         points: -150
@@ -147,6 +156,7 @@ points:
         items:
           - { id: p02-d-care, points: -14, axis: care, refs: [no06-telework-guideline] }
           - { id: p02-d-content, points: -10, axis: content, refs: [no06-telework-guideline] }
+    lesson: { ja: '新しい端末の送付と手続きを止め、対象者には理由と見通しを書面で伝え、相談窓口を設ける。全員の内定を取り消すと、被害と無関係な人まで傷つける。止める範囲と説明の仕方を対象者ごとに決める。', en: '' }
 
   - id: p03-agency
     at: { day: 0, minutes: 900 }
@@ -156,7 +166,8 @@ points:
     voices: [v03-agency, v03-sns, v03-legal]
     choices:
       - id: p03-trust
-        text: { ja: '先方の確認を信じ、こちらの調査は採用の話が落ち着いてからにする。', en: '' }
+        text: { ja: '先方の確認を信じ、こちらの調査は採用の話が落ち着いてからにすると伝えて、そのまま待つ方針にする。', en: '' }
+        explain: { ja: '先方の確認をそのまま信じると、同じ経路の応募者の確認が遅れる。契約上の確認権を行使しない点が弱い。', en: '' }
         minutes: 60
         category: hurt
         points: -80
@@ -166,7 +177,8 @@ points:
           - { id: p03-a-content, points: -7, axis: content, refs: [no06-government-advisory] }
           - { id: p03-a-record, points: -6, axis: record, refs: [jpcert-handling] }
       - id: p03-request
-        text: { ja: '契約に基づき、この人物の確認記録と、同じ紹介案件の記録の提出を求める。', en: '' }
+        text: { ja: '契約に基づき、この人物の確認記録と、同じ紹介案件の記録の提出を求めて精査する。', en: '' }
+        explain: { ja: '契約に基づいて記録の提出を求めている。事実の確認として妥当だが、同じ経路の全員の確認までは決めていない。', en: '' }
         minutes: 90
         category: maintain
         points: 25
@@ -176,7 +188,8 @@ points:
           - { id: p03-b-order, points: 6, axis: order, refs: [meti-csm-guideline] }
           - { id: p03-b-content, points: 5, axis: content, refs: [no06-ipa-10threats] }
       - id: p03-recheck
-        text: { ja: '記録の提出を求め、同じ紹介経路で入った全員の本人確認をやり直す。費用はこちらが持ち、対象者に説明する。', en: '' }
+        text: { ja: '記録の提出を求め、同じ紹介経路で入った全員の本人確認をやり直し、費用はこちらが持って説明する。', en: '' }
+        explain: { ja: '記録の提出に加え、同じ経路で入った全員の確認をやり直し、費用と説明の責任も会社が持つ。採用の穴を広く塞ぐ対応。', en: '' }
         minutes: 150
         category: recover
         points: 90
@@ -188,7 +201,8 @@ points:
           - { id: p03-c-order, points: 6, axis: order, refs: [meti-csm-guideline] }
           - { id: p03-c-care, points: 6, axis: care, refs: [no06-telework-guideline] }
       - id: p03-blame
-        text: { ja: '会見で紹介会社の名前を出し、確認漏れは先方の責任だと説明する。', en: '' }
+        text: { ja: '会見で紹介会社の名前を出し、確認漏れは先方の責任だと説明して自社の関与を薄める。', en: '' }
+        explain: { ja: '先方の名前を出して責任を寄せると、自社の確認不足が見えなくなる。契約と記録で責任を整理すべき場面。', en: '' }
         minutes: 60
         category: hurt
         points: -120
@@ -198,6 +212,7 @@ points:
         items:
           - { id: p03-d-wording, points: -14, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p03-d-content, points: -10, axis: content, refs: [meti-csm-guideline] }
+    lesson: { ja: '紹介会社の確認を信じ切らず、契約に基づいて記録の提出を求める。同じ紹介経路で入った人の確認もやり直し、費用と説明の責任は会社が持つ。会見で先方に責任を寄せると信頼を失う。', en: '' }
 
   - id: p04-board-report
     at: { day: 1, minutes: 540 }
@@ -207,7 +222,8 @@ points:
     voices: [v04-ceo, v04-flatter, v04-legal]
     choices:
       - id: p04-delegate
-        text: { ja: 'セキュリティの話なので、報告はセキュリティ責任者に任せる。', en: '' }
+        text: { ja: 'セキュリティの話なので、報告はセキュリティ責任者に任せ、自分は席を外して状況の説明を待つことにする。', en: '' }
+        explain: { ja: '採用の判断をした本人が報告から降りると、責任の所在が見えない。セキュリティだけの問題ではない。', en: '' }
         minutes: 45
         category: hurt
         points: -70
@@ -218,7 +234,8 @@ points:
           - { id: p04-a-order, points: -7, axis: order, refs: [meti-csm-guideline] }
           - { id: p04-a-record, points: -6, axis: record, refs: [jpcert-handling] }
       - id: p04-written
-        text: { ja: '書面で、確認できた事実と自分の判断の誤りを分けて社長に出す。', en: '' }
+        text: { ja: '書面で、確認できた事実と自分の判断の誤りを分けて社長に提出し、説明を求める。', en: '' }
+        explain: { ja: '事実と判断の誤りを分けて書面で出すのは妥当。取締役会への諮問や全工程の点検までは踏み込んでいない。', en: '' }
         minutes: 90
         category: maintain
         points: 25
@@ -228,8 +245,22 @@ points:
         items:
           - { id: p04-b-record, points: 6, axis: record, refs: [jpcert-handling] }
           - { id: p04-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: p04-blame-field
+        text: { ja: '「現場の運用ミス」として報告し、自分の関与を書かずに人事の責任としてまとめる。', en: '' }
+        explain: { ja: '現場のミスにすると、自分の判断の誤りが報告から消える。後で整合が取れず、隠蔽と見られる。', en: '' }
+        minutes: 45
+        category: fatal
+        points: -200
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -20 }
+        setFlags: { hidFacts: true }
+        items:
+          - { id: p04-d-wording, points: -14, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p04-d-record, points: -10, axis: record, refs: [jpcert-handling] }
+
       - id: p04-own
-        text: { ja: '書面で事実と自分の判断の誤りを出し、取締役会に諮って、採用の全工程の点検を自分の責任で行うと宣言する。', en: '' }
+        text: { ja: '書面で事実と自分の判断の誤りを出し、取締役会に諮って採用の全工程の点検を自分の責任で行う。', en: '' }
+        explain: { ja: '事実と判断の誤りを分け、取締役会に諮って全工程の点検を自分の責任で行うと宣言している。責任の取り方として明確。', en: '' }
         minutes: 120
         category: recover
         points: 90
@@ -241,18 +272,7 @@ points:
           - { id: p04-c-order, points: 6, axis: order, refs: [meti-csm-guideline] }
           - { id: p04-c-record, points: 6, axis: record, refs: [jpcert-handling] }
           - { id: p04-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
-      - id: p04-blame-field
-        text: { ja: '「現場の運用ミス」として報告し、自分の関与を書かない。', en: '' }
-        minutes: 45
-        category: fatal
-        points: -200
-        refs: [meti-disclosure-guidance]
-        gauges: { flame: 15, trust: -20 }
-        setFlags: { hidFacts: true }
-        items:
-          - { id: p04-d-wording, points: -14, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: p04-d-record, points: -10, axis: record, refs: [jpcert-handling] }
-
+    lesson: { ja: '書面で事実と自分の判断の誤りを分け、取締役会に諮って全工程の点検を自分の責任で行うと宣言する。セキュリティに任せたり現場のミスにしたりすると、責任の所在がぼやける。', en: '' }
   - id: p05-reverify
     at: { day: 1, minutes: 900 }
     phase: investigate
@@ -260,29 +280,9 @@ points:
     text: { ja: '15時。同じやり方で入った遠隔採用者は、今月入社が十二名、累計で四十名いる。まず今月入社した十二名の本人確認をやり直す範囲を決める。対象者からは「なぜ自分たちだけ」という声が上がっている。', en: '' }
     voices: [v05-sns, v05-hr, v05-ok]
     choices:
-      - id: p05-three
-        text: { ja: '同じ担当者が関わった三人だけを、静かに確認する。', en: '' }
-        minutes: 90
-        category: hurt
-        points: -70
-        refs: [no06-government-advisory]
-        gauges: { trust: -10, stamina: -5 }
-        items:
-          - { id: p05-a-content, points: -7, axis: content, refs: [no06-government-advisory] }
-          - { id: p05-a-record, points: -6, axis: record, refs: [jpcert-handling] }
-      - id: p05-all
-        text: { ja: '十二名全員の本人確認を、対面を含めてやり直す。', en: '' }
-        minutes: 180
-        category: maintain
-        points: 25
-        refs: [no06-government-advisory]
-        gauges: { trust: 5, stamina: -10 }
-        setFlags: { identityReverified: true }
-        items:
-          - { id: p05-b-content, points: 6, axis: content, refs: [no06-government-advisory] }
-          - { id: p05-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
       - id: p05-all-care
-        text: { ja: '十二名全員を対面で確認し、目的と範囲を文書で説明する。不利益は出さないと約束し、相談窓口と個別面談を設ける。', en: '' }
+        text: { ja: '十二名全員を対面で確認し、目的と範囲を文書で説明し、不利益は出さないと約束して相談窓口を設ける。', en: '' }
+        explain: { ja: '全員の確認と文書での説明、不利益を出さない約束、相談窓口をそろえている。範囲と配慮の両方を満たす。', en: '' }
         minutes: 240
         category: recover
         points: 100
@@ -293,8 +293,32 @@ points:
           - { id: p05-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
           - { id: p05-c-care, points: 6, axis: care, refs: [no06-telework-guideline] }
           - { id: p05-c-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+      - id: p05-three
+        text: { ja: '同じ担当者が関わった三人だけを静かに確認し、他の社員には一切声をかけずにそのまま済ませようとする。', en: '' }
+        explain: { ja: '三人に絞ると、同じ経路で入った他の社員の確認が抜ける。静かに行うことで対象者への説明もない。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -70
+        refs: [no06-government-advisory]
+        gauges: { trust: -10, stamina: -5 }
+        items:
+          - { id: p05-a-content, points: -7, axis: content, refs: [no06-government-advisory] }
+          - { id: p05-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: p05-all
+        text: { ja: '十二名全員の本人確認を、対面を含めてやり直すと決め、対象者にその旨を書面で伝える。', en: '' }
+        explain: { ja: '全員の確認をやり直す判断は妥当。ただし目的と範囲の文書説明や相談窓口までは整っていない。', en: '' }
+        minutes: 180
+        category: maintain
+        points: 25
+        refs: [no06-government-advisory]
+        gauges: { trust: 5, stamina: -10 }
+        setFlags: { identityReverified: true }
+        items:
+          - { id: p05-b-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p05-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
       - id: p05-foreign
-        text: { ja: '外国籍の社員だけに、追加の書類と面談を求める。', en: '' }
+        text: { ja: '外国籍の社員だけに追加の書類提出と面談を求め、他の社員より厳しく本人確認を行う。', en: '' }
+        explain: { ja: '国籍で対象を分けると、同じ経路の他の社員の確認が抜け、不当な差別になる。被害の防止と国籍は関係ない。', en: '' }
         minutes: 90
         category: fatal
         points: -200
@@ -303,6 +327,7 @@ points:
         items:
           - { id: p05-d-care, points: -14, axis: care, refs: [no06-equal-treatment] }
           - { id: p05-d-content, points: -10, axis: content, refs: [no06-equal-treatment, no06-government-advisory] }
+    lesson: { ja: '全員の本人確認をやり直し、目的と範囲を文書で説明して不利益を出さないと約束する。相談窓口と個別面談も設ける。三人に絞ると見落とし、外国籍だけを狙うと差別になる。', en: '' }
 
   - id: p06-applicant-report
     at: { day: 2, minutes: 540 }
@@ -315,7 +340,8 @@ points:
       - { id: note-address, text: { ja: '貸与端末の送付先は、他社の端末も届く国内のレンタルオフィスだった。', en: '' } }
     choices:
       - id: p06-wait
-        text: { ja: '社長の返事を待ち、報告するかどうかは決めてもらう。', en: '' }
+        text: { ja: '社長の返事を待ち、報告するかどうかは経営の判断に任せると決めて、書類を閉じ、そのまま様子を見て待つ。', en: '' }
+        explain: { ja: '社長の返事を待つと、三日の期限に間に合わない。報告の要否は経営の裁量ではなく、法の要件で決まる。', en: '' }
         minutes: 90
         category: hurt
         points: -150
@@ -325,18 +351,9 @@ points:
         items:
           - { id: p06-a-time, points: -7, axis: time, refs: [ppc-report-prelim] }
           - { id: p06-a-record, points: -6, axis: record, refs: [ppc-report-prelim] }
-      - id: p06-oral
-        text: { ja: '所管官庁には口頭で相談するが、書面は出さない。', en: '' }
-        minutes: 60
-        category: hurt
-        points: -100
-        refs: [ppc-report-prelim]
-        gauges: { flame: 10, trust: -10 }
-        items:
-          - { id: p06-b-record, points: -7, axis: record, refs: [ppc-report-prelim] }
-          - { id: p06-b-time, points: -6, axis: time, refs: [ppc-report-prelim] }
       - id: p06-report
-        text: { ja: '分かっている範囲で速報を出し、不明点は調査中と明記する。応募者への通知と窓口の準備も同時に始める。', en: '' }
+        text: { ja: '分かっている範囲で速報を出し、不明点は調査中と明記し、応募者への通知と窓口の準備も同時に始める。', en: '' }
+        explain: { ja: '分かっている範囲で速報を出し、不明点を調査中と明記し、応募者への通知も始めている。期限を守る妥当な対応。', en: '' }
         minutes: 150
         category: recover
         points: 50
@@ -347,8 +364,20 @@ points:
           - { id: p06-c-time, points: 6, axis: time, refs: [ppc-report-prelim] }
           - { id: p06-c-content, points: 6, axis: content, refs: [ppc-report-prelim] }
           - { id: p06-c-record, points: 6, axis: record, refs: [ppc-report-prelim] }
+      - id: p06-oral
+        text: { ja: '所管官庁には口頭で相談して状況を伝えるが、書面での報告は出さずに様子を見続ける。', en: '' }
+        explain: { ja: '口頭の相談だけでは報告の記録が残らない。書面を出さない理由が調整ではなく様子見になっており、要件を満たさない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [ppc-report-prelim]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: p06-b-record, points: -7, axis: record, refs: [ppc-report-prelim] }
+          - { id: p06-b-time, points: -6, axis: time, refs: [ppc-report-prelim] }
       - id: p06-none
-        text: { ja: '採用の情報は報告の対象ではないと判断し、報告しない。', en: '' }
+        text: { ja: '採用の情報は報告の対象ではないと判断し、委員会への報告を行わず社内で処理する。', en: '' }
+        explain: { ja: '採用の応募者情報も個人情報であり、不正の目的のおそれがあれば報告の対象になる。対象外と決めつけるのは危険。', en: '' }
         minutes: 30
         category: fatal
         points: -200
@@ -358,6 +387,7 @@ points:
         items:
           - { id: p06-d-record, points: -14, axis: record, refs: [ppc-report-scope] }
           - { id: p06-d-content, points: -10, axis: content, refs: [ppc-report-scope] }
+    lesson: { ja: '件数が固まっていなくても、不正の目的のおそれがあれば速報の対象になる。分かっている範囲と不明点を分けて出し、応募者への通知と窓口を並行させる。社長の返事待ちは期限を落とす。', en: '' }
 
   - id: p08-leak-threat
     at: { day: 3, minutes: 540 }
@@ -367,7 +397,8 @@ points:
     voices: [v08-attacker, v08-coward, v08-ok]
     choices:
       - id: p08-delay
-        text: { ja: '公表を先に延ばし、相手との交渉の時間を作る。', en: '' }
+        text: { ja: '公表を先に延ばし、相手との交渉の時間を作って、名簿の扱いと要求の内容を慎重に探って出方をうかがう。', en: '' }
+        explain: { ja: '交渉で時間を稼ごうとすると、その間に名簿が売られる。相手の要求に応じる前提の対応になっており危険。', en: '' }
         minutes: 120
         category: hurt
         points: -100
@@ -380,7 +411,8 @@ points:
           - { id: p08-a-time, points: -7, axis: time, refs: [meti-disclosure-guidance] }
           - { id: p08-a-order, points: -6, axis: order, refs: [npa-consult] }
       - id: p08-keep
-        text: { ja: '返信せず、メールと記録を保全して警察に渡す。', en: '' }
+        text: { ja: '返信せず、メールと記録を保全して警察に渡し、相手の要求には一切応じないでおく。', en: '' }
+        explain: { ja: '返信せず記録を保全して警察に渡す判断は妥当。公表の時期や対象者への注意喚起までは決めていない。', en: '' }
         minutes: 90
         category: maintain
         points: 25
@@ -390,7 +422,8 @@ points:
           - { id: p08-b-record, points: 6, axis: record, refs: [jpcert-handling] }
           - { id: p08-b-order, points: 5, axis: order, refs: [npa-consult] }
       - id: p08-keep-plan
-        text: { ja: '保全して警察に渡し、対象者に注意喚起を出す。公表の時期は相手に合わせず、自分たちで決めると社内で確認する。', en: '' }
+        text: { ja: '保全して警察に渡し、対象者に注意喚起を出す。公表の時期は相手に合わせず、自分たちで決めると確認する。', en: '' }
+        explain: { ja: '記録保全と警察への相談に加え、対象者への注意喚起と公表時期の主体性まで決めている。相手に振り回されない対応。', en: '' }
         minutes: 150
         category: recover
         points: 100
@@ -402,7 +435,8 @@ points:
           - { id: p08-c-order, points: 6, axis: order, refs: [npa-consult] }
           - { id: p08-c-wording, points: 6, axis: wording, refs: [meti-disclosure-guidance] }
       - id: p08-publish
-        text: { ja: '名簿の一部を先に公開し、これ以上は出せないと示す。', en: '' }
+        text: { ja: '名簿の一部を先に公開し、これ以上は出せないと相手に示して交渉を有利に進めようとする。', en: '' }
+        explain: { ja: '名簿の一部を公開すると、対象者の情報を自分から広げることになる。交渉の材料に個人情報を使うべきではない。', en: '' }
         minutes: 60
         category: hurt
         points: -150
@@ -411,6 +445,7 @@ points:
         items:
           - { id: p08-d-care, points: -14, axis: care, refs: [meti-trade-secret] }
           - { id: p08-d-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+    lesson: { ja: '脅迫メールには返信せず、記録を保全して警察に渡す。公表の時期は相手に合わせず、自分たちで決める。名簿の一部を公開すると、対象者の情報を自分から広げることになる。', en: '' }
 
   - id: p09-agency-blame
     at: { day: 4, minutes: 540 }
@@ -420,7 +455,8 @@ points:
     voices: [v09-vendor, v09-past, v09-ok]
     choices:
       - id: p09-blame
-        text: { ja: '責任は紹介会社にあると、公表文に書く。', en: '' }
+        text: { ja: '責任は紹介会社にあると公表文に書き、自社の確認不足には触れずに済ませようとする。', en: '' }
+        explain: { ja: '責任を紹介会社に寄せると、自社の確認不足が公表文から消える。契約と記録で責任を整理すべき場面。', en: '' }
         minutes: 90
         category: hurt
         points: -90
@@ -430,7 +466,8 @@ points:
           - { id: p09-a-wording, points: -7, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p09-a-content, points: -6, axis: content, refs: [meti-csm-guideline] }
       - id: p09-fact
-        text: { ja: '事実を確認し、契約上の責任分界を整理する。', en: '' }
+        text: { ja: '事実を確認し、契約上の責任分界を整理して、公表に使う材料を社内で時間をかけてそろえていく。', en: '' }
+        explain: { ja: '事実と契約上の責任分界を整理するのは妥当な出発点。再発防止の契約条件までは踏み込んでいない。', en: '' }
         minutes: 90
         category: maintain
         points: 25
@@ -439,8 +476,21 @@ points:
         items:
           - { id: p09-b-content, points: 6, axis: content, refs: [meti-csm-guideline] }
           - { id: p09-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: p09-leak
+        text: { ja: '記者に紹介会社の内部資料を渡し、先方の落ち度を示して自社を守ろうと画策する。', en: '' }
+        explain: { ja: '内部資料を記者に渡すと、取引先の情報管理を崩し、信頼を失う。責任の整理と情報提供は分けるべき。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -150
+        refs: [meti-trade-secret]
+        gauges: { flame: 20, trust: -20 }
+        items:
+          - { id: p09-d-record, points: -14, axis: record, refs: [meti-trade-secret] }
+          - { id: p09-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+
       - id: p09-contract
-        text: { ja: '責任分界を整理し、本人確認の方法と確認記録の提出を契約に明記する。他の紹介会社にも同じ条件を求める。', en: '' }
+        text: { ja: '責任分界を整理し、本人確認の方法と確認記録の提出を契約に明記し、他の紹介会社にも求める。', en: '' }
+        explain: { ja: '責任分界を整理したうえで、本人確認の方法と記録の提出を契約に明記している。他の紹介会社にも広げる点が評価できる。', en: '' }
         minutes: 180
         category: recover
         points: 100
@@ -451,17 +501,7 @@ points:
           - { id: p09-c-content, points: 6, axis: content, refs: [meti-csm-guideline] }
           - { id: p09-c-order, points: 6, axis: order, refs: [no06-ipa-10threats] }
           - { id: p09-c-record, points: 6, axis: record, refs: [jpcert-handling] }
-      - id: p09-leak
-        text: { ja: '記者に紹介会社の内部資料を渡し、先方の落ち度を示す。', en: '' }
-        minutes: 60
-        category: hurt
-        points: -150
-        refs: [meti-trade-secret]
-        gauges: { flame: 20, trust: -20 }
-        items:
-          - { id: p09-d-record, points: -14, axis: record, refs: [meti-trade-secret] }
-          - { id: p09-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
-
+    lesson: { ja: '責任の所在は契約と確認記録で決める。事実を確認し、本人確認の方法と記録の提出を契約に明記する。紹介会社の名前を出して責任を寄せると、自社の確認不足が見えなくなる。', en: '' }
   - id: p10-employee-voice
     at: { day: 5, minutes: 600 }
     phase: organize
@@ -469,28 +509,9 @@ points:
     text: { ja: '5日目。社内掲示板に「遠隔採用は全部やめろ」という投稿が並ぶ。社員代表が「現場は、誰を信じていいか分からない」と来る。', en: '' }
     voices: [v10-sns, v10-insider, v10-ok]
     choices:
-      - id: p10-silent
-        text: { ja: '仕事に集中するよう伝え、説明はしない。', en: '' }
-        minutes: 60
-        category: hurt
-        points: -60
-        refs: [no06-telework-guideline]
-        gauges: { trust: -10, flame: 5 }
-        items:
-          - { id: p10-a-care, points: -7, axis: care, refs: [no06-telework-guideline] }
-          - { id: p10-a-content, points: -6, axis: content, refs: [meti-csm-guideline] }
-      - id: p10-explain
-        text: { ja: '分かっている事実を説明し、国籍や出身で同僚を疑わない方針を伝える。', en: '' }
-        minutes: 90
-        category: maintain
-        points: 25
-        refs: [meti-csm-guideline, no06-telework-guideline]
-        gauges: { flame: -5, trust: 5 }
-        items:
-          - { id: p10-b-care, points: 6, axis: care, refs: [no06-equal-treatment] }
-          - { id: p10-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
       - id: p10-care
         text: { ja: '説明会と相談窓口を設け、対象になった社員には個別面談を行う。方針を文書にして全社に出す。', en: '' }
+        explain: { ja: '説明会と相談窓口、個別面談、文書化まで整えている。不安と差別の両方に向き合う対応として評価できる。', en: '' }
         minutes: 180
         category: recover
         points: 110
@@ -501,8 +522,31 @@ points:
           - { id: p10-c-care, points: 6, axis: care, refs: [no06-telework-guideline] }
           - { id: p10-c-content, points: 6, axis: content, refs: [meti-csm-guideline] }
           - { id: p10-c-order, points: 6, axis: order, refs: [meti-csm-guideline] }
+      - id: p10-silent
+        text: { ja: '仕事に集中するよう伝え、説明は行わず、掲示板の投稿にも個別には答えずにそのままにする。', en: '' }
+        explain: { ja: '説明しないまま仕事に集中させると、不安が国籍や出身への疑いに変わる。掲示板の投稿にも答えず分断が残る。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -60
+        refs: [no06-telework-guideline]
+        gauges: { trust: -10, flame: 5 }
+        items:
+          - { id: p10-a-care, points: -7, axis: care, refs: [no06-telework-guideline] }
+          - { id: p10-a-content, points: -6, axis: content, refs: [meti-csm-guideline] }
+      - id: p10-explain
+        text: { ja: '分かっている事実を説明し、国籍や出身で同僚を疑わない方針を伝えて、様子を見る。', en: '' }
+        explain: { ja: '事実と方針を伝えるのは妥当。説明会や相談窓口、対象者への個別面談までは整っていない。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [meti-csm-guideline, no06-telework-guideline]
+        gauges: { flame: -5, trust: 5 }
+        items:
+          - { id: p10-b-care, points: 6, axis: care, refs: [no06-equal-treatment] }
+          - { id: p10-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
       - id: p10-list
-        text: { ja: '人事に、社員を国籍別に並べた名簿を作らせる。', en: '' }
+        text: { ja: '人事に、社員を国籍別に並べた名簿を作らせ、対象者の把握に使おうとする。', en: '' }
+        explain: { ja: '国籍別の名簿は、社員を属性で分類する行為になり、差別を助長する。対象者の把握という目的でも正当化できない。', en: '' }
         minutes: 90
         category: fatal
         points: -200
@@ -511,6 +555,7 @@ points:
         items:
           - { id: p10-d-care, points: -14, axis: care, refs: [no06-equal-treatment] }
           - { id: p10-d-record, points: -10, axis: record, refs: [no06-equal-treatment] }
+    lesson: { ja: '社員には事実を説明し、国籍や出身で同僚を疑わない方針を伝える。説明会と相談窓口、対象者への個別面談を設ける。沈黙や国籍別の名簿は、不安を差別に変える。方針は文書にして全社に繰り返し伝える。', en: '' }
 
   - id: p07-impersonated
     at: { day: 5, minutes: 900 }
@@ -520,7 +565,8 @@ points:
     voices: [v07-bold, v07-sns, v07-ok]
     choices:
       - id: p07-none
-        text: { ja: '警察の捜査を待ち、こちらからは何もしない。', en: '' }
+        text: { ja: '警察の捜査を待ち、こちらからは何もせず、本人への連絡も取らないでそのままにしておく。', en: '' }
+        explain: { ja: '捜査を待つだけでは、経歴を盗用された人の負担が残る。会社として謝罪や支援を申し出る余地を逃している。', en: '' }
         minutes: 60
         category: hurt
         points: -60
@@ -530,18 +576,9 @@ points:
         items:
           - { id: p07-a-care, points: -7, axis: care, refs: [meti-trade-secret] }
           - { id: p07-a-record, points: -6, axis: record, refs: [npa-consult] }
-      - id: p07-police
-        text: { ja: '警察を通じて、こちらの連絡先を伝える。', en: '' }
-        minutes: 45
-        category: maintain
-        points: 25
-        refs: [npa-consult]
-        gauges: { trust: 5 }
-        items:
-          - { id: p07-b-order, points: 6, axis: order, refs: [npa-consult] }
-          - { id: p07-b-care, points: 5, axis: care, refs: [meti-trade-secret] }
       - id: p07-support
         text: { ja: '警察と調整して本人に連絡し、謝罪と、名誉回復のための訂正・相談窓口・費用の負担を申し出る。', en: '' }
+        explain: { ja: '警察と調整したうえで、謝罪と名誉回復の支援、費用の負担まで申し出ている。被害者への対応として適切。', en: '' }
         minutes: 150
         category: recover
         points: 110
@@ -552,8 +589,20 @@ points:
           - { id: p07-c-care, points: 6, axis: care, refs: [meti-trade-secret] }
           - { id: p07-c-wording, points: 6, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p07-c-record, points: 6, axis: record, refs: [npa-consult] }
+      - id: p07-police
+        text: { ja: '警察を通じて、こちらの連絡先を本人に伝えてもらい、謝罪と支援の機会を辛抱強く待つことにする。', en: '' }
+        explain: { ja: '警察を通じて連絡先を伝えるのは配慮がある。ただし謝罪や支援の具体策を自分から示していない。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 25
+        refs: [npa-consult]
+        gauges: { trust: 5 }
+        items:
+          - { id: p07-b-order, points: 6, axis: order, refs: [npa-consult] }
+          - { id: p07-b-care, points: 5, axis: care, refs: [meti-trade-secret] }
       - id: p07-name
-        text: { ja: '本人の名前と写真を公表し、同じ手口への注意を呼びかける。', en: '' }
+        text: { ja: '本人の名前と写真を公表し、同じ手口への注意を呼びかけて被害を防ごうとする。', en: '' }
+        explain: { ja: '名前と写真を公表すると、経歴を盗用された人をさらに傷つける。注意喚起は特定しない形で行うべき。', en: '' }
         minutes: 45
         category: hurt
         points: -150
@@ -562,6 +611,7 @@ points:
         items:
           - { id: p07-d-care, points: -14, axis: care, refs: [meti-trade-secret] }
           - { id: p07-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '経歴を盗用された人も被害者である。警察と調整して連絡し、謝罪と名誉回復の支援、費用の負担を申し出る。名前や写真を公表すると、その人の生活をさらに傷つける。連絡の経路は警察と調整する。', en: '' }
 
   - id: p11-board-cover
     at: { day: 8, minutes: 600 }
@@ -571,7 +621,8 @@ points:
     voices: [v11-boss, v11-flatter, v11-ok]
     choices:
       - id: p11-field
-        text: { ja: '担当者の判断として報告し、自分は前に出ない。', en: '' }
+        text: { ja: '担当者の判断として報告し、自分は一切前に出ず、役員の言葉に従ってそのまま短くまとめてしまう。', en: '' }
+        explain: { ja: '担当者に責任を寄せると、自分の関与が見えなくなる。役員の言葉に従うだけでは、再発防止の議論も進まない。', en: '' }
         minutes: 45
         category: hurt
         points: -80
@@ -582,7 +633,8 @@ points:
           - { id: p11-a-wording, points: -7, axis: wording, refs: [meti-csm-guideline] }
           - { id: p11-a-record, points: -6, axis: record, refs: [jpcert-handling] }
       - id: p11-own
-        text: { ja: '自分の判断として報告する。', en: '' }
+        text: { ja: '自分の判断として報告し、担当者には触れずに経緯と対応だけを短くまとめる。', en: '' }
+        explain: { ja: '自分の判断として報告する点は妥当。再発防止の予算や体制、担当者を守る姿勢までは示していない。', en: '' }
         minutes: 90
         category: maintain
         points: 25
@@ -593,6 +645,7 @@ points:
           - { id: p11-b-wording, points: 5, axis: wording, refs: [meti-csm-guideline] }
       - id: p11-own-plan
         text: { ja: '自分の判断として報告し、再発防止の予算と体制を取締役会で諮る。担当者を守ることも明言する。', en: '' }
+        explain: { ja: '自分の判断として報告し、予算と体制を諮り、担当者を守ると明言している。責任と再発防止を両立した対応。', en: '' }
         minutes: 150
         category: recover
         points: 100
@@ -604,7 +657,8 @@ points:
           - { id: p11-c-wording, points: 6, axis: wording, refs: [meti-csm-guideline] }
           - { id: p11-c-care, points: 6, axis: care, refs: [no06-telework-guideline] }
       - id: p11-rewrite
-        text: { ja: '議事録の自分の発言を、後から整える。', en: '' }
+        text: { ja: '議事録の自分の発言を、後から都合よく整えて書き換え、記録を一切残さないようにする。', en: '' }
+        explain: { ja: '議事録を書き換えると、判断の経緯そのものが失われる。後から整合が取れず、隠蔽と見られる。', en: '' }
         minutes: 30
         category: fatal
         points: -200
@@ -614,6 +668,7 @@ points:
         items:
           - { id: p11-d-record, points: -14, axis: record, refs: [jpcert-handling] }
           - { id: p11-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '自分の判断として報告し、再発防止の予算と体制を取締役会で諮る。担当者を守ることも明言する。担当者に責任を寄せると、組織の判断の誤りが隠れる。報告の場では自分の判断だったと明確に伝える。', en: '' }
 
   - id: p12-resume
     at: { day: 12, minutes: 600 }
@@ -623,7 +678,8 @@ points:
     voices: [v12-sns, v12-field, v12-ok]
     choices:
       - id: p12-fast
-        text: { ja: '同じやり方で全面再開する。', en: '' }
+        text: { ja: '同じやり方で全面再開し、本人確認の方法も変えずに、応募者への説明も今までどおりでよいと伝える。', en: '' }
+        explain: { ja: '同じやり方で再開すると、同じ穴が残る。確認の方法を変えずに再開する判断は、再発の可能性を高める。', en: '' }
         minutes: 120
         category: hurt
         points: -120
@@ -635,7 +691,8 @@ points:
           - { id: p12-a-content, points: -7, axis: content, refs: [no06-government-advisory] }
           - { id: p12-a-order, points: -7, axis: order, refs: [meti-csm-guideline] }
       - id: p12-stop
-        text: { ja: '本人確認の方法が決まるまで、採用を全部止め続ける。', en: '' }
+        text: { ja: '本人確認の方法が決まるまで、採用を全部止め続け、現場にはしばらく我慢してもらう。', en: '' }
+        explain: { ja: '全部止め続けると現場の負担が大きい。安全側に見えて、確認の方法を決める作業を先送りしている。', en: '' }
         minutes: 120
         category: hurt
         points: -80
@@ -646,7 +703,8 @@ points:
           - { id: p12-b-time, points: -6, axis: time, refs: [no06-telework-guideline] }
           - { id: p12-b-care, points: -4, axis: care, refs: [no06-telework-guideline] }
       - id: p12-standard
-        text: { ja: '対面か複数の手段による本人確認を入れて、再開する。', en: '' }
+        text: { ja: '対面か複数の手段による本人確認を入れて、採用を再開すると社内と応募者の両方に伝える。', en: '' }
+        explain: { ja: '対面か複数の手段で確認する基準を入れて再開するのは妥当。応募者と紹介会社への事前説明までは決めていない。', en: '' }
         minutes: 180
         category: maintain
         points: 25
@@ -657,7 +715,8 @@ points:
           - { id: p12-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
           - { id: p12-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
       - id: p12-standard-care
-        text: { ja: '対面と複数の手段で本人を確かめ、端末の送付先と連絡手段も確認する。基準を文書にして、応募者と紹介会社に事前に伝える。', en: '' }
+        text: { ja: '対面と複数の手段で本人を確かめ、端末の送付先も確認する。基準を文書にして応募者と紹介会社に伝える。', en: '' }
+        explain: { ja: '本人確認と送付先の確認を組み合わせ、基準を文書にして事前に伝えている。再発を防ぎながら採用を戻す対応。', en: '' }
         minutes: 240
         category: recover
         points: 110
@@ -668,6 +727,7 @@ points:
           - { id: p12-d-content, points: 6, axis: content, refs: [no06-government-advisory] }
           - { id: p12-d-order, points: 6, axis: order, refs: [meti-csm-guideline] }
           - { id: p12-d-care, points: 6, axis: care, refs: [no06-telework-guideline] }
+    lesson: { ja: '対面と複数の手段で本人を確かめ、端末の送付先も確認する。基準を文書にして応募者と紹介会社に事前に伝える。全面再開も全面停止も、確認の設計を飛ばしている。確認の方法と再開の条件を先に文書で決める。', en: '' }
 
   - id: p13-police-records
     at: { day: 18, minutes: 600 }
@@ -676,28 +736,9 @@ points:
     text: { ja: '18日目。警察から、採用の記録と応募者名簿の任意提出を求められた。応募者には、まだ何も伝えていない。', en: '' }
     voices: [v13-coward, v13-lawish, v13-ok]
     choices:
-      - id: p13-refuse
-        text: { ja: '応募者の個人情報なので、提出は断る。', en: '' }
-        minutes: 60
-        category: hurt
-        points: -60
-        refs: [npa-consult, ppc-report-scope]
-        gauges: { flame: 10, trust: -10 }
-        items:
-          - { id: p13-a-order, points: -7, axis: order, refs: [npa-consult] }
-          - { id: p13-a-record, points: -6, axis: record, refs: [jpcert-handling] }
-      - id: p13-scope
-        text: { ja: '必要範囲を確認して、記録を提出する。', en: '' }
-        minutes: 90
-        category: maintain
-        points: 25
-        refs: [npa-consult, jpcert-handling]
-        gauges: { trust: 5, stamina: -5 }
-        items:
-          - { id: p13-b-order, points: 6, axis: order, refs: [npa-consult] }
-          - { id: p13-b-record, points: 5, axis: record, refs: [jpcert-handling] }
       - id: p13-scope-explain
         text: { ja: '必要範囲を確認して提出し、応募者には提出した旨と目的を通知する。記録の管理の連鎖も残す。', en: '' }
+        explain: { ja: '範囲を確認して提出し、応募者への通知と管理の連鎖の記録まで行っている。協力と配慮を両立した対応。', en: '' }
         minutes: 180
         category: recover
         points: 100
@@ -708,8 +749,31 @@ points:
           - { id: p13-c-order, points: 6, axis: order, refs: [npa-consult] }
           - { id: p13-c-record, points: 6, axis: record, refs: [jpcert-handling] }
           - { id: p13-c-care, points: 6, axis: care, refs: [ppc-notify-person] }
+      - id: p13-refuse
+        text: { ja: '応募者の個人情報なので、警察への提出は断り、社内で管理を続けると伝えて、協力を拒む姿勢を見せる。', en: '' }
+        explain: { ja: '個人情報を理由に全部断ると、捜査への協力が遅れる。必要範囲を確認して応じる方法を検討すべき。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -60
+        refs: [npa-consult, ppc-report-scope]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: p13-a-order, points: -7, axis: order, refs: [npa-consult] }
+          - { id: p13-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: p13-scope
+        text: { ja: '必要範囲を確認して、採用の記録だけを警察に提出し、捜査に協力すると伝える。', en: '' }
+        explain: { ja: '必要範囲を確認して記録を提出するのは妥当。応募者への通知や管理の連鎖の記録までは整っていない。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [npa-consult, jpcert-handling]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: p13-b-order, points: 6, axis: order, refs: [npa-consult] }
+          - { id: p13-b-record, points: 5, axis: record, refs: [jpcert-handling] }
       - id: p13-all
-        text: { ja: '必要な範囲を確かめず、名簿を丸ごと渡す。', en: '' }
+        text: { ja: '必要な範囲を確かめず、応募者名簿を丸ごと警察に渡して協力したつもりになる。', en: '' }
+        explain: { ja: '名簿を丸ごと渡すと、捜査に不要な個人情報まで提供することになる。必要範囲の確認を飛ばした対応は危険。', en: '' }
         minutes: 45
         category: hurt
         points: -60
@@ -718,6 +782,7 @@ points:
         items:
           - { id: p13-d-record, points: -14, axis: record, refs: [npa-consult] }
           - { id: p13-d-care, points: -10, axis: care, refs: [no04-ppc-guideline-general] }
+    lesson: { ja: '警察の任意提出には必要範囲を確認して応じ、応募者には提出した旨と目的を通知する。名簿を丸ごと渡すのも、個人情報を理由に全部断るのも極端。提出した範囲と目的を記録に残す。', en: '' }
 
   - id: p14-real-person
     at: { day: 25, minutes: 600 }
@@ -727,7 +792,8 @@ points:
     voices: [v14-sns, v14-bold, v14-ok]
     choices:
       - id: p14-none
-        text: { ja: '警察の捜査の結果を待つ。', en: '' }
+        text: { ja: '警察の捜査の結果を待ち、こちらからは連絡も支援も申し出ずに静観する。', en: '' }
+        explain: { ja: '静観すると、経歴を盗用された人の負担が残る。会社として謝罪や支援を申し出る機会を逃している。', en: '' }
         minutes: 60
         category: hurt
         points: -60
@@ -736,18 +802,9 @@ points:
         coward: true
         items:
           - { id: p14-a-care, points: -7, axis: care, refs: [meti-trade-secret] }
-      - id: p14-window
-        text: { ja: '相談窓口を設け、連絡があれば応じる。', en: '' }
-        minutes: 90
-        category: maintain
-        points: 25
-        refs: [ppc-notify-person]
-        gauges: { trust: 5 }
-        items:
-          - { id: p14-b-care, points: 6, axis: care, refs: [ppc-notify-person] }
-          - { id: p14-b-order, points: 5, axis: order, refs: [npa-consult] }
       - id: p14-support
         text: { ja: 'こちらから連絡を取り、謝罪と、名誉回復の支援、費用の負担、再発防止の説明を行う。', en: '' }
+        explain: { ja: 'こちらから連絡し、謝罪と名誉回復の支援、費用の負担、再発防止の説明まで行っている。被害者への対応として適切。', en: '' }
         minutes: 180
         category: recover
         points: 110
@@ -758,8 +815,20 @@ points:
           - { id: p14-c-care, points: 6, axis: care, refs: [meti-trade-secret] }
           - { id: p14-c-wording, points: 6, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p14-c-record, points: 6, axis: record, refs: [jpcert-handling] }
+      - id: p14-window
+        text: { ja: '相談窓口を設け、連絡があれば応じるとして、こちらからは積極的に動かないで静かに待つ。', en: '' }
+        explain: { ja: '窓口を設けるのは一定の配慮。ただし相手からの連絡を待つだけでは、被害者の負担を減らせない。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [ppc-notify-person]
+        gauges: { trust: 5 }
+        items:
+          - { id: p14-b-care, points: 6, axis: care, refs: [ppc-notify-person] }
+          - { id: p14-b-order, points: 5, axis: order, refs: [npa-consult] }
       - id: p14-write
-        text: { ja: 'その人のSNSに、こちらの主張を書き込む。', en: '' }
+        text: { ja: 'その人のSNSに、こちらの主張を直接書き込み、公開の場で反論しようとする。', en: '' }
+        explain: { ja: '相手のSNSに書き込むと、公開の場で争いを広げ、被害者をさらに傷つける。連絡は非公開の経路で行うべき。', en: '' }
         minutes: 30
         category: hurt
         points: -120
@@ -768,6 +837,7 @@ points:
         items:
           - { id: p14-d-wording, points: -14, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p14-d-care, points: -10, axis: care, refs: [meti-trade-secret] }
+    lesson: { ja: '経歴を盗用された人には、こちらから連絡し、謝罪と名誉回復の支援、費用の負担を申し出る。窓口を設けて待つだけでは、被害者の負担が残る。連絡の経路は警察と調整する。', en: '' }
 
   - id: p15-report
     at: { day: 45, minutes: 600 }
@@ -777,7 +847,8 @@ points:
     voices: [v15-expert, v15-coward, v15-ok]
     choices:
       - id: p15-hide
-        text: { ja: '人事の部分は公開しない。', en: '' }
+        text: { ja: '人事の部分は公開せず、社内の関係者だけに回して外部への説明を避ける。', en: '' }
+        explain: { ja: '人事の部分を公開しないと、採用の穴の説明責任を果たせない。攻撃に使える詳細だけ伏せる方法がある。', en: '' }
         minutes: 60
         category: hurt
         points: -150
@@ -787,7 +858,8 @@ points:
           - { id: p15-a-content, points: -7, axis: content, refs: [meti-disclosure-guidance] }
           - { id: p15-a-record, points: -7, axis: record, refs: [meti-disclosure-guidance] }
       - id: p15-publish
-        text: { ja: '攻撃に使える詳細だけ伏せて、人事の部分を公開する。', en: '' }
+        text: { ja: '攻撃に使える詳細だけ伏せて、人事の部分を公開し、再発防止の進捗も毎月示していく。', en: '' }
+        explain: { ja: '攻撃に使える詳細だけ伏せて公開するのは妥当。説明責任と安全のバランスが取れている。', en: '' }
         minutes: 180
         category: recover
         points: 100
@@ -800,6 +872,7 @@ points:
           - { id: p15-b-record, points: 6, axis: record, refs: [meti-disclosure-guidance] }
       - id: p15-share
         text: { ja: '公開に加え、採用の本人確認の手順を業界団体に無償で共有し、進捗を毎月公開する。', en: '' }
+        explain: { ja: '公開に加えて手順を業界に共有し、進捗も毎月示している。同じ手口の被害を減らす点が評価できる。', en: '' }
         minutes: 240
         category: increase
         points: 300
@@ -813,7 +886,8 @@ points:
           - { id: p15-c-record, points: 6, axis: record, refs: [meti-disclosure-guidance] }
           - { id: p15-c-care, points: 6, axis: care, refs: [no06-ipa-10threats] }
       - id: p15-victim
-        text: { ja: '「人事は被害者だった」と書き、会社の落ち度をぼかす。', en: '' }
+        text: { ja: '「人事は被害者だった」と書き、会社の落ち度をぼかして年次報告をまとめる。', en: '' }
+        explain: { ja: '被害者だと書いて落ち度をぼかすと、採用の穴が報告から消える。後で経緯を問われ、訂正が必要になる。', en: '' }
         minutes: 60
         category: fatal
         points: -200
@@ -823,6 +897,7 @@ points:
         items:
           - { id: p15-d-content, points: -14, axis: content, refs: [meti-disclosure-guidance] }
           - { id: p15-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '人事の部分も、攻撃に使える詳細だけ伏せて公開する。採用の本人確認の手順を業界に共有し、進捗を毎月示す。公開しないと説明責任を問われ、被害者扱いでぼかすのも通らない。', en: '' }
 
   - id: p16-annual
     at: { day: 60, minutes: 600 }
@@ -832,7 +907,8 @@ points:
     voices: [v16-boss, v16-flatter, v16-ok]
     choices:
       - id: p16-blame
-        text: { ja: '「紹介会社の確認漏れ」と書き、採用の経緯には触れない。', en: '' }
+        text: { ja: '「紹介会社の確認漏れ」と書き、採用の経緯には触れずに報告をまとめる。', en: '' }
+        explain: { ja: '紹介会社に責任を寄せると、自社の採用の穴が報告から消える。契約と記録で責任を整理すべき。', en: '' }
         minutes: 90
         category: hurt
         points: -100
@@ -842,7 +918,8 @@ points:
           - { id: p16-a-wording, points: -7, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p16-a-content, points: -6, axis: content, refs: [no06-government-advisory] }
       - id: p16-fact
-        text: { ja: '採用の穴と、そこから何を直したかを書く。', en: '' }
+        text: { ja: '採用の穴と、そこから何を直したかを書いて年次報告に載せる。', en: '' }
+        explain: { ja: '採用の穴と直したことを書くのは妥当。自分の責任や第三者検証の結果までは触れていない。', en: '' }
         minutes: 180
         category: recover
         points: 90
@@ -852,8 +929,21 @@ points:
         items:
           - { id: p16-b-content, points: 6, axis: content, refs: [no06-government-advisory] }
           - { id: p16-b-record, points: 6, axis: record, refs: [meti-disclosure-guidance] }
+      - id: p16-none
+        text: { ja: '報告には触れず、捜査中の事項は書かないとして今年の報告から外す。', en: '' }
+        explain: { ja: '報告に触れないと、株主や取引先への説明ができない。捜査中でも、分かっている事実は書ける。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -200
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -20 }
+        items:
+          - { id: p16-d-record, points: -14, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: p16-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+
       - id: p16-own
         text: { ja: '採用の穴と直したことを書き、自分の責任と第三者検証の結果を添える。', en: '' }
+        explain: { ja: '採用の穴と直したことに加え、自分の責任と第三者検証の結果を添えている。説明の厚みがある。', en: '' }
         minutes: 240
         category: recover
         points: 120
@@ -864,17 +954,7 @@ points:
           - { id: p16-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
           - { id: p16-c-record, points: 6, axis: record, refs: [meti-disclosure-guidance] }
           - { id: p16-c-wording, points: 6, axis: wording, refs: [meti-csm-guideline] }
-      - id: p16-none
-        text: { ja: '報告には触れない。捜査中の事項は書かない。', en: '' }
-        minutes: 60
-        category: fatal
-        points: -200
-        refs: [meti-disclosure-guidance]
-        gauges: { flame: 15, trust: -20 }
-        items:
-          - { id: p16-d-record, points: -14, axis: record, refs: [meti-disclosure-guidance] }
-          - { id: p16-d-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
-
+    lesson: { ja: '年次報告には採用の穴と直したことを書き、自分の責任と第三者検証の結果を添える。紹介会社に責任を寄せたり触れなかったりすると、後で必ず問われる。報告の場では自分の判断だったと明確に伝える。', en: '' }
   - id: p17-repeat
     at: { day: 90, minutes: 600 }
     phase: after
@@ -882,28 +962,9 @@ points:
     text: { ja: '90日目。採用の窓口に、また同じ形の応募が届いた。職歴は整っていて、面接はすべてオンラインを希望している。', en: '' }
     voices: [v17-sns, v17-past, v17-ok]
     choices:
-      - id: p17-reject
-        text: { ja: '断る。理由は伝えない。', en: '' }
-        minutes: 30
-        category: hurt
-        points: -50
-        refs: [no06-government-advisory]
-        gauges: { trust: -10, stamina: 5 }
-        items:
-          - { id: p17-a-care, points: -7, axis: care, refs: [no06-government-advisory] }
-          - { id: p17-a-record, points: -6, axis: record, refs: [jpcert-handling] }
-      - id: p17-check
-        text: { ja: '基準どおりの本人確認を行い、問題がなければ選考を進める。', en: '' }
-        minutes: 120
-        category: maintain
-        points: 25
-        refs: [no06-government-advisory]
-        gauges: { trust: 5, stamina: -5 }
-        items:
-          - { id: p17-b-content, points: 6, axis: content, refs: [no06-government-advisory] }
-          - { id: p17-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
       - id: p17-check-report
-        text: { ja: '基準どおり確認したうえで、同じ特徴の応募が続いていることを警察と当局に相談し、業界の窓口にも共有する。', en: '' }
+        text: { ja: '基準どおり確認したうえで、同じ特徴の応募が続くことを警察と当局に相談し、業界の窓口にも共有する。', en: '' }
+        explain: { ja: '確認したうえで、同じ特徴の応募が続くことを警察と当局、業界の窓口に共有している。再発を防ぐ対応。', en: '' }
         minutes: 180
         category: recover
         points: 100
@@ -914,8 +975,31 @@ points:
           - { id: p17-c-content, points: 6, axis: content, refs: [no06-government-advisory] }
           - { id: p17-c-order, points: 6, axis: order, refs: [npa-consult] }
           - { id: p17-c-record, points: 6, axis: record, refs: [jpcert-handling] }
+      - id: p17-reject
+        text: { ja: '断る。理由は伝えず、今後の応募も受け付けないとだけ事務的に返して終わらせてしまう。', en: '' }
+        explain: { ja: '理由を伝えずに断ると、同じ手口の応募が他の経路で続く。当局や業界への共有もなく、再発を防げない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -50
+        refs: [no06-government-advisory]
+        gauges: { trust: -10, stamina: 5 }
+        items:
+          - { id: p17-a-care, points: -7, axis: care, refs: [no06-government-advisory] }
+          - { id: p17-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: p17-check
+        text: { ja: '基準どおりの本人確認を行い、問題がなければ選考を進めると応募者に書面と口頭の両方で改めて丁寧に伝える。', en: '' }
+        explain: { ja: '基準どおり確認して選考を進めるのは妥当。同じ特徴の応募が続くことを当局や業界に共有していない。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 25
+        refs: [no06-government-advisory]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: p17-b-content, points: 6, axis: content, refs: [no06-government-advisory] }
+          - { id: p17-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
       - id: p17-origin
-        text: { ja: '前回の件で懲りたので、応募者の出身地を理由に、選考に進めない。', en: '' }
+        text: { ja: '前回の件で懲りたので、応募者の出身地を理由に、選考に進めないと事務的に決める。', en: '' }
+        explain: { ja: '出身地で選考を止めると、不当な差別になる。同じ手口の応募を防ぐことと出身地は関係ない。', en: '' }
         minutes: 45
         category: fatal
         points: -200
@@ -924,6 +1008,7 @@ points:
         items:
           - { id: p17-d-care, points: -14, axis: care, refs: [no06-equal-treatment] }
           - { id: p17-d-content, points: -10, axis: content, refs: [no06-equal-treatment, no06-government-advisory] }
+    lesson: { ja: '同じ特徴の応募が続くなら、基準どおり確認したうえで警察と当局に相談し、業界の窓口にも共有する。断るだけでも、出身地で排除しても、再発は防げない。選考の公平性の記録も残す。', en: '' }
 drafts:
   board-report:
     title: { ja: '社長・取締役会への報告書', en: '' }
@@ -938,53 +1023,53 @@ drafts:
       - id: facts
         label: { ja: '事実と推測の分け方', en: '' }
         options:
-          - { id: or-f-split, text: { ja: '確認できた事実と、分かっていないことを分けて書く', en: '' }, points: 8, axis: content, refs: [jpcert-handling] }
-          - { id: or-f-guess, text: { ja: '推測も事実として書く', en: '' }, points: -10, axis: wording, refs: [jpcert-handling] }
+          - { id: or-f-split, text: { ja: '確認できた事実と、分かっていないことを分けて書く', en: '' }, points: 8, axis: content, refs: [jpcert-handling], explain: { ja: '事実と推測を分けると、後で分かったことを足しても報告が崩れない。取締役会の判断材料になる。', en: '' } }
+          - { id: or-f-guess, text: { ja: '推測も確認済みの事実として一緒に書く', en: '' }, points: -10, axis: wording, refs: [jpcert-handling], explain: { ja: '推測を事実として書くと、誤りがそのまま経営の判断に入る。後で訂正しても信頼は戻らない。', en: '' } }
       - id: hiring
         label: { ja: '採用の穴', en: '' }
         options:
-          - { id: or-h-remote, text: { ja: '面接三回がすべて遠隔で、対面の本人確認をしていないと書く', en: '' }, points: 8, axis: content, refs: [no06-government-advisory] }
-          - { id: or-h-none, text: { ja: '「採用手続きに不備はなかった」と書く', en: '' }, points: -15, axis: content, refs: [no06-government-advisory], delayed: { afterPhases: 1, points: -20, reason: { ja: '採用の不備を否定した訂正が必要になった。', en: '' } } }
+          - { id: or-h-none, text: { ja: '「採用手続きに不備はなく問題なかった」と書く', en: '' }, points: -15, axis: content, refs: [no06-government-advisory], delayed: { afterPhases: 1, points: -20, reason: { ja: '採用の不備を否定した訂正が必要になった。', en: '' } }, explain: { ja: '不備がなかったと書くと、面接がすべて遠隔だった事実と食い違う。後で訂正が必要になる。', en: '' } }
+          - { id: or-h-remote, text: { ja: '面接三回がすべて遠隔で、対面の本人確認をしていないと書く', en: '' }, points: 8, axis: content, refs: [no06-government-advisory], explain: { ja: '採用の穴を具体的に書いており、再発防止の出発点になる。批判は受けるが、後で問われにくい。', en: '' } }
       - id: device
         label: { ja: '端末の送付先', en: '' }
         options:
-          - { id: or-d-self, text: { ja: '送付先を本人の申告だけで確認したと書く', en: '' }, points: 6, axis: content, refs: [no06-government-advisory] }
-          - { id: or-d-none, text: { ja: '端末の送付先に触れない', en: '' }, points: -8, axis: content, refs: [no06-government-advisory] }
+          - { id: or-d-self, text: { ja: '送付先を本人の申告だけで確認したと書く', en: '' }, points: 6, axis: content, refs: [no06-government-advisory], explain: { ja: '送付先を本人の申告だけで確認したと書くと、確認の弱さが伝わる。再発防止の議論につながる。', en: '' } }
+          - { id: or-d-none, text: { ja: '端末の送付先の確認には触れない', en: '' }, points: -8, axis: content, refs: [no06-government-advisory], explain: { ja: '送付先に触れないと、端末がどこに届いたかの説明が抜ける。同じ手口の防止に結びつかない。', en: '' } }
       - id: responsibility
         label: { ja: '責任の書き方', en: '' }
         options:
-          - { id: or-r-own, text: { ja: '自分の判断の誤りとして書く', en: '' }, points: 8, axis: record, refs: [meti-csm-guideline] }
-          - { id: or-r-field, text: { ja: '現場の担当者の判断として書く', en: '' }, points: -12, axis: wording, refs: [meti-csm-guideline] }
+          - { id: or-r-field, text: { ja: '現場の担当者の判断として書く', en: '' }, points: -12, axis: wording, refs: [meti-csm-guideline], explain: { ja: '現場の担当者に責任を寄せると、自分の関与が見えなくなる。後で経緯を問われることになる。', en: '' } }
+          - { id: or-r-own, text: { ja: '自分の判断の誤りとして書く', en: '' }, points: 8, axis: record, refs: [meti-csm-guideline], explain: { ja: '自分の判断の誤りとして書くと、責任の所在が明確になる。再発防止の説得力も増すからだ。', en: '' } }
       - id: ask
         label: { ja: '取締役会への要請', en: '' }
         options:
-          - { id: or-a-budget, text: { ja: '点検の予算と体制を求める', en: '' }, points: 5, axis: order, refs: [meti-csm-guideline] }
-          - { id: or-a-none, text: { ja: '要請は書かない', en: '' }, points: -5, axis: order, refs: [meti-csm-guideline] }
+          - { id: or-a-budget, text: { ja: '点検の予算と体制を求める', en: '' }, points: 5, axis: order, refs: [meti-csm-guideline], explain: { ja: '予算と体制を求めると、再発防止が実行される可能性が上がる。要請のない報告は絵に描いた餅になる。', en: '' } }
+          - { id: or-a-none, text: { ja: '取締役会への要請は書かない', en: '' }, points: -5, axis: order, refs: [meti-csm-guideline], explain: { ja: '要請を書かないと、点検の予算も体制も動かない。報告しただけで終わってしまうだけだ。', en: '' } }
       - id: employee
         label: { ja: '社員への配慮', en: '' }
         options:
-          - { id: or-e-care, text: { ja: '対象になった社員への説明と相談窓口を書く', en: '' }, points: 6, axis: care, refs: [no06-telework-guideline] }
-          - { id: or-e-none, text: { ja: '社内への説明に触れない', en: '' }, points: -6, axis: care, refs: [no06-telework-guideline] }
+          - { id: or-e-none, text: { ja: '社内への説明や相談窓口には触れない', en: '' }, points: -6, axis: care, refs: [no06-telework-guideline], explain: { ja: '社内説明に触れないと、社員は報道で初めて知る。現場の不安と会社への不信が残ること。', en: '' } }
+          - { id: or-e-care, text: { ja: '対象になった社員への説明と相談窓口を書く', en: '' }, points: 6, axis: care, refs: [no06-telework-guideline], explain: { ja: '社員への説明と相談窓口を書くと、現場の不安を減らす具体策になる。対象者への配慮も伝わる。', en: '' } }
       - id: next
         label: { ja: '次の報告', en: '' }
         options:
-          - { id: or-n-next, text: { ja: '次の報告の予定を書く', en: '' }, points: 4, axis: content, refs: [meti-disclosure-guidance] }
-          - { id: or-n-none, text: { ja: '次回の予定を書かない', en: '' }, points: -3, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: or-n-next, text: { ja: '次の報告の予定を書く', en: '' }, points: 4, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '次の報告予定があると、調査が続いていることが伝わる。報告して終わりにしない姿勢。', en: '' } }
+          - { id: or-n-none, text: { ja: '次回の予定を書かない', en: '' }, points: -3, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '次回の予定がないと、報告後に関心が途切れたように見える。継続的な説明の約束が弱い。', en: '' } }
       - id: tone
         label: { ja: '書き出し', en: '' }
         options:
-          - { id: or-tone-split, text: { ja: '謝罪と事実を分けて書く', en: '' }, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: or-tone-excuse, text: { ja: '言い訳を先に書く', en: '' }, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: or-tone-excuse, text: { ja: '言い訳を最初に長く書く', en: '' }, points: -8, axis: wording, refs: [meti-disclosure-guidance], explain: { ja: '言い訳を先に置くと、事実を隠している印象になる。報告の内容が届きにくくなるだけだ。', en: '' } }
+          - { id: or-tone-split, text: { ja: '謝罪と事実を分けて書く', en: '' }, points: 5, axis: wording, refs: [meti-disclosure-guidance], explain: { ja: '謝罪と事実を分けると、何を認めて何を説明するのかが読み取りやすい。感情的な反発を減らせる。', en: '' } }
       - id: approval
         label: { ja: '社内確認', en: '' }
         options:
-          - { id: or-i-check, text: { ja: '法務・広報・セキュリティで確認する', en: '' }, points: 4, axis: order, refs: [meti-csm-guideline] }
-          - { id: or-i-solo, text: { ja: '自分の判断だけで出す', en: '' }, points: -6, axis: order, refs: [meti-csm-guideline] }
+          - { id: or-i-check, text: { ja: '法務・広報・セキュリティで確認する', en: '' }, points: 4, axis: order, refs: [meti-csm-guideline], explain: { ja: '複数の部署で確認すると、事実誤認や表現の偏りを減らせる。取締役会に出す前の最低限。', en: '' } }
+          - { id: or-i-solo, text: { ja: '自分の判断だけで社外に提出する', en: '' }, points: -6, axis: order, refs: [meti-csm-guideline], explain: { ja: '一人で出すと、法務や広報の確認が抜ける。表現の誤りや法的な問題を見落とすおそれがある。', en: '' } }
       - id: record
         label: { ja: '記録', en: '' }
         options:
-          - { id: or-rec-log, text: { ja: '提出した時刻と版を記録する', en: '' }, points: 5, axis: record, refs: [jpcert-handling] }
-          - { id: or-rec-none, text: { ja: '記録を残さない', en: '' }, points: -6, axis: record, refs: [jpcert-handling] }
+          - { id: or-rec-none, text: { ja: '提出の記録を残さない', en: '' }, points: -6, axis: record, refs: [jpcert-handling], explain: { ja: '記録がないと、いつ何を出したか説明できない。訂正や更新の根拠も失ってしまうのだ。', en: '' } }
+          - { id: or-rec-log, text: { ja: '提出した時刻と版を記録する', en: '' }, points: 5, axis: record, refs: [jpcert-handling], explain: { ja: '提出の時刻と版を残すと、後から報告の変遷を説明できる。訂正があった場合の土台になる。', en: '' } }
   hr-report:
     title: { ja: '調査報告書の人事部分', en: '' }
     slots:
@@ -998,58 +1083,58 @@ drafts:
       - id: scope
         label: { ja: '公開する範囲', en: '' }
         options:
-          - { id: fr-s-full, text: { ja: '攻撃に使える詳細だけ伏せて、人事の部分を全文公開する', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance] }
-          - { id: fr-s-hide, text: { ja: '人事の部分は公開しない', en: '' }, points: -20, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: fr-s-full, text: { ja: '攻撃に使える詳細だけ伏せて、人事の部分を全文公開する', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '攻撃に使える詳細だけ伏せて公開するのは、説明と安全のバランスが取れている。人事の穴も伝わる。', en: '' } }
+          - { id: fr-s-hide, text: { ja: '人事の部分は公開せず社内の関係者に留める', en: '' }, points: -20, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '公開しないと、採用の穴の説明責任を果たせない。伏せる範囲を限定すれば公開できる。', en: '' } }
       - id: hiring
         label: { ja: '採用の経緯', en: '' }
         options:
-          - { id: fr-h-detail, text: { ja: '面接三回が遠隔で、対面の確認をしなかったと具体的に書く', en: '' }, points: 8, axis: content, refs: [no06-government-advisory] }
-          - { id: fr-h-hide, text: { ja: '「確認は行っていた」と書く', en: '' }, points: -12, axis: content, refs: [no06-government-advisory] }
+          - { id: fr-h-hide, text: { ja: '「本人確認は問題なく行っていた」と明記する', en: '' }, points: -12, axis: content, refs: [no06-government-advisory], explain: { ja: '確認を行っていたと書くと、事実と食い違う。後で訂正が必要になり、隠蔽と見られる。', en: '' } }
+          - { id: fr-h-detail, text: { ja: '面接三回が遠隔で、対面の確認をしなかったと具体的に書く', en: '' }, points: 8, axis: content, refs: [no06-government-advisory], explain: { ja: '面接が遠隔だけだったことと対面確認の不在を具体的に書くと、同じ手口の再発を防げる。', en: '' } }
       - id: applicant
         label: { ja: '応募者情報', en: '' }
         options:
-          - { id: fr-a-store, text: { ja: '応募者名簿の保管期間と置き場所の誤りを書く', en: '' }, points: 8, axis: content, refs: [ppc-report-scope] }
-          - { id: fr-a-none, text: { ja: '応募者情報に触れない', en: '' }, points: -10, axis: content, refs: [ppc-report-scope] }
+          - { id: fr-a-store, text: { ja: '応募者名簿の保管期間と置き場所の誤りを書く', en: '' }, points: 8, axis: content, refs: [ppc-report-scope], explain: { ja: '保管期間と置き場所の誤りを書くと、個人情報の管理の問題が具体的に伝わる。再発防止につながる。', en: '' } }
+          - { id: fr-a-none, text: { ja: '応募者情報の保管や漏えいには触れない', en: '' }, points: -10, axis: content, refs: [ppc-report-scope], explain: { ja: '応募者情報の保管に触れないと、漏えいの範囲が報告から抜ける。説明責任を果たせない。', en: '' } }
       - id: person
         label: { ja: '経歴を盗用された人', en: '' }
         options:
-          - { id: fr-p-care, text: { ja: 'その人への支援と訂正を書く', en: '' }, points: 8, axis: care, refs: [meti-trade-secret] }
-          - { id: fr-p-none, text: { ja: 'その人に触れない', en: '' }, points: -10, axis: care, refs: [meti-trade-secret] }
+          - { id: fr-p-none, text: { ja: 'その人の支援には触れない', en: '' }, points: -10, axis: care, refs: [meti-trade-secret], explain: { ja: 'その人の支援に触れないと、被害者を置き去りにした印象になる。謝罪と支援を示すべき。', en: '' } }
+          - { id: fr-p-care, text: { ja: 'その人への支援と訂正を書く', en: '' }, points: 8, axis: care, refs: [meti-trade-secret], explain: { ja: '経歴を盗用された人への支援と訂正を書くと、被害者への配慮が伝わる。会社の姿勢を示せる。', en: '' } }
       - id: employee
         label: { ja: '社員への説明', en: '' }
         options:
-          - { id: fr-e-care, text: { ja: '対象社員への説明と相談窓口の実績を書く', en: '' }, points: 6, axis: care, refs: [no06-telework-guideline] }
-          - { id: fr-e-none, text: { ja: '社内への説明に触れない', en: '' }, points: -6, axis: care, refs: [no06-telework-guideline] }
+          - { id: fr-e-care, text: { ja: '対象社員への説明と相談窓口の実績を書く', en: '' }, points: 6, axis: care, refs: [no06-telework-guideline], explain: { ja: '対象社員への説明と相談窓口の実績を書くと、現場の不安への対応が具体的に伝わること。', en: '' } }
+          - { id: fr-e-none, text: { ja: '社内への説明や相談窓口には触れない', en: '' }, points: -6, axis: care, refs: [no06-telework-guideline], explain: { ja: '社内説明に触れないと、社員は報道で初めて知る。現場の不安と会社への不信が残ること。', en: '' } }
       - id: responsibility
         label: { ja: '責任の書き方', en: '' }
         options:
-          - { id: fr-r-own, text: { ja: '自分の判断の誤りを書く', en: '' }, points: 8, axis: record, refs: [meti-csm-guideline] }
-          - { id: fr-r-agency, text: { ja: '紹介会社の責任として書く', en: '' }, points: -10, axis: wording, refs: [meti-csm-guideline] }
+          - { id: fr-r-agency, text: { ja: '紹介会社の責任として書く', en: '' }, points: -10, axis: wording, refs: [meti-csm-guideline], explain: { ja: '紹介会社の責任にすると、自社の採用の穴が報告から消える。後で経緯を問われることになる。', en: '' } }
+          - { id: fr-r-own, text: { ja: '自分の判断の誤りを書く', en: '' }, points: 8, axis: record, refs: [meti-csm-guideline], explain: { ja: '自分の判断の誤りを書くと、責任の所在が明確になり、再発防止の説得力も増すからだ。', en: '' } }
       - id: measures
         label: { ja: '再発防止策', en: '' }
         options:
-          - { id: fr-m-plan, text: { ja: '実施時期と担当を書く', en: '' }, points: 8, axis: content, refs: [meti-csm-guideline] }
-          - { id: fr-m-slogan, text: { ja: '「再発防止に努めます」とだけ書く', en: '' }, points: -8, axis: content, refs: [meti-csm-guideline] }
+          - { id: fr-m-plan, text: { ja: '実施時期と担当者を具体的に書く', en: '' }, points: 8, axis: content, refs: [meti-csm-guideline], explain: { ja: '実施時期と担当を書くと、対策が実行されるか後から確認できる。具体的な約束になる。', en: '' } }
+          - { id: fr-m-slogan, text: { ja: '「再発防止に努めます」とだけ書く', en: '' }, points: -8, axis: content, refs: [meti-csm-guideline], explain: { ja: '努力目標だけでは、何をいつ誰がやるのか分からない。実行されたかを確認できないだけだ。', en: '' } }
       - id: thirdparty
         label: { ja: '第三者委員会の意見', en: '' }
         options:
-          - { id: fr-3-full, text: { ja: '意見を全文掲載する', en: '' }, points: 6, axis: content, refs: [cissp-cbk-secops] }
-          - { id: fr-3-summary, text: { ja: '要約だけを載せる', en: '' }, points: -6, axis: content, refs: [cissp-cbk-secops] }
+          - { id: fr-3-summary, text: { ja: '要約だけを載せる', en: '' }, points: -6, axis: content, refs: [cissp-cbk-secops], explain: { ja: '要約だけだと、都合の悪い指摘が省かれたと疑われる。全文を載せる方が説明として強い。', en: '' } }
+          - { id: fr-3-full, text: { ja: '意見を全文掲載する', en: '' }, points: 6, axis: content, refs: [cissp-cbk-secops], explain: { ja: '第三者委員会の意見をそのまま載せると、都合のよい編集をしていないことが伝わることだ。', en: '' } }
       - id: progress
         label: { ja: '進捗の公開', en: '' }
         options:
-          - { id: fr-prog-monthly, text: { ja: '進捗を毎月公開する', en: '' }, points: 6, axis: record, refs: [meti-disclosure-guidance] }
-          - { id: fr-prog-once, text: { ja: '一度だけ公開する', en: '' }, points: -4, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: fr-prog-monthly, text: { ja: '進捗を毎月公開する', en: '' }, points: 6, axis: record, refs: [meti-disclosure-guidance], explain: { ja: '毎月の公開を約束すると、再発防止策が続いているかを外部から確認できる。継続的な説明になる。', en: '' } }
+          - { id: fr-prog-once, text: { ja: '一度だけ公開する', en: '' }, points: -4, axis: record, refs: [meti-disclosure-guidance], explain: { ja: '一度だけの公開では、その後の進み具合が分からない。長期の対策には継続的な報告が要る。', en: '' } }
       - id: industry
         label: { ja: '業界への共有', en: '' }
         options:
-          - { id: fr-ind-share, text: { ja: '採用の本人確認の手順を業界団体に共有する', en: '' }, points: 8, axis: content, refs: [no06-ipa-10threats] }
-          - { id: fr-ind-keep, text: { ja: '社内にとどめる', en: '' }, points: -5, axis: content, refs: [no06-ipa-10threats] }
+          - { id: fr-ind-keep, text: { ja: '社内の研修資料だけに留めておきたい', en: '' }, points: -5, axis: content, refs: [no06-ipa-10threats], explain: { ja: '自社だけに留めると、同じ手口の被害が他社で繰り返される。共有しない理由はほとんどない。', en: '' } }
+          - { id: fr-ind-share, text: { ja: '採用の本人確認の手順を業界団体に共有する', en: '' }, points: 8, axis: content, refs: [no06-ipa-10threats], explain: { ja: '手順を業界に共有すると、同じ手口の被害を業界全体で減らせる。自社の信用回復にもつながる。', en: '' } }
       - id: next
         label: { ja: '次の報告', en: '' }
         options:
-          - { id: fr-n-next, text: { ja: '次の報告の予定を書く', en: '' }, points: 3, axis: content, refs: [meti-disclosure-guidance] }
-          - { id: fr-n-none, text: { ja: '次回の予定を書かない', en: '' }, points: -3, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: fr-n-next, text: { ja: '次の報告の予定を書く', en: '' }, points: 3, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '次の報告予定を示すと、調査が続いていることが伝わる。公表して終わりにしない姿勢。', en: '' } }
+          - { id: fr-n-none, text: { ja: '次回の予定を書かない', en: '' }, points: -3, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '次回の予定がないと、関心が途切れたように見える。継続的な説明の約束が弱いだけだ。', en: '' } }
 voices:
   - { id: v01-ceo, media: boss, misleading: true, type: boss-pressure, text: { ja: '社長「人事の失敗だ。人事の中で片付けて、表には出すな」。', en: '' }, trigger: { at: point } }
   - { id: v01-own, media: boss, misleading: true, type: coward-critique, text: { ja: '古参の役員「最終面接で採用を推薦したのは、あなた自身だ。今は自分の関与を出さない方がいい」。', en: '' }, trigger: { at: point } }
