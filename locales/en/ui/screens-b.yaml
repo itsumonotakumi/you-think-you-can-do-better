@@ -70,6 +70,7 @@ sb:
   voices:
     heading: "Public voices"
     empty: "No voices yet."
+    older: "Earlier voices ({n})"
   media:
     sns: "SNS"
     news: "News"

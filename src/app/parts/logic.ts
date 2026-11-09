@@ -162,6 +162,14 @@ export function voiceViews(state: PlayState, scenario: Scenario): VoiceItem[] {
   return out;
 }
 
+/** 世間の声を「最新（いちばん新しい時刻に届いた声）」と「それより前」に分ける。それより前は画面で折り畳む */
+export function splitVoices(items: VoiceItem[]): { latest: VoiceItem[]; older: VoiceItem[] } {
+  if (items.length === 0) return { latest: [], older: [] };
+  const key = (v: VoiceItem): number => v.at.day * 1440 + v.at.minutes;
+  const newest = Math.max(...items.map(key));
+  return { latest: items.filter((v) => key(v) === newest), older: items.filter((v) => key(v) !== newest) };
+}
+
 // ---------------- 音の字幕 ----------------
 
 export type CueCaption =

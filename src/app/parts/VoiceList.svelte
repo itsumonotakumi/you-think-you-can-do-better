@@ -1,16 +1,17 @@
 <script lang="ts">
   // 世間の声。媒体アイコンと文字だけ。誘導かどうかで見た目を変えない
   import { t, loc } from '../../i18n';
-  import { formatClock, mediaGlyph, mediaLabelKey, type VoiceItem } from './logic';
+  import { formatClock, mediaGlyph, mediaLabelKey, splitVoices, type VoiceItem } from './logic';
 
   let { voices }: { voices: VoiceItem[] } = $props();
+  // 最新の声だけ開いて見せ、それより前の声は折り畳む
+  const parts = $derived(splitVoices(voices));
 </script>
 
 {#if voices.length === 0}
   <p class="empty">{t('sb.voices.empty')}</p>
 {:else}
-  <ul class="voices">
-    {#each voices as voice, index (voice.id + ':' + index)}
+{#snippet voiceItem(voice: VoiceItem)}
       <li class="voice" data-media={voice.media}>
         <span class="meta">
           <span class="badge" data-media={voice.media} aria-hidden="true">{mediaGlyph(voice.media)}</span>
@@ -19,11 +20,37 @@
         </span>
         <p class="text">{loc(voice.text)}</p>
       </li>
+  {/snippet}
+  <ul class="voices">
+    {#each parts.latest as voice, index (voice.id + ':' + index)}
+      {@render voiceItem(voice)}
     {/each}
   </ul>
+  {#if parts.older.length > 0}
+    <details class="older">
+      <summary>{t('sb.voices.older', { n: parts.older.length })}</summary>
+      <ul class="voices">
+        {#each parts.older as voice, index (voice.id + ':' + index)}
+          {@render voiceItem(voice)}
+        {/each}
+      </ul>
+    </details>
+  {/if}
 {/if}
 
 <style>
+  .older {
+    margin-top: 0.6rem;
+  }
+  .older summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 0.9em;
+    padding: 0.3rem 0;
+  }
+  .older .voices {
+    margin-top: 0.4rem;
+  }
   .voices {
     display: grid;
     gap: 0.55rem;

@@ -70,6 +70,7 @@ sb:
   voices:
     heading: "世間の声"
     empty: "まだ声は届いていません。"
+    older: "それより前の声（{n}件）"
   media:
     sns: "SNS"
     news: "ニュース"
