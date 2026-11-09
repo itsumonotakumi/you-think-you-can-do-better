@@ -9,6 +9,7 @@
   import { saveProgress } from '../../storage';
   import { applyStep, errorMessage, play, resetCaptions, scenario, screen, settings } from '../store';
   import { choiceIndexFromKey, nextFreeNoteId, voiceViews } from '../parts/logic';
+  import { orderChoices } from '../parts/shuffle';
   import TopBar from '../parts/TopBar.svelte';
   import Typewriter from '../parts/Typewriter.svelte';
   import ChoiceList from '../parts/ChoiceList.svelte';
@@ -21,6 +22,10 @@
   const point = $derived($play && $scenario ? currentPoint($play, $scenario) : null);
   const draftPending = $derived(Boolean($play?.pendingDraft));
   const voices = $derived($play && $scenario ? voiceViews($play, $scenario) : []);
+  // 表示だけ並べ替える。選んだときは元の id をそのまま渡す（エンジンは変えない）
+  const orderedChoices = $derived(
+    point && $play ? orderChoices(point.choices, $play.startedAt, point.id) : [],
+  );
   const illustration = $derived(
     point?.illustration && $scenario
       ? ($scenario.illustrations ?? []).find((i) => i.id === point?.illustration)
@@ -89,9 +94,9 @@
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA'
         || target.tagName === 'SELECT' || target.isContentEditable)) return;
       if (!point || draftPending || busy) return;
-      const index = choiceIndexFromKey(event.key, point.choices.length);
+      const index = choiceIndexFromKey(event.key, orderedChoices.length);
       if (index === null) return;
-      const choice = point.choices[index];
+      const choice = orderedChoices[index];
       if (!choice) return;
       event.preventDefault();
       select(choice.id);
@@ -173,6 +178,68 @@
   </div>
 
   <div class="body">
+    <!-- 世間の声は、判断の問題文より上に置く（先に世間を見てから考える） -->
+    <aside class="side" aria-label={t('sb.main.side')}>
+      <div class="tabs" role="tablist" aria-label={t('sb.main.side')}>
+        <button
+          id="tab-voices"
+          type="button"
+          role="tab"
+          aria-selected={tab === 'voices'}
+          aria-controls="panel-voices"
+          class:active={tab === 'voices'}
+          onclick={() => (tab = 'voices')}
+        >{t('sb.voices.heading')}</button>
+        <button
+          id="tab-notes"
+          type="button"
+          role="tab"
+          aria-selected={tab === 'notes'}
+          aria-controls="panel-notes"
+          class:active={tab === 'notes'}
+          onclick={() => (tab = 'notes')}
+        >{t('sb.notes.heading')}</button>
+      </div>
+
+      <section
+        id="panel-voices"
+        class="panel panel--voices"
+        class:active={tab === 'voices'}
+        aria-labelledby="tab-voices"
+      >
+        <h2>{t('sb.voices.heading')}</h2>
+        {#if voicesNoticeOpen}
+          <div class="notice" role="note">
+            <p>{notice('voices')}</p>
+            <button type="button" onclick={() => (voicesNoticeOpen = false)}>{t('sb.notice.close')}</button>
+          </div>
+        {/if}
+        {#if hasAttackerVoice}
+          <div class="notice notice--criminal" role="note">
+            <p>{notice('criminal')}</p>
+          </div>
+        {/if}
+        <VoiceList {voices} />
+      </section>
+
+      <section
+        id="panel-notes"
+        class="panel panel--notes"
+        class:active={tab === 'notes'}
+        aria-labelledby="tab-notes"
+      >
+        <h2>{t('sb.notes.heading')}</h2>
+        <NotePanel
+          notable={point?.notable ?? []}
+          notes={$play?.notes ?? []}
+          addedIds={addedNotableIds}
+          status={noteStatus}
+          onaddnotable={addNotable}
+          onaddfree={addFree}
+        />
+      </section>
+    </aside>
+
     <div class="primary-col">
       <section class="situation" aria-labelledby="situation-heading">
         <h2 id="situation-heading">{t('sb.situation.heading')}</h2>
@@ -198,7 +265,7 @@
           </button>
         {:else if point}
           <ChoiceList
-            choices={point.choices}
+            choices={orderedChoices}
             stamina={$play?.gauges.stamina ?? 100}
             disabled={busy}
             onselect={select}
@@ -208,67 +275,6 @@
         {/if}
       </section>
     </div>
-
-    <aside class="side" aria-label={t('sb.main.side')}>
-      <div class="tabs" role="tablist" aria-label={t('sb.main.side')}>
-        <button
-          id="tab-voices"
-          type="button"
-          role="tab"
-          aria-selected={tab === 'voices'}
-          aria-controls="panel-voices"
-          class:active={tab === 'voices'}
-          onclick={() => (tab = 'voices')}
-        >{t('sb.voices.heading')}</button>
-        <button
-          id="tab-notes"
-          type="button"
-          role="tab"
-          aria-selected={tab === 'notes'}
-          aria-controls="panel-notes"
-          class:active={tab === 'notes'}
-          onclick={() => (tab = 'notes')}
-        >{t('sb.notes.heading')}</button>
-      </div>
-
-      <section
-        id="panel-voices"
-        class="panel"
-        class:active={tab === 'voices'}
-        aria-labelledby="tab-voices"
-      >
-        <h2>{t('sb.voices.heading')}</h2>
-        {#if voicesNoticeOpen}
-          <div class="notice" role="note">
-            <p>{notice('voices')}</p>
-            <button type="button" onclick={() => (voicesNoticeOpen = false)}>{t('sb.notice.close')}</button>
-          </div>
-        {/if}
-        {#if hasAttackerVoice}
-          <div class="notice notice--criminal" role="note">
-            <p>{notice('criminal')}</p>
-          </div>
-        {/if}
-        <VoiceList {voices} />
-      </section>
-
-      <section
-        id="panel-notes"
-        class="panel"
-        class:active={tab === 'notes'}
-        aria-labelledby="tab-notes"
-      >
-        <h2>{t('sb.notes.heading')}</h2>
-        <NotePanel
-          notable={point?.notable ?? []}
-          notes={$play?.notes ?? []}
-          addedIds={addedNotableIds}
-          status={noteStatus}
-          onaddnotable={addNotable}
-          onaddfree={addFree}
-        />
-      </section>
-    </aside>
   </div>
 
   {#if abortOpen}
@@ -309,7 +315,6 @@
   }
   .body {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 22rem;
     gap: 0.8rem;
     align-items: start;
   }
@@ -401,6 +406,11 @@
     border-radius: 8px;
     background: var(--panel);
   }
+  /* 判断の問題文は色で見分けられるようにする（見出しの文字も残す） */
+  section.situation {
+    border-left: 4px solid var(--card-question-line);
+    background: var(--card-question);
+  }
   h2 {
     margin: 0 0 0.5rem;
     font-size: 0.9rem;
@@ -426,6 +436,13 @@
     display: grid;
     gap: 0.6rem;
     min-width: 0;
+  }
+  /* PC では声を広く、記録を狭く横に並べて問題文の上に置く */
+  @media (min-width: 640px) {
+    .side {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      align-items: start;
+    }
   }
   .tabs {
     display: none;
@@ -457,9 +474,9 @@
     margin-bottom: 0.5rem;
     padding: 0.5rem 0.6rem;
     border: 1px solid var(--line-strong);
-    border-left: 3px solid var(--accent);
+    border-left: 4px solid var(--card-notice-line);
     border-radius: 5px;
-    background: var(--panel-hover);
+    background: var(--card-notice);
     font-size: 0.85rem;
   }
   .notice p {

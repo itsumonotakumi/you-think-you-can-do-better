@@ -33,6 +33,28 @@
   --gauge-trust: #2f7a4a;
   --gauge-stamina: #4a6591;
   --gauge-coward: #6c5a92;
+  /* カードの面と左線。種類ごとに色を変え、媒体は文字ラベルでも示す。
+     文字（--text / --text-soft / --muted）とのコントラストは WCAG AA 以上 */
+  --card-question: #eaf1fa;
+  --card-question-line: #1f5f99;
+  --card-sns: #e6f6f3;
+  --card-sns-line: #16756b;
+  --card-news: #fdf3e0;
+  --card-news-line: #8a6200;
+  --card-board: #f0f0f7;
+  --card-board-line: #4f5578;
+  --card-chat: #eef7e9;
+  --card-chat-line: #357a3f;
+  --card-mail: #f3effb;
+  --card-mail-line: #5f4a92;
+  --card-phone: #fdeef0;
+  --card-phone-line: #a63d4e;
+  --card-attacker: #fdecea;
+  --card-attacker-line: #b3412e;
+  --card-notice: #fff8e5;
+  --card-notice-line: #8a6200;
+  --card-report: #f3f6ec;
+  --card-report-line: #4c6b30;
   /* 早送り演出の走査線。白背景では黒、暗い背景では白を使う */
   --fx-stripe: rgba(15, 23, 32, 0.06);
   --radius: 10px;
@@ -66,6 +88,27 @@
   --gauge-trust: #5f9e86;
   --gauge-stamina: #7a8db8;
   --gauge-coward: #8a7bb0;
+  /* ダークでも同じ種類分けを保つ（面は暗く、左線は明るく） */
+  --card-question: #17212e;
+  --card-question-line: #7fb2d9;
+  --card-sns: #142523;
+  --card-sns-line: #5fbfae;
+  --card-news: #262013;
+  --card-news-line: #d9b26a;
+  --card-board: #1b1c28;
+  --card-board-line: #a3a8d0;
+  --card-chat: #16241a;
+  --card-chat-line: #8fbf9f;
+  --card-mail: #1f1a2b;
+  --card-mail-line: #b3a1e0;
+  --card-phone: #281920;
+  --card-phone-line: #e2907f;
+  --card-attacker: #2a1a18;
+  --card-attacker-line: #e2907f;
+  --card-notice: #251f14;
+  --card-notice-line: #d9b26a;
+  --card-report: #1a2118;
+  --card-report-line: #8fbf9f;
   --fx-stripe: rgba(255, 255, 255, 0.05);
   --radius: 10px;
 }

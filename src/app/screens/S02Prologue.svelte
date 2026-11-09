@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { PlayState } from '../../engine/types';
   import { audio } from '../../audio';
   import { notice, setLang, t } from '../../i18n';
   import { savePrologue, saveProgress } from '../../storage';
@@ -18,6 +19,7 @@
     return {
       title: t('sa.prologue.title'),
       lead: t('sa.prologue.lead'),
+      explain: t('sa.prologue.explain'),
       prompt: t('sa.prologue.prompt'),
       placeholder: t('sa.prologue.placeholder'),
       counter: (n: number) => t('sa.prologue.counter', { n }),
@@ -26,6 +28,7 @@
       hoursHint: t('sa.prologue.hoursHint'),
       hoursInvalid: t('sa.prologue.hoursInvalid'),
       begin: t('sa.prologue.begin'),
+      skip: t('sa.prologue.skip'),
       back: t('sa.common.back'),
       home: t('sa.error.home'),
       optional: t('sa.common.optional'),
@@ -47,6 +50,21 @@
     screen.set('S04');
   }
 
+  /** 入力の有無にかかわらず開始する。保存と画面遷移をここにまとめる */
+  function startWith(prologue: PlayState['prologue']): void {
+    const current = $play;
+    if (!current) {
+      screen.set('S01');
+      return;
+    }
+    const next = { ...current, prologue };
+    play.set(next);
+    savePrologue(prologue);
+    saveProgress(next);
+    error = '';
+    screen.set('S05');
+  }
+
   function begin(): void {
     const current = $play;
     if (!current) {
@@ -65,13 +83,14 @@
       predicted = n;
     }
 
-    const prologue = { comment: comment.slice(0, 200), predictedHours: predicted };
-    const next = { ...current, prologue };
-    play.set(next);
-    savePrologue(prologue);
-    saveProgress(next);
-    error = '';
-    screen.set('S05');
+    startWith({ comment: comment.slice(0, 200), predictedHours: predicted });
+  }
+
+  /** 入力せずに始める（コメント空・予測なし）。あとで書き直しは求めない */
+  function skip(): void {
+    comment = '';
+    hours = '';
+    startWith({ comment: '', predictedHours: null });
   }
 </script>
 
@@ -83,6 +102,8 @@
 
   {#if $play}
     <div class="panel stack">
+      <p class="explain">{ui.explain}</p>
+
       <div class="field">
         <label class="field-label" for="prologue-comment">{ui.prompt}</label>
         <textarea
@@ -124,6 +145,8 @@
         <button class="btn btn--ghost" onclick={back}>{ui.back}</button>
         <button class="btn btn--primary" onclick={begin}>{ui.begin}</button>
       </div>
+
+      <button class="btn btn--ghost btn--wide skip" onclick={skip}>{ui.skip}</button>
     </div>
   {:else}
     <div class="panel stack">
@@ -137,3 +160,15 @@
     <p class="notice">{ui.criminal}</p>
   </div>
 </section>
+
+<style>
+  .explain {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 0.95em;
+    line-height: 1.8;
+  }
+  .skip {
+    justify-content: center;
+  }
+</style>

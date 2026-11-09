@@ -25,6 +25,7 @@ sa.title.credit: 制作：いつもの匠
 # --- S02 プロローグ ---
 sa.prologue.title: プロローグ
 sa.prologue.lead: まず、事件が報じられたときの自分を思い出してください。
+sa.prologue.explain: ここで書いた言葉と予測は、プレイの最後にもう一度表示します。当事者を体験した後で、最初の自分の見方と比べるためです。どちらも任意です。
 sa.prologue.prompt: この事件が報じられたとき、あなたは何と書き込みましたか。
 sa.prologue.placeholder: 例：対応が遅すぎる。誰が責任を取るのか。
 sa.prologue.counter: "{n} / 200字"
@@ -33,6 +34,7 @@ sa.prologue.hoursUnit: 時間
 sa.prologue.hoursHint: 任意です。空欄のままでも始められます。
 sa.prologue.hoursInvalid: 0〜720の整数で入力してください。
 sa.prologue.begin: はじめる
+sa.prologue.skip: 入力せずに始める
 sa.prologue.noPlay: プレイの準備ができていません。タイトルに戻ってください。
 
 # --- S03 シナリオ選択 ---

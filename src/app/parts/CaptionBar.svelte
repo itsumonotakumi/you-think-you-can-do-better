@@ -4,13 +4,13 @@
   // 表示待ちは store の captions、表示し終えたものは captionHistory に残す。
   import { t, loc } from '../../i18n';
   import { captionHistory, captions } from '../store';
-  import { formatClock, isKnownSe, mediaLabelKey, type ShownCaption } from './logic';
+  import { formatClock, groupCaptions, isKnownSe, mediaLabelKey, type ShownCaption } from './logic';
 
-  /** 履歴として並べる件数 */
+  /** 履歴として並べる件数（同じ文言は1件にまとめた後で数える） */
   const VISIBLE_HISTORY = 5;
 
   const current = $derived($captions[0] ?? null);
-  const history = $derived($captionHistory.slice(0, VISIBLE_HISTORY));
+  const history = $derived(groupCaptions($captionHistory, label, VISIBLE_HISTORY));
 
   function label(caption: ShownCaption): string {
     if (caption.kind === 'se') {
@@ -41,12 +41,17 @@
   {/if}
 
   {#if history.length > 0}
-    <!-- 履歴は画面をふさがないよう畳んでおく（開けば読める） -->
+    <!-- 履歴は画面をふさがないよう畳んでおく（既定は閉じる。開けば読める） -->
     <details class="history-box">
       <summary class="history-summary">{t('sb.caption.history', { count: history.length })}</summary>
       <ol class="history" aria-live="off">
-        {#each history as caption (caption.captionId)}
-          <li class="caption history-item">{label(caption)}</li>
+        {#each history as group (group.caption.captionId)}
+          <li class="caption history-item">
+            <span class="history-text">{label(group.caption)}</span>
+            {#if group.count > 1}
+              <span class="repeat">{t('sb.caption.repeat', { count: group.count })}</span>
+            {/if}
+          </li>
         {/each}
       </ol>
     </details>
@@ -101,5 +106,11 @@
     background: none;
     color: var(--muted);
     font-size: 0.75rem;
+  }
+  .repeat {
+    margin-left: 0.35rem;
+    color: var(--text-soft);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }
 </style>

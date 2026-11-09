@@ -219,6 +219,33 @@ export function shiftCaption(
   };
 }
 
+export interface CaptionGroup {
+  caption: ShownCaption;
+  count: number;
+}
+
+/**
+ * 履歴を新しい順のまま、連続して同じ表示になる字幕を1件にまとめる。
+ * 例: 「カメラのシャッター」が5件続いたら1件（count=5）にする。
+ * limit はまとめた後の件数。数え切ってから切るので、端の件数も正しい。
+ */
+export function groupCaptions(
+  history: readonly ShownCaption[],
+  labelOf: (caption: ShownCaption) => string,
+  limit: number,
+): CaptionGroup[] {
+  const groups: CaptionGroup[] = [];
+  for (const caption of history) {
+    const last = groups[groups.length - 1];
+    if (last && labelOf(last.caption) === labelOf(caption)) {
+      last.count += 1;
+    } else {
+      groups.push({ caption, count: 1 });
+    }
+  }
+  return groups.slice(0, Math.max(0, limit));
+}
+
 // ---------------- 記録のID ----------------
 
 /** 自由記述の記録ID。既存と重ならない free-<連番> を返す */

@@ -17,6 +17,11 @@ const timers = new Map<FxId, ReturnType<typeof setTimeout>>();
 let lastFlashAt = Number.NEGATIVE_INFINITY;
 const FLASH_MIN_INTERVAL_MS = 340;
 
+/** documentElement に付きうる演出クラス */
+const FX_IDS: readonly FxId[] = [
+  'avalanche', 'shake', 'night', 'fastforward', 'deadline', 'flash', 'blur', 'stamp',
+];
+
 function className(id: FxId): string {
   return `fx-${id}`;
 }
@@ -68,5 +73,21 @@ export function runFxCues(cues: Cue[], reduceMotion: boolean): void {
     if (cue.kind !== 'fx') continue;
     if (reduceMotion && MOTION_FX.includes(cue.id)) continue;
     runFx(cue.id, cue.on ?? true);
+  }
+}
+
+/**
+ * 付いている演出クラスを外す。画面遷移のたびに呼び、
+ * 結果画面などに早送りの横縞が残らないようにする。
+ * keep に挙げたものだけは残す（プレイ中をまたぐ深夜・期限の色など）。
+ */
+export function clearFx(keep: readonly FxId[] = []): void {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  if (!root) return;
+  for (const id of FX_IDS) {
+    clearTimer(id);
+    if (keep.includes(id)) continue;
+    root.classList.remove(className(id));
   }
 }

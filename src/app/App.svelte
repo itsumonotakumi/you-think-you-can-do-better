@@ -21,7 +21,7 @@
     advanceCaption, captionHistory, captions, cues, enqueueCaptions, errorMessage, play,
     resetCaptions, screen, settings,
   } from './store';
-  import { runFxCues } from './effects';
+  import { runFxCues, clearFx } from './effects';
   import './effects/effects.css';
   import { claimCaptionCues, claimCues } from './parts/cueMemory';
   import { cueCaptions } from './parts/logic';
@@ -67,6 +67,16 @@
     if (!startedAt || startedAt === lastStartedAt) return;
     lastStartedAt = startedAt;
     resetCaptions();
+  });
+
+  $effect(() => {
+    // 画面を移るときは演出クラスを必ず外す（結果画面に早送りの横縞が残る不具合の防止）。
+    // プレイ中をまたいでよい深夜・期限の色だけは残す。
+    const current = $screen;
+    const keep = current === 'S05' || current === 'S06' || current === 'S07'
+      ? (['night', 'deadline'] as const)
+      : [];
+    clearFx(keep);
   });
 
   $effect(() => {
@@ -183,6 +193,10 @@
   }
   .caption-host :global(.caption-bar) {
     max-width: 46rem;
+    /* 本文の操作を邪魔しない。触れるのは履歴の開閉だけ */
+    pointer-events: none;
+  }
+  .caption-host :global(.history-box) {
     pointer-events: auto;
   }
   @media (max-width: 640px) {
