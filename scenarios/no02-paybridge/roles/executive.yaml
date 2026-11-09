@@ -51,8 +51,21 @@ points:
     notable:
       - { id: note-first-call, text: { ja: 'Day 0 16時、自治体の税金払いサイトに不審な通信の痕跡。影響範囲は不明。', en: '' } }
     choices:
+      - id: p01-command
+        text: { ja: '対策本部を立ち上げ、調査会社と弁護士を手配し、権限を委譲する。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [meti-csm-guideline]
+        gauges: { flame: -5, trust: 5, stamina: -5 }
+        setFlags: { commandStarted: true }
+        items:
+          - { id: p01-b-time, points: 5, axis: time, refs: [jpcert-handling] }
+          - { id: p01-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: p01-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+        explain: { ja: '指揮と調査の体制を早く整え、専門家への委任も決めた。初動を止めず、被害の拡大を抑えやすい。', en: '' }
       - id: p01-wait
-        text: { ja: '正確な報告が揃うまで、明日の定例会議で聞く。', en: '' }
+        text: { ja: '正確な報告が揃うのを待ち、明日の定例会議でまとめて聞く。', en: '' }
         minutes: 60
         category: hurt
         points: -150
@@ -65,20 +78,9 @@ points:
         items:
           - { id: p01-a-record, points: -5, axis: record, refs: [jpcert-handling] }
           - { id: p01-a-time, points: -10, axis: time, refs: [jpcert-handling] }
-      - id: p01-command
-        text: { ja: '対策本部を立ち上げ、セキュリティ責任者に決裁権限を委譲する。外部の調査会社と弁護士を手配する。', en: '' }
-        minutes: 30
-        category: maintain
-        points: 20
-        refs: [meti-csm-guideline]
-        gauges: { flame: -5, trust: 5, stamina: -5 }
-        setFlags: { commandStarted: true }
-        items:
-          - { id: p01-b-time, points: 5, axis: time, refs: [jpcert-handling] }
-          - { id: p01-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
-          - { id: p01-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+        explain: { ja: '報告を待つ間に被害が広がる。初動の遅れは復旧時間と信頼の両方を損なうため、評価は低い。', en: '' }
       - id: p01-self
-        text: { ja: '自分でサーバー室に行き、画面を直接確かめる。', en: '' }
+        text: { ja: '自分でサーバー室に向かい、画面を直接見て状況を確かめる。', en: '' }
         minutes: 60
         category: hurt
         points: -50
@@ -87,7 +89,9 @@ points:
         items:
           - { id: p01-c-order, points: -10, axis: order, refs: [meti-csm-guideline] }
           - { id: p01-c-care, points: -5, axis: care, refs: [meti-csm-guideline] }
+        explain: { ja: '現場を見る姿勢は悪くないが、経営者が自ら動くと指揮が空く。役割分担を崩した点が響く。', en: '' }
 
+    lesson: { ja: '初動で問われるのは、自分が何をするかより指揮の形を決めることだ。報告が揃う前でも、対策本部の立ち上げと権限の委譲は決められる。会議を待つ間に被害は広がり、初動の遅れは復旧と説明の両方を難しくする。', en: '' }
   - id: p02-evidence
     at: { day: 0, minutes: 1140 }
     phase: contain
@@ -95,20 +99,8 @@ points:
     text: { ja: '19時。決済基盤部長が「修正を当てるなら今です。ただし、バックアップ系にも同じ穴があります。証拠を残すなら、先に切り離す必要があります」と言う。', en: '' }
     voices: [v02-expert, v02-field, v02-rule, v02-ok]
     choices:
-      - id: p02-patch
-        text: { ja: '修正を当てることを最優先にし、証拠の保全は後回しにする。', en: '' }
-        minutes: 120
-        category: hurt
-        points: -120
-        refs: [nist-sp800-61r3]
-        gauges: { damage: 15, flame: 5, trust: -10 }
-        delayed:
-          - { afterPhases: 1, points: -50, gauges: { damage: 10, trust: -10 }, reason: { ja: '証拠が失われ、侵入経路と漏えい範囲の特定ができなくなった。', en: '' } }
-        items:
-          - { id: p02-a-record, points: -15, axis: record, refs: [nist-sp800-61r3] }
-          - { id: p02-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
       - id: p02-preserve
-        text: { ja: 'サーバーを切り離して証拠を保全し、修正の適用は調査と並行して進める。', en: '' }
+        text: { ja: 'サーバーを切り離して証拠を保全し、修正は調査と並行して進める。', en: '' }
         minutes: 150
         category: maintain
         points: 20
@@ -119,8 +111,9 @@ points:
           - { id: p02-b-record, points: 8, axis: record, refs: [nist-sp800-61r3] }
           - { id: p02-b-order, points: 5, axis: order, refs: [nist-sp800-61r3] }
           - { id: p02-b-time, points: 3, axis: time, refs: [jpcert-handling] }
+        explain: { ja: '証拠保全と修正の並行は妥当だが、止められない決済の代替手段に触れておらず、現場が止まりやすい。', en: '' }
       - id: p02-preserve-plan
-        text: { ja: '証拠を保全し、修正の適用計画と、止められない決済の代替手段を同時に指示する。', en: '' }
+        text: { ja: '証拠を保全し、修正の計画と決済の代替手段を同時に指示する。', en: '' }
         minutes: 180
         category: recover
         points: 100
@@ -132,7 +125,22 @@ points:
           - { id: p02-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
           - { id: p02-c-content, points: 8, axis: content, refs: [meti-csm-guideline] }
           - { id: p02-c-care, points: 5, axis: care, refs: [jpcert-handling] }
+        explain: { ja: '証拠と復旧を同時に進め、決済の代替まで示した。被害と業務の両方を見ている点が強い。', en: '' }
+      - id: p02-patch
+        text: { ja: '修正を当てることを優先し、証拠の保全は後回しにして進める。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -120
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, flame: 5, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -50, gauges: { damage: 10, trust: -10 }, reason: { ja: '証拠が失われ、侵入経路と漏えい範囲の特定ができなくなった。', en: '' } }
+        items:
+          - { id: p02-a-record, points: -15, axis: record, refs: [nist-sp800-61r3] }
+          - { id: p02-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+        explain: { ja: '修正を急ぐ判断は理解できるが、証拠を失うと侵入経路と範囲の特定が難しくなる。後工程の負担が大きい。', en: '' }
 
+    lesson: { ja: '証拠保全と復旧は対立しない。影響のある系を切り離して証拠を残し、修正は調査と並行して進める。決済のように止められない業務には、先に代替手段を用意しておくことが、その後の説明責任にもつながる。', en: '' }
   - id: p03-stop
     at: { day: 1, minutes: 420 }
     phase: contain
@@ -140,20 +148,8 @@ points:
     text: { ja: '朝7時。自治体の税金払いサイトを止めるか。窓口は8時に開く。カード決済は分離して動かしたままにできる。', en: '' }
     voices: [v03-public, v03-coward, v03-ok]
     choices:
-      - id: p03-keep
-        text: { ja: '決済は止めず、監視を強めて様子を見る。', en: '' }
-        minutes: 60
-        category: hurt
-        points: -100
-        refs: [nist-sp800-61r3]
-        gauges: { damage: 20, flame: 5 }
-        delayed:
-          - { afterPhases: 1, points: -60, gauges: { damage: 15, trust: -10 }, reason: { ja: '止めなかった経路から再び侵入され、被害が広がった。', en: '' } }
-        items:
-          - { id: p03-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
-          - { id: p03-a-record, points: -8, axis: record, refs: [nist-sp800-61r3] }
       - id: p03-partial
-        text: { ja: '問題のサイトだけを止め、自治体には電話で連絡する。', en: '' }
+        text: { ja: '問題のサイトだけを止め、自治体の担当者に電話で連絡する。', en: '' }
         minutes: 90
         category: maintain
         points: 20
@@ -164,8 +160,22 @@ points:
           - { id: p03-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
           - { id: p03-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
           - { id: p03-b-care, points: -5, axis: care, refs: [jpcert-handling] }
+        explain: { ja: '対象を絞って止めた判断は妥当だが、委託元への連絡が電話だけで、代替手段と再開見込みが伝わらない。', en: '' }
+      - id: p03-keep
+        text: { ja: '決済は止めずに監視を強め、翌朝の利用状況を見て判断する。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 20, flame: 5 }
+        delayed:
+          - { afterPhases: 1, points: -60, gauges: { damage: 15, trust: -10 }, reason: { ja: '止めなかった経路から再び侵入され、被害が広がった。', en: '' } }
+        items:
+          - { id: p03-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: p03-a-record, points: -8, axis: record, refs: [nist-sp800-61r3] }
+        explain: { ja: '監視を強めても、侵入が続けば被害は広がる。止める判断を先送りした分、復旧と説明が後手に回る。', en: '' }
       - id: p03-stop-plan
-        text: { ja: '対象サイトを止め、自治体の担当者に直接連絡する。復旧見込みと代替の支払い方法を伝え、カード系は分離して動かす。', en: '' }
+        text: { ja: '対象サイトを止め、自治体に代替の支払い方法と再開見込みを伝える。', en: '' }
         minutes: 120
         category: recover
         points: 100
@@ -177,7 +187,9 @@ points:
           - { id: p03-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
           - { id: p03-c-care, points: 10, axis: care, refs: [jpcert-handling] }
           - { id: p03-c-content, points: 5, axis: content, refs: [meti-csm-guideline] }
+        explain: { ja: '止める範囲を絞り、代替の支払い方法と再開見込みまで伝えた。利用者の混乱を抑える実務的な対応だ。', en: '' }
 
+    lesson: { ja: '止めるか止めないかは、被害の拡大と業務への影響を並べて決める。止める場合でも、委託元への連絡、代替の支払い方法、再開の見込みを同時に伝えれば、利用者の混乱は抑えられる。監視だけで様子を見る判断は、被害が続く前提を忘れがちだ。', en: '' }
   - id: p04-muni
     at: { day: 1, minutes: 600 }
     phase: organize
@@ -187,8 +199,22 @@ points:
     notable:
       - { id: note-gov-share, text: { ja: '自治体には公表の文面を事前に共有し、発表の順番と理由を記録した。', en: '' } }
     choices:
+      - id: p04-share
+        text: { ja: '同日の同時発表を自治体に求め、文面を先に共有して事実を出す。', en: '' }
+        minutes: 120
+        category: recover
+        points: 100
+        refs: [meti-disclosure-guidance, no02-ppc-report-entrusted, jpcert-handling]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { govAligned: true }
+        items:
+          - { id: p04-b-order, points: 8, axis: order, refs: [jpcert-handling] }
+          - { id: p04-b-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p04-b-content, points: 5, axis: content, refs: [no02-ppc-report-entrusted] }
+          - { id: p04-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+        explain: { ja: '文面を先に共有し、同時発表を目指した点が評価できる。応じられない場合の自社発表も決めており、順番を守りつつ空白を作らない。', en: '' }
       - id: p04-wait
-        text: { ja: '自治体の一週間の庁内調整を待ち、それまで何も出さない。', en: '' }
+        text: { ja: '自治体の庁内調整を待ち、それが終わるまで当社は何も出さない。', en: '' }
         minutes: 180
         category: hurt
         points: -80
@@ -201,21 +227,9 @@ points:
           - { id: p04-a-time, points: -10, axis: time, refs: [meti-disclosure-guidance] }
           - { id: p04-a-order, points: -8, axis: order, refs: [meti-disclosure-guidance] }
           - { id: p04-a-record, points: -5, axis: record, refs: [jpcert-handling] }
-      - id: p04-share
-        text: { ja: '同日の同時発表を自治体に求め、文面を先に共有する。応じられなければ自社分の事実だけを今日中に出す。', en: '' }
-        minutes: 120
-        category: recover
-        points: 100
-        refs: [meti-disclosure-guidance, no02-ppc-report-entrusted, jpcert-handling]
-        gauges: { flame: -5, trust: 10, stamina: -10 }
-        setFlags: { govAligned: true }
-        items:
-          - { id: p04-b-order, points: 8, axis: order, refs: [jpcert-handling] }
-          - { id: p04-b-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
-          - { id: p04-b-content, points: 5, axis: content, refs: [no02-ppc-report-entrusted] }
-          - { id: p04-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+        explain: { ja: '庁内調整を待つ間にも報道は進む。説明の空白は隠蔽と受け取られやすく、信頼の回復に時間がかかる。', en: '' }
       - id: p04-silent
-        text: { ja: '自治体が発表するまで、当社は何も言わない。', en: '' }
+        text: { ja: '自治体が発表するまで待ち、当社からの説明は控えることに決める。', en: '' }
         minutes: 60
         category: hurt
         points: -120
@@ -228,7 +242,9 @@ points:
           - { id: p04-c-wording, points: -20, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p04-c-record, points: -10, axis: record, refs: [jpcert-handling] }
           - { id: p04-c-time, points: -10, axis: time, refs: [meti-disclosure-guidance] }
+        explain: { ja: '委託元に任せきりにすると、当社の関与が見えなくなる。事実を出さない時間が長いほど、後で説明しにくくなる。', en: '' }
 
+    lesson: { ja: '委託元との発表は、順番と文面の共有で決まる。同時発表が難しい場合でも、事実を出す時刻を先に伝え、共有した記録を残す。待つことと任せることは違う。黙って待てば、隠蔽と受け取られても仕方がない。', en: '' }
   - id: p05-first-report
     at: { day: 1, minutes: 1080 }
     phase: notify
@@ -236,20 +252,8 @@ points:
     text: { ja: '18時。広報が「今夜、第1報を出せます。被害の全容はまだ分かっていません」と言う。', en: '' }
     voices: [v05-coward, v05-popular, v05-ok]
     choices:
-      - id: p05-tonight
-        text: { ja: '今夜中に第1報を出し、分からない点は調査中と書く。', en: '' }
-        minutes: 120
-        category: maintain
-        points: 20
-        refs: [ppc-report-prelim]
-        gauges: { trust: 5, stamina: -10 }
-        detail: first-report
-        setFlags: { firstPublic: true }
-        items:
-          - { id: p05-a-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
-          - { id: p05-a-order, points: 5, axis: order, refs: [meti-disclosure-guidance] }
       - id: p05-wait
-        text: { ja: '全容が分かってから出す。', en: '' }
+        text: { ja: '全容が分かってから、正確な内容だけをまとめて発表する。', en: '' }
         minutes: 180
         category: hurt
         points: -100
@@ -261,8 +265,22 @@ points:
         items:
           - { id: p05-b-time, points: -10, axis: time, refs: [ppc-report-prelim] }
           - { id: p05-b-care, points: -10, axis: care, refs: [ppc-notify-person] }
+        explain: { ja: '全容を待つ間に、報道や憶測が先に広がる。説明の空白は、後から事実を出しても埋めにくい。', en: '' }
+      - id: p05-tonight
+        text: { ja: '今夜中に第1報を出し、分からない点は調査中と明記する。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 20
+        refs: [ppc-report-prelim]
+        gauges: { trust: 5, stamina: -10 }
+        detail: first-report
+        setFlags: { firstPublic: true }
+        items:
+          - { id: p05-a-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: p05-a-order, points: 5, axis: order, refs: [meti-disclosure-guidance] }
+        explain: { ja: '分かる範囲で第1報を出し、不明点を調査中と明記した。初期の説明として誠実で、その後の更新もしやすい。', en: '' }
       - id: p05-maintenance
-        text: { ja: '今夜、メンテナンス障害として発表する。', en: '' }
+        text: { ja: '今夜、メンテナンスに伴う障害として利用者に発表する。', en: '' }
         minutes: 90
         category: fatal
         points: -250
@@ -273,7 +291,9 @@ points:
           - { id: p05-c-wording, points: -20, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p05-c-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
           - { id: p05-c-record, points: -10, axis: record, refs: [jpcert-handling] }
+        explain: { ja: '障害という言い換えは、原因が分かった時に矛盾する。隠す意図がなくても、後の説明の信頼を大きく損なう。', en: '' }
 
+    lesson: { ja: '全容が分かるまで待つと、その間の説明が空白になる。分かっている事実と不明点を分け、今夜中に第1報を出す。メンテナンス障害という言い換えは、後で必ず矛盾する。最初の説明が、その後の信頼の土台になる。', en: '' }
   - id: p06-card
     at: { day: 2, minutes: 540 }
     phase: notify
@@ -284,7 +304,7 @@ points:
       - { id: note-card-code, text: { ja: 'カードのセキュリティコードを保存していた事実と、三年前の接続仕様の変更で入った設定、廃止の予定を記録した。', en: '' } }
     choices:
       - id: p06-later
-        text: { ja: '原因の究明を優先し、カード会社への連絡は後にする。', en: '' }
+        text: { ja: '原因の究明を優先し、カード会社への連絡は後日に回す。', en: '' }
         minutes: 120
         category: hurt
         points: -120
@@ -293,8 +313,9 @@ points:
         items:
           - { id: p06-a-order, points: -10, axis: order, refs: [ppc-report-scope] }
           - { id: p06-a-content, points: -10, axis: content, refs: [ppc-report-scope] }
+        explain: { ja: '原因の究明を優先した結果、カード会社の監視強化が遅れる。不正利用の拡大を招きかねない。', en: '' }
       - id: p06-notify
-        text: { ja: 'カード会社とアクワイアラー（加盟店契約会社）に事実を連絡し、不正利用の監視強化を依頼する。', en: '' }
+        text: { ja: 'カード会社と加盟店契約会社に事実を連絡し、監視の強化を頼む。', en: '' }
         minutes: 120
         category: maintain
         points: 20
@@ -304,8 +325,9 @@ points:
         items:
           - { id: p06-b-order, points: 8, axis: order, refs: [ppc-report-scope] }
           - { id: p06-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
+        explain: { ja: '事実を早く連絡し、監視の強化を依頼した点は妥当。保存情報の削除予定まで踏み込むと、さらに信頼される。', en: '' }
       - id: p06-notify-plan
-        text: { ja: '連絡に加え、保存していたカード情報の特定と削除の完了予定、設計の変更を提示する。', en: '' }
+        text: { ja: '連絡に加え、保存したカード情報の削除予定と設計変更を示す。', en: '' }
         minutes: 180
         category: recover
         points: 100
@@ -317,7 +339,9 @@ points:
           - { id: p06-c-content, points: 8, axis: content, refs: [meti-csm-guideline] }
           - { id: p06-c-record, points: 8, axis: record, refs: [jpcert-handling] }
           - { id: p06-c-care, points: 5, axis: care, refs: [ppc-notify-person] }
+        explain: { ja: '連絡に加えて、保存情報の削除予定と設計変更を示した。カード会社が判断しやすい材料を揃えている。', en: '' }
 
+    lesson: { ja: 'カード会社への連絡は、原因の究明を待たずに行う。事実、影響する範囲、保存していた情報の扱い、再発防止の予定を伝える。連絡が遅れるほど、カード会社の判断も遅れ、加盟店と利用者への影響が広がる。', en: '' }
   - id: p07-report-leak
     at: { day: 2, minutes: 840 }
     phase: notify
@@ -327,19 +351,8 @@ points:
     notable:
       - { id: note-count, text: { ja: '報道時点の件数は概数。確定値ではない。', en: '' } }
     choices:
-      - id: p07-deny
-        text: { ja: '報道を否定し、確認中を続ける。', en: '' }
-        minutes: 120
-        category: hurt
-        points: -150
-        refs: [ppc-report-scope]
-        gauges: { flame: 20, trust: -15, damage: 10 }
-        coward: true
-        items:
-          - { id: p07-a-content, points: -10, axis: content, refs: [ppc-report-scope] }
-          - { id: p07-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
       - id: p07-admit
-        text: { ja: '事実を認め、追加の発表を行い、自治体と共同で会見する。', en: '' }
+        text: { ja: '事実を認めて追加の発表を行い、自治体と共同で会見する。', en: '' }
         minutes: 180
         category: recover
         points: 100
@@ -350,8 +363,21 @@ points:
           - { id: p07-b-content, points: 8, axis: content, refs: [ppc-report-prelim] }
           - { id: p07-b-order, points: 8, axis: order, refs: [meti-disclosure-guidance] }
           - { id: p07-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+        explain: { ja: '事実を認め、追加発表と共同会見で説明した。委託元と足並みを揃えつつ、自社の責任も示している。', en: '' }
+      - id: p07-deny
+        text: { ja: '報道の内容を否定し、確認中という説明を続けて様子を見る。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -150
+        refs: [ppc-report-scope]
+        gauges: { flame: 20, trust: -15, damage: 10 }
+        coward: true
+        items:
+          - { id: p07-a-content, points: -10, axis: content, refs: [ppc-report-scope] }
+          - { id: p07-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+        explain: { ja: '報道で事実が出た後に否定を続けると、後の訂正で信頼を大きく失う。確認中という説明にも期限が必要だ。', en: '' }
       - id: p07-pass
-        text: { ja: '自治体に任せ、当社は「協力している」とだけ言う。', en: '' }
+        text: { ja: '自治体に説明を任せ、当社は協力しているとだけ答える。', en: '' }
         minutes: 60
         category: hurt
         points: -80
@@ -360,7 +386,9 @@ points:
         items:
           - { id: p07-c-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p07-c-order, points: -8, axis: order, refs: [meti-disclosure-guidance] }
+        explain: { ja: '委託元に任せると、当社が関与していないように見える。協力しているという説明だけでは責任の所在が伝わらない。', en: '' }
 
+    lesson: { ja: '報道で事実が明らかになった後は、否定を続けるほど信頼を失う。事実を認め、追加の発表と共同の会見で説明する。委託元に任せきりにすると、当社が関与していないように見え、責任の所在がぼやける。', en: '' }
   - id: p08-prelim
     at: { day: 3, minutes: 540 }
     phase: notify
@@ -369,7 +397,7 @@ points:
     voices: [v08-law, v08-boss, v08-ok]
     choices:
       - id: p08-wait
-        text: { ja: '件数が確定してから報告する。', en: '' }
+        text: { ja: '件数が確定するまで待ち、まとまった形で報告することにする。', en: '' }
         minutes: 120
         category: hurt
         points: -150
@@ -380,6 +408,7 @@ points:
         items:
           - { id: p08-a-time, points: -10, axis: time, refs: [ppc-report-prelim] }
           - { id: p08-a-record, points: -8, axis: record, refs: [ppc-report-prelim] }
+        explain: { ja: '件数が確定するのを待つと、法定期限を過ぎる。分かる範囲で速報を出す判断が求められる。', en: '' }
       - id: p08-file
         text: { ja: '分かっている範囲で速報を出し、不明点は調査中と明記する。', en: '' }
         minutes: 90
@@ -392,8 +421,9 @@ points:
           - { id: p08-b-content, points: 8, axis: content, refs: [ppc-report-prelim] }
           - { id: p08-b-time, points: 5, axis: time, refs: [ppc-report-prelim] }
           - { id: p08-b-record, points: 5, axis: record, refs: [ppc-report-prelim] }
+        explain: { ja: '分かっている範囲で速報を出し、不明点を調査中と明記した。期限を守りつつ、後の更新の余地も残している。', en: '' }
       - id: p08-oral
-        text: { ja: '所管庁には口頭で相談するが、書面は出さない。', en: '' }
+        text: { ja: '所管庁には口頭で相談し、書面での報告は後日に回す。', en: '' }
         minutes: 60
         category: hurt
         points: -100
@@ -402,7 +432,9 @@ points:
         items:
           - { id: p08-c-record, points: -10, axis: record, refs: [ppc-report-scope] }
           - { id: p08-c-time, points: -8, axis: time, refs: [ppc-report-scope] }
+        explain: { ja: '口頭の相談だけでは記録が残らない。書面を出した時刻と内容が、後の説明の根拠になる。', en: '' }
 
+    lesson: { ja: '件数が確定するのを待つと、法定期限を過ぎる。分かっている範囲で速報を出し、不明点は調査中と明記する。口頭の相談だけでは記録が残らない。書面で出した時刻と内容が、後の説明の根拠になる。', en: '' }
   - id: p09-timely
     at: { day: 3, minutes: 900 }
     phase: notify
@@ -413,7 +445,7 @@ points:
       - { id: note-timely, text: { ja: '適時開示の判断時刻と理由を記録した。', en: '' } }
     choices:
       - id: p09-hold
-        text: { ja: '決算発表まで公表しない。', en: '' }
+        text: { ja: '決算発表の日程に合わせ、それまで公表を控えておく。', en: '' }
         minutes: 120
         category: hurt
         points: -150
@@ -425,8 +457,9 @@ points:
         items:
           - { id: p09-a-time, points: -10, axis: time, refs: [meti-disclosure-guidance] }
           - { id: p09-a-record, points: -10, axis: record, refs: [no02-timely-disclosure] }
+        explain: { ja: '決算発表まで待つと、投資家への説明が遅れる。適時開示の判断を先送りした点が響く。', en: '' }
       - id: p09-disclose
-        text: { ja: '影響が確定していない事実と、調査中であることを今日中に開示する。', en: '' }
+        text: { ja: '影響が確定していない事実と調査中であることを今日中に開示する。', en: '' }
         minutes: 90
         category: maintain
         points: 30
@@ -437,8 +470,9 @@ points:
           - { id: p09-b-content, points: 8, axis: content, refs: [no02-timely-disclosure] }
           - { id: p09-b-time, points: 5, axis: time, refs: [meti-disclosure-guidance] }
           - { id: p09-b-record, points: 5, axis: record, refs: [no02-timely-disclosure] }
+        explain: { ja: '影響が確定していなくても、事実と調査中であることを今日中に開示した。適時開示の基本に沿う。', en: '' }
       - id: p09-disclose-plan
-        text: { ja: '今日中に開示し、影響額の見通しと調査の進捗を四半期ごとに更新すると約束する。', en: '' }
+        text: { ja: '今日中に開示し、影響額の見通しと四半期ごとの更新を約束する。', en: '' }
         minutes: 120
         category: recover
         points: 100
@@ -449,7 +483,9 @@ points:
           - { id: p09-c-content, points: 8, axis: content, refs: [no02-timely-disclosure] }
           - { id: p09-c-order, points: 8, axis: order, refs: [meti-disclosure-guidance] }
           - { id: p09-c-record, points: 8, axis: record, refs: [no02-timely-disclosure] }
+        explain: { ja: '開示に加え、影響額の見通しと更新の時期を示した。数字が動いても説明の筋を通しやすい。', en: '' }
 
+    lesson: { ja: '上場企業には、投資家への適時開示が求められる。影響が確定していなくても、分かっている事実と調査中であることを今日中に開示する。影響額の見通しと更新の時期を示せば、後から数字が動いても説明しやすい。', en: '' }
   - id: p10-investigate
     at: { day: 4, minutes: 600 }
     phase: notify
@@ -457,31 +493,8 @@ points:
     text: { ja: '10時。調査会社の報告。侵入は約三週間前。同じ手口が複数の委託元で使われている可能性がある。', en: '' }
     voices: [v10-past, v10-insider, v10-ok]
     choices:
-      - id: p10-narrow
-        text: { ja: 'すでに公表した範囲だけを調査し、追加の公表は控える。', en: '' }
-        minutes: 120
-        category: hurt
-        points: -120
-        refs: [nist-sp800-61r3]
-        gauges: { damage: 15, trust: -10 }
-        items:
-          - { id: p10-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
-          - { id: p10-a-content2, points: -10, axis: content, refs: [nist-sp800-61r3] }
-          - { id: p10-a-record, points: -5, axis: record, refs: [jpcert-handling] }
-      - id: p10-expand
-        text: { ja: '全委託元・全システムに調査を広げ、第三者委員会を設置する。', en: '' }
-        minutes: 240
-        category: maintain
-        points: 30
-        refs: [meti-csm-guideline]
-        gauges: { damage: -10, trust: 10, stamina: -15 }
-        setFlags: { thirdParty: true }
-        items:
-          - { id: p10-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
-          - { id: p10-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
-          - { id: p10-b-record, points: 5, axis: record, refs: [jpcert-handling] }
       - id: p10-expand-plan
-        text: { ja: '調査を広げ、第三者委員会を設置する。加えて、被害者の補償基準と専用窓口を先に公表する。', en: '' }
+        text: { ja: '調査を広げて第三者委員会を置き、補償基準と専用窓口も公表する。', en: '' }
         minutes: 300
         category: recover
         points: 120
@@ -493,7 +506,34 @@ points:
           - { id: p10-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
           - { id: p10-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
           - { id: p10-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+        explain: { ja: '調査の拡大に加え、補償基準と専用窓口を先に示した。被害者の不安に応える具体的な対応だ。', en: '' }
+      - id: p10-narrow
+        text: { ja: 'すでに公表した範囲だけを調査し、追加の公表は控える。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -120
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, trust: -10 }
+        items:
+          - { id: p10-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: p10-a-content2, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: p10-a-record, points: -5, axis: record, refs: [jpcert-handling] }
+        explain: { ja: '公表した範囲だけを調べると、被害の全体像を見落とす。追加の公表を控える判断は隠蔽と受け取られやすい。', en: '' }
+      - id: p10-expand
+        text: { ja: '全委託元と全システムに調査を広げ、第三者委員会を設置する。', en: '' }
+        minutes: 240
+        category: maintain
+        points: 30
+        refs: [meti-csm-guideline]
+        gauges: { damage: -10, trust: 10, stamina: -15 }
+        setFlags: { thirdParty: true }
+        items:
+          - { id: p10-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: p10-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: p10-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+        explain: { ja: '全委託元と全システムに調査を広げ、第三者委員会を置いた。範囲を限定しない姿勢は評価できる。', en: '' }
 
+    lesson: { ja: '公表した範囲だけを調べるのは、被害の全体像を見ないのと同じだ。全委託元と全システムに調査を広げ、第三者委員会を置く。補償の基準と専用窓口を先に示すことで、被害者の不安にも応えられる。', en: '' }
   - id: p11-notify
     at: { day: 5, minutes: 600 }
     phase: notify
@@ -502,7 +542,7 @@ points:
     voices: [v11-field, v11-expert, v11-ok]
     choices:
       - id: p11-email
-        text: { ja: 'メールの一斉送信だけで済ませ、専用窓口や偽通知への注意は添えない。', en: '' }
+        text: { ja: 'メールの一斉送信だけで済ませ、専用窓口と偽通知の注意は省く。', en: '' }
         minutes: 120
         category: hurt
         points: -40
@@ -511,19 +551,20 @@ points:
         items:
           - { id: p11-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
           - { id: p11-a-content, points: -8, axis: content, refs: [ppc-notify-person] }
-      - id: p11-email-plan
-        text: { ja: 'メールで通知し、専用窓口と偽通知への注意を添える。書面は希望者に送る。', en: '' }
-        minutes: 150
-        category: recover
-        points: 80
+        explain: { ja: '一斉メールだけで済ませ、窓口と偽通知の注意を省いた。届かない人と、誤解する人が残る。', en: '' }
+      - id: p11-news
+        text: { ja: '個別の通知はせず、報道と自社の公表だけで知らせようとする。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -150
         refs: [ppc-notify-person]
-        gauges: { flame: -5, trust: 10, stamina: -10 }
-        setFlags: { victimNotified: true }
+        gauges: { flame: 20, trust: -15 }
         items:
-          - { id: p11-d-care, points: 8, axis: care, refs: [ppc-notify-person] }
-          - { id: p11-d-content, points: 5, axis: content, refs: [ppc-notify-person] }
+          - { id: p11-c-care, points: -15, axis: care, refs: [ppc-notify-person] }
+          - { id: p11-c-content, points: -10, axis: content, refs: [ppc-notify-person] }
+        explain: { ja: '個別の通知をせず、報道と公表だけで済ませた。知らないまま被害に遭う人が残る。再発の危険を残す。', en: '' }
       - id: p11-letter
-        text: { ja: 'メールと書面で通知し、専用窓口と偽通知への注意を添える。', en: '' }
+        text: { ja: 'メールと書面で通知し、専用窓口と偽通知への注意も添える。', en: '' }
         minutes: 240
         category: recover
         points: 100
@@ -535,17 +576,21 @@ points:
           - { id: p11-b-care2, points: 8, axis: care, refs: [ppc-notify-person] }
           - { id: p11-b-wording, points: 5, axis: wording, refs: [ppc-notify-person] }
           - { id: p11-b-record, points: 5, axis: record, refs: [jpcert-handling] }
-      - id: p11-news
-        text: { ja: '通知は報道と公表で知ってもらう。', en: '' }
-        minutes: 60
-        category: hurt
-        points: -150
+        explain: { ja: 'メールと書面の両方で通知し、専用窓口と偽通知の注意も添えた。届く手段を分けた点が強い。', en: '' }
+      - id: p11-email-plan
+        text: { ja: 'メールで通知し、専用窓口と偽通知の注意を添える。書面は希望者に送る。', en: '' }
+        minutes: 150
+        category: recover
+        points: 80
         refs: [ppc-notify-person]
-        gauges: { flame: 20, trust: -15 }
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { victimNotified: true }
         items:
-          - { id: p11-c-care, points: -15, axis: care, refs: [ppc-notify-person] }
-          - { id: p11-c-content, points: -10, axis: content, refs: [ppc-notify-person] }
+          - { id: p11-d-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: p11-d-content, points: 5, axis: content, refs: [ppc-notify-person] }
+        explain: { ja: 'メールで通知し、窓口と偽通知の注意も添えた。書面を希望者に送る形で、費用と確実性のバランスを取っている。', en: '' }
 
+    lesson: { ja: '通知は、届く人と届かない人を分けて考える。メールだけでなく書面も用意し、専用窓口と偽通知への注意を添える。報道や公表だけで済ませると、知らないまま被害に遭う人が残る。', en: '' }
   - id: p12-ceo
     at: { day: 6, minutes: 660 }
     phase: notify
@@ -554,7 +599,7 @@ points:
     voices: [v12-bold, v12-flattery, v12-ok]
     choices:
       - id: p12-sns
-        text: { ja: '個人のSNSで「絶対に許さない」と強い言葉で発信する。', en: '' }
+        text: { ja: '個人のSNSで強い言葉を使い、自社の怒りを直接伝える。', en: '' }
         minutes: 30
         category: hurt
         points: -60
@@ -565,8 +610,9 @@ points:
         items:
           - { id: p12-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p12-a-order, points: -10, axis: order, refs: [meti-disclosure-guidance] }
+        explain: { ja: '個人のSNSで強い言葉を発すると、公式の説明と食い違う恐れがある。感情的な発信は混乱を招きやすい。', en: '' }
       - id: p12-official
-        text: { ja: '個人での発信は控え、公式の発表に一本化する。', en: '' }
+        text: { ja: '個人での発信は控え、公式の発表だけに一本化する。', en: '' }
         minutes: 45
         category: maintain
         points: 20
@@ -575,8 +621,9 @@ points:
         items:
           - { id: p12-b-order, points: 8, axis: order, refs: [meti-disclosure-guidance] }
           - { id: p12-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+        explain: { ja: '個人の発信を控え、公式に一本化した。情報の出所が明確になり、後の訂正も容易になる。', en: '' }
       - id: p12-conference
-        text: { ja: '記者会見を前倒しし、被害者への謝罪と事実だけを述べる。個人の発信は控える。', en: '' }
+        text: { ja: '記者会見を前倒しし、被害者への謝罪と事実だけを述べる。', en: '' }
         minutes: 120
         category: recover
         points: 100
@@ -587,7 +634,9 @@ points:
           - { id: p12-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
           - { id: p12-c-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
           - { id: p12-c-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+        explain: { ja: '会見を前倒しし、謝罪と事実だけを述べた。経営者が自ら説明する姿勢は、信頼の回復に効く。', en: '' }
 
+    lesson: { ja: '経営者の個人的な発信は、公式の説明と食い違うと混乱を招く。記者会見を前倒しし、被害者への謝罪と事実だけを述べる。強い言葉より、責任の所在と今後の行動を示すほうが、信頼の回復に近い。', en: '' }
   - id: p13-stamina
     at: { day: 8, minutes: 540 }
     phase: recover
@@ -595,8 +644,20 @@ points:
     text: { ja: '9時。対策本部は五日連続の徹夜。現場から「このままだと確認漏れが出る。交代を入れてほしい」という声が出ている。', en: '' }
     voices: [v13-flattery, v13-public, v13-ok]
     choices:
+      - id: p13-shift-care
+        text: { ja: '交代制に加え、外部ヘルプデスクと臨時窓口を増員して社員を支える。', en: '' }
+        minutes: 150
+        category: recover
+        points: 100
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: 15, trust: 10, flame: -5 }
+        items:
+          - { id: p13-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: p13-c-care2, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: p13-c-care3, points: 8, axis: care, refs: [ipa-sme-guideline] }
+        explain: { ja: '交代制に加え、外部ヘルプデスクと臨時窓口を増員した。負荷を分け、社員のケアも組み込んでいる。', en: '' }
       - id: p13-allnight
-        text: { ja: '全員で最後まで走り抜く。ここで休むと流れが切れる。', en: '' }
+        text: { ja: '全員で最後まで走り抜き、休むのは落ち着いてからにする。', en: '' }
         minutes: 120
         category: hurt
         points: -30
@@ -607,8 +668,9 @@ points:
         items:
           - { id: p13-a-care, points: -10, axis: care, refs: [ipa-sme-guideline] }
           - { id: p13-a-care2, points: -8, axis: care, refs: [ipa-sme-guideline] }
+        explain: { ja: '全員で走り続けると、疲労から確認漏れが起きる。休む判断を先送りした分、復旧のやり直しが増える。', en: '' }
       - id: p13-shift
-        text: { ja: '半日ごとの交代制を敷き、社長自身も休む。', en: '' }
+        text: { ja: '半日ごとの交代制を敷き、社長自身も休む時間を確保する。', en: '' }
         minutes: 90
         category: maintain
         points: 20
@@ -617,18 +679,9 @@ points:
         items:
           - { id: p13-b-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
           - { id: p13-b-care2, points: 5, axis: care, refs: [ipa-sme-guideline] }
-      - id: p13-shift-care
-        text: { ja: '交代制に加え、外部ヘルプデスクと臨時の問い合わせ窓口を増員する。社員のケアも案内する。', en: '' }
-        minutes: 150
-        category: recover
-        points: 100
-        refs: [ipa-sme-guideline]
-        gauges: { stamina: 15, trust: 10, flame: -5 }
-        items:
-          - { id: p13-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
-          - { id: p13-c-care2, points: 8, axis: care, refs: [ipa-sme-guideline] }
-          - { id: p13-c-care3, points: 8, axis: care, refs: [ipa-sme-guideline] }
+        explain: { ja: '交代制を敷き、社長自身も休むことにした。長い対応を前提にした現実的な判断だ。復旧までの時間を短くできる。', en: '' }
 
+    lesson: { ja: '長時間の対応は、集中力を落とし、確認漏れを生む。半日ごとの交代制を敷き、社外のヘルプデスクや臨時窓口で負荷を分ける。社員のケアも、復旧の品質を保つための投資と考えたい。', en: '' }
   - id: p14-resume
     at: { day: 12, minutes: 540 }
     phase: recover
@@ -637,7 +690,7 @@ points:
     voices: [v14-coward, v14-public, v14-ok]
     choices:
       - id: p14-rush
-        text: { ja: '全面再開し、監視は通常体制に戻す。', en: '' }
+        text: { ja: '全面再開に踏み切り、監視を通常の体制に戻して様子を見る。', en: '' }
         minutes: 120
         category: hurt
         points: -150
@@ -649,19 +702,9 @@ points:
           - { id: p14-a-time, points: -10, axis: time, refs: [nist-sp800-61r3] }
           - { id: p14-a-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
           - { id: p14-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
-      - id: p14-step
-        text: { ja: 'クリーンな環境から段階的に再開し、監視を強化する。', en: '' }
-        minutes: 240
-        category: maintain
-        points: 30
-        refs: [nist-sp800-61r3]
-        gauges: { damage: -10, stamina: -10, trust: 5 }
-        items:
-          - { id: p14-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
-          - { id: p14-b-record, points: 5, axis: record, refs: [nist-sp800-61r3] }
-          - { id: p14-b-time, points: 3, axis: time, refs: [meti-csm-guideline] }
+        explain: { ja: '全面再開と監視の通常化を同時に決めた。再発の兆候を見逃し、再度止める事態になりやすい。', en: '' }
       - id: p14-verified
-        text: { ja: '段階的に再開し、再開前の第三者検証を公開する。再発したときの補償も明記する。', en: '' }
+        text: { ja: '段階的に再開し、再開前の第三者検証と再発時の補償を明記する。', en: '' }
         minutes: 300
         category: recover
         points: 100
@@ -673,7 +716,21 @@ points:
           - { id: p14-c-record, points: 8, axis: record, refs: [jpcert-handling] }
           - { id: p14-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
           - { id: p14-c-time, points: 5, axis: time, refs: [meti-csm-guideline] }
+        explain: { ja: '再開前に第三者検証を行い、再発時の補償も明記した。利用者と取引先の不安に応える内容だ。', en: '' }
+      - id: p14-step
+        text: { ja: 'クリーンな環境から段階的に再開し、監視を強化して続ける。', en: '' }
+        minutes: 240
+        category: maintain
+        points: 30
+        refs: [nist-sp800-61r3]
+        gauges: { damage: -10, stamina: -10, trust: 5 }
+        items:
+          - { id: p14-b-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: p14-b-record, points: 5, axis: record, refs: [nist-sp800-61r3] }
+          - { id: p14-b-time, points: 3, axis: time, refs: [meti-csm-guideline] }
+        explain: { ja: '段階的に再開し、監視を強化した。リスクを抑えながら業務を戻す妥当な判断だ。再発の防止にもつながる。', en: '' }
 
+    lesson: { ja: '再開は速さより条件で決める。クリーンな環境から段階的に戻し、第三者検証と監視の強化を前提にする。再発したときの補償まで先に明記しておけば、利用者と取引先の不安を減らせる。', en: '' }
   - id: p15-final
     at: { day: 45, minutes: 600 }
     phase: after
@@ -682,7 +739,7 @@ points:
     voices: [v15-expert, v15-law, v15-ok]
     choices:
       - id: p15-hide
-        text: { ja: '確報は出すが、調査報告書は公開しない。', en: '' }
+        text: { ja: '確報は出すが、調査報告書は社内にとどめて公開しない。', en: '' }
         minutes: 60
         category: hurt
         points: -100
@@ -693,8 +750,9 @@ points:
           - { id: p15-a-content, points: -10, axis: content, refs: [meti-disclosure-guidance] }
           - { id: p15-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
           - { id: p15-a-record, points: -5, axis: record, refs: [meti-disclosure-guidance] }
+        explain: { ja: '確報だけを出して報告書を公開しないと、隠しているという疑いが残る。再発防止の検証も進みにくい。', en: '' }
       - id: p15-publish
-        text: { ja: '攻撃に使える部分だけ伏せて、調査報告書を全文公開する。', en: '' }
+        text: { ja: '攻撃に使える部分だけを伏せて、調査報告書を全文公開する。', en: '' }
         minutes: 180
         category: recover
         points: 100
@@ -705,8 +763,9 @@ points:
         items:
           - { id: p15-b-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
           - { id: p15-b-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
+        explain: { ja: '攻撃に使える部分だけを伏せて全文公開した。説明責任を果たしつつ、悪用のリスクも抑えている。', en: '' }
       - id: p15-share
-        text: { ja: '全文公開に加え、再発防止の進捗を毎月公開し、得た教訓を業界に無償で共有する。', en: '' }
+        text: { ja: '全文公開に加え、再発防止の進捗と教訓を業界に無償で共有する。', en: '' }
         minutes: 240
         category: increase
         points: 300
@@ -719,7 +778,9 @@ points:
           - { id: p15-c-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
           - { id: p15-c-record, points: 8, axis: record, refs: [meti-disclosure-guidance] }
           - { id: p15-c-content2, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+        explain: { ja: '全文公開に加え、進捗と教訓を業界に共有した。自社だけでなく、決済業界全体の再発防止に貢献する。', en: '' }
 
+    lesson: { ja: '調査報告書は、隠すほど疑いを残す。攻撃に使える部分だけを伏せて全文を公開し、再発防止の進捗と教訓を業界に共有する。説明を一度で終わらせず、更新し続けることが信頼につながる。', en: '' }
   - id: p16-press
     at: { day: 46, minutes: 540 }
     phase: after
@@ -727,28 +788,8 @@ points:
     text: { ja: '9時。記者会見を明日に控え、広報が「質問は制限して、二十分で終わらせたい」と言う。', en: '' }
     voices: [v16-flattery, v16-coward, v16-ok]
     choices:
-      - id: p16-short
-        text: { ja: '質問を制限し、会見を短く打ち切る。', en: '' }
-        minutes: 45
-        category: hurt
-        points: -60
-        refs: [meti-disclosure-guidance]
-        gauges: { flame: 15, trust: -10 }
-        items:
-          - { id: p16-a-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
-          - { id: p16-a-care2, points: -8, axis: care, refs: [meti-disclosure-guidance] }
-      - id: p16-facts
-        text: { ja: '記録を手元に置き、事実だけを答え、不明点は確認して回答すると言う。', en: '' }
-        minutes: 90
-        category: maintain
-        points: 30
-        refs: [jpcert-handling]
-        gauges: { trust: 5, stamina: -10 }
-        items:
-          - { id: p16-b-wording, points: 8, axis: wording, refs: [jpcert-handling] }
-          - { id: p16-b-wording2, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
       - id: p16-ready
-        text: { ja: '想定問答を全役員で確認し、最初に被害者への謝罪を述べる。回答は記録に基づく。', en: '' }
+        text: { ja: '想定問答を全役員で確認し、最初に被害者への謝罪を述べる。', en: '' }
         minutes: 150
         category: recover
         points: 100
@@ -759,7 +800,31 @@ points:
           - { id: p16-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
           - { id: p16-c-care, points: 8, axis: care, refs: [meti-csm-guideline] }
           - { id: p16-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+        explain: { ja: '想定問答を全役員で確認し、最初に謝罪を述べた。会見の準備と順番が整っており、信頼の回復に近い。', en: '' }
+      - id: p16-short
+        text: { ja: '質問を制限し、会見を短時間で打ち切って終わらせる。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -60
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -10 }
+        items:
+          - { id: p16-a-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p16-a-care2, points: -8, axis: care, refs: [meti-disclosure-guidance] }
+        explain: { ja: '質問を制限して打ち切ると、隠していると受け取られる。説明の機会を減らすほど、批判は長引く。', en: '' }
+      - id: p16-facts
+        text: { ja: '記録を手元に置き、事実だけを答え、不明点は確認して答える。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 30
+        refs: [jpcert-handling]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: p16-b-wording, points: 8, axis: wording, refs: [jpcert-handling] }
+          - { id: p16-b-wording2, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
+        explain: { ja: '記録を手元に置き、事実だけを答えた。不明点に期限を設ける姿勢も、誠実な説明につながる。', en: '' }
 
+    lesson: { ja: '記者会見では、記録に基づく事実だけを答える。想定問答を全役員で確認し、最初に被害者への謝罪を述べる。答えられない問いには、回答の期限を約束する。質問を制限すると、隠していると受け取られる。', en: '' }
 drafts:
   first-report:
     title: { ja: '第1報の文案', en: '' }
@@ -774,118 +839,118 @@ drafts:
       - id: scope
         label: { ja: '対象範囲', en: '' }
         options:
-          - { id: fd-s-all, text: { ja: '委託元の全利用者（過去の利用者を含む）', en: '' }, points: 10, axis: content, refs: [ppc-report-scope] }
-          - { id: fd-s-current, text: { ja: '現行の利用者のみ', en: '' }, points: -20, axis: content, refs: [ppc-report-scope], delayed: { afterPhases: 1, points: -20, reason: { ja: '対象の訂正が必要になった。', en: '' } } }
+          - { id: fd-s-current, text: { ja: '現行の利用者だけを対象にし、過去の利用者は除く。', en: '' }, points: -20, axis: content, refs: [ppc-report-scope], delayed: { afterPhases: 1, points: -20, reason: { ja: '対象の訂正が必要になった。', en: '' } }, explain: { ja: '現行の利用者に限定すると、過去の利用者への通知が漏れる。対象の訂正が必要になり、信頼を損なう。', en: '' } }
+          - { id: fd-s-all, text: { ja: '委託元の全利用者を対象にし、過去の利用者も含める。', en: '' }, points: 10, axis: content, refs: [ppc-report-scope], explain: { ja: '過去の利用者まで対象にした点が評価できる。対象を広げるほど通知の負担は増えるが、漏れによる不信を避けられる。', en: '' } }
       - id: dates
         label: { ja: '日時の書き方', en: '' }
         options:
-          - { id: fd-d-split, text: { ja: '発生と検知の日時を分けて書く', en: '' }, points: 5, axis: content, refs: [jpcert-handling] }
-          - { id: fd-d-merge, text: { ja: '発生と検知をまとめて書く', en: '' }, points: -10, axis: wording, refs: [jpcert-handling] }
+          - { id: fd-d-split, text: { ja: '発生と検知の日時を分けて、それぞれの時刻を書く。', en: '' }, points: 5, axis: content, refs: [jpcert-handling], explain: { ja: '発生と検知を分けると、初動の遅れも隠さず示せる。後の検証で時刻を照合しやすい。復旧までの時間を短くできる。', en: '' } }
+          - { id: fd-d-merge, text: { ja: '発生と検知をまとめて、一つの日時として書く。', en: '' }, points: -10, axis: wording, refs: [jpcert-handling], explain: { ja: '発生と検知をまとめると、都合よく見える。検証で食い違いが出た時の説明が難しくなる。', en: '' } }
       - id: certainty
         label: { ja: '断定の強さ', en: '' }
         options:
-          - { id: fd-c-maybe, text: { ja: '「漏えいの可能性」と「確認」を使い分ける', en: '' }, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: fd-c-confirm, text: { ja: 'すべて「漏えいを確認」と断定する', en: '' }, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: fd-c-none, text: { ja: '「漏えいはない」と書く', en: '' }, points: -20, axis: wording, refs: [ppc-report-scope] }
+          - { id: fd-c-confirm, text: { ja: 'すべて漏えいを確認したと断定して、強く書く。', en: '' }, points: -15, axis: wording, refs: [meti-disclosure-guidance], explain: { ja: '未確認の事実まで断定すると、後で訂正が必要になる。説明の信頼を損ないやすい。被害の拡大を招きかねない。', en: '' } }
+          - { id: fd-c-maybe, text: { ja: '漏えいの可能性と確認済みを使い分けて、確度を示す。', en: '' }, points: 5, axis: wording, refs: [meti-disclosure-guidance], explain: { ja: '可能性と確認済みを使い分け、確度を正確に伝えている。断定的な表現を避け、後の更新にも耐える。', en: '' } }
+          - { id: fd-c-none, text: { ja: '漏えいはないと明記して、影響を否定する。', en: '' }, points: -20, axis: wording, refs: [ppc-report-scope], explain: { ja: '漏えいがないと書くと、事実と異なる場合に大きな問題になる。安全宣言は根拠がある時だけ使う。', en: '' } }
       - id: leaked
         label: { ja: '漏れた項目', en: '' }
         options:
-          - { id: fd-l-specific, text: { ja: 'カード番号、有効期限、氏名、連絡先を具体的に列挙する', en: '' }, points: 10, axis: content, refs: [ppc-report-scope] }
-          - { id: fd-l-vague, text: { ja: '「一部の情報」とぼかす', en: '' }, points: -10, axis: content, refs: [ppc-report-scope] }
+          - { id: fd-l-specific, text: { ja: '漏れた項目を、カード番号や氏名など具体的に列挙する。', en: '' }, points: 10, axis: content, refs: [ppc-report-scope], explain: { ja: '漏れた項目を具体的に示すと、利用者が自分のリスクを判断できる。通知の実効性が高い。', en: '' } }
+          - { id: fd-l-vague, text: { ja: '漏れた項目は一部の情報とぼかして、詳細を避ける。', en: '' }, points: -10, axis: content, refs: [ppc-report-scope], explain: { ja: '一部の情報とぼかすと、利用者は何を確認すべきか分からない。不安だけが残る。被害の拡大を招きかねない。', en: '' } }
       - id: action
         label: { ja: '利用者が今すぐすること', en: '' }
         options:
-          - { id: fd-a-concrete, text: { ja: 'カード会社への連絡、利用明細の確認、パスワード変更を具体的に書く', en: '' }, points: 10, axis: care, refs: [ppc-notify-person] }
-          - { id: fd-a-generic, text: { ja: '「注意してください」とだけ書く', en: '' }, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: fd-a-generic, text: { ja: '注意してくださいとだけ書いて、具体的な行動は示さない。', en: '' }, points: -10, axis: care, refs: [ppc-notify-person], explain: { ja: '注意してくださいだけでは、何をすればよいか伝わらない。行動につながらない通知になる。', en: '' } }
+          - { id: fd-a-concrete, text: { ja: 'カード会社への連絡や明細の確認など、行動を具体的に書く。', en: '' }, points: 10, axis: care, refs: [ppc-notify-person], explain: { ja: '連絡先や確認方法を具体的に示すと、利用者はすぐ行動できる。通知の目的を果たしている。', en: '' } }
       - id: phishing
         label: { ja: '偽通知への注意', en: '' }
         options:
-          - { id: fd-p-warn, text: { ja: '「当社が電話でカード番号を聞くことはありません」と書く', en: '' }, points: 8, axis: care, refs: [ppc-notify-person] }
-          - { id: fd-p-none, text: { ja: '偽通知への注意を書かない', en: '' }, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: fd-p-warn, text: { ja: '当社が電話でカード番号を聞くことはないと明記する。', en: '' }, points: 8, axis: care, refs: [ppc-notify-person], explain: { ja: '当社が電話でカード番号を聞かないと明記した。偽の連絡による二次被害を防ぐ実務的な注意だ。', en: '' } }
+          - { id: fd-p-none, text: { ja: '偽の連絡への注意は書かず、本題だけを伝える。', en: '' }, points: -10, axis: care, refs: [ppc-notify-person], explain: { ja: '偽通知への注意を書かないと、不安につけ込む連絡に利用者が応じてしまう恐れがある。', en: '' } }
       - id: contact
         label: { ja: '問い合わせ窓口', en: '' }
         options:
-          - { id: fd-w-hours, text: { ja: '専用窓口の番号、受付時間、増員を書く', en: '' }, points: 5, axis: care, refs: [meti-csm-guideline] }
-          - { id: fd-w-number, text: { ja: '番号だけを書く', en: '' }, points: -5, axis: care, refs: [meti-csm-guideline] }
-          - { id: fd-w-none, text: { ja: '窓口を書かない', en: '' }, points: -15, axis: care, refs: [meti-csm-guideline] }
+          - { id: fd-w-number, text: { ja: '問い合わせは代表番号だけを書いて、受付時間は省く。', en: '' }, points: -5, axis: care, refs: [meti-csm-guideline], explain: { ja: '番号だけでは、いつ誰が対応するか分からない。問い合わせの混雑に対応できない。現場の混乱が長引く。', en: '' } }
+          - { id: fd-w-none, text: { ja: '問い合わせ窓口は書かず、案内は本文だけにする。', en: '' }, points: -15, axis: care, refs: [meti-csm-guideline], explain: { ja: '窓口を書かないと、利用者は相談先を失う。不安がSNSなどに流れ、二次的な混乱を招く。', en: '' } }
+          - { id: fd-w-hours, text: { ja: '専用窓口の番号、受付時間、増員の体制まで書く。', en: '' }, points: 5, axis: care, refs: [meti-csm-guideline], explain: { ja: '番号だけでなく受付時間と増員まで示した。問い合わせが集中しても対応しやすい。復旧までの時間を短くできる。', en: '' } }
       - id: next
         label: { ja: '次の報告', en: '' }
         options:
-          - { id: fd-n-next, text: { ja: '次の報告予定を書く', en: '' }, points: 3, axis: content, refs: [meti-disclosure-guidance] }
-          - { id: fd-n-none, text: { ja: '次回の予定を書かない', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: fd-n-next, text: { ja: '次の報告の予定日と、更新する内容を書く。', en: '' }, points: 3, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '次の報告予定を示すと、利用者は更新を待てる。説明が一度で終わらないことを伝えている。', en: '' } }
+          - { id: fd-n-none, text: { ja: '次回の報告予定は書かず、今回の内容だけを伝える。', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '次回の予定がないと、利用者は情報が出るまで不安を抱える。問い合わせも増えやすい。', en: '' } }
       - id: apology
         label: { ja: '謝罪の主語', en: '' }
         options:
-          - { id: fd-ap-company, text: { ja: '「当社」として謝罪する', en: '' }, points: 3, axis: wording, refs: [meti-disclosure-guidance] }
-          - { id: fd-ap-muni, text: { ja: '「委託元の自治体」の責任として謝罪する', en: '' }, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: fd-ap-muni, text: { ja: '委託元の自治体の責任として、謝罪の主体を任せる。', en: '' }, points: -10, axis: wording, refs: [meti-disclosure-guidance], explain: { ja: '委託元の責任として謝罪すると、自社の責任を回避しているように見える。関係が悪化しやすい。', en: '' } }
+          - { id: fd-ap-company, text: { ja: '当社として謝罪し、責任の所在を明確にする。', en: '' }, points: 3, axis: wording, refs: [meti-disclosure-guidance], explain: { ja: '当社として謝罪し、責任の所在を明確にした。委託元に責任を転嫁しない姿勢が伝わる。', en: '' } }
       - id: govshare
         label: { ja: '自治体への共有', en: '' }
         options:
-          - { id: fd-g-share, text: { ja: '公表前に自治体へ文面を共有する', en: '' }, points: 5, axis: order, refs: [jpcert-handling] }
-          - { id: fd-g-after, text: { ja: '公表後に自治体へ報告する', en: '' }, points: -10, axis: order, refs: [jpcert-handling] }
+          - { id: fd-g-share, text: { ja: '公表の前に、自治体へ文面を共有して了解を得る。', en: '' }, points: 5, axis: order, refs: [jpcert-handling], explain: { ja: '公表前に文面を共有し、自治体の了解を得た。同時発表の土台になり、順番の混乱を避けられる。', en: '' } }
+          - { id: fd-g-after, text: { ja: '公表の後に、自治体へ報告して事後で連絡する。', en: '' }, points: -10, axis: order, refs: [jpcert-handling], explain: { ja: '公表後に報告すると、自治体は事後対応になる。発表の順番を巡る不信を招きやすい。被害の拡大を招きかねない。', en: '' } }
       - id: approval
         label: { ja: '社内確認', en: '' }
         options:
-          - { id: fd-i-share, text: { ja: '公表前に広報・法務・IRで文案を確認する', en: '' }, points: 5, axis: order, refs: [meti-csm-guideline] }
-          - { id: fd-i-solo, text: { ja: '社長の判断だけで出す', en: '' }, points: -10, axis: order, refs: [meti-csm-guideline] }
+          - { id: fd-i-solo, text: { ja: '社長の判断だけで文案を決め、社内の確認は省く。', en: '' }, points: -10, axis: order, refs: [meti-csm-guideline], explain: { ja: '社長の判断だけで出すと、法務やIRの確認が抜ける。後の訂正や説明の負担が増える。', en: '' } }
+          - { id: fd-i-share, text: { ja: '公表の前に、広報・法務・IRで文案を確認する。', en: '' }, points: 5, axis: order, refs: [meti-csm-guideline], explain: { ja: '広報・法務・IRで文案を確認した。表現の齟齬や開示漏れを防げる。現場の負担も抑えられる。', en: '' } }
       - id: record
         label: { ja: '記録', en: '' }
         options:
-          - { id: fd-r-log, text: { ja: '公表した時刻と版を記録する', en: '' }, points: 5, axis: record, refs: [jpcert-handling] }
-          - { id: fd-r-none, text: { ja: '記録を残さない', en: '' }, points: -8, axis: record, refs: [jpcert-handling] }
+          - { id: fd-r-log, text: { ja: '公表した時刻と版を記録に残し、後から確認できるようにする。', en: '' }, points: 5, axis: record, refs: [jpcert-handling], explain: { ja: '公表した時刻と版を記録した。後の訂正や検証で、何をいつ出したかを示せる。復旧までの時間を短くできる。', en: '' } }
+          - { id: fd-r-none, text: { ja: '公表の記録は残さず、口頭の共有だけで済ませる。', en: '' }, points: -8, axis: record, refs: [jpcert-handling], explain: { ja: '記録を残さないと、後の検証で説明が食い違う。訂正の経緯も追えなくなる。再発の危険を残す。', en: '' } }
   final-report:
     title: { ja: '調査報告書の公開範囲', en: '' }
     slots:
       - id: scope
         label: { ja: '公開する範囲', en: '' }
         options:
-          - { id: fr-s-full, text: { ja: '攻撃に使える詳細だけ伏せて全文公開する', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance] }
-          - { id: fr-s-hide, text: { ja: '公開しない', en: '' }, points: -20, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: fr-s-hide, text: { ja: '報告書は公開せず、社内と所管庁への提出だけにする。', en: '' }, points: -20, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '報告書を公開しないと、隠蔽の疑いが残る。再発防止の検証も進みにくい。後の訂正や説明の負担が増える。', en: '' } }
+          - { id: fr-s-full, text: { ja: '攻撃に使える詳細だけを伏せて、報告書を全文公開する。', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '攻撃に使える詳細だけを伏せて全文公開した。説明責任と悪用防止のバランスが取れている。', en: '' } }
       - id: cause
         label: { ja: '原因の書き方', en: '' }
         options:
-          - { id: fr-c-cause, text: { ja: '原因と判断の誤りを具体的に書く', en: '' }, points: 10, axis: content, refs: [nist-sp800-61r3] }
-          - { id: fr-c-vague, text: { ja: '「外部からの攻撃」とだけ書く', en: '' }, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: fr-c-cause, text: { ja: '原因と判断の誤りを、具体的な経緯として書く。', en: '' }, points: 10, axis: content, refs: [nist-sp800-61r3], explain: { ja: '原因と判断の誤りを具体的に書いた。再発防止につながり、説明としても説得力がある。', en: '' } }
+          - { id: fr-c-vague, text: { ja: '外部からの攻撃とだけ書いて、原因は特定しない。', en: '' }, points: -10, axis: content, refs: [nist-sp800-61r3], explain: { ja: '外部からの攻撃とだけ書くと、自社の課題が見えない。再発防止の議論が進まない。関係先の不信を招きやすい。', en: '' } }
       - id: vuln
         label: { ja: '公表済みの脆弱性への対応', en: '' }
         options:
-          - { id: fr-v-late, text: { ja: '対応が遅れた経緯を書く', en: '' }, points: 10, axis: content, refs: [meti-csm-guideline] }
-          - { id: fr-v-omit, text: { ja: '脆弱性には触れない', en: '' }, points: -15, axis: content, refs: [meti-csm-guideline] }
+          - { id: fr-v-omit, text: { ja: '公表済みの脆弱性には触れず、対応の遅れも書かない。', en: '' }, points: -15, axis: content, refs: [meti-csm-guideline], explain: { ja: '脆弱性に触れないと、同じ問題の再発を防げない。説明の一貫性も失う。被害の拡大を招きかねない。', en: '' } }
+          - { id: fr-v-late, text: { ja: '公表済みの脆弱性に、対応が遅れた経緯を書く。', en: '' }, points: 10, axis: content, refs: [meti-csm-guideline], explain: { ja: '対応が遅れた経緯を書いた。都合の悪い事実ほど、隠さず示すほうが信頼される。関係先の理解を得やすい。', en: '' } }
       - id: code
         label: { ja: 'セキュリティコードの保存', en: '' }
         options:
-          - { id: fr-k-design, text: { ja: '保存していた設計と、廃止の完了を書く', en: '' }, points: 10, axis: content, refs: [ppc-report-scope] }
-          - { id: fr-k-omit, text: { ja: '保存の事実に触れない', en: '' }, points: -15, axis: content, refs: [ppc-report-scope] }
+          - { id: fr-k-design, text: { ja: '保存していた設計と、廃止が完了したことを書く。', en: '' }, points: 10, axis: content, refs: [ppc-report-scope], explain: { ja: '保存していた設計と廃止の完了を書いた。法令上の論点に正面から向き合っている。再発の防止にもつながる。', en: '' } }
+          - { id: fr-k-omit, text: { ja: 'セキュリティコードの保存には触れず、件数だけを書く。', en: '' }, points: -15, axis: content, refs: [ppc-report-scope], explain: { ja: '保存の事実に触れないと、後から明らかになった時に説明が崩れる。現場の混乱が長引く。', en: '' } }
       - id: measures
         label: { ja: '再発防止策', en: '' }
         options:
-          - { id: fr-m-plan, text: { ja: '実施時期と担当を書く', en: '' }, points: 10, axis: content, refs: [cissp-cbk-secops] }
-          - { id: fr-m-slogan, text: { ja: '「再発防止に努めます」とだけ書く', en: '' }, points: -10, axis: content, refs: [cissp-cbk-secops] }
+          - { id: fr-m-slogan, text: { ja: '再発防止に努めますとだけ書いて、具体策は示さない。', en: '' }, points: -10, axis: content, refs: [cissp-cbk-secops], explain: { ja: '再発防止に努めますだけでは、何をするか分からない。実行の検証もできない。現場の混乱が長引く。', en: '' } }
+          - { id: fr-m-plan, text: { ja: '再発防止策の実施時期と担当を、具体的に書く。', en: '' }, points: 10, axis: content, refs: [cissp-cbk-secops], explain: { ja: '実施時期と担当を書いた。対策が実行されるかを後から確認できる。その後の説明が楽になる。', en: '' } }
       - id: thirdparty
         label: { ja: '第三者委員会の意見', en: '' }
         options:
-          - { id: fr-t-full, text: { ja: '第三者委員会の意見を全文掲載する', en: '' }, points: 8, axis: content, refs: [cissp-cbk-secops] }
-          - { id: fr-t-summary, text: { ja: '要約だけを載せる', en: '' }, points: -8, axis: content, refs: [cissp-cbk-secops] }
+          - { id: fr-t-full, text: { ja: '第三者委員会の意見を、要約せず全文掲載する。', en: '' }, points: 8, axis: content, refs: [cissp-cbk-secops], explain: { ja: '第三者委員会の意見を全文掲載した。都合の悪い指摘も含め、説明の透明性が高い。その後の説明が楽になる。', en: '' } }
+          - { id: fr-t-summary, text: { ja: '第三者委員会の意見は要約だけを載せる。', en: '' }, points: -8, axis: content, refs: [cissp-cbk-secops], explain: { ja: '要約だけでは、委員会が何を指摘したか伝わらない。都合よく切り取ったと見られやすい。', en: '' } }
       - id: victims
         label: { ja: '被害者への補償', en: '' }
         options:
-          - { id: fr-vi-record, text: { ja: '補償と窓口の実績を書く', en: '' }, points: 8, axis: care, refs: [ppc-notify-person] }
-          - { id: fr-vi-none, text: { ja: '補償に触れない', en: '' }, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: fr-vi-none, text: { ja: '被害者への補償には触れず、対応の事実だけを書く。', en: '' }, points: -10, axis: care, refs: [ppc-notify-person], explain: { ja: '補償に触れないと、被害者への配慮が乏しく見える。信頼の回復が遅れる。再発の危険を残す。', en: '' } }
+          - { id: fr-vi-record, text: { ja: '被害者への補償と、窓口の実績を書く。', en: '' }, points: 8, axis: care, refs: [ppc-notify-person], explain: { ja: '補償と窓口の実績を書いた。被害者への対応が具体的に伝わる。関係先の理解を得やすい。', en: '' } }
       - id: progress
         label: { ja: '進捗の公開', en: '' }
         options:
-          - { id: fr-p-monthly, text: { ja: '進捗を毎月公開する', en: '' }, points: 10, axis: record, refs: [meti-disclosure-guidance] }
-          - { id: fr-p-once, text: { ja: '一度だけ公開する', en: '' }, points: -5, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: fr-p-monthly, text: { ja: '再発防止の進捗を、毎月公開して更新する。', en: '' }, points: 10, axis: record, refs: [meti-disclosure-guidance], explain: { ja: '進捗を毎月公開すると、対策が続いていることを示せる。説明の更新が信頼になる。現場の負担も抑えられる。', en: '' } }
+          - { id: fr-p-once, text: { ja: '進捗は一度だけ公開して、以後は更新しない。', en: '' }, points: -5, axis: record, refs: [meti-disclosure-guidance], explain: { ja: '一度だけの公開では、その後の進捗が分からない。対策が止まったように見える。現場の混乱が長引く。', en: '' } }
       - id: industry
         label: { ja: '業界への共有', en: '' }
         options:
-          - { id: fr-i-share, text: { ja: '得た教訓を業界に無償で共有する', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance] }
-          - { id: fr-i-keep, text: { ja: '自社の中にとどめる', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: fr-i-keep, text: { ja: '得た教訓は社内にとどめ、外部へは共有しない。', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '教訓を社内にとどめると、同じ被害が他社で繰り返される。業界からの評価も上がりにくい。', en: '' } }
+          - { id: fr-i-share, text: { ja: '得た教訓を業界に無償で共有し、再発を防ぐ。', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '得た教訓を業界に共有した。自社の再発防止だけでなく、業界全体の底上げになる。その後の説明が楽になる。', en: '' } }
       - id: ad
         label: { ja: '宣伝との線引き', en: '' }
         options:
-          - { id: fr-ad-none, text: { ja: '復旧を宣伝に使わない', en: '' }, points: 5, axis: care, refs: [meti-disclosure-guidance] }
-          - { id: fr-ad-use, text: { ja: '復旧を宣伝に使う', en: '' }, points: -15, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: fr-ad-none, text: { ja: '復旧を宣伝に使わず、事実の説明にとどめる。', en: '' }, points: 5, axis: care, refs: [meti-disclosure-guidance], explain: { ja: '復旧を宣伝に使わない姿勢は、被害者への配慮として伝わる。関係先の理解を得やすい。', en: '' } }
+          - { id: fr-ad-use, text: { ja: '復旧の速さを宣伝に使い、信頼の回復を狙う。', en: '' }, points: -15, axis: care, refs: [meti-disclosure-guidance], explain: { ja: '復旧を宣伝に使うと、被害を軽く見ていると受け取られる。信頼を損ないやすい。後の訂正や説明の負担が増える。', en: '' } }
 voices:
   - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '今夜はもう上がらせてやれ。正確な報告が揃うまで、明日の定例会議で聞けばいい。', en: '' }, trigger: { at: point } }
   - { id: v01-ok, media: chat, misleading: false, text: { ja: 'セキュリティ責任者「影響範囲を調べる前に、決裁だけください」。', en: '' }, trigger: { at: point } }
