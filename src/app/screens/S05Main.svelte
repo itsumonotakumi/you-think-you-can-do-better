@@ -206,7 +206,22 @@
   </div>
 
   <div class="body">
-    <!-- 世間の声は、判断の問題文より上に置く（先に世間を見てから考える） -->
+    <!-- 並び: 状況 → 世間の声 → 選択肢（状況を読み、世間の声を見てから選ぶ） -->
+    <section class="situation" aria-labelledby="situation-heading">
+      <h2 id="situation-heading">{t('sb.situation.heading')}</h2>
+      {#if point}
+        <Typewriter text={loc(point.text)} instant={$settings.reduceMotion} />
+      {:else}
+        <p>{t('sb.main.noPoint')}</p>
+      {/if}
+      {#if illustration}
+        <figure>
+          <img src={illustration.file} alt={loc(illustration.alt)} />
+          <figcaption>{loc(illustration.credit)}</figcaption>
+        </figure>
+      {/if}
+    </section>
+
     <aside class="side" aria-label={t('sb.main.side')}>
       <div class="tabs" role="tablist" aria-label={t('sb.main.side')}>
         <button
@@ -269,21 +284,6 @@
     </aside>
 
     <div class="primary-col">
-      <section class="situation" aria-labelledby="situation-heading">
-        <h2 id="situation-heading">{t('sb.situation.heading')}</h2>
-        {#if point}
-          <Typewriter text={loc(point.text)} instant={$settings.reduceMotion} />
-        {:else}
-          <p>{t('sb.main.noPoint')}</p>
-        {/if}
-        {#if illustration}
-          <figure>
-            <img src={illustration.file} alt={loc(illustration.alt)} />
-            <figcaption>{loc(illustration.credit)}</figcaption>
-          </figure>
-        {/if}
-      </section>
-
       <section class="choices" aria-labelledby="choices-heading">
         <h2 id="choices-heading">{t('sb.choices.heading')}</h2>
         {#if draftPending}
