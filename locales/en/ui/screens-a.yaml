@@ -129,3 +129,7 @@ sa.error.detail: Details
 sa.error.continue: Continue
 sa.error.home: Back to title
 sa.error.noProgress: There is no saved play to resume.
+
+# --- Illustrations ---
+sa.images.key: "A scene from {title}"
+sa.images.portrait: "Portrait of the {role}"

@@ -4,6 +4,7 @@
   import { loc, setLang, t } from '../../i18n';
   import { loadPrologue, nextPlayCount, registerPlayStart, saveProgress } from '../../storage';
   import { applyStep, scenario, screen, selectedScenarioId, settings } from '../store';
+  import { portrait } from '../illustrations';
   import type { RoleId, Scenario } from '../../engine/types';
   import { ROLES } from '../../engine/types';
   // エンジン本体（src/engine/index.ts）は別担当。未着の間も型検査を通すため解決エラーだけ抑止する。
@@ -63,9 +64,12 @@
     if (!sc) return [];
     return ROLES.filter((role) => Boolean(sc.roles[role])).map((role) => {
       const script = sc.roles[role]!;
+      const label = t(`sa.roles.role.${role}`);
       return {
         role,
-        label: t(`sa.roles.role.${role}`),
+        label,
+        portraitSrc: portrait(sc.id, role),
+        portraitAlt: t('sa.images.portrait', { role: label }),
         info: t(`sa.roles.info.${role}`),
         intro: loc(script.intro),
         estimate: t('sa.roles.estimate', { n: script.estimateMinutes }),
@@ -128,7 +132,23 @@
       {#each roles as item (item.role)}
         <li class="role-card">
           <div class="role-card__body">
-            <h2 class="role-card__title">{item.label}</h2>
+            <div class="role-card__head">
+              {#if item.portraitSrc}
+                <img
+                  class="role-card__portrait"
+                  src={item.portraitSrc}
+                  alt={item.portraitAlt}
+                  width="480"
+                  height="480"
+                  loading="lazy"
+                  decoding="async"
+                  onerror={(event) => {
+                    (event.currentTarget as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              {/if}
+              <h2 class="role-card__title">{item.label}</h2>
+            </div>
             <p class="role-card__intro">{item.intro}</p>
             <p class="role-card__info">
               <span class="tag">{ui.info}</span>
@@ -156,3 +176,21 @@
     </div>
   {/if}
 </section>
+
+<style>
+  .role-card__head {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+  }
+  .role-card__portrait {
+    display: block;
+    flex: 0 0 auto;
+    width: 72px;
+    height: 72px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel-hover);
+    object-fit: cover;
+  }
+</style>

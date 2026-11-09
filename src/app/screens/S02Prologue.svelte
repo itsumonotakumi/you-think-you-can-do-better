@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { PlayState } from '../../engine/types';
   import { audio } from '../../audio';
-  import { notice, setLang, t } from '../../i18n';
+  import { notice, setLang, t, loc } from '../../i18n';
   import { savePrologue, saveProgress } from '../../storage';
-  import { play, screen, settings } from '../store';
+  import { keyVisual } from '../illustrations';
+  import { play, scenario, screen, settings } from '../store';
   import '../styles/base.css';
 
   let comment = $state($play?.prologue.comment ?? '');
@@ -35,6 +36,8 @@
       noPlay: t('sa.prologue.noPlay'),
       fiction: notice('fiction'),
       criminal: notice('criminal'),
+      keySrc: $scenario ? keyVisual($scenario.id) : null,
+      keyAlt: $scenario ? t('sa.images.key', { title: loc($scenario.title) }) : '',
     };
   });
 
@@ -95,6 +98,20 @@
 </script>
 
 <section class="screen screen--narrow" data-screen="S02Prologue">
+  {#if ui.keySrc}
+    <img
+      class="prologue-key"
+      src={ui.keySrc}
+      alt={ui.keyAlt}
+      width="1280"
+      height="721"
+      decoding="async"
+      onerror={(event) => {
+        (event.currentTarget as HTMLImageElement).style.display = 'none';
+      }}
+    />
+  {/if}
+
   <header class="screen-head">
     <h1>{ui.title}</h1>
     <p class="lead">{ui.lead}</p>
@@ -170,5 +187,16 @@
   }
   .skip {
     justify-content: center;
+  }
+  .prologue-key {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-bottom: 1.25em;
+    aspect-ratio: 1280 / 721;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel-hover);
   }
 </style>

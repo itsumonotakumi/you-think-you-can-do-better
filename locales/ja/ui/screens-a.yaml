@@ -129,3 +129,7 @@ sa.error.detail: 詳細
 sa.error.continue: 続きから
 sa.error.home: タイトルへ
 sa.error.noProgress: 続きから再開できるデータがありません。
+
+# --- イラスト ---
+sa.images.key: "「{title}」の場面"
+sa.images.portrait: "{role}の人物画"

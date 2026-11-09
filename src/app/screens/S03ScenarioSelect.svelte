@@ -3,6 +3,7 @@
   import { loadIndex } from '../../data/loader';
   import { applyLang, loc, notice, t, takePendingNotice } from '../../i18n';
   import { loadPlays } from '../../storage';
+  import { keyVisual } from '../illustrations';
   import { scenario, screen, selectedScenarioId, settings } from '../store';
   import type { PlaysStore, ScenarioSummary } from '../../engine/types';
   import '../styles/base.css';
@@ -55,6 +56,8 @@
         id: s.id,
         title: loc(s.title),
         tagline: loc(s.tagline),
+        keySrc: keyVisual(s.id),
+        keyAlt: t('sa.images.key', { title: loc(s.title) }),
         period: loc(s.sourcePeriod),
         status: s.status,
         statusLabel: t(`sa.scenarios.status.${s.status}`),
@@ -129,6 +132,20 @@
     <ul class="scenario-list">
       {#each cards as card (card.id)}
         <li class="scenario-card">
+          {#if card.keySrc}
+            <img
+              class="scenario-card__key"
+              src={card.keySrc}
+              alt={card.keyAlt}
+              width="1280"
+              height="721"
+              loading="lazy"
+              decoding="async"
+              onerror={(event) => {
+                (event.currentTarget as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          {/if}
           <div class="scenario-card__head">
             <h2 class="scenario-card__title">{card.title}</h2>
             <span class="badge badge--{card.status}">{card.statusLabel}</span>
@@ -174,3 +191,16 @@
     <button class="btn btn--ghost" onclick={backToTitle}>{ui.back}</button>
   </div>
 </section>
+
+<style>
+  .scenario-card__key {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1280 / 721;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel-hover);
+  }
+</style>
