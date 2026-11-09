@@ -1,4 +1,4 @@
-// シナリオ検査 C01〜C22（C11〜C13 は実エンジンの貪欲シミュレーション）。
+// シナリオ検査 C01〜C25（C11〜C13 は実エンジンの貪欲シミュレーション）。
 import {
   CATEGORY_RANGE,
   PHASES,
@@ -1358,6 +1358,182 @@ export function checkC22(project: Project): Issue[] {
   return out;
 }
 
+// ---------------- C23 正解が長さで分かる / C24 最高点の位置の偏り / C25 振り返りの解説 ----------------
+//
+// C23・C24 は「正解が本文の長さや並び順で分かってしまう」偏りを警告する。
+// 表示時は選択肢を並べ替えるが、データ側の偏りも目安として出す。
+// 最高点が同点で複数ある判断は、どれが正解か決まらないので判定しない。
+
+/** 長さの比（1.3 倍）。浮動小数の誤差を避けるため整数で比べる。 */
+const LENGTH_BIAS_NUMERATOR = 13;
+const LENGTH_BIAS_DENOMINATOR = 10;
+/** 同じ位置に集まっていれば偏りとみなす割合（50%）。 */
+const POSITION_SHARE = 0.5;
+
+interface ChoiceGroup {
+  /** 判断ポイントの choices か、報告書スロットの options か */
+  kind: 'point' | 'slot';
+  value: Obj;
+  items: unknown[];
+}
+
+function draftSlots(script: Obj): Obj[] {
+  const slots: Obj[] = [];
+  for (const draft of Object.values(asObj(script.drafts))) {
+    const list = asObj(draft).slots;
+    if (!Array.isArray(list)) continue;
+    for (const slot of list) slots.push(asObj(slot));
+  }
+  return slots;
+}
+
+/** 点数を比べる対象（2つ以上あるものだけ）を集める。 */
+function choiceGroups(script: Obj): ChoiceGroup[] {
+  const groups: ChoiceGroup[] = [];
+  if (Array.isArray(script.points)) {
+    for (const point of script.points) {
+      const p = asObj(point);
+      if (Array.isArray(p.choices) && p.choices.length >= 2) {
+        groups.push({ kind: 'point', value: p, items: p.choices });
+      }
+    }
+  }
+  for (const slot of draftSlots(script)) {
+    if (Array.isArray(slot.options) && slot.options.length >= 2) {
+      groups.push({ kind: 'slot', value: slot, items: slot.options });
+    }
+  }
+  return groups;
+}
+
+/** 最高点の選択肢の添字。同点が複数、または点数がすべて読めないときは null。 */
+function topChoiceIndex(items: unknown[]): number | null {
+  let top = -1;
+  let topPoints = Number.NEGATIVE_INFINITY;
+  let tied = false;
+  items.forEach((item, index) => {
+    const points = asObj(item).points;
+    if (!isNum(points)) return;
+    if (points > topPoints) {
+      topPoints = points;
+      top = index;
+      tied = false;
+    } else if (points === topPoints) {
+      tied = true;
+    }
+  });
+  return top < 0 || tied ? null : top;
+}
+
+/** 文言の ja の長さ（文字数）。 */
+function jaLength(value: unknown): number {
+  const text = asObj(value);
+  return typeof text.ja === 'string' ? text.ja.length : 0;
+}
+
+function groupLabel(kind: ChoiceGroup['kind']): string {
+  return kind === 'point' ? '判断ポイント' : '報告書スロット';
+}
+
+export function checkC23(project: Project): Issue[] {
+  const out: Issue[] = [];
+  for (const sc of project.scenarios) {
+    for (const [role, script] of roleEntries(sc)) {
+      const file = roleFile(sc, role);
+      for (const group of choiceGroups(script)) {
+        const top = topChoiceIndex(group.items);
+        if (top === null) continue;
+        const topChoice = group.items[top];
+        const topLength = jaLength(asObj(topChoice).text);
+        let longestOther = 0;
+        group.items.forEach((item, index) => {
+          if (index === top) return;
+          longestOther = Math.max(longestOther, jaLength(asObj(item).text));
+        });
+        if (longestOther === 0) continue;
+        if (topLength * LENGTH_BIAS_DENOMINATOR < longestOther * LENGTH_BIAS_NUMERATOR) continue;
+        report(out, file, topChoice, 'text', 'C23',
+          `${groupLabel(group.kind)}: 最高点の選択肢の本文が ${topLength} 文字で、他の選択肢（最大 ${longestOther} 文字）より長い。長さで正解が分かる（警告）`,
+          'warning');
+      }
+    }
+  }
+  return out;
+}
+
+export function checkC24(project: Project): Issue[] {
+  const out: Issue[] = [];
+  for (const sc of project.scenarios) {
+    for (const [role, script] of roleEntries(sc)) {
+      const file = roleFile(sc, role);
+      const groups = choiceGroups(script);
+      for (const kind of ['point', 'slot'] as const) {
+        const targets = groups.filter((group) => group.kind === kind);
+        if (targets.length === 0) continue;
+        // 最高点の位置（1始まり）ごとの件数
+        const counts = new Map<number, number>();
+        let total = 0;
+        for (const group of targets) {
+          const top = topChoiceIndex(group.items);
+          if (top === null) continue;
+          total += 1;
+          const position = top + 1;
+          counts.set(position, (counts.get(position) ?? 0) + 1);
+        }
+        if (total === 0) continue;
+        let worstPosition = 0;
+        let worstCount = 0;
+        for (const [position, count] of counts) {
+          if (count > worstCount || (count === worstCount && position < worstPosition)) {
+            worstPosition = position;
+            worstCount = count;
+          }
+        }
+        if (worstCount < total * POSITION_SHARE) continue;
+        const percent = Math.round((worstCount / total) * 100);
+        report(out, file, targets[0]?.value ?? script, undefined, 'C24',
+          `${groupLabel(kind)}: 最高点の選択肢が ${worstPosition} 番に偏っている（${worstCount}/${total} 件、${percent}%）（警告）`,
+          'warning');
+      }
+    }
+  }
+  return out;
+}
+
+/** 振り返り用の解説が Localized（ja があればよい）で書かれているか。 */
+function hasExplanationText(value: unknown): boolean {
+  return isLocalized(value) && isStr(asObj(value).ja);
+}
+
+export function checkC25(project: Project): Issue[] {
+  const out: Issue[] = [];
+  for (const sc of project.scenarios) {
+    for (const [role, script] of roleEntries(sc)) {
+      let missing = 0;
+      if (Array.isArray(script.points)) {
+        for (const point of script.points) {
+          const p = asObj(point);
+          if (!hasExplanationText(p.lesson)) missing += 1;
+          if (!Array.isArray(p.choices)) continue;
+          for (const choice of p.choices) {
+            if (!hasExplanationText(asObj(choice).explain)) missing += 1;
+          }
+        }
+      }
+      for (const slot of draftSlots(script)) {
+        if (!Array.isArray(slot.options)) continue;
+        for (const option of slot.options) {
+          if (!hasExplanationText(asObj(option).explain)) missing += 1;
+        }
+      }
+      if (missing === 0) continue;
+      report(out, roleFile(sc, role), script, 'points', 'C25',
+        `振り返りの解説（lesson・explain）が欠け ${missing} 件（警告）`, 'warning');
+    }
+  }
+  return out;
+}
+
 // ---------------- C11〜C13 経路シミュレーション ----------------
 //
 // 実エンジンを貪欲に走らせた結果を使う簡略版。厳密な全経路探索はしない。
@@ -1487,6 +1663,9 @@ const CHECKS = [
   checkC20,
   checkC21,
   checkC22,
+  checkC23,
+  checkC24,
+  checkC25,
 ];
 
 /** skipPaths: 経路検査（C11〜C13、重い）を省く。build-data 用（validate は必ず全検査する） */
