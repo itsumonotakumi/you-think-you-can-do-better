@@ -2,20 +2,25 @@
   // 文案作成の部品選択。auto の部品は時計から決まるので選択欄を出さない
   import type { Draft } from '../../engine/types';
   import { t, loc } from '../../i18n';
+  import { orderOptions } from './shuffle';
 
   let {
     draft,
     selections,
+    playId = '',
     onselect,
   }: {
     draft: Draft;
     selections: Record<string, string>;
+    /** プレイID（開始時刻）。同じプレイなら並び順を変えない */
+    playId?: string;
     onselect: (slotId: string, itemId: string) => void;
   } = $props();
 </script>
 
 <div class="slots">
   {#each draft.slots as slot (slot.id)}
+    {@const options = orderOptions(slot.options ?? [], playId, slot.id)}
     <fieldset>
       <legend>
         {loc(slot.label)}
@@ -25,7 +30,7 @@
         <p class="auto-value">{t('sb.draft.autoValue')}</p>
       {:else}
         <div class="options">
-          {#each slot.options ?? [] as option (option.id)}
+          {#each options as option (option.id)}
             <label class="option" class:selected={selections[slot.id] === option.id}>
               <input
                 type="radio"

@@ -11,7 +11,7 @@
 {:else}
   <ul class="voices">
     {#each voices as voice, index (voice.id + ':' + index)}
-      <li class="voice">
+      <li class="voice" data-media={voice.media}>
         <span class="meta">
           <span class="badge" data-media={voice.media} aria-hidden="true">{mediaGlyph(voice.media)}</span>
           <span class="media">{t(mediaLabelKey(voice.media))}</span>
@@ -34,8 +34,38 @@
   .voice {
     padding: 0.5rem 0.6rem;
     border: 1px solid var(--line-strong);
+    border-left: 4px solid var(--card-question-line);
     border-radius: 6px;
-    background: var(--panel-hover);
+    background: var(--card-question);
+  }
+  /* 媒体ごとに面と左線の色を変える。色だけに頼らず、上の媒体名も必ず出す */
+  .voice[data-media='sns'] {
+    border-left-color: var(--card-sns-line);
+    background: var(--card-sns);
+  }
+  .voice[data-media='news'] {
+    border-left-color: var(--card-news-line);
+    background: var(--card-news);
+  }
+  .voice[data-media='board'] {
+    border-left-color: var(--card-board-line);
+    background: var(--card-board);
+  }
+  .voice[data-media='chat'] {
+    border-left-color: var(--card-chat-line);
+    background: var(--card-chat);
+  }
+  .voice[data-media='boss'] {
+    border-left-color: var(--card-phone-line);
+    background: var(--card-phone);
+  }
+  .voice[data-media='vendor'] {
+    border-left-color: var(--card-mail-line);
+    background: var(--card-mail);
+  }
+  .voice[data-media='attacker'] {
+    border-left-color: var(--card-attacker-line);
+    background: var(--card-attacker);
   }
   .meta {
     display: flex;

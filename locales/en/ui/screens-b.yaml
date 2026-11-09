@@ -98,6 +98,7 @@ sb:
     clock: "Time advanced to {time}"
     delayed: "Delayed impact"
     history: "Caption history ({count})"
+    repeat: "×{count}"
     se:
       notify_sns: "Notification: SNS"
       notify_news: "Notification: news"

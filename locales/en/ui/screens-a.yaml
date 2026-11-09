@@ -25,6 +25,7 @@ sa.title.credit: Created by Itsumono Takumi
 # --- S02 Prologue ---
 sa.prologue.title: Prologue
 sa.prologue.lead: First, remember where you stood when the incident was reported.
+sa.prologue.explain: What you write here and your prediction will appear again at the end of the play. They are there so you can compare your first view with what you think after experiencing the incident yourself. Both are optional.
 sa.prologue.prompt: What did you post when this incident was reported?
 sa.prologue.placeholder: "Example: Too slow. Who is going to take responsibility?"
 sa.prologue.counter: "{n} / 200 characters"
@@ -33,6 +34,7 @@ sa.prologue.hoursUnit: hours
 sa.prologue.hoursHint: Optional. You can leave it blank.
 sa.prologue.hoursInvalid: Enter a whole number from 0 to 720.
 sa.prologue.begin: Start
+sa.prologue.skip: Start without entering anything
 sa.prologue.noPlay: The play is not ready. Please return to the title screen.
 
 # --- S03 Scenario select ---

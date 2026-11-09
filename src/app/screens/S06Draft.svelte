@@ -71,7 +71,7 @@
     <p class="title">{loc(draft.title)}</p>
     <p class="progress">{t('sb.draft.progress', { done: picked, total: draft.slots.length })}</p>
 
-    <DraftSlots {draft} {selections} onselect={selectSlot} />
+    <DraftSlots {draft} {selections} playId={$play?.startedAt ?? ''} onselect={selectSlot} />
 
     <section class="composed" aria-labelledby="composed-heading">
       <h2 id="composed-heading">{t('sb.draft.composed')}</h2>
@@ -131,8 +131,9 @@
   .composed {
     padding: 0.8rem;
     border: 1px solid var(--line-strong);
+    border-left: 4px solid var(--card-report-line);
     border-radius: 8px;
-    background: var(--panel);
+    background: var(--card-report);
   }
   .composed :global(.typed) {
     line-height: 1.8;

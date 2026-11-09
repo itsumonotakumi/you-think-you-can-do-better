@@ -98,6 +98,7 @@ sb:
     clock: "時刻が{time}に進みました"
     delayed: "遅れて来た影響"
     history: "字幕の履歴（{count}）"
+    repeat: "×{count}"
     se:
       notify_sns: "通知：SNS"
       notify_news: "通知：ニュース"

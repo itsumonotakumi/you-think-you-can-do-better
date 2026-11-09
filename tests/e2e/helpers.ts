@@ -54,7 +54,9 @@ export async function completeDraft(page: Page): Promise<void> {
   for (let i = 0; i < count; i++) {
     const radio = slots.nth(i).locator('input[type="radio"]').first();
     if ((await radio.count()) === 0) continue; // auto の部品は選択欄なし
-    await radio.check({ force: true });
+    // 固定表示の字幕などに座標を奪われないよう、要素そのものへ click を送る
+    await radio.evaluate((el) => (el as HTMLInputElement).click());
+    await expect(radio).toBeChecked();
   }
 
   const confirm = page.locator('[data-screen="S06Draft"] button.confirm');
