@@ -159,7 +159,7 @@ export interface DraftSlot {
   /** true: 時計から自動で決まる（items を when で判定） */
   auto?: boolean;
   items?: (DetailItem & { when: { withinHours?: number; otherwise?: boolean } })[];
-  options?: (DetailItem & { text: Localized; delayed?: DelayedSpec })[];
+  options?: (DetailItem & { text: Localized; delayed?: DelayedSpec; explain?: Localized })[];
 }
 
 export interface Voice {
