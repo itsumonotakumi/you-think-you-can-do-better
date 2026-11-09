@@ -97,14 +97,14 @@ describe('画面のスモーク（SSR）', () => {
     expect(body).toContain('対応が遅い');
   });
 
-  it('S09 が判断・細目・誘導の声を出す', () => {
+  it('S09 が判断を出し、最高点の時は誘導の声と細目を出さない', () => {
     scenario.set(fixture);
     settings.set({ ...DEFAULT_SETTINGS });
     play.set(baseState());
     const { body } = render(S09Review);
     expect(body).toContain('振り返り');
     expect(body).toContain('隔離');
-    expect(body).toContain('i-iso-record');
-    expect(body).toContain('黙っておけ');
+    expect(body).not.toContain('i-iso-record'); // 細目は ?debug=1 の時だけ
+    expect(body).not.toContain('黙っておけ'); // 最高点を選んだので誘導の声は出さない
   });
 });
