@@ -78,8 +78,13 @@
     align-items: baseline;
     font-variant-numeric: tabular-nums;
   }
+  .clock .day {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
   .clock .time {
-    font-size: 1.25rem;
+    font-size: 2.1rem;
+    line-height: 1.1;
     font-weight: 700;
     letter-spacing: 0.04em;
   }

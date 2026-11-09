@@ -80,6 +80,27 @@
     color: var(--text);
     font-size: 0.9rem;
   }
+  /* いま起きたこと（着信・通知・時刻）は大きく目立たせる */
+  .caption.current {
+    padding: 0.55rem 0.9rem;
+    border-left-width: 6px;
+    border-left-color: var(--danger);
+    background: var(--panel);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+    font-size: 1.25rem;
+    font-weight: 700;
+    animation: caption-in 0.25s ease-out;
+  }
+  @keyframes caption-in {
+    from { transform: translateY(8px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .caption.current { animation: none; }
+  }
+  :global(.reduce-motion) .caption.current {
+    animation: none;
+  }
   .history-box {
     padding: 0.15rem 0.35rem 0.3rem;
     border: 1px solid var(--line);

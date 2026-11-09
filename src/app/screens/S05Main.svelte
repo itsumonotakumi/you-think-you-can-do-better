@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   // S05 本編: 上部バー、状況、選択肢、世間の声、記録
   // 演出キュー（audio.runCues() と runFxCues()）と字幕は App.svelte で一元処理する
   import { onMount } from 'svelte';
@@ -117,6 +118,15 @@
     return () => window.removeEventListener('keydown', handleKey);
   });
 
+  /** 選んだ後は次の「状況」の先頭まで画面を戻す（下の選択肢に居続けないように） */
+  async function scrollToSituation(): Promise<void> {
+    await tick();
+    const target = document.getElementById('situation-heading');
+    if (!target) return;
+    (target.closest('.situation') ?? target).scrollIntoView({ behavior: $settings.reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    target.focus({ preventScroll: true });
+  }
+
   function select(choiceId: string): void {
     const state = $play;
     const current = $scenario;
@@ -131,6 +141,7 @@
       }
       saveProgress(result.state);
       applyStep(result);
+      void scrollToSituation();
     } catch (error) {
       errorMessage.set(error instanceof Error ? error.message : String(error));
       screen.set('error');
@@ -208,7 +219,7 @@
   <div class="body">
     <!-- 並び: 状況 → 世間の声 → 選択肢（状況を読み、世間の声を見てから選ぶ） -->
     <section class="situation" aria-labelledby="situation-heading">
-      <h2 id="situation-heading">{t('sb.situation.heading')}</h2>
+      <h2 id="situation-heading" tabindex="-1">{t('sb.situation.heading')}</h2>
       {#if point}
         <Typewriter text={loc(point.text)} instant={$settings.reduceMotion} />
       {:else}
@@ -345,6 +356,9 @@
     display: grid;
     gap: 0.8rem;
     align-items: start;
+  }
+  .situation {
+    scroll-margin-top: 0.8rem;
   }
   .primary-col {
     display: grid;
