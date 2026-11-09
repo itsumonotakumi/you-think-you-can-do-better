@@ -28,6 +28,7 @@ sc:
     waiting: "The conference is being prepared."
     missing: "Press conference data was not found."
     shutter: "Camera shutter"
+    imageAlt: "A press conference scene"
     caption:
       shutter: "Camera shutter"
       fiveSeconds: "5 seconds left"

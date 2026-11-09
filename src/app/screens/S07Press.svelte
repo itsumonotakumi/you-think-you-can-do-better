@@ -82,8 +82,10 @@
   import { runFxCues } from '../effects';
   import { claimCues } from '../parts/cueMemory';
   import { choiceIndexFromKey, formatClock } from '../parts/logic';
+  import { pressImage } from '../illustrations';
   import '../effects/effects.css';
 
+  const pressSrc = pressImage();
   let busy = $state(false);
   let notesOpen = $state(false);
   let remaining = $state(DEFAULT_PRESS_SECONDS);
@@ -247,6 +249,19 @@
       </button>
     </div>
   {:else if question}
+    <img
+      class="press-illustration"
+      src={pressSrc}
+      alt={t('sc.press.imageAlt')}
+      width="1280"
+      height="721"
+      loading="lazy"
+      decoding="async"
+      onerror={(event) => {
+        (event.currentTarget as HTMLImageElement).style.display = 'none';
+      }}
+    />
+
     <header class="press-head">
       <div>
         <p class="eyebrow">{t('sc.press.title')}</p>
@@ -349,6 +364,16 @@
   .press {
     display: grid;
     gap: 0.8rem;
+  }
+  .press-illustration {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1280 / 721;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
   }
   .press-head {
     display: flex;

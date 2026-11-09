@@ -28,6 +28,7 @@ sc:
     waiting: "会見の準備中です。"
     missing: "記者会見のデータが見つかりません。"
     shutter: "カメラのシャッター"
+    imageAlt: "記者会見の場面"
     caption:
       shutter: "シャッター音"
       fiveSeconds: "残り5秒"

@@ -5,9 +5,10 @@
   import type { Localized } from '../../engine/types';
   import { addNote, choose, currentPoint, startPress } from '../../engine';
   import { audio } from '../../audio';
-  import { t, loc, notice } from '../../i18n';
+  import { t, loc, notice, setLang } from '../../i18n';
   import { saveProgress } from '../../storage';
   import { applyStep, errorMessage, play, resetCaptions, scenario, screen, settings } from '../store';
+  import { portrait } from '../illustrations';
   import { choiceIndexFromKey, nextFreeNoteId, voiceViews } from '../parts/logic';
   import { orderChoices } from '../parts/shuffle';
   import TopBar from '../parts/TopBar.svelte';
@@ -39,6 +40,17 @@
       : [],
   );
   const hasAttackerVoice = $derived(voices.some((voice) => voice.media === 'attacker'));
+
+  // 自分のロールの人物画。画像は飾りなので、無くても進行に影響しない
+  const portraitView = $derived.by(() => {
+    setLang($settings.lang);
+    const state = $play;
+    if (!state) return null;
+    return {
+      src: portrait(state.scenarioId, state.role),
+      alt: t(`sa.roles.role.${state.role}`),
+    };
+  });
 
   let noteStatus = $state('');
   let voicesNoticeOpen = $state(false);
@@ -167,10 +179,26 @@
   <h1 class="sr-only">{t('sb.main.title')}</h1>
 
   <div class="game-bar">
-    <div class="game-bar__actions">
-      <button type="button" class="abort" onclick={() => (abortOpen = true)}>
-        {t('sb.main.abort.button')}
-      </button>
+    <div class="game-bar__top">
+      {#if portraitView?.src}
+        <img
+          class="game-bar__portrait"
+          src={portraitView.src}
+          alt={portraitView.alt}
+          width="480"
+          height="480"
+          loading="lazy"
+          decoding="async"
+          onerror={(event) => {
+            (event.currentTarget as HTMLImageElement).style.display = 'none';
+          }}
+        />
+      {/if}
+      <div class="game-bar__actions">
+        <button type="button" class="abort" onclick={() => (abortOpen = true)}>
+          {t('sb.main.abort.button')}
+        </button>
+      </div>
     </div>
     {#if $play && $scenario}
       <TopBar play={$play} scenario={$scenario} />
@@ -326,6 +354,22 @@
   .game-bar {
     display: grid;
     gap: 0.3rem;
+  }
+  .game-bar__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .game-bar__portrait {
+    display: block;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    background: var(--panel);
+    object-fit: cover;
   }
   .game-bar__actions {
     display: flex;
