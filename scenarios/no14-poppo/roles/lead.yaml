@@ -1,0 +1,952 @@
+# No.14 ハルカゼマート / 部門長（デジタル事業部長）ロール
+# プレイヤーはデジタル事業部長。アプリ、認証、決済、監視の技術判断を担う。
+# 事業の停止や補償は経営が決める。あなたは、被害を止め、再開の条件を数字で示す。
+# 判断ポイント16、細目は choices[].items と drafts の合計で80以上。
+estimateMinutes: 30
+intro: { ja: 'あなたはハルカゼマートのデジタル事業部長、三田 亮。ハルカゼポイントのアプリ、認証、決済、監視を預かっている。午前8時15分、監視画面のログイン失敗が跳ね上がった。10分で4000件。同じ時刻、お客様窓口には「残高が減った」という電話が入っている。止めるか、止めずに守るか。技術的に何ができて、何ができないか。数字で示すのはあなたの仕事だ。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-coward-2
+  '3': v-coward-3
+  '4': v-coward-4
+deadlines:
+  - id: dl-lead-ppc-prelim
+    ref: ppc-report-prelim
+    label: { ja: '個人情報保護委員会への速報', en: '' }
+    points: -150
+    doneFlag: ppcPrelimFiled
+  - id: dl-lead-ppc-final
+    ref: ppc-report-final-malicious
+    label: { ja: '個人情報保護委員会への確報', en: '' }
+    points: -120
+    doneFlag: ppcFinalFiled
+events:
+  - id: ev-lead-fail
+    at: { day: 0, minutes: 660 }
+    voices: [v-ev-fail]
+    gauges: { damage: 5 }
+    sound: { se: [notify_chat] }
+    caption: { ja: '監視のアラートが、別のサーバーでも上がった。', en: '' }
+  - id: ev-lead-news
+    at: { day: 0, minutes: 1200 }
+    voices: [v-ev-news]
+    gauges: { flame: 10 }
+    sound: { se: [notify_news] }
+    caption: { ja: 'ニュースサイトが、アプリの不正利用を報じた。', en: '' }
+  - id: ev-lead-vendor
+    at: { day: 1, minutes: 780 }
+    voices: [v-ev-vendor]
+    gauges: { flame: 5 }
+    sound: { se: [mail_arrive] }
+    caption: { ja: '認証基盤のベンダーから、設定変更の見積もりが届いた。', en: '' }
+  - id: ev-lead-reopen
+    at: { day: 3, minutes: 480 }
+    voices: [v-ev-reopen]
+    gauges: { trust: -5 }
+    sound: { se: [notify_chat] }
+    caption: { ja: '再開を待つ店舗から、問い合わせが来た。', en: '' }
+points:
+  - id: l01-alert
+    at: { day: 0, minutes: 495 }
+    phase: detect
+    sound: { se: [notify_chat] }
+    text: { ja: '午前8時15分。ログイン失敗が10分で4000件、成功も2300件。まず何を見るか。', en: '' }
+    voices: [v01-past, v01-expert, v01-ok]
+    notable:
+      - { id: note-scale, text: { ja: '午前8時15分、ログイン失敗が10分で4000件、成功が2300件。', en: '' } }
+    choices:
+      - id: l01-failures
+        text: { ja: '失敗の件数だけを集計し、増え方を見続ける。', en: '' }
+        explain: { ja: '失敗の増加は攻撃の兆候として有用。ただし成功したログインを見なければ、すでに侵入された範囲が分からない。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [no14-credential-stuffing]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l01-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: l01-b-content, points: 5, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l01-b-time, points: 5, axis: time, refs: [jpcert-handling] }
+      - id: l01-success-only
+        text: { ja: '成功したログインだけを見て、失敗は無視する。', en: '' }
+        explain: { ja: '失敗を無視すると、攻撃の試行に気づけない。大量の失敗の後ろで、少数の成功が被害を生んでいる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -90
+        refs: [no14-credential-stuffing]
+        gauges: { damage: 10, flame: 5 }
+        items:
+          - { id: l01-a-content, points: -10, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l01-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+          - { id: l01-a-care, points: -5, axis: care, refs: [ppc-notify-person] }
+      - id: l01-both
+        text: { ja: '失敗と成功を IP と時刻で分け、普段と違う型を探す。', en: '' }
+        explain: { ja: '失敗と成功を同じ軸で見ている。攻撃の試行と、実際に通ったログインの両方を特定できる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 100
+        refs: [no14-credential-stuffing, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { patternFound: true }
+        items:
+          - { id: l01-c-content, points: 8, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l01-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: l01-c-time, points: 5, axis: time, refs: [nist-sp800-61r3] }
+          - { id: l01-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+    lesson: { ja: '不正ログインの兆候は、失敗と成功を同じ軸で見る。大量の失敗の後ろで、少数の成功が被害を生む。IP と時刻で普段と違う型を探し、試行と侵入の両方を特定して、次の対策につなげる。', en: '' }
+
+  - id: l02-block
+    at: { day: 0, minutes: 540 }
+    phase: detect
+    sound: { se: [notify_chat] }
+    text: { ja: '午前9時。同じ IP から多数のログイン成功。どう止めるか。', en: '' }
+    voices: [v02-coward, v02-vendor, v02-ok]
+    choices:
+      - id: l02-email
+        text: { ja: 'パスワードの変更を促すメールを、全会員に送る。', en: '' }
+        explain: { ja: '利用者に知らせることは必要だが、メールを読む前にもログインは続く。攻撃の経路を止めていない。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [no14-credential-stuffing]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l02-b-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: l02-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: l02-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: l02-freeze
+        text: { ja: '該当アカウントを凍結し、攻撃元の IP と端末を遮断する。', en: '' }
+        explain: { ja: '被害に使われているアカウントと経路の両方を止めている。凍結した範囲を記録すれば、復旧の判断にも使える。', en: '' }
+        minutes: 60
+        category: recover
+        points: 100
+        refs: [no14-credential-stuffing, nist-sp800-61r3]
+        gauges: { damage: -10, trust: 10, stamina: -10 }
+        setFlags: { accountsFrozen: true }
+        items:
+          - { id: l02-c-order, points: 8, axis: order, refs: [no14-credential-stuffing] }
+          - { id: l02-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: l02-c-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: l02-c-care, points: 5, axis: care, refs: [ppc-notify-person] }
+      - id: l02-warning
+        text: { ja: 'ログイン画面に警告を出すだけで、遮断はしない。', en: '' }
+        explain: { ja: '警告は利用者への注意だが、攻撃者は画面を見ない。遮断しない限り、同じ経路でログインが続く。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -110
+        refs: [no14-credential-stuffing]
+        gauges: { damage: 15, trust: -5 }
+        items:
+          - { id: l02-a-content, points: -10, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l02-a-order, points: -10, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l02-a-care, points: -5, axis: care, refs: [ppc-notify-person] }
+    lesson: { ja: '不正ログインは、使われているアカウントと攻撃元の経路の両方を止める。警告やメールだけでは、読まれる前も攻撃は続く。凍結した範囲と理由を記録し、復旧の判断に使う。', en: '' }
+
+  - id: l03-reset
+    at: { day: 0, minutes: 630 }
+    phase: contain
+    sound: { se: [typing] }
+    text: { ja: '午前10時30分。パスワード変更の強制。どう設計するか。', en: '' }
+    voices: [v03-popular, v03-coward, v03-ok]
+    choices:
+      - id: l03-forced
+        text: { ja: '該当アカウントは次回ログインで変更を必須にし、通知も出す。', en: '' }
+        explain: { ja: '該当アカウントだけに絞り、次回ログインで確実に変更させている。通知も出すので、利用者は理由を理解できる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 100
+        refs: [no14-credential-stuffing, no14-mfa-guideline]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { resetForced: true }
+        items:
+          - { id: l03-c-order, points: 8, axis: order, refs: [no14-credential-stuffing] }
+          - { id: l03-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: l03-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: l03-optional
+        text: { ja: '利用者に任意で変更を勧めるメールを送っておく。', en: '' }
+        explain: { ja: '任意では、変更しない人のアカウントが残る。攻撃者はそこを狙い続けるため、被害が止まらない。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [no14-credential-stuffing]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l03-b-care, points: 5, axis: care, refs: [ppc-notify-person] }
+          - { id: l03-b-content, points: 5, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l03-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: l03-none
+        text: { ja: '変更は本人の判断に任せきりにして、何もしない。', en: '' }
+        explain: { ja: '何もしないと、漏えいした認証情報がそのまま使える。パスワードの使い回しは、本人だけでは防げない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -90
+        refs: [no14-credential-stuffing]
+        gauges: { damage: 10, trust: -10 }
+        coward: true
+        items:
+          - { id: l03-a-content, points: -10, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l03-a-care, points: -8, axis: care, refs: [ppc-notify-person] }
+          - { id: l03-a-order, points: -5, axis: order, refs: [meti-csm-guideline] }
+    lesson: { ja: '漏えいした認証情報が使われた疑いでは、該当アカウントのパスワード変更を次回ログインで必須にする。任意の呼びかけでは変更しない人が残り、攻撃者はそこを狙い続ける。理由も通知する。', en: '' }
+
+  - id: l04-stop
+    at: { day: 0, minutes: 720 }
+    phase: contain
+    sound: { se: [notify_chat] }
+    text: { ja: '正午。アプリを止めるか。技術的には、認証と残高利用だけを止められる。', en: '' }
+    voices: [v04-bold, v04-coward, v04-ok]
+    notable:
+      - { id: note-stop, text: { ja: '正午、残高利用と送金を止め、閲覧とポイント確認は残す判断。', en: '' } }
+    choices:
+      - id: l04-full-stop
+        text: { ja: 'アプリ全体を止め、復旧の見通しを丁寧に出す。', en: '' }
+        explain: { ja: '被害は確実に止まるが、ポイントの確認や店頭の支払いまで止まる。止める範囲を狭められるのに、全部を止めている。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [nist-sp800-61r3]
+        gauges: { flame: 10, trust: -5 }
+        setFlags: { appStopped: true }
+        items:
+          - { id: l04-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l04-b-care, points: 5, axis: care, refs: [ppc-notify-person] }
+          - { id: l04-b-content, points: 5, axis: content, refs: [meti-disclosure-guidance] }
+      - id: l04-partial
+        text: { ja: '残高利用と送金だけを止め、閲覧とポイント確認は残す。', en: '' }
+        explain: { ja: '危険な機能だけを止め、生活に必要な確認は残している。被害を抑えながら、混乱も小さくできる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 100
+        refs: [nist-sp800-61r3, no14-mfa-guideline]
+        gauges: { damage: -10, flame: 5, trust: 10, stamina: -10 }
+        setFlags: { appStopped: false, partialStop: true }
+        items:
+          - { id: l04-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l04-c-content, points: 8, axis: content, refs: [no14-mfa-guideline] }
+          - { id: l04-c-care, points: 5, axis: care, refs: [ppc-notify-person] }
+          - { id: l04-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: l04-keep
+        text: { ja: 'すべて動かしたまま、ログの監視だけを続ける。', en: '' }
+        explain: { ja: '監視だけでは残高は守れない。攻撃が続く間に、ポイントと残高が使われて被害が広がる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -130
+        refs: [no14-credential-stuffing]
+        gauges: { damage: 15, flame: 10, trust: -10 }
+        coward: true
+        setFlags: { appStopped: false }
+        delayed:
+          - { afterPhases: 1, points: -50, gauges: { damage: 10 }, reason: { ja: '止めなかった残高利用が、夜間に集中して使われた。', en: '' } }
+        items:
+          - { id: l04-a-content, points: -12, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l04-a-order, points: -8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l04-a-care, points: -5, axis: care, refs: [ppc-notify-person] }
+    lesson: { ja: 'アプリ全体を止める前に、危険な機能だけを止められないか考える。残高利用と送金を止め、閲覧を残せば、被害を抑えながら生活の不便も小さくできる。監視だけでは残高は守れない。', en: '' }
+
+  - id: l05-logs
+    at: { day: 0, minutes: 840 }
+    phase: investigate
+    sound: { se: [notify_chat] }
+    text: { ja: '午後2時。ログの保全。何を残すか。', en: '' }
+    voices: [v05-expert, v05-field, v05-ok]
+    choices:
+      - id: l05-app-only
+        text: { ja: 'アプリのログだけを、調査会社に丸ごと渡して任せる。', en: '' }
+        explain: { ja: 'アプリのログだけでは、認証や決済の経路が分からない。調査の範囲が狭まり、原因の特定が遅れる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l05-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: l05-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: l05-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: l05-all
+        text: { ja: '認証、アプリ、決済のログを別媒体に保存し、手順を記録する。', en: '' }
+        explain: { ja: '複数のログを別媒体に残し、保存の手順まで記録している。調査の再現性と証拠としての価値が高い。', en: '' }
+        minutes: 120
+        category: recover
+        points: 100
+        refs: [jpcert-handling, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -15 }
+        setFlags: { evidenceKept: true }
+        items:
+          - { id: l05-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: l05-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l05-c-content, points: 5, axis: content, refs: [jpcert-handling] }
+          - { id: l05-c-time, points: 5, axis: time, refs: [nist-sp800-61r3] }
+      - id: l05-delete
+        text: { ja: '容量を空けるため、古いログから順番に削除する。', en: '' }
+        explain: { ja: '攻撃の痕跡を自分で消すことになる。原因も範囲も分からなくなり、調査と説明の両方が成り立たない。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -200
+        refs: [jpcert-handling]
+        gauges: { flame: 15, trust: -15 }
+        setFlags: { logsDeleted: true }
+        delayed:
+          - { afterPhases: 2, points: -70, gauges: { flame: 10, trust: -10 }, reason: { ja: 'ログを消したことで、原因の特定ができなくなった。', en: '' } }
+        items:
+          - { id: l05-a-record, points: -20, axis: record, refs: [jpcert-handling] }
+          - { id: l05-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: l05-a-order, points: -10, axis: order, refs: [meti-csm-guideline] }
+    lesson: { ja: '調査の前にログを消さない。認証、アプリ、決済のログを別媒体に保存し、保存した時刻と手順を記録する。証拠が残っていなければ、原因も被害の範囲も説明できず、再発防止も設計できない。', en: '' }
+
+  - id: l06-entry
+    at: { day: 0, minutes: 960 }
+    phase: investigate
+    sound: { se: [mail_arrive] }
+    text: { ja: '午後4時。他社の漏えい情報との照合。どこから手を付けるか。', en: '' }
+    voices: [v06-insider, v06-vendor, v06-ok]
+    choices:
+      - id: l06-list
+        text: { ja: '外部の漏えい情報と照合し、一致したアカウントを洗い出す。', en: '' }
+        explain: { ja: '他社の漏えい情報と照合することで、狙われた ID の範囲が分かる。自社の認証の弱点も見えてくる。', en: '' }
+        minutes: 120
+        category: recover
+        points: 100
+        refs: [no14-credential-stuffing]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { listMatched: true }
+        items:
+          - { id: l06-c-content, points: 8, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l06-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: l06-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: l06-strength
+        text: { ja: '社内のパスワード強度だけを、ひととおり点検する。', en: '' }
+        explain: { ja: '強度の点検は参考になるが、他社から漏えた認証情報は強度に関係なく使われる。侵入口の特定には届かない。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [no14-credential-stuffing]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l06-b-content, points: 5, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l06-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: l06-b-care, points: 5, axis: care, refs: [ppc-notify-person] }
+      - id: l06-ip
+        text: { ja: '攻撃者の IP を追い、手口の特定だけに集中する。', en: '' }
+        explain: { ja: 'IP を追うだけでは、どのアカウントが使われたか分からない。攻撃元は変わるため、対策にも結びつきにくい。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -80
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 5, trust: -5 }
+        items:
+          - { id: l06-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: l06-a-order, points: -5, axis: order, refs: [meti-csm-guideline] }
+          - { id: l06-a-record, points: -5, axis: record, refs: [jpcert-handling] }
+    lesson: { ja: '他社から漏えた認証情報の使い回しが疑われるときは、外部の漏えい情報と照合して、一致したアカウントを洗い出す。パスワード強度や IP の追跡だけでは、使われた範囲も対策も見えない。', en: '' }
+
+  - id: l07-mfa
+    at: { day: 1, minutes: 600 }
+    phase: organize
+    sound: { se: [mail_arrive] }
+    text: { ja: 'Day 1 午前10時。二要素認証の方式。SMS と認証アプリ、どちらを主にするか。', en: '' }
+    voices: [v07-vendor, v07-past, v07-ok]
+    choices:
+      - id: l07-sms-only
+        text: { ja: 'SMS だけに統一し、設定は利用者の任意にする。', en: '' }
+        explain: { ja: 'SMS は導入しやすいが、任意では設定しない人が残る。固定電話や番号変更の人も取り残される。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [no14-mfa-guideline]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: l07-b-content, points: 5, axis: content, refs: [no14-mfa-guideline] }
+          - { id: l07-b-care, points: 5, axis: care, refs: [no14-mfa-guideline] }
+          - { id: l07-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: l07-free
+        text: { ja: '方式は決めず、利用者の希望に任せきりにしてしまう。', en: '' }
+        explain: { ja: '方式を決めないと、設定の案内も支援もできない。結果として設定率が上がらず、被害は残る。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -90
+        refs: [no14-mfa-guideline]
+        gauges: { damage: 10, trust: -5 }
+        coward: true
+        items:
+          - { id: l07-a-content, points: -10, axis: content, refs: [no14-mfa-guideline] }
+          - { id: l07-a-care, points: -8, axis: care, refs: [no14-mfa-guideline] }
+          - { id: l07-a-order, points: -5, axis: order, refs: [meti-csm-guideline] }
+      - id: l07-app
+        text: { ja: '認証アプリを主にし、使えない人には SMS と電話を用意する。', en: '' }
+        explain: { ja: '安全性の高い方式を主にしながら、使えない人の逃げ道も用意している。設定率を上げる現実的な設計だ。', en: '' }
+        minutes: 150
+        category: recover
+        points: 110
+        refs: [no14-mfa-guideline, no14-credential-stuffing]
+        gauges: { trust: 10, stamina: -15 }
+        setFlags: { mfaDesigned: true }
+        items:
+          - { id: l07-c-content, points: 8, axis: content, refs: [no14-mfa-guideline] }
+          - { id: l07-c-care, points: 8, axis: care, refs: [no14-mfa-guideline] }
+          - { id: l07-c-order, points: 5, axis: order, refs: [no14-credential-stuffing] }
+          - { id: l07-c-time, points: 5, axis: time, refs: [no14-mfa-guideline] }
+    lesson: { ja: '二要素認証は、安全性の高い認証アプリを主にし、使えない人には SMS や電話の支援を用意する。方式を決めず任意にすると、設定率が上がらず被害が残る。全員に届く設計にする。', en: '' }
+
+  - id: l08-rate
+    at: { day: 1, minutes: 840 }
+    phase: organize
+    sound: { se: [notify_chat] }
+    text: { ja: 'Day 1 午後2時。レート制限とbot対策。どう入れるか。', en: '' }
+    voices: [v08-coward, v08-expert, v08-ok]
+    choices:
+      - id: l08-limit
+        text: { ja: '失敗回数の上限だけを決め、しばらく様子を見る。', en: '' }
+        explain: { ja: '上限を決めるだけでは、上限に達する前に大量の試行が通る。複数の IP を使われると効果が薄い。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [no14-credential-stuffing]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l08-b-content, points: 5, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l08-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: l08-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: l08-captcha
+        text: { ja: 'CAPTCHA を追加するだけで、試行制限はしない。', en: '' }
+        explain: { ja: 'CAPTCHA は自動化を難しくするが、突破される前提で考える必要がある。回数の制限がなければ試行は続く。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -80
+        refs: [no14-credential-stuffing]
+        gauges: { damage: 5, trust: -5 }
+        items:
+          - { id: l08-a-content, points: -10, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l08-a-order, points: -5, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l08-a-care, points: -5, axis: care, refs: [ppc-notify-person] }
+      - id: l08-both
+        text: { ja: 'ログイン試行を制限し、同じ端末の連続失敗で一時停止する。', en: '' }
+        explain: { ja: '回数と端末の両方で制限している。自動化された試行を止めつつ、正常な利用者の再試行も妨げにくい。', en: '' }
+        minutes: 120
+        category: recover
+        points: 100
+        refs: [no14-credential-stuffing, nist-sp800-61r3]
+        gauges: { damage: -5, trust: 10, stamina: -10 }
+        setFlags: { rateLimited: true }
+        items:
+          - { id: l08-c-content, points: 8, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l08-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l08-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+    lesson: { ja: 'リスト型攻撃には、ログイン試行の回数制限と端末単位の一時停止を組み合わせる。CAPTCHA だけで回数を制限しないと、突破された後に試行が続く。正常な利用者の再試行も妨げない設計にする。', en: '' }
+
+  - id: l09-scope
+    at: { day: 1, minutes: 1080 }
+    phase: notify
+    sound: { se: [notify_news] }
+    text: { ja: 'Day 1 午後6時。影響範囲の確定と説明。技術的に何を言えるか。', en: '' }
+    voices: [v09-public, v09-law, v09-ok]
+    notable:
+      - { id: note-scale, text: { ja: '不正ログインは約2300件、残高が使われたのは640件。範囲は調査中。', en: '' } }
+    choices:
+      - id: l09-scope
+        text: { ja: 'ログインと利用の件数を分け、範囲と断定できない点を説明する。', en: '' }
+        explain: { ja: 'ログインされた件数と、実際に残高が使われた件数を分けている。確定していない部分も隠さず伝えられる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 100
+        refs: [meti-disclosure-guidance, ppc-report-scope]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { scopeExplained: true, ppcPrelimFiled: true }
+        items:
+          - { id: l09-c-content, points: 8, axis: content, refs: [ppc-report-scope] }
+          - { id: l09-c-wording, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: l09-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: l09-count-only
+        text: { ja: '不正ログインの件数だけを、発表して終わりにする。', en: '' }
+        explain: { ja: '件数だけでは、残高が使われたかどうかが伝わらない。会員は自分が被害に遭ったか判断できない。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [meti-disclosure-guidance]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l09-b-content, points: 5, axis: content, refs: [ppc-report-scope] }
+          - { id: l09-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: l09-b-care, points: 5, axis: care, refs: [ppc-notify-person] }
+      - id: l09-not-our-leak
+        text: { ja: '「当社からは漏れていない」とだけ技術的に説明する。', en: '' }
+        explain: { ja: '自社からの漏えいがないことは事実でも、それだけでは攻撃の手口も対策も伝わらない。会員の不安に答えていない。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -90
+        refs: [meti-disclosure-guidance, no14-credential-stuffing]
+        gauges: { flame: 10, trust: -10 }
+        setFlags: { saidNotOurLeak: true }
+        items:
+          - { id: l09-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: l09-a-content, points: -8, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l09-a-care, points: -5, axis: care, refs: [ppc-notify-person] }
+    lesson: { ja: '影響範囲は、不正ログインの件数と、残高が使われた件数を分けて説明する。確定していない部分は調査中と書く。「漏れていない」だけでは、会員は自分が被害に遭ったか判断できない。', en: '' }
+
+  - id: l10-notice-tech
+    at: { day: 2, minutes: 600 }
+    phase: notify
+    sound: { se: [typing] }
+    text: { ja: 'Day 2 午前10時。通知文の技術部分。何を書くか。', en: '' }
+    voices: [v10-coward, v10-popular, v10-ok]
+    choices:
+      - id: l10-change
+        text: { ja: 'パスワードを変えるよう、短く書くだけにする。', en: '' }
+        explain: { ja: '変更の指示は必要だが、二要素認証の設定や怪しいログインの確認方法が抜けている。行動が半分で止まる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [ppc-notify-person]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l10-b-care, points: 5, axis: care, refs: [ppc-notify-person] }
+          - { id: l10-b-content, points: 5, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: l10-b-order, points: 5, axis: order, refs: [no14-mfa-guideline] }
+      - id: l10-window
+        text: { ja: '技術的な説明は省き、窓口へ問い合わせるよう書く。', en: '' }
+        explain: { ja: '窓口に誘導するだけでは、会員は何をすればよいか分からない。問い合わせが集中し、対応も遅れる。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -80
+        refs: [ppc-notify-person]
+        gauges: { flame: 10, trust: -10 }
+        coward: true
+        items:
+          - { id: l10-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: l10-a-content, points: -8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: l10-a-order, points: -5, axis: order, refs: [no14-mfa-guideline] }
+      - id: l10-concrete
+        text: { ja: '変える設定と、怪しいログインの確認方法を具体的に書く。', en: '' }
+        explain: { ja: '変更すべき設定と確認の手順まで書いている。会員が自分で被害の有無を確かめられ、問い合わせも減る。', en: '' }
+        minutes: 120
+        category: recover
+        points: 100
+        refs: [no14-mfa-guideline, ppc-notify-person]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { noticeConcrete: true }
+        items:
+          - { id: l10-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: l10-c-content, points: 8, axis: content, refs: [no14-mfa-guideline] }
+          - { id: l10-c-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '通知文の技術部分は、変更すべき設定と、怪しいログインの確認方法を具体的に書く。パスワード変更だけでは、二要素認証の設定も被害の確認も抜ける。会員が自分で動ける手順を示す。', en: '' }
+
+  - id: l11-reopen
+    at: { day: 3, minutes: 600 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: 'Day 3 午前10時。段階的再開の設計。何を条件に戻すか。', en: '' }
+    voices: [v11-bold, v11-coward, v11-ok]
+    choices:
+      - id: l11-all
+        text: { ja: '全機能を一度に戻し、監視だけを強める。', en: '' }
+        explain: { ja: '認証の強化が終わる前に全機能を戻すと、同じ手口で再び残高が使われる。監視だけでは防げない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -90
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, flame: 5, trust: -5 }
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { damage: 10 }, reason: { ja: '再開した機能で、同じ手口の不正利用が再び起きた。', en: '' } }
+        items:
+          - { id: l11-a-content, points: -10, axis: content, refs: [no14-mfa-guideline] }
+          - { id: l11-a-order, points: -8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l11-a-care, points: -5, axis: care, refs: [ppc-notify-person] }
+      - id: l11-conditions
+        text: { ja: '機能ごとに再開条件を決め、監視の数字で判断する。', en: '' }
+        explain: { ja: '機能ごとに条件を分け、監視の数字で判断する設計にしている。戻す範囲を説明でき、再停止の判断も速い。', en: '' }
+        minutes: 120
+        category: recover
+        points: 110
+        refs: [nist-sp800-61r3, no14-mfa-guideline]
+        gauges: { flame: -5, trust: 10, damage: -10 }
+        setFlags: { phasedReopen: true }
+        detail: lead-reopen
+        items:
+          - { id: l11-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l11-c-content, points: 8, axis: content, refs: [no14-mfa-guideline] }
+          - { id: l11-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: l11-none
+        text: { ja: '再開の条件は決めず、状況を見て判断する。', en: '' }
+        explain: { ja: '条件がないと、再開の判断がその場の空気で決まる。危険な状態でも戻し、再発時に止められない。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -80
+        refs: [nist-sp800-61r3]
+        gauges: { flame: 5, trust: -5 }
+        coward: true
+        items:
+          - { id: l11-b-order, points: -8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l11-b-content, points: -5, axis: content, refs: [no14-mfa-guideline] }
+          - { id: l11-b-record, points: -5, axis: record, refs: [jpcert-handling] }
+    lesson: { ja: '再開は機能ごとに条件を決め、監視の数字で判断する。全機能を一度に戻すと、認証の強化が終わる前に同じ手口で再発する。戻す範囲と再停止の条件を先に決め、記録に残す。', en: '' }
+
+  - id: l12-monitoring
+    at: { day: 5, minutes: 600 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: 'Day 5 午前10時。再開後の監視と、再停止の基準。どう決めるか。', en: '' }
+    voices: [v12-coward, v12-past, v12-ok]
+    notable:
+      - { id: note-refund, text: { ja: '補償の申請受付と連携し、不正利用の再発を監視している。', en: '' } }
+    choices:
+      - id: l12-stop-rule
+        text: { ja: '同じ兆候が出たときの停止基準と連絡先を決めておく。', en: '' }
+        explain: { ja: '再開の後こそ、止める基準が必要になる。兆候と連絡先を決めておけば、夜間でも同じ判断ができる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 100
+        refs: [nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { stopRule: true }
+        items:
+          - { id: l12-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l12-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: l12-c-content, points: 5, axis: content, refs: [no14-credential-stuffing] }
+      - id: l12-morning
+        text: { ja: '毎朝の定例で、監視の数字を必ず確認する。', en: '' }
+        explain: { ja: '定例で数字を見る運用は良いが、夜間や休日の異常に気づけない。止める判断の基準もまだない。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [nist-sp800-61r3]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l12-b-order, points: 5, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l12-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: l12-b-content, points: 5, axis: content, refs: [no14-credential-stuffing] }
+      - id: l12-later
+        text: { ja: '問題が起きてから、その場で判断することにする。', en: '' }
+        explain: { ja: 'その場の判断では、夜間や担当者が変わったときに止められない。被害が広がってから基準を作ることになる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -70
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 10, trust: -5 }
+        coward: true
+        items:
+          - { id: l12-a-order, points: -8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l12-a-record, points: -5, axis: record, refs: [jpcert-handling] }
+          - { id: l12-a-care, points: -5, axis: care, refs: [ppc-notify-person] }
+    lesson: { ja: '再開した後こそ、同じ兆候が出たときの停止基準と連絡先を決めておく。毎朝の定例だけでは夜間や休日の異常に気づけない。担当が変わっても同じ判断ができる形にして、記録を残す。', en: '' }
+
+  - id: l13-debt
+    at: { day: 10, minutes: 600 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: 'Day 10 午前10時。技術的負債の返済。パスワードだけの認証をどう変えるか。', en: '' }
+    voices: [v13-past, v13-boss, v13-ok]
+    choices:
+      - id: l13-password
+        text: { ja: 'パスワードの桁数と記号の条件を厳しくする。', en: '' }
+        explain: { ja: '条件を厳しくしても、他社から漏えたパスワードは使える。認証の方式そのものを変えなければ再発する。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [no14-mfa-guideline]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l13-b-content, points: 5, axis: content, refs: [no14-mfa-guideline] }
+          - { id: l13-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: l13-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: l13-later
+        text: { ja: '現場の運用でカバーし、改修は先送りする。', en: '' }
+        explain: { ja: '現場の注意で認証の弱点は埋まらない。改修を先送りするほど、同じ手口の再発リスクが残る。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -90
+        refs: [no14-mfa-guideline]
+        gauges: { damage: 10, trust: -5 }
+        coward: true
+        delayed:
+          - { afterPhases: 2, points: -40, gauges: { damage: 10 }, reason: { ja: '認証の改修が遅れ、同じ手口のログインが再び増えた。', en: '' } }
+        items:
+          - { id: l13-a-content, points: -10, axis: content, refs: [no14-mfa-guideline] }
+          - { id: l13-a-time, points: -8, axis: time, refs: [no14-credential-stuffing] }
+          - { id: l13-a-order, points: -5, axis: order, refs: [meti-csm-guideline] }
+      - id: l13-plan
+        text: { ja: '認証基盤の改修計画を作り、予算と期限を経営に諮る。', en: '' }
+        explain: { ja: '改修を計画に落とし、予算と期限を経営に諮っている。技術の課題を組織の判断につなげた点が良い。', en: '' }
+        minutes: 150
+        category: recover
+        points: 110
+        refs: [no14-mfa-guideline, meti-csm-guideline]
+        gauges: { trust: 10, stamina: -15 }
+        setFlags: { authPlan: true }
+        items:
+          - { id: l13-c-content, points: 8, axis: content, refs: [no14-mfa-guideline] }
+          - { id: l13-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: l13-c-time, points: 8, axis: time, refs: [no14-mfa-guideline] }
+          - { id: l13-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+    lesson: { ja: 'パスワードの条件を厳しくするだけでは、他社から漏えた認証情報は防げない。認証基盤の改修計画を作り、予算と期限を経営に諮る。技術の課題を組織の判断につなげ、実行まで追う。', en: '' }
+
+  - id: l14-report
+    at: { day: 21, minutes: 600 }
+    phase: after
+    sound: { se: [notify_news] }
+    text: { ja: 'Day 21 午前10時。調査報告書の技術部分。何を書くか。', en: '' }
+    voices: [v14-expert, v14-law, v14-ok]
+    choices:
+      - id: l14-technique-only
+        text: { ja: '攻撃の手口だけを書き、自社の弱点は別紙にする。', en: '' }
+        explain: { ja: '手口だけを書くと、自社がどこを直すのか分からない。弱点を別紙にすると、対策の優先順位も見えなくなる。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [nist-sp800-61r3]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: l14-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: l14-b-record, points: 5, axis: record, refs: [cissp-cbk-secops] }
+          - { id: l14-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: l14-summary
+        text: { ja: '技術的な詳細は伏せ、概要だけを書く。', en: '' }
+        explain: { ja: '詳細を伏せると、再発防止の担当も期限も決められない。同じ弱点が残り、検証もできない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -90
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 5, trust: -10 }
+        coward: true
+        items:
+          - { id: l14-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: l14-a-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: l14-a-wording, points: -5, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: l14-specific
+        text: { ja: '侵入口、検知の遅れ、認証の弱点を具体的に書く。', en: '' }
+        explain: { ja: '攻撃の入口と、検知が遅れた理由、認証の弱点を具体的に書いている。対策の担当と期限も決めやすい。', en: '' }
+        minutes: 180
+        category: recover
+        points: 110
+        refs: [nist-sp800-61r3, no14-credential-stuffing]
+        gauges: { flame: -5, trust: 15, stamina: -10 }
+        setFlags: { reportTechnical: true }
+        items:
+          - { id: l14-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: l14-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: l14-c-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: l14-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+    lesson: { ja: '調査報告書の技術部分には、侵入口、検知の遅れ、認証の弱点を具体的に書く。攻撃の手口だけや概要だけでは、どこを直すか決められず、同じ弱点が残る。対策の担当と期限まで示す。', en: '' }
+
+  - id: l15-drill
+    at: { day: 45, minutes: 600 }
+    phase: after
+    sound: { se: [notify_chat] }
+    text: { ja: 'Day 45 午前10時。監視と訓練の定着。何を続けるか。', en: '' }
+    voices: [v15-past, v15-coward, v15-ok]
+    choices:
+      - id: l15-drill
+        text: { ja: '攻撃を想定した訓練を半年ごとに行い、結果を公開する。', en: '' }
+        explain: { ja: '訓練を定期的に続け、結果まで公開している。対策が形だけになっていないか、外からも確かめられる。', en: '' }
+        minutes: 180
+        category: recover
+        points: 110
+        refs: [cissp-cbk-secops, meti-csm-guideline]
+        gauges: { trust: 15, stamina: -10, flame: -5 }
+        setFlags: { drillStarted: true }
+        items:
+          - { id: l15-c-order, points: 8, axis: order, refs: [cissp-cbk-secops] }
+          - { id: l15-c-record, points: 8, axis: record, refs: [meti-csm-guideline] }
+          - { id: l15-c-care, points: 5, axis: care, refs: [ipa-sme-guideline] }
+      - id: l15-dashboard
+        text: { ja: '監視のダッシュボードを毎日見る運用にする。', en: '' }
+        explain: { ja: '毎日の監視は被害の早期発見に効く。ただし訓練がないと、異常が出たときの動きが人によってばらつく。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [nist-sp800-61r3]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l15-b-order, points: 5, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l15-b-record, points: 5, axis: record, refs: [cissp-cbk-secops] }
+          - { id: l15-b-content, points: 5, axis: content, refs: [no14-credential-stuffing] }
+      - id: l15-once
+        text: { ja: '研修を一度だけ行い、あとは現場に任せる。', en: '' }
+        explain: { ja: '一度の研修は記憶に残りにくい。担当が変わると動きも変わるため、再発時の初動がそろわない。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -80
+        refs: [ipa-sme-guideline]
+        gauges: { trust: -5, damage: 5 }
+        coward: true
+        items:
+          - { id: l15-a-care, points: -10, axis: care, refs: [ipa-sme-guideline] }
+          - { id: l15-a-order, points: -5, axis: order, refs: [cissp-cbk-secops] }
+          - { id: l15-a-record, points: -5, axis: record, refs: [meti-csm-guideline] }
+    lesson: { ja: '監視は毎日見るだけでは足りない。攻撃を想定した訓練を定期的に行い、結果を公開する。担当が変わっても同じ初動が取れるようにし、対策が形だけになっていないか確かめる。', en: '' }
+
+  - id: l16-share
+    at: { day: 60, minutes: 600 }
+    phase: after
+    sound: { se: [notify_chat] }
+    text: { ja: 'Day 60 午前10時。業界への共有。技術の知見をどう残すか。', en: '' }
+    voices: [v16-expert, v16-past, v16-ok]
+    choices:
+      - id: l16-result
+        text: { ja: '自社の対策が終わったことだけを、短く発表する。', en: '' }
+        explain: { ja: '完了の報告は必要だが、他の事業者が同じ手口を防ぐ情報にはならない。知見が自社の中に閉じる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 30
+        refs: [meti-csm-guideline]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: l16-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
+          - { id: l16-b-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: l16-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: l16-hide
+        text: { ja: '共有すると攻撃のヒントになるので、公表しない。', en: '' }
+        explain: { ja: '攻撃に使える詳細を伏せるのは必要だが、検知の設定や点検の観点まで隠すと、同じ被害が他社で起きる。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -80
+        refs: [meti-csm-guideline]
+        gauges: { trust: -5, flame: 5 }
+        coward: true
+        items:
+          - { id: l16-a-content, points: -10, axis: content, refs: [meti-csm-guideline] }
+          - { id: l16-a-record, points: -5, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: l16-a-care, points: -5, axis: care, refs: [ipa-sme-guideline] }
+      - id: l16-share
+        text: { ja: '検知の設定と点検表を公開し、他社の訓練にも使ってもらう。', en: '' }
+        explain: { ja: '攻撃に使える情報は伏せつつ、検知の設定と点検表を共有している。他社の訓練に使われる実効性のある知見だ。', en: '' }
+        minutes: 240
+        category: increase
+        points: 300
+        fatalAlternate: 50
+        refs: [meti-csm-guideline, no14-credential-stuffing]
+        gauges: { flame: -15, trust: 20, stamina: -15 }
+        setFlags: { sharedLessons: true, ppcFinalFiled: true }
+        items:
+          - { id: l16-c-content, points: 8, axis: content, refs: [no14-credential-stuffing] }
+          - { id: l16-c-record, points: 8, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: l16-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: l16-c-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+    lesson: { ja: '攻撃に使える詳細は伏せつつ、検知の設定と点検表は公開する。他社の訓練に使ってもらえれば、同じ手口の被害を減らせる。完了報告だけで終わらせず、知見を地域に残して次の備えにする。', en: '' }
+drafts:
+  lead-reopen:
+    title: { ja: '段階的再開の技術メモ', en: '' }
+    slots:
+      - id: criteria
+        label: { ja: '再開の条件', en: '' }
+        options:
+          - { id: lr-c-feel, text: { ja: '担当者の勘で再開を決めてしまい、記録も残さない', en: '' }, points: -10, axis: order, refs: [nist-sp800-61r3], explain: { ja: '判断が人によって変わると、危険な状態でも戻してしまう。再停止の基準も曖昧になる。', en: '' } }
+          - { id: lr-c-list, text: { ja: '監視の数字を参考にして、再開を決める', en: '' }, points: 2, axis: order, refs: [nist-sp800-61r3], explain: { ja: '数字は参考にしているが、条件として決めていない。担当が変わると判断がぶれやすい。', en: '' } }
+          - { id: lr-c-number, text: { ja: '監視の数字で再開の条件を決め、記録に残す', en: '' }, points: 10, axis: order, refs: [nist-sp800-61r3], explain: { ja: '数字で決めれば、担当が変わっても同じ判断ができる。戻す範囲も説明しやすく、記録にも残せる。', en: '' } }
+      - id: residual
+        label: { ja: '残るリスク', en: '' }
+        options:
+          - { id: lr-r-hide, text: { ja: '残るリスクは説明せずに隠す', en: '' }, points: -10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '残るリスクを隠すと、利用者が自分で身を守れない。後から分かったときに不信が大きくなる。', en: '' } }
+          - { id: lr-r-part, text: { ja: '残るリスクは簡単に触れておく', en: '' }, points: 2, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '簡単に触れるだけでは、利用者は何に注意すべきか分からない。対策の説明も届きにくい。', en: '' } }
+          - { id: lr-r-explain, text: { ja: '残るリスクと対策の両方を説明する', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '残るリスクを説明すると、利用者は自分で注意できる。対策の進み具合も伝わり、不安が少し和らぐ。', en: '' } }
+      - id: monitoring
+        label: { ja: '監視の方法', en: '' }
+        options:
+          - { id: lr-m-stop, text: { ja: '再開したら監視を減らしてしまう', en: '' }, points: -10, axis: time, refs: [nist-sp800-61r3], explain: { ja: '再開直後こそ監視が必要だ。減らすと、同じ手口の再発に気づくのが遅れ、被害が広がってしまう。', en: '' } }
+          - { id: lr-m-daily, text: { ja: '再開後は毎朝だけ監視する', en: '' }, points: 2, axis: time, refs: [nist-sp800-61r3], explain: { ja: '毎朝の確認だけでは、夜間や休日の異常に気づけない。再開直後の監視としては弱すぎる。', en: '' } }
+          - { id: lr-m-watch, text: { ja: '再開した後も監視を続ける', en: '' }, points: 10, axis: time, refs: [nist-sp800-61r3], explain: { ja: '再開後も監視を続けることで、同じ兆候を早く見つけられる。再停止の判断にもつながる。', en: '' } }
+      - id: stop
+        label: { ja: '再停止の基準', en: '' }
+        options:
+          - { id: lr-s-vague, text: { ja: '再停止の基準は決めない', en: '' }, points: -8, axis: order, refs: [nist-sp800-61r3], explain: { ja: '基準がないと、夜間や休日に止める判断ができない。被害が広がってから決めることになる。', en: '' } }
+          - { id: lr-s-clear, text: { ja: '再停止の基準を先に決める', en: '' }, points: 8, axis: order, refs: [nist-sp800-61r3], explain: { ja: '再停止の基準を先に決めれば、異常が出たときに迷わない。担当が変わっても同じ動きができる。', en: '' } }
+      - id: auth
+        label: { ja: '認証の扱い', en: '' }
+        options:
+          - { id: lr-a-require, text: { ja: '二要素認証の設定を求める', en: '' }, points: 10, axis: content, refs: [no14-mfa-guideline], explain: { ja: '再開の前提に二要素認証を置くと、同じ手口の被害を減らせる。設定できない人への支援も必要になる。', en: '' } }
+          - { id: lr-a-later, text: { ja: '二要素認証の設定は後回しにする', en: '' }, points: -10, axis: content, refs: [no14-mfa-guideline], explain: { ja: '認証を後回しにすると、再開した瞬間から同じ手口の隙が残る。再発のリスクが高く、被害も繰り返す。', en: '' } }
+      - id: rate
+        label: { ja: '試行の制限', en: '' }
+        options:
+          - { id: lr-ra-none, text: { ja: '試行の制限は入れない', en: '' }, points: -8, axis: content, refs: [no14-credential-stuffing], explain: { ja: '試行を制限しないと、再開後に同じ自動化されたログインが戻ってくる。被害が再び広がる。', en: '' } }
+          - { id: lr-ra-limit, text: { ja: '試行回数の制限を入れる', en: '' }, points: 8, axis: content, refs: [no14-credential-stuffing], explain: { ja: '試行回数を制限すると、自動化された攻撃を止めやすい。正常な利用者の再試行にも配慮する。', en: '' } }
+      - id: contact
+        label: { ja: '連絡先', en: '' }
+        options:
+          - { id: lr-co-clear, text: { ja: '夜間の連絡先を決める', en: '' }, points: 8, axis: order, refs: [nist-sp800-61r3], explain: { ja: '夜間に異常が出たときの連絡先を決めておくと、止める判断が遅れない。再発時の初動が速くなる。', en: '' } }
+          - { id: lr-co-none, text: { ja: '夜間の連絡先は決めない', en: '' }, points: -8, axis: order, refs: [nist-sp800-61r3], explain: { ja: '連絡先がないと、異常に気づいても止める人がいない。翌朝まで被害が続き、対応が後手に回る。', en: '' } }
+      - id: rollback
+        label: { ja: '戻し方', en: '' }
+        options:
+          - { id: lr-ro-none, text: { ja: '戻し方の手順は決めない', en: '' }, points: -8, axis: order, refs: [nist-sp800-61r3], explain: { ja: '戻し方を決めないと、再停止が必要になったときに手順がなく、復旧が長引いて利用者の不便も増える。', en: '' } }
+          - { id: lr-ro-plan, text: { ja: '戻し方の手順を先に決めておく', en: '' }, points: 8, axis: order, refs: [nist-sp800-61r3], explain: { ja: '戻し方の手順を決めておくと、再停止しても短時間で安全な状態に戻せる。復旧の見通しも立つ。', en: '' } }
+      - id: record
+        label: { ja: '記録', en: '' }
+        options:
+          - { id: lr-re-log, text: { ja: '再開の判断と時刻を記録する', en: '' }, points: 8, axis: record, refs: [jpcert-handling], explain: { ja: '判断と時刻を記録すると、後から経緯を説明できる。同じ判断を再現することもできる。', en: '' } }
+          - { id: lr-re-none, text: { ja: '再開の判断の記録は残さない', en: '' }, points: -8, axis: record, refs: [jpcert-handling], explain: { ja: '記録がないと、なぜ再開したのか説明できない。再発時に判断の妥当性も示せず、検証が進まない。', en: '' } }
+      - id: review
+        label: { ja: '見直し', en: '' }
+        options:
+          - { id: lr-v-once, text: { ja: '再開した後も条件を見直さない', en: '' }, points: -8, axis: order, refs: [nist-sp800-61r3], explain: { ja: '再開後に見直さないと、条件が実態と合わなくなる。危険な状態でも戻し続け、再発を招いてしまう。', en: '' } }
+          - { id: lr-v-review, text: { ja: '再開した後も、条件を見直し続ける', en: '' }, points: 8, axis: order, refs: [nist-sp800-61r3], explain: { ja: '再開した後も、条件を見直し続けると、監視の実態に合わせて判断を調整できる。安全側に戻すこともできる。', en: '' } }
+voices:
+  - { id: v01-past, media: boss, misleading: true, type: past-success, text: { ja: '前の障害も、朝のうちに収まった。大げさにするな。', en: '' }, trigger: { at: point } }
+  - { id: v01-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'ログイン失敗は、利用者の入力ミスです。攻撃ではありません。', en: '' }, trigger: { at: point } }
+  - { id: v01-ok, media: chat, misleading: false, text: { ja: '監視班「成功したログインの IP が、普段と違う国に寄っています」。', en: '' }, trigger: { at: point } }
+  - { id: v01-after, media: chat, misleading: false, text: { ja: '監視班「見るべき数字が、一気に絞れました」。', en: '' }, trigger: { at: after, choice: l01-both } }
+  - { id: v02-coward, media: news, misleading: true, type: coward-critique, text: { ja: 'アカウントを止めるのは、やりすぎだ。', en: '' }, trigger: { at: point } }
+  - { id: v02-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '遮断すると、正規の利用者も止まります。', en: '' }, trigger: { at: point } }
+  - { id: v02-ok, media: chat, misleading: false, text: { ja: '監視班「同じ IP から、一分に二百回のログインです」。', en: '' }, trigger: { at: point } }
+  - { id: v02-after, media: sns, misleading: false, text: { ja: '急にログインできなくなった。何も説明がない。', en: '' }, trigger: { at: after, choice: l02-freeze } }
+  - { id: v03-popular, media: sns, misleading: true, type: popular, text: { ja: '他のアプリは、パスワード変更を促すだけだ。', en: '' }, trigger: { at: point } }
+  - { id: v03-coward, media: news, misleading: true, type: coward-critique, text: { ja: '強制すると、利用者が離れる。任意で十分だ。', en: '' }, trigger: { at: point } }
+  - { id: v03-ok, media: chat, misleading: false, text: { ja: '監視班「変更していないアカウントに、またログインがあります」。', en: '' }, trigger: { at: point } }
+  - { id: v03-after, media: sns, misleading: false, text: { ja: '変更を強制されて、アプリが使いにくい。', en: '' }, trigger: { at: after, choice: l03-forced } }
+  - { id: v04-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: '全部止めれば、犯人も諦める。思い切れ。', en: '' }, trigger: { at: point } }
+  - { id: v04-coward, media: news, misleading: true, type: coward-critique, text: { ja: '一部だけ止めるのは中途半端だ。', en: '' }, trigger: { at: point } }
+  - { id: v04-ok, media: chat, misleading: false, text: { ja: '開発班「残高利用だけ止めれば、閲覧は残せます」。', en: '' }, trigger: { at: point } }
+  - { id: v04-after, media: sns, misleading: false, text: { ja: 'ポイントは見られるのに、支払いはできないのか。', en: '' }, trigger: { at: after, choice: l04-partial } }
+  - { id: v05-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '古いログは容量の無駄です。消しましょう。', en: '' }, trigger: { at: point } }
+  - { id: v05-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '調査会社に渡す前に、整理しておきました。', en: '' }, trigger: { at: point } }
+  - { id: v05-ok, media: chat, misleading: false, text: { ja: '法務「ログは消さず、別の媒体に残しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v05-after, media: vendor, misleading: false, text: { ja: 'ログを全部残すと、調査に時間がかかります。', en: '' }, trigger: { at: after, choice: l05-all } }
+  - { id: v06-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の者だけど、漏えいリストは社内にある。外部に探させるな。', en: '' }, trigger: { at: point } }
+  - { id: v06-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '他社のリストを見ても、うちには関係ありません。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '調査班「他社の漏えいリストと、一致する ID があります」。', en: '' }, trigger: { at: point } }
+  - { id: v06-after, media: news, misleading: false, text: { ja: '他社の漏えいを調べるより、自社の対策だろ。', en: '' }, trigger: { at: after, choice: l06-list } }
+  - { id: v07-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '認証アプリの導入は、来期のキャンペーンに合わせましょう。', en: '' }, trigger: { at: point } }
+  - { id: v07-past, media: boss, misleading: true, type: past-success, text: { ja: '前も SMS で乗り切った。同じでいい。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '開発班「認証アプリなら、SMS より安全にできます」。', en: '' }, trigger: { at: point } }
+  - { id: v07-after, media: sns, misleading: false, text: { ja: '設定が面倒で、アプリを開かなくなった。', en: '' }, trigger: { at: after, choice: l07-app } }
+  - { id: v08-coward, media: news, misleading: true, type: coward-critique, text: { ja: '制限を強めると、利用者が離れる。', en: '' }, trigger: { at: point } }
+  - { id: v08-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'CAPTCHA を入れれば、自動化は止まります。', en: '' }, trigger: { at: point } }
+  - { id: v08-ok, media: chat, misleading: false, text: { ja: '開発班「同じ端末から、短時間に何百回も試行されています」。', en: '' }, trigger: { at: point } }
+  - { id: v08-after, media: sns, misleading: false, text: { ja: 'ログインを制限されて、自分のアカウントに入れない。', en: '' }, trigger: { at: after, choice: l08-both } }
+  - { id: v09-public, media: sns, misleading: true, type: public-opinion, text: { ja: '件数だけ出せば十分だ。細かい説明は混乱する。', en: '' }, trigger: { at: point } }
+  - { id: v09-law, media: board, misleading: true, type: law-ish, text: { ja: '確定していない件数は、発表しない方が安全です。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '調査班「ログインと利用は、別の件数です」。', en: '' }, trigger: { at: point } }
+  - { id: v09-after, media: news, misleading: false, text: { ja: 'まだ確定していないのに、数字を出すのか。', en: '' }, trigger: { at: after, choice: l09-scope } }
+  - { id: v10-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '技術的な話は、窓口に任せればいい。', en: '' }, trigger: { at: point } }
+  - { id: v10-popular, media: sns, misleading: true, type: popular, text: { ja: '他のアプリも、パスワード変更の案内だけだ。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '窓口「二要素認証の設定方法を聞く電話が増えています」。', en: '' }, trigger: { at: point } }
+  - { id: v10-after, media: sns, misleading: false, text: { ja: '設定の手順が細かすぎて、途中でやめた。', en: '' }, trigger: { at: after, choice: l10-concrete } }
+  - { id: v11-bold, media: sns, misleading: true, type: bold-buzz, text: { ja: 'いつまでも止めるな。全部戻して信頼を取り戻せ。', en: '' }, trigger: { at: point } }
+  - { id: v11-coward, media: news, misleading: true, type: coward-critique, text: { ja: '段階的に戻すのは、優柔不断に見える。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '開発班「機能ごとに、危険度が違います」。', en: '' }, trigger: { at: point } }
+  - { id: v11-after, media: sns, misleading: false, text: { ja: 'まだ全部使えないのか。', en: '' }, trigger: { at: after, choice: l11-conditions } }
+  - { id: v12-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '再開したら、監視は減らしていいだろ。', en: '' }, trigger: { at: point } }
+  - { id: v12-past, media: boss, misleading: true, type: past-success, text: { ja: '前も、再開したら自然に落ち着いた。', en: '' }, trigger: { at: point } }
+  - { id: v12-ok, media: chat, misleading: false, text: { ja: '監視班「再開後も、同じ IP からの試行が続いています」。', en: '' }, trigger: { at: point } }
+  - { id: v12-after, media: news, misleading: false, text: { ja: '止める基準を作るなら、最初から止めるな。', en: '' }, trigger: { at: after, choice: l12-stop-rule } }
+  - { id: v13-past, media: boss, misleading: true, type: past-success, text: { ja: 'パスワードの条件を厳しくすれば、前も収まった。', en: '' }, trigger: { at: point } }
+  - { id: v13-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '改修は来期だ。今は運用でしのげ。', en: '' }, trigger: { at: point } }
+  - { id: v13-ok, media: chat, misleading: false, text: { ja: '開発班「認証基盤の改修に、三か月かかります」。', en: '' }, trigger: { at: point } }
+  - { id: v13-after, media: news, misleading: false, text: { ja: '改修計画だけ作って、いつ終わるんだ。', en: '' }, trigger: { at: after, choice: l13-plan } }
+  - { id: v14-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '技術的な詳細は、攻撃者に渡すだけです。', en: '' }, trigger: { at: point } }
+  - { id: v14-law, media: board, misleading: true, type: law-ish, text: { ja: '技術部分は任意です。概要だけで十分です。', en: '' }, trigger: { at: point } }
+  - { id: v14-ok, media: chat, misleading: false, text: { ja: '調査委員「弱点を書かないと、対策が決まりません」。', en: '' }, trigger: { at: point } }
+  - { id: v14-after, media: news, misleading: false, text: { ja: '自社の弱点を書くなんて、よくやるな。', en: '' }, trigger: { at: after, choice: l14-specific } }
+  - { id: v15-past, media: boss, misleading: true, type: past-success, text: { ja: '前も研修を一度やれば、しばらく落ち着いた。', en: '' }, trigger: { at: point } }
+  - { id: v15-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '訓練ばかりやって、現場が疲れる。', en: '' }, trigger: { at: point } }
+  - { id: v15-ok, media: chat, misleading: false, text: { ja: '開発班「訓練の結果を、毎回同じ様式で残せます」。', en: '' }, trigger: { at: point } }
+  - { id: v15-after, media: sns, misleading: false, text: { ja: '訓練の結果を公開して、誰が得するんだ。', en: '' }, trigger: { at: after, choice: l15-drill } }
+  - { id: v16-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '検知の設定を公開すると、避け方を教えることになります。', en: '' }, trigger: { at: point } }
+  - { id: v16-past, media: boss, misleading: true, type: past-success, text: { ja: '前も、完了報告だけで十分だった。', en: '' }, trigger: { at: point } }
+  - { id: v16-ok, media: chat, misleading: false, text: { ja: '開発班「点検表は、他社でもそのまま使えます」。', en: '' }, trigger: { at: point } }
+  - { id: v16-after, media: sns, misleading: false, text: { ja: '点検表を配る前に、自社の対策を終わらせろ。', en: '' }, trigger: { at: after, choice: l16-share } }
+  - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「調査中」なんだ。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-3, media: sns, misleading: false, text: { ja: 'デジタル事業部は責任を取りたくないだけだ。事なかれ主義。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-4, media: news, misleading: false, text: { ja: '臆病な判断が、被害を広げた。取引先が独自に調査を始めている。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-fail, media: chat, misleading: false, text: { ja: '監視班「別のサーバーでも、同じ失敗の増加があります」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-news, media: news, misleading: false, text: { ja: 'ニュース「スーパーのアプリで不正利用。二要素認証は未導入」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-vendor, media: vendor, misleading: false, text: { ja: '認証ベンダー「全員に配るなら、三か月の見積もりです」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-reopen, media: chat, misleading: false, text: { ja: '店舗「お客様から、いつアプリが戻るのか聞かれます」。', en: '' }, trigger: { at: manual } }

@@ -1,0 +1,135 @@
+# No.14 ハルカゼマート（地域スーパーのポイント・決済アプリ）
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+id: no14-poppo
+version: '1.0.0'
+status: latest
+published: '2026-11-13'
+sourcePeriod: { ja: '2020年代半ばの不正ログイン事案の構造を参考にしたフィクション', en: '' }
+difficulty: 3
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: '残高は消えた。アプリは動いている', en: '' }
+tagline: { ja: '他社から流出した ID とパスワードの使い回しで、会員のポイントと残高が奪われた。地域の台所を預かるスーパーの、止めるか動かすかの判断。', en: '' }
+company:
+  name: { ja: 'ハルカゼマート', en: '' }
+  industry: { ja: '食品スーパー・ネットスーパー', en: '' }
+  size: { ja: '32店舗、従業員1600名（パート・アルバイトを含む）、アプリ会員420万人', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '風間 俊介', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: admin
+      name: { ja: '白石 奈緒', en: '' }
+      title: { ja: '管理本部長', en: '' }
+    - id: digital
+      name: { ja: '三田 亮', en: '' }
+      title: { ja: 'デジタル事業部長', en: '' }
+    - id: cs
+      name: { ja: '小柳 美咲', en: '' }
+      title: { ja: 'お客様窓口責任者', en: '' }
+    - id: sec
+      name: { ja: '大河内 修', en: '' }
+      title: { ja: '情報セキュリティ室長', en: '' }
+    - id: store
+      name: { ja: '熊谷 浩司', en: '' }
+      title: { ja: '店舗運営部長', en: '' }
+    - id: advisor
+      name: { ja: '外山 誠一', en: '' }
+      title: { ja: '外部顧問弁護士', en: '' }
+start: { day: 0, minutes: 480 }
+initialGauges: { damage: 20, flame: 0, trust: 68, stamina: 95 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-scale
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '不正に使われたアカウントは何件ですか。', en: '' }
+      answers:
+        - { id: a-scale-unknown, text: { ja: 'まだ調べています。', en: '' }, points: -30 }
+        - { id: a-scale-count, text: { ja: '不正ログインが約2300件、うち640件でポイントや残高が使われました。', en: '' }, points: 30 }
+        - { id: a-scale-note, text: { ja: '2300件のログインのうち640件で残高が使われました。対象には個別に連絡し、追加の調査結果も公表します。', en: '' }, points: 80, requiresNote: note-scale }
+    - id: q-2fa
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '二要素認証は、なぜ導入していなかったのですか。', en: '' }
+      answers:
+        - { id: a-2fa-cost, text: { ja: '費用と手間を考えて、見送っていました。', en: '' }, points: 30 }
+        - { id: a-2fa-password, text: { ja: 'パスワードで十分だと考えていました。', en: '' }, points: -50 }
+        - { id: a-2fa-plan, text: { ja: '導入を先送りしていました。方式と時期を公表し、全員に順次求めます。', en: '' }, points: 80 }
+    - id: q-comp
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '補償の範囲はどう考えていますか。', en: '' }
+      answers:
+        - { id: a-comp-none, text: { ja: '利用者の管理の問題なので、補償しません。', en: '' }, points: -100 }
+        - { id: a-comp-scope, text: { ja: 'ポイント残高と不正利用分に限り、本人確認をしたうえで戻します。', en: '' }, points: 30, when: { flags: { fullRefund: false } } }
+        - { id: a-comp-full, text: { ja: '全額を戻すと約束しました。支払いの時期と方法を公表します。', en: '' }, points: 80, when: { flags: { fullRefund: true } } }
+  extraQuestions:
+    - when: { flags: { appStopped: false } }
+      question:
+        id: q-nostop
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: 'アプリを止めなかったのはなぜですか。', en: '' }
+        answers:
+          - { id: a-nostop-service, text: { ja: '生活の決済なので、止められませんでした。', en: '' }, points: -70 }
+          - { id: a-nostop-limit, text: { ja: '該当アカウントを凍結し、危険な操作を止めて続けました。', en: '' }, points: 30 }
+          - { id: a-nostop-note, text: { ja: '全停止は避けましたが、送金と残高利用を止め、安全を確認して戻しました。判断の時刻は記録しています。', en: '' }, points: 80, requiresNote: note-stop }
+    - when: { flags: { saidNotOurLeak: true } }
+      question:
+        id: q-ownleak
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '「当社からは漏れていない」という説明は、誤解を招きませんでしたか。', en: '' }
+        answers:
+          - { id: a-ownleak-defend, text: { ja: '事実です。当社からは漏れていません。', en: '' }, points: -70 }
+          - { id: a-ownleak-explain, text: { ja: '他社から流出した認証情報の使い回しによる被害です。説明が足りませんでした。', en: '' }, points: 30 }
+          - { id: a-ownleak-own, text: { ja: '事実ですが、説明の順番が悪く誤解を招きました。攻撃の全体像と対策を改めて説明します。', en: '' }, points: 80 }
+    - when: { flags: { blamedUsers: true } }
+      question:
+        id: q-blame
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '利用者のパスワード管理の問題だという説明は、適切でしたか。', en: '' }
+        answers:
+          - { id: a-blame-keep, text: { ja: '使い回しが原因なので、利用者の責任です。', en: '' }, points: -100 }
+          - { id: a-blame-soften, text: { ja: '使い回しを狙われた被害で、当社の認証も弱かったです。', en: '' }, points: 30 }
+          - { id: a-blame-own, text: { ja: '利用者のせいに見える説明でした。認証の強化と通知の改善を進めます。', en: '' }, points: 80 }
+    - when: { flags: { fullRefund: true } }
+      question:
+        id: q-refund
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '全額補償は、いつ支払うのですか。', en: '' }
+        answers:
+          - { id: a-refund-unknown, text: { ja: '時期はまだ決めていません。', en: '' }, points: -50 }
+          - { id: a-refund-order, text: { ja: '本人確認が済んだ方から、順に振り込みます。', en: '' }, points: 30 }
+          - { id: a-refund-note, text: { ja: '金額の確定を待たず、申請のあった方から順に払います。進捗は毎週公表します。', en: '' }, points: 80, requiresNote: note-refund }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '不正利用は一件も取り戻せなかったわけではない。補償は申請から十日で終わり、二要素認証は三か月で全員に広がった。半年後のアプリ利用は事件前を上回り、店頭の常連が「あのとき、ちゃんと電話をくれた」と言った。被害の責任は攻撃者にある。問われたのは、被害を広げないための対応だった。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが、会員は戻った。アプリの利用額は半年で事件前の水準に近づき、店舗の売上も落ち着いた。二要素認証の設定率は八成を超え、問い合わせ窓口には「説明が早かった」という声も残った。被害の責任は攻撃者にある。問われたのは、被害を広げないための対応だった。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '会社は立ち直ったが、一部の会員はアプリの決済を使わなくなった。ポイントだけを目的に戻ってくる客が増え、ネットスーパーの利用は伸びない。信頼を取り戻すには、もう一年かかる。被害の責任は攻撃者にある。問われたのは、被害を広げないための対応だった。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '第三者委員会は、二要素認証の先送りと補償の遅れを指摘した。社長は半年で退任し、新しい体制がアプリの立て直しを進めている。店頭の売上は戻ったが、デジタルの売上は半分のままだ。被害の責任は攻撃者にある。問われたのは、被害を広げないための対応だった。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '補償の列に並ぶ会員の姿が報道され、提携先の決済サービスから契約を見直すと言われた。アプリは止まったままで、ネットスーパーの注文は電話に戻った。どこで判断を誤ったのか、対応の記録を読み返す日が続く。被害の責任は攻撃者にある。問われたのは、被害を広げないための対応だった。', en: '' }
+salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 15, min: 30, max: 130 }
