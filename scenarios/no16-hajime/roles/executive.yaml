@@ -1,0 +1,718 @@
+# No.16 こもれびカルチャー / 経営者（代表取締役社長）ロール
+# 入門編: 判断8、報告書1。一つひとつの解説を長めに書く。
+# 視点: 12教室を束ねる社長。事実の把握、会員への説明、公表、再発防止の予算を決める。
+estimateMinutes: 13
+intro: { ja: 'あなたはこもれびカルチャーの社長。12教室、会員4,200名の習い事チェーンを束ねている。金曜の午前10時、運営本部長が血相を変えて入ってきた。会員向けのお知らせメールが、Bcc ではなく To に約400件のアドレスを並べて送られたという。送信はもう戻せない。最初の一日で、何を決めるか。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-ex-coward-2
+  '3': v-ex-coward-3
+  '4': v-ex-coward-4
+events:
+  - id: ev-ex-replies
+    at: { day: 0, minutes: 630 }
+    voices: [v-ex-ev-replies]
+    gauges: { flame: 5 }
+    sound: { se: [notify_sns] }
+    caption: { ja: '受信者からの返信が10件を超えた。「私のアドレスも見えています」という指摘が並ぶ。', en: '' }
+  - id: ev-ex-press
+    at: { day: 0, minutes: 900 }
+    voices: [v-ex-ev-press]
+    gauges: { flame: 5 }
+    sound: { se: [phone_ring] }
+    caption: { ja: '地域紙の記者から、誤送信について取材の申し込みが入った。', en: '' }
+points:
+  - id: p-ex-01
+    at: { day: 0, minutes: 600 }
+    phase: detect
+    sound: { se: [notify_chat] }
+    text: { ja: '午前10時。運営本部長が「会員向けメールの宛先を間違えました」と報告に来た。送信は9時42分。会員412人のアドレスが To に並び、Bcc は空だった。受信者同士が見える状態で、すでに数件の返信が来ている。', en: '' }
+    voices: [v-ex-01-boss, v-ex-01-sns, v-ex-01-legal]
+    notable:
+      - { id: note-cause, text: { ja: '会員412人のアドレスを To に入れ、Bcc を空のまま送信した。配信ツールの宛先設定の誤り。', en: '' } }
+      - { id: note-response, text: { ja: '送信は9時42分。気づいたのは10時。取り消しはできず、返信が届き始めている。', en: '' } }
+    choices:
+      - id: p-ex-01-a
+        text: { ja: '事実と宛先数を確かめ、送信の記録と設定を保全する。', en: '' }
+        explain: { ja: 'まず事実と証拠を押さえる判断。宛先数と設定が分かれば、その後の説明も再発防止もぶれない。', en: '' }
+        minutes: 30
+        category: increase
+        points: 300
+        refs: [jpcert-handling, no16-ppc-breach-qa]
+        gauges: { flame: -5, trust: 10, stamina: -5 }
+        setFlags: { factsFixed: true }
+        items:
+          - { id: ex01a-order, points: 8, axis: order, refs: [jpcert-handling] }
+          - { id: ex01a-record, points: 10, axis: record, refs: [jpcert-handling] }
+          - { id: ex01a-time, points: 5, axis: time, refs: [no16-ppc-breach-qa] }
+      - id: p-ex-01-b
+        text: { ja: '担当者を呼び、なぜ間違えたのかをその場で問い詰める。', en: '' }
+        explain: { ja: '原因の確認は必要だが、問い詰めることを優先すると、事実の保全と初動が遅れる。まず記録を残す。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -120
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 10, trust: -5 }
+        delayed:
+          - { afterPhases: 1, points: -30, gauges: { flame: 5 }, reason: { ja: '初動が遅れた間に、受信者からの指摘がSNSに広がった。', en: '' } }
+        items:
+          - { id: ex01b-record, points: -8, axis: record, refs: [jpcert-handling] }
+          - { id: ex01b-order, points: -10, axis: order, refs: [ipa-sme-guideline] }
+          - { id: ex01b-care, points: -5, axis: care, refs: [ipa-sme-guideline] }
+      - id: p-ex-01-c
+        text: { ja: 'まず取引先と講師に謝り、会員への連絡は後に回す。', en: '' }
+        explain: { ja: '関係者への配慮に見えるが、被害を受けた会員への連絡が遅れ、不信が広がる。影響の大きい順に連絡する。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -100
+        refs: [ppc-notify-person, ipa-sme-guideline]
+        gauges: { flame: 5, trust: -10 }
+        items:
+          - { id: ex01c-order, points: -8, axis: order, refs: [ppc-notify-person] }
+          - { id: ex01c-care, points: -6, axis: care, refs: [ipa-sme-guideline] }
+          - { id: ex01c-time, points: -5, axis: time, refs: [ppc-notify-person] }
+    lesson: { ja: '誤送信に気づいた直後に大事なのは、謝罪より先に事実と証拠を押さえること。宛先数、送信時刻、配信設定、返信の有無を記録すれば、説明と再発防止の土台になる。担当者を責める時間は、その後に使う。', en: '' }
+
+  - id: p-ex-x1
+    at: { day: 0, minutes: 615 }
+    when: { flags: { factsFixed: false } }
+    phase: detect
+    text: { ja: '報告から15分。送信履歴をまだ保存していない。担当者が「画面を閉じてもいいですか」と聞いてきた。', en: '' }
+    voices: [v-ex-01-legal]
+    choices:
+      - id: p-ex-x1-a
+        text: { ja: '今からでも履歴と設定画面を保存し、時刻を書き留める。', en: '' }
+        explain: { ja: '遅れても、今の状態を残せば説明できる。まず履歴を保存し、分かる範囲で時刻を書く。', en: '' }
+        minutes: 30
+        category: recover
+        points: 120
+        refs: [jpcert-handling, cissp-cbk-secops]
+        gauges: { trust: 5 }
+        setFlags: { factsFixed: true }
+        items:
+          - { id: exx1a-record, points: 6, axis: record, refs: [jpcert-handling] }
+          - { id: exx1a-order, points: 4, axis: order, refs: [cissp-cbk-secops] }
+      - id: p-ex-x1-b
+        text: { ja: '閉じてしまった画面の記憶を、あとで聞き取ってまとめる。', en: '' }
+        explain: { ja: '記憶に頼ると、時刻と設定があいまいになる。画面と履歴が残っていれば確かめられる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [jpcert-handling]
+        gauges: { flame: 5 }
+        items:
+          - { id: exx1b-record, points: -4, axis: record, refs: [jpcert-handling] }
+          - { id: exx1b-content, points: -3, axis: content, refs: [cissp-cbk-secops] }
+    lesson: { ja: '事実の保全が遅れても、取り返せる。今の画面と履歴を保存し、分かる範囲で時刻を書く。閉じた画面は戻らないが、操作履歴や送信記録が残っていることが多い。まず記録を残す。', en: '' }
+
+  - id: p-ex-02
+    at: { day: 0, minutes: 645 }
+    phase: contain
+    sound: { se: [phone_ring] }
+    text: { ja: '午前10時45分。教室から「保護者が電話をかけてきて、うちの子のアドレスも見えたのかと聞かれました」と連絡が入った。広報は「お詫びの文を今日中に出したい」と言う。', en: '' }
+    voices: [v-ex-02-vendor, v-ex-02-field, v-ex-02-ok]
+    popular: { choiceId: p-ex-02-a, percent: 48 }
+    choices:
+      - id: p-ex-02-a
+        text: { ja: '次回の教室だよりに、お詫びと注意書きを載せる。', en: '' }
+        explain: { ja: 'お詫びを出す判断はよいが、月1回の便りでは届くのが遅い。待つ間に不安と問い合わせが増える。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [ppc-notify-person]
+        gauges: { flame: 5, trust: -5 }
+        delayed:
+          - { afterPhases: 1, points: -30, gauges: { flame: 5 }, reason: { ja: '教室だよりを待つ間に、保護者からの問い合わせが窓口に積み上がった。', en: '' } }
+        items:
+          - { id: ex02a-time, points: 3, axis: time, refs: [ppc-notify-person] }
+          - { id: ex02a-wording, points: 2, axis: wording, refs: [ppc-notify-person] }
+          - { id: ex02a-care, points: 1, axis: care, refs: [ipa-sme-guideline] }
+      - id: p-ex-02-b
+        text: { ja: '対象の全員に、個別のお詫びと削除のお願いを送る。', en: '' }
+        explain: { ja: '影響を受けた人に直接届く連絡。誰が何をすればよいかを示せば、不安と二次被害を減らせる。', en: '' }
+        minutes: 45
+        category: increase
+        points: 300
+        refs: [ppc-notify-person, no16-ppc-breach-qa]
+        gauges: { flame: -10, trust: 10, stamina: -10 }
+        setFlags: { notifiedMembers: true }
+        detail: draft-ex-apology
+        items:
+          - { id: ex02b-content, points: 10, axis: content, refs: [ppc-notify-person] }
+          - { id: ex02b-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: ex02b-wording, points: 5, axis: wording, refs: [no16-ppc-breach-qa] }
+      - id: p-ex-02-c
+        text: { ja: '返信をくれた人にだけ、事情を説明して謝る。', en: '' }
+        explain: { ja: '声を上げた人だけに答えると、何も言わない大多数に説明が届かない。不公平だと受け取られる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -120
+        refs: [ppc-notify-person]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: ex02c-care, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: ex02c-time, points: -8, axis: time, refs: [ppc-notify-person] }
+          - { id: ex02c-wording, points: -5, axis: wording, refs: [ipa-sme-guideline] }
+    lesson: { ja: '影響を受けた人には、一人ひとりに届く形で連絡する。対象の範囲、分かっている事実、本人が取るべき行動、問い合わせ先を書く。教室だよりや返信への返答だけで済ませると、何も言わない大多数に届かない。', en: '' }
+
+  - id: p-ex-x2
+    at: { day: 0, minutes: 660 }
+    when: { flags: { notifiedMembers: false } }
+    phase: contain
+    text: { ja: '午前11時。会員への連絡がまだ出ていない。教室からは「保護者が待っている」と電話が来る。', en: '' }
+    voices: [v-ex-02-ok]
+    choices:
+      - id: p-ex-x2-a
+        text: { ja: '教室からの電話に個別に答え、全体への連絡は後にする。', en: '' }
+        explain: { ja: '個別の対応も必要だが、それだけでは大多数に届かない。全員への連絡を先に決める。全体を先に。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ppc-notify-person]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: exx2a-care, points: -4, axis: care, refs: [ppc-notify-person] }
+          - { id: exx2a-time, points: -3, axis: time, refs: [ppc-notify-person] }
+      - id: p-ex-x2-b
+        text: { ja: '今日中に全員へ個別のお詫びと削除のお願いを出す。', en: '' }
+        explain: { ja: '遅れても、全員に直接届ければ不安は減る。事実と本人がすることを短く書く。今日中に出す。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [ppc-notify-person]
+        gauges: { flame: -5, trust: 10, stamina: -5 }
+        setFlags: { notifiedMembers: true }
+        items:
+          - { id: exx2b-content, points: 6, axis: content, refs: [ppc-notify-person] }
+          - { id: exx2b-care, points: 5, axis: care, refs: [ppc-notify-person] }
+    lesson: { ja: '連絡が遅れても、今日中に出せば不安は減る。対象の全員に、事実と本人がすることを短くてもよいので届ける。教室への個別対応だけでは、大多数に届かない。短くても全員に届ける。', en: '' }
+
+  - id: p-ex-03
+    at: { day: 0, minutes: 690 }
+    phase: organize
+    text: { ja: '午前11時30分。顧問弁護士と法務が入った。メールアドレスだけの漏えいを、個人情報保護委員会へ報告する必要があるか。法務は「要件を一つずつ確認しましょう」と言う。', en: '' }
+    voices: [v-ex-03-law, v-ex-03-boss, v-ex-03-legal]
+    notable:
+      - { id: note-report, text: { ja: '法務と確認し、今回は委員会への報告の要件に当たらないと判断した。判断の理由と時刻を記録した。', en: '' } }
+    choices:
+      - id: p-ex-03-a
+        text: { ja: '400件だけなので、委員会への報告は不要と即断する。', en: '' }
+        explain: { ja: '件数だけで決めると、要件を取り違える。判断の理由を残さないと、後から説明できない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -120
+        refs: [ppc-report-scope]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: ex03a-record, points: -10, axis: record, refs: [ppc-report-scope] }
+          - { id: ex03a-content, points: -8, axis: content, refs: [no16-ppc-mail-address] }
+          - { id: ex03a-order, points: -5, axis: order, refs: [ppc-report-scope] }
+      - id: p-ex-03-b
+        text: { ja: '判断を法務に任せ、結論が出るまで社内で待つ。', en: '' }
+        explain: { ja: '専門家に任せるのはよいが、待つ間に本人への通知も止まる。判断の期限を決めておきたい。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [ppc-report-scope, ppc-notify-person]
+        gauges: { flame: 5 }
+        setFlags: { reportFiled: true }
+        coward: true
+        items:
+          - { id: ex03b-record, points: 5, axis: record, refs: [ppc-report-scope] }
+          - { id: ex03b-time, points: 3, axis: time, refs: [ppc-report-prelim] }
+          - { id: ex03b-content, points: 1, axis: content, refs: [ppc-report-final] }
+      - id: p-ex-03-c
+        text: { ja: '法務と要件を確かめ、対象外の判断と理由を記録する。', en: '' }
+        explain: { ja: '要件を確かめて判断し、理由を残している。対象外でも本人通知は必要だと分けて考えている。', en: '' }
+        minutes: 45
+        category: increase
+        points: 300
+        refs: [ppc-report-scope, no16-ppc-mail-address, ppc-notify-person]
+        gauges: { trust: 10 }
+        setFlags: { reportAssessed: true }
+        items:
+          - { id: ex03c-record, points: 10, axis: record, refs: [ppc-report-scope] }
+          - { id: ex03c-content, points: 8, axis: content, refs: [no16-ppc-mail-address] }
+          - { id: ex03c-wording, points: 5, axis: wording, refs: [ppc-notify-person] }
+    lesson: { ja: 'メールアドレスも、会員名簿と結び付けて特定の個人を識別できるなら個人データになる。委員会への報告は要配慮個人情報、不正の目的、1,000人超などが要件で、今回は当たらない。それでも本人への通知と、判断した理由の記録は残す。報告対象なら速報は3日以内、確報は30日以内、不正の目的のおそれがあれば60日以内が期限になる。', en: '' }
+
+  - id: p-ex-04
+    at: { day: 0, minutes: 780 }
+    phase: notify
+    sound: { se: [phone_ring] }
+    text: { ja: '午後1時。地域紙の記者から「会員向けメールの誤送信について、事実関係を教えてほしい」と電話があった。広報は「今日中に発表するか、決めてほしい」と言う。', en: '' }
+    voices: [v-ex-04-sns, v-ex-04-buzz, v-ex-04-pr]
+    choices:
+      - id: p-ex-04-a
+        text: { ja: '事実と対象人数、原因、再発防止、窓口を公表する。', en: '' }
+        explain: { ja: '誤送信の事実と、影響を受けた人が取るべき行動をまとめて出している。隠すより早く信頼を戻せる。', en: '' }
+        minutes: 60
+        category: increase
+        points: 350
+        refs: [meti-disclosure-guidance, ppc-notify-person]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        setFlags: { statementMade: true }
+        items:
+          - { id: ex04a-content, points: 10, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: ex04a-time, points: 8, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: ex04a-wording, points: 5, axis: wording, refs: [ppc-notify-person] }
+      - id: p-ex-04-b
+        text: { ja: '問い合わせがあった場合だけ、個別に説明する。', en: '' }
+        explain: { ja: '個別の説明は必要だが、それだけでは全体像が伝わらない。記者から聞かれてからでは遅い。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 5 }
+        coward: true
+        items:
+          - { id: ex04b-wording, points: 2, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: ex04b-time, points: 1, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: ex04b-care, points: 1, axis: care, refs: [ppc-notify-person] }
+      - id: p-ex-04-c
+        text: { ja: '情報漏えいはないと発表し、社内だけで収める。', en: '' }
+        explain: { ja: '誤送信は起きている。事実と違う発表は、後から分かった時に信頼を大きく壊す。隠すほど被害は大きくなる。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [meti-disclosure-guidance, ppc-report-scope]
+        gauges: { flame: 20, trust: -20 }
+        setFlags: { liedPublic: true, silenced: true }
+        items:
+          - { id: ex04c-content, points: -12, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: ex04c-wording, points: -10, axis: wording, refs: [ppc-report-scope] }
+          - { id: ex04c-care, points: -5, axis: care, refs: [ppc-notify-person] }
+    lesson: { ja: '誤送信は隠しても小さくならない。対象人数、原因、本人が取るべき行動、窓口、次の報告の予定を出す。会員に口外を求めるのも誤りで、自由に話せる状態を保つ。事実と違う発表は、後から分かった時にいちばん大きな失点になる。', en: '' }
+
+  - id: p-ex-x3
+    at: { day: 0, minutes: 795 }
+    when: { flags: { statementMade: false } }
+    phase: notify
+    text: { ja: '午後1時15分。まだ公表していない。記者から2度目の電話が来て、「いつ発表するのか」と聞かれた。', en: '' }
+    voices: [v-ex-04-pr]
+    choices:
+      - id: p-ex-x3-a
+        text: { ja: '事実と対象、窓口をまとめ、今日中に公表する。', en: '' }
+        explain: { ja: '遅れても今日中に出せば、推測が広がる前に事実を伝えられる。短くても要点をそろえる。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: -5, trust: 10 }
+        setFlags: { statementMade: true }
+        items:
+          - { id: exx3a-content, points: 6, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: exx3a-time, points: 5, axis: time, refs: [meti-disclosure-guidance] }
+      - id: p-ex-x3-b
+        text: { ja: '記者への回答を控え、発表の日を来週にする。', en: '' }
+        explain: { ja: '待つ間に、記者も会員も推測で話し始める。今日出せる範囲を出す方が信頼を保てる。今日出す。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: exx3b-time, points: -5, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: exx3b-wording, points: -4, axis: wording, refs: [ppc-notify-person] }
+    lesson: { ja: '公表が遅れても、今日中に出せば取り返せる。事実、対象、本人がすること、窓口を短くまとめる。記者への回答を止めると、推測だけが広がる。短くても今日中に、事実と対象と窓口を出す。', en: '' }
+
+  - id: p-ex-05
+    at: { day: 0, minutes: 870 }
+    phase: recover
+    text: { ja: '午後2時30分。管理部長が再発防止の案を持ってきた。「配信ツールには、宛先を固定する設定と、送信前の承認機能があります。費用は月2万円です」と言う。', en: '' }
+    voices: [v-ex-05-vendor, v-ex-05-past, v-ex-05-it]
+    choices:
+      - id: p-ex-05-a
+        text: { ja: '担当者を替えれば解決するとして、研修だけを行う。', en: '' }
+        explain: { ja: '研修は必要だが、人の注意だけに頼ると同じ誤りが再び起きる。仕組みの変更が抜けている。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: ex05a-wording, points: 3, axis: wording, refs: [ipa-sme-guideline] }
+          - { id: ex05a-record, points: 2, axis: record, refs: [no07-ipa-insider] }
+          - { id: ex05a-care, points: -2, axis: care, refs: [ipa-sme-guideline] }
+      - id: p-ex-05-b
+        text: { ja: '配信ツールで宛先を固定し、送信前の承認を仕組みにする。', en: '' }
+        explain: { ja: '人の注意ではなく設定と承認で防いでいる。費用はかかるが、同じ事故を確実に減らせる。', en: '' }
+        minutes: 60
+        category: increase
+        points: 300
+        refs: [no07-ipa-insider, ipa-sme-guideline, nist-sp800-61r3]
+        gauges: { trust: 15, stamina: -10 }
+        setFlags: { toolFixed: true }
+        items:
+          - { id: ex05b-content, points: 10, axis: content, refs: [no07-ipa-insider] }
+          - { id: ex05b-record, points: 8, axis: record, refs: [nist-sp800-61r3] }
+          - { id: ex05b-order, points: 5, axis: order, refs: [ipa-sme-guideline] }
+      - id: p-ex-05-c
+        text: { ja: '当面は全員の注意だけで乗り切り、様子を見る。', en: '' }
+        explain: { ja: '費用をかけない判断は分かるが、注意は疲れると薄れる。再発を防ぐ仕組みを先に決めたい。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 5, trust: -5 }
+        delayed:
+          - { afterPhases: 2, points: -40, gauges: { flame: 10 }, reason: { ja: '別の教室で、同じ宛先の誤りが起きた。', en: '' } }
+        items:
+          - { id: ex05c-record, points: -10, axis: record, refs: [no07-ipa-insider] }
+          - { id: ex05c-time, points: -8, axis: time, refs: [ipa-sme-guideline] }
+          - { id: ex05c-content, points: -5, axis: content, refs: [ipa-sme-guideline] }
+    lesson: { ja: '再発防止は、人に気をつけるよう言うだけでは足りない。宛先を Bcc に固定する、送信前の承認を必須にする、宛先数の上限を決める。設定と手順で防げば、担当者が忙しい日でも同じ事故は起きにくい。', en: '' }
+
+  - id: p-ex-x4
+    at: { day: 0, minutes: 885 }
+    when: { flags: { toolFixed: false } }
+    phase: recover
+    text: { ja: '午後2時45分。再発防止の設定はまだ決まっていない。教室から「来週の配信はどうするのか」と聞かれている。', en: '' }
+    voices: [v-ex-05-it]
+    choices:
+      - id: p-ex-x4-a
+        text: { ja: '来週の配信は止め、設定は来月まで検討する。', en: '' }
+        explain: { ja: '止める判断は安全だが、止めたままにすると現場が困る。今できる設定から始めたい。設定を進める。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: exx4a-time, points: -4, axis: time, refs: [ipa-sme-guideline] }
+          - { id: exx4a-content, points: -3, axis: content, refs: [no07-ipa-insider] }
+      - id: p-ex-x4-b
+        text: { ja: '宛先の固定だけでも今夜入れ、来週の配信に間に合わせる。', en: '' }
+        explain: { ja: '全部そろうのを待たず、Bcc の固定から始めている。小さくても、効く対策を先に入れる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [no07-ipa-insider, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { toolFixed: true }
+        items:
+          - { id: exx4b-content, points: 6, axis: content, refs: [no07-ipa-insider] }
+          - { id: exx4b-order, points: 4, axis: order, refs: [nist-sp800-61r3] }
+    lesson: { ja: '設定は一度に全部そろえなくてよい。Bcc の固定だけでも先に入れ、次の配信に間に合わせる。止める判断も必要だが、止めたままにすると現場が困る。今できる設定から始める。', en: '' }
+
+  - id: p-ex-06
+    at: { day: 0, minutes: 960 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: '午後4時。お詫びのメールを出した直後から、削除のお願いへの返信が続いている。中には「知らない人からメールが来た」という相談もある。', en: '' }
+    voices: [v-ex-06-expert, v-ex-06-popular, v-ex-06-member]
+    notable:
+      - { id: note-check, text: { ja: '受信者からの返信と不審メールの相談を集計している。現時点で悪用の申し出はない。', en: '' } }
+    choices:
+      - id: p-ex-06-a
+        text: { ja: '返信はまとめて一斉に返し、個別の確認はしない。', en: '' }
+        explain: { ja: '早く返せるが、削除できたかどうかを一人ずつ確かめていない。二次被害の兆候も見落とす。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [ppc-notify-person]
+        gauges: { flame: 5 }
+        items:
+          - { id: ex06a-time, points: 2, axis: time, refs: [ppc-notify-person] }
+          - { id: ex06a-wording, points: 1, axis: wording, refs: [ppc-notify-person] }
+          - { id: ex06a-care, points: 1, axis: care, refs: [ipa-sme-guideline] }
+      - id: p-ex-06-b
+        text: { ja: '削除依頼の返信に全員宛てで返し、削除を確認する。', en: '' }
+        explain: { ja: '全員宛ての返信は、同じ誤送信を繰り返すことになる。アドレスが再び全員に見える。個別に返す。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [ppc-notify-person, no16-ppc-breach-qa]
+        gauges: { flame: 25, trust: -20 }
+        items:
+          - { id: ex06b-care, points: -12, axis: care, refs: [ppc-notify-person] }
+          - { id: ex06b-content, points: -10, axis: content, refs: [no16-ppc-breach-qa] }
+          - { id: ex06b-order, points: -5, axis: order, refs: [ipa-sme-guideline] }
+      - id: p-ex-06-c
+        text: { ja: '一人ずつ削除を確かめ、不審メールの相談先を案内する。', en: '' }
+        explain: { ja: '削除の確認と相談先の案内を両方行っている。二次被害を早く見つけ、本人を孤立させない。', en: '' }
+        minutes: 90
+        category: increase
+        points: 300
+        refs: [ppc-notify-person, cissp-cbk-secops]
+        gauges: { flame: -5, trust: 10, stamina: -15 }
+        setFlags: { checkedReplies: true }
+        items:
+          - { id: ex06c-care, points: 10, axis: care, refs: [ppc-notify-person] }
+          - { id: ex06c-content, points: 8, axis: content, refs: [cissp-cbk-secops] }
+          - { id: ex06c-record, points: 5, axis: record, refs: [cissp-cbk-secops] }
+    lesson: { ja: '削除のお願いをした後は、返信を一つずつ確認する。全員宛ての返信は、同じ誤りを繰り返すことになる。不審なメールが来たという相談には、窓口と連絡先を添えて早く答える。二次被害は、本人からの小さな声から見つかることが多い。', en: '' }
+
+  - id: p-ex-x5
+    at: { day: 0, minutes: 975 }
+    when: { flags: { checkedReplies: false } }
+    phase: recover
+    text: { ja: '午後4時15分。削除のお願いへの返信を、まだ集計していない。受信箱には未読が残っている。', en: '' }
+    voices: [v-ex-06-member]
+    choices:
+      - id: p-ex-x5-a
+        text: { ja: '未読を開き、削除の確認と不審メールの相談を拾う。', en: '' }
+        explain: { ja: '返信には、削除の確認と不審メールの相談が含まれる。拾うことで二次被害を早く見つけられる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [ppc-notify-person, cissp-cbk-secops]
+        gauges: { flame: -5, trust: 10, stamina: -5 }
+        setFlags: { checkedReplies: true }
+        items:
+          - { id: exx5a-care, points: 6, axis: care, refs: [ppc-notify-person] }
+          - { id: exx5a-record, points: 4, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-ex-x5-b
+        text: { ja: '返信は窓口に転送し、自分では読まない。', en: '' }
+        explain: { ja: '転送だけでは、緊急の相談が埋もれる。気になる内容は自分でも目を通したい。自分でも読む。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ppc-notify-person]
+        gauges: { flame: 5 }
+        items:
+          - { id: exx5b-care, points: -4, axis: care, refs: [ppc-notify-person] }
+          - { id: exx5b-record, points: -3, axis: record, refs: [cissp-cbk-secops] }
+    lesson: { ja: '返信には、削除できたかの確認と、不審メールの相談が含まれる。まとめて窓口に流すだけでは、緊急の相談が埋もれる。未読を開き、気になるものはすぐ共有する。未読を開いて相談を拾う。', en: '' }
+
+  - id: p-ex-07
+    at: { day: 0, minutes: 1050 }
+    phase: after
+    text: { ja: '午後5時30分。こもれび台教室の責任者から電話が来た。「保護者に何と説明すればいいですか。教室によって言うことが違うと困ります」と言う。', en: '' }
+    voices: [v-ex-07-instructor, v-ex-07-field, v-ex-07-sns]
+    choices:
+      - id: p-ex-07-a
+        text: { ja: '教室責任者と講師に事実を共有し、保護者向けの文を渡す。', en: '' }
+        explain: { ja: '現場が最初に保護者と話す。事実と統一した文、本部の窓口を先に渡せば、説明が食い違わない。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [jpcert-handling, ipa-sme-guideline]
+        gauges: { flame: -5, trust: 10, stamina: -5 }
+        setFlags: { sharedWithField: true }
+        items:
+          - { id: ex07a-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: ex07a-order, points: 5, axis: order, refs: [jpcert-handling] }
+          - { id: ex07a-content, points: 3, axis: content, refs: [ipa-sme-guideline] }
+      - id: p-ex-07-b
+        text: { ja: '本部だけで対応し、質問が来たら現場に説明させる。', en: '' }
+        explain: { ja: '現場に丸投げすると、教室ごとに説明がばらつく。本部が事実と文をそろえる必要がある。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 5 }
+        coward: true
+        items:
+          - { id: ex07b-time, points: 2, axis: time, refs: [ipa-sme-guideline] }
+          - { id: ex07b-wording, points: 1, axis: wording, refs: [ipa-sme-guideline] }
+          - { id: ex07b-care, points: -2, axis: care, refs: [jpcert-handling] }
+      - id: p-ex-07-c
+        text: { ja: '現場からの電話は本部で止め、保護者につながない。', en: '' }
+        explain: { ja: '問い合わせを止めると、保護者は行き場を失う。説明しないことが不信を大きくする。窓口を開けておく。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -120
+        refs: [ppc-notify-person]
+        gauges: { flame: 15, trust: -10 }
+        items:
+          - { id: ex07c-care, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: ex07c-time, points: -8, axis: time, refs: [ipa-sme-guideline] }
+          - { id: ex07c-wording, points: -5, axis: wording, refs: [ipa-sme-guideline] }
+    lesson: { ja: '現場は保護者から最初に声をかけられる。事実と統一した説明、本部の窓口を先に渡す。隠したり本部で電話を止めたりすると、現場が孤立し、教室ごとに説明が食い違う。現場を味方にすると、説明の速さが変わる。', en: '' }
+
+  - id: p-ex-x6
+    at: { day: 0, minutes: 1065 }
+    when: { flags: { sharedWithField: false } }
+    phase: after
+    text: { ja: '午後5時45分。教室には事実を伝えていない。保護者から「教室に聞いても分からない」という声が出ている。', en: '' }
+    voices: [v-ex-07-instructor]
+    choices:
+      - id: p-ex-x6-a
+        text: { ja: '教室には引き続き本部任せとし、保護者には本部だけで答える。', en: '' }
+        explain: { ja: '本部が答える方針はよいが、現場に事実がないと、保護者の最初の質問に答えられない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: exx6a-care, points: -4, axis: care, refs: [ipa-sme-guideline] }
+          - { id: exx6a-order, points: -3, axis: order, refs: [jpcert-handling] }
+      - id: p-ex-x6-b
+        text: { ja: '教室に事実と文を渡し、本部の窓口を案内してもらう。', en: '' }
+        explain: { ja: '事実と統一文を渡せば、教室は保護者に同じ説明ができる。本部は後ろで支える。現場を支える。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [ipa-sme-guideline, jpcert-handling]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { sharedWithField: true }
+        items:
+          - { id: exx6b-care, points: 6, axis: care, refs: [ipa-sme-guideline] }
+          - { id: exx6b-order, points: 4, axis: order, refs: [jpcert-handling] }
+    lesson: { ja: '現場に事実を渡すのが遅れても、今日中に渡せば説明はそろう。教室は保護者と最初に話す。統一文と窓口を渡し、本部が後ろで支える。事実と統一文を渡し、本部が後ろで支える。', en: '' }
+
+  - id: p-ex-08
+    at: { day: 0, minutes: 1140 }
+    phase: after
+    text: { ja: '午後7時。今日の対応を振り返る時間になった。広報は「お詫びの文はよく書けています。このまま終わりにしましょう」と言う。管理部長は「1か月後に、対策の実施状況を出したい」と言う。', en: '' }
+    voices: [v-ex-08-flatter, v-ex-08-coward, v-ex-08-legal]
+    choices:
+      - id: p-ex-08-a
+        text: { ja: '社内で報告書を作り、役員会と本部だけに共有する。', en: '' }
+        explain: { ja: '記録を残す点はよい。ただし外に出さないと、実施したかどうかを誰も確かめられない。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 30
+        refs: [cissp-cbk-secops, nist-sp800-61r3]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: ex08a-record, points: 4, axis: record, refs: [cissp-cbk-secops] }
+          - { id: ex08a-content, points: 3, axis: content, refs: [nist-sp800-61r3] }
+          - { id: ex08a-time, points: 2, axis: time, refs: [cissp-cbk-secops] }
+      - id: p-ex-08-b
+        text: { ja: '再発防止の実施状況を1か月後に公表し、外部の確認を入れる。', en: '' }
+        explain: { ja: 'やったと報告するだけでなく、外から確かめられる形にしている。同じ事故を防ぐ強い約束になる。', en: '' }
+        minutes: 90
+        category: increase
+        points: 300
+        refs: [meti-csm-guideline, cissp-cbk-secops]
+        gauges: { trust: 15, stamina: -10 }
+        setFlags: { followupPublic: true }
+        items:
+          - { id: ex08b-content, points: 10, axis: content, refs: [meti-csm-guideline] }
+          - { id: ex08b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: ex08b-care, points: 5, axis: care, refs: [nist-sp800-61r3] }
+      - id: p-ex-08-c
+        text: { ja: '担当者への注意で終え、報告書も記録も残さない。', en: '' }
+        explain: { ja: '記録がなければ、何を直したのかを説明できない。同じ誤りを防ぐ材料も残らない。記録が次の改善を支える。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [cissp-cbk-secops, no07-ipa-insider]
+        gauges: { flame: 10, trust: -15 }
+        items:
+          - { id: ex08c-record, points: -12, axis: record, refs: [cissp-cbk-secops] }
+          - { id: ex08c-content, points: -10, axis: content, refs: [no07-ipa-insider] }
+          - { id: ex08c-care, points: -5, axis: care, refs: [ipa-sme-guideline] }
+    lesson: { ja: '再発防止は、やったと報告するだけでは足りない。誰が、いつ、何を確認するかを決め、実施状況を外に出す。外部の目が入ると、同じ事故が起きにくくなる。担当者への注意で終えると、記録も教訓も残らない。', en: '' }
+
+  - id: p-ex-x7
+    at: { day: 0, minutes: 1155 }
+    when: { flags: { followupPublic: false } }
+    phase: after
+    text: { ja: '午後7時15分。今日の振り返りはまだできていない。明日から通常の業務に戻る予定になっている。', en: '' }
+    voices: [v-ex-08-legal]
+    choices:
+      - id: p-ex-x7-a
+        text: { ja: '今日のうちに、決めたことと残った課題を記録に残す。', en: '' }
+        explain: { ja: '記憶が新しいうちに、決めたことと残った課題を残している。次の確認にもつながる。記録に残す。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [cissp-cbk-secops]
+        gauges: { trust: 10 }
+        setFlags: { followupPublic: true }
+        items:
+          - { id: exx7a-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: exx7a-content, points: 4, axis: content, refs: [nist-sp800-61r3] }
+      - id: p-ex-x7-b
+        text: { ja: '通常業務に戻し、振り返りは月末にまとめて行う。', en: '' }
+        explain: { ja: '月末まで待つと、なぜその判断をしたかを思い出せない。記録は早いほど正確になる。今書く。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [cissp-cbk-secops]
+        gauges: { trust: -5 }
+        items:
+          - { id: exx7b-record, points: -4, axis: record, refs: [cissp-cbk-secops] }
+          - { id: exx7b-content, points: -3, axis: content, refs: [nist-sp800-61r3] }
+    lesson: { ja: '振り返りは記憶が新しいうちに。決めたこと、できなかったこと、次の確認の日を短く残す。月末まで待つと、なぜその判断をしたかを思い出せなくなる。決めたことと残った課題を書く。', en: '' }
+
+
+drafts:
+  draft-ex-apology:
+    title: { ja: '会員のみなさまへのお詫び', en: '' }
+    slots:
+      - id: timing
+        label: { ja: '送る時刻', en: '' }
+        auto: true
+        items:
+          - { id: ex-t-24h, when: { withinHours: 24 }, points: 10, axis: time, refs: [ppc-notify-person] }
+          - { id: ex-t-72h, when: { withinHours: 72 }, points: 3, axis: time, refs: [ppc-notify-person] }
+          - { id: ex-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [ppc-notify-person] }
+      - id: subject
+        label: { ja: '件名', en: '' }
+        options:
+          - { id: ex-s-notice, text: { ja: '教室だより11月号のお知らせ', en: '' }, points: -10, axis: wording, refs: [ppc-notify-person], explain: { ja: '通常のお知らせに見えると、開かれずに捨てられる。謝罪と用件が件名から分からない。', en: '' } }
+          - { id: ex-s-apology, text: { ja: 'お詫びと誤送信のお知らせ', en: '' }, points: 8, axis: wording, refs: [ppc-notify-person], explain: { ja: '件名だけで謝罪と用件が分かる。開いてもらいやすく、本文を読む前に内容が伝わる。不安を減らす。', en: '' } }
+          - { id: ex-s-urgent, text: { ja: '至急、内容をご確認ください', en: '' }, points: -4, axis: wording, refs: [ppc-notify-person], explain: { ja: '急ぎであることは伝わるが、何の用件か分からない。不安だけをあおる件名になる。用件を書く。', en: '' } }
+      - id: scope
+        label: { ja: '対象の範囲', en: '' }
+        options:
+          - { id: ex-sc-current, text: { ja: '現在の会員だけを対象にする', en: '' }, points: -12, axis: content, refs: [ppc-notify-person], delayed: { afterPhases: 1, points: -20, reason: { ja: '退会者からの問い合わせで、対象から漏れていたことが分かった。', en: '' } }, explain: { ja: '退会者や体験申込者のアドレスも入っていた。現会員だけに絞ると、影響を受けた人に届かない。', en: '' } }
+          - { id: ex-sc-unknown, text: { ja: '対象範囲は現在調査中と書く', en: '' }, points: -6, axis: content, refs: [ppc-notify-person], explain: { ja: '調査中と書くだけでは、自分が対象かどうかを読む人が判断できない。範囲は分かっている限り書く。', en: '' } }
+          - { id: ex-sc-all, text: { ja: '全会員と体験申込者・退会者を含む', en: '' }, points: 10, axis: content, refs: [ppc-notify-person], explain: { ja: '実際にアドレスが入っていた範囲をすべて含めている。対象の漏れによる二次的な不信を防げる。', en: '' } }
+      - id: cause
+        label: { ja: '原因の書き方', en: '' }
+        options:
+          - { id: ex-ca-config, text: { ja: '配信ツールの宛先設定の誤り', en: '' }, points: 6, axis: content, refs: [no16-ppc-breach-qa], explain: { ja: '何が起きたかを具体的に書いている。責任の所在をぼかさず、再発防止の説明にもつながる。', en: '' } }
+          - { id: ex-ca-person, text: { ja: '担当者の確認不足による誤り', en: '' }, points: -8, axis: wording, refs: [ipa-sme-guideline], explain: { ja: '個人の責任に寄せると、確認の手順がなかった事実が見えなくなる。再発防止の話にならない。', en: '' } }
+          - { id: ex-ca-vendor, text: { ja: 'ツールの不具合による誤り', en: '' }, points: -12, axis: content, refs: [no16-ppc-breach-qa], explain: { ja: '事実と違う原因を書くと、後で訂正が必要になる。まず調べた事実を書くべき場面。事実を書く。', en: '' } }
+      - id: action
+        label: { ja: '本人がすること', en: '' }
+        options:
+          - { id: ex-ac-delete, text: { ja: '受信したメールを削除する', en: '' }, points: 3, axis: care, refs: [ppc-notify-person], explain: { ja: '削除は一つの対策だが、それだけでは不審なメールへの備えが伝わらない。不審メールへの備えも伝える。', en: '' } }
+          - { id: ex-ac-watch, text: { ja: '不審なメールに注意し返信しない', en: '' }, points: 10, axis: care, refs: [ppc-notify-person], explain: { ja: 'アドレスが漏れた後に起きるのは、なりすましや迷惑メール。具体的な行動を示せている。', en: '' } }
+          - { id: ex-ac-nothing, text: { ja: '特に対応は不要と記載する', en: '' }, points: -10, axis: care, refs: [ppc-notify-person], explain: { ja: '何もしなくてよいと受け取られ、不審メールの相談が遅れる。本人が取る行動を書くべき。', en: '' } }
+      - id: apology
+        label: { ja: '謝罪の主語', en: '' }
+        options:
+          - { id: ex-ap-company, text: { ja: '当社の確認不足として謝る', en: '' }, points: 5, axis: wording, refs: [meti-disclosure-guidance], explain: { ja: '組織としての責任を示す書き方。担当者一人に責任を寄せない点が信頼につながる。組織の責任を示す。', en: '' } }
+          - { id: ex-ap-staff, text: { ja: '担当者の確認不足として謝る', en: '' }, points: -8, axis: wording, refs: [ipa-sme-guideline], explain: { ja: '個人に責任を寄せると、会社が何を直すのかが見えない。再発防止の説明と食い違う。会社の責任を書く。', en: '' } }
+          - { id: ex-ap-system, text: { ja: 'システム設定の誤りとして謝る', en: '' }, points: -4, axis: wording, refs: [no16-ppc-breach-qa], explain: { ja: '仕組みの話だけにすると、確認しなかった事実が抜ける。原因と謝罪の対象がずれる。確認の手順を示す。', en: '' } }
+      - id: contact
+        label: { ja: '問い合わせ先', en: '' }
+        options:
+          - { id: ex-co-staff, text: { ja: '担当者個人のメールアドレス', en: '' }, points: -12, axis: care, refs: [ppc-notify-person], explain: { ja: '個人のアドレスに問い合わせが集中すると、対応が止まる。担当者も特定されてしまう。', en: '' } }
+          - { id: ex-co-window, text: { ja: '専用窓口の電話とメールと受付時間', en: '' }, points: 8, axis: care, refs: [ppc-notify-person], explain: { ja: '窓口と受付時間が分かれば、本人は迷わず連絡できる。対応の記録も一か所に集まる。記録も集まる。', en: '' } }
+          - { id: ex-co-form, text: { ja: '教室の受付で口頭により説明', en: '' }, points: -5, axis: order, refs: [ipa-sme-guideline], explain: { ja: '教室の受付は数が限られ、記録も残りにくい。電話とメールの窓口を用意したい。電話とメールがよい。', en: '' } }
+      - id: followup
+        label: { ja: '次の報告', en: '' }
+        options:
+          - { id: ex-fu-month, text: { ja: '1か月後に再発防止の実施状況', en: '' }, points: 5, axis: record, refs: [meti-csm-guideline], explain: { ja: '次の報告の予定を示すと、対策が実行されたかを外から確かめられる。約束として残る。', en: '' } }
+          - { id: ex-fu-none, text: { ja: '次の報告は特に記載しない', en: '' }, points: -6, axis: record, refs: [cissp-cbk-secops], explain: { ja: '次の報告がないと、対策が終わったのか続いているのか分からない。不安が残る。予定を書く。', en: '' } }
+          - { id: ex-fu-soon, text: { ja: '来週までに実施状況を報告', en: '' }, points: 2, axis: time, refs: [meti-csm-guideline], explain: { ja: '早い報告はよいが、対策の実施には時間がかかる。実現できない期限は信頼を損なう。無理のない期限にする。', en: '' } }
+voices:
+  - { id: v-ex-01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '大事にしたくない。まず社内で片づけろ。会員には黙っていろ。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-01-sns, media: sns, misleading: true, type: public-opinion, text: { ja: '400件で謝罪会見？大げさすぎる。現場は忙しいんだぞ。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-01-legal, media: chat, misleading: false, text: { ja: '顧問弁護士「まず事実と宛先数、送信履歴の保全です」。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-02-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '配信ツール会社「弊社の製品に不具合はありません。運用の問題です」。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-02-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '教室責任者「保護者には言わないでおきます。今は発表しない方が」。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-02-ok, media: chat, misleading: false, text: { ja: '運営本部長「教室から保護者の電話が来ています。待たせられません」。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-03-law, media: sns, misleading: true, type: law-ish, text: { ja: '1,000人超じゃないと報告義務はない。400件なら何もしなくていい。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-03-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '委員会に出すとニュースになる。今回はやめておけ。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-03-legal, media: chat, misleading: false, text: { ja: '顧問弁護士「メールアドレスも個人データです。要件を分けて確認しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-04-sns, media: sns, misleading: true, type: public-opinion, text: { ja: '400件の誤送信で会見？時間の無駄だ。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-04-buzz, media: sns, misleading: true, type: bold-buzz, text: { ja: '「悪用は一切ありません」と言い切れば、それで終わる。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-04-pr, media: chat, misleading: false, text: { ja: '広報「対象人数、原因、窓口を出しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-05-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '送信前の確認機能は有料オプションです。必要性は低いと思います。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-05-past, media: boss, misleading: true, type: past-success, text: { ja: '前回の炎上も、黙っていたら収まっただろう。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-05-it, media: chat, misleading: false, text: { ja: '管理部長「人の注意ではなく、設定で防げます」。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-06-expert, media: sns, misleading: true, type: fake-expert, text: { ja: 'メールアドレスは個人情報じゃない。SNSで誰でも見られる情報だ。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-06-popular, media: board, misleading: true, type: popular, text: { ja: '他の教室チェーンも To で送ってる。うちだけ騒ぎすぎ。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-06-member, media: chat, misleading: false, text: { ja: '会員担当「削除の返信が続いています。一人ずつ確認します」。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-07-instructor, media: chat, misleading: false, text: { ja: '教室責任者「保護者に何と説明すればいいですか」。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-07-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場でうまく言っておきます。本部は来ないでください。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-07-sns, media: sns, misleading: true, type: coward-critique, text: { ja: '現場に任せるのは臆病。本部が全部説明しろ。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-08-flatter, media: chat, misleading: true, type: flattery, text: { ja: '社長の謝罪文は名文です。このまま出しましょう。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-08-coward, media: news, misleading: true, type: coward-critique, text: { ja: '外部の確認を入れるのは臆病。自分たちで終わらせろ。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-08-legal, media: chat, misleading: false, text: { ja: '顧問弁護士「実施状況を1か月後に出す。それで十分です」。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-after-01, media: sns, misleading: true, type: public-opinion, text: { ja: '社長が事実確認から入るって。400件で大げさだ。', en: '' }, trigger: { at: after, choice: p-ex-01-a } }
+  - { id: v-ex-flag-silence, media: sns, misleading: false, text: { ja: '口止めしたって本当か。', en: '' }, trigger: { flags: { silenced: true } } }
+  - { id: v-ex-coward-2, media: sns, misleading: false, text: { ja: 'いつまで調査中なんだ。社長は何をしている。', en: '' }, trigger: { at: manual } }
+  - { id: v-ex-coward-3, media: news, misleading: false, text: { ja: '責任を取らないつもりか。事なかれ主義の会社だ。', en: '' }, trigger: { at: manual } }
+  - { id: v-ex-coward-4, media: news, misleading: false, text: { ja: '臆病な経営が被害を広げた。取引先が独自に調べ始めた。', en: '' }, trigger: { at: manual } }
+  - { id: v-ex-ev-replies, media: chat, misleading: false, text: { ja: '受信者「私のアドレスも見えています。どうしてくれるんですか」。', en: '' }, trigger: { at: point } }
+  - { id: v-ex-ev-press, media: news, misleading: false, text: { ja: '地域紙「誤送信の事実と、再発防止を聞かせてください」。', en: '' }, trigger: { at: point } }
