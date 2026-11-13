@@ -62,6 +62,10 @@ sc:
   review:
     title: "Review"
     summaryHeading: "Result"
+    mode:
+      normal: "Standard mode"
+      hard: "Full-on mode"
+    modeNote: "Full-on mode: every decision had a time limit, and a decision that ran out was treated as deferred."
     resultLine: "Raw {raw} / Official {official} / Rank {rank}"
     entriesHeading: "Every decision"
     noEntries: "No decisions were recorded."

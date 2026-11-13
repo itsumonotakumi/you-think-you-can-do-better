@@ -64,7 +64,7 @@
       raw: value.raw,
       playCount: value.playCount,
       at: new Date().toISOString(),
-    });
+    }, state.mode === 'hard' ? 'hard' : 'normal');
     saveProgress(null);
 
     audio.playBgm(current.endings[value.rank].bgm);

@@ -167,6 +167,9 @@
     <h1>{t('sc.review.title')}</h1>
     {#if report}
       <p class="play-count">{t('sc.playCount', { n: report.playCount })}</p>
+      <p class="mode-badge" data-mode={$play.mode === 'hard' ? 'hard' : 'normal'}>
+        {t($play.mode === 'hard' ? 'sc.review.mode.hard' : 'sc.review.mode.normal')}
+      </p>
     {/if}
     {#if debug}
       <p class="debug-badge">{t('common.debugMode')}</p>
@@ -183,6 +186,9 @@
           rank: report.result.rank,
         })}
       </p>
+      {#if $play.mode === 'hard'}
+        <p class="hint">{t('sc.review.modeNote')}</p>
+      {/if}
     </section>
 
     <section class="panel" aria-labelledby="review-entries-heading">
@@ -482,6 +488,19 @@
   .play-count {
     margin: 0;
     color: var(--muted);
+  }
+  .mode-badge {
+    margin: 0;
+    padding: 0.1rem 0.55rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    color: var(--text-soft);
+    font-size: 0.78em;
+  }
+  .mode-badge[data-mode='hard'] {
+    border-color: var(--warn);
+    color: var(--warn);
+    font-weight: 700;
   }
   .panel {
     margin: 0;

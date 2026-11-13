@@ -73,6 +73,11 @@ sa.roles.info.analyst: Monitoring, detection, technical investigation. Following
 sa.roles.choose: Start with this role
 sa.roles.loadError: Could not load the scenario.
 sa.roles.startError: Could not start the play. Please try again.
+sa.roles.mode.legend: Difficulty
+sa.roles.mode.normal: Standard (no time limit)
+sa.roles.mode.hard: Full-on (60 seconds per decision)
+sa.roles.mode.hint: In full-on mode each decision has a time limit. When time runs out, the decision is deferred and the most cautious choice is taken. You can extend the limit by 1.5x or 2x in Settings.
+sa.roles.mode.hardNotice: In full-on mode the decision notes are unavailable. Explanations are shown together on the review screen.
 
 # --- S10 Settings ---
 sa.settings.title: Settings
@@ -90,7 +95,7 @@ sa.settings.se: Sound effect volume
 sa.settings.muted: Mute
 sa.settings.reduceMotion: Reduce motion
 sa.settings.reduceMotionHint: Stops shaking, flashes, fast-forward, and typing effects. Only color and weight changes remain.
-sa.settings.pressTime: Press conference time limit
+sa.settings.pressTime: Time limit (press conference and full-on mode)
 sa.settings.pressTime1: Normal
 sa.settings.pressTime15: 1.5x
 sa.settings.pressTime2: 2x

@@ -36,7 +36,7 @@ common.bgmVolume: BGM音量
 common.seVolume: 効果音音量
 common.mute: ミュート
 common.reduceMotion: 演出を減らす
-common.pressTimeScale: 記者会見の時間延長
+common.pressTimeScale: 制限時間の延長
 common.clearData: 保存データの消去
 common.clearConfirm: プレイ回数と初回記録も消えます。消去しますか？
 common.audioLoadFailed: 音を読み込めませんでした

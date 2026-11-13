@@ -56,6 +56,12 @@ sb:
     noPoint: "Nothing is happening right now."
     noChoices: "No actions available."
     draftPending: "Draft the statement."
+    timer:
+      heading: "Time left"
+      remaining: "{seconds}s left"
+      scale: "The time limit is extended {scale}x in Settings."
+      hint: "When time runs out, the decision is deferred and the most cautious choice is taken."
+      timeoutResult: "Time is up: the decision was deferred ({choice})"
     abort:
       button: "Stop and return to title"
       heading: "Return to the title?"

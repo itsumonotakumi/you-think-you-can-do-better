@@ -1,7 +1,7 @@
 // 保存（localStorage）。担当: storage。設計書 8章, 13章。
 // localStorage が無い・例外のときは memoryOnly=true にしてメモリ上で動く。
 import type {
-  DeadlineState, DelayedEffect, Flags, Gauges, GameTime, Localized, PlayRecord, PlayState,
+  DeadlineState, DelayedEffect, Flags, Gauges, GameTime, Localized, PlayMode, PlayRecord, PlayState,
   PlaysStore, PlayerNote, PressState, Rank, Settings, VoiceShown,
 } from '../engine/types';
 import { LANGS, PHASES, ROLES, STORAGE_KEYS } from '../engine/types';
@@ -188,20 +188,25 @@ function savePlays(plays: PlaysStore): void {
   writeRaw(STORAGE_KEYS.plays, JSON.stringify(plays));
 }
 
-function playKey(scenarioId: string, role: string): string {
-  return `${scenarioId}/${role}`;
+/**
+ * プレイ回数のキー。通常モードは従来どおり `${scenarioId}/${role}`、
+ * 本番モードだけ `/hard` を足して別に数える（#10。既存の保存はそのまま読める）。
+ */
+function playKey(scenarioId: string, role: string, mode: PlayMode = 'normal'): string {
+  const base = `${scenarioId}/${role}`;
+  return mode === 'hard' ? `${base}/hard` : base;
 }
 
 /** 次に始めるプレイの回数（1始まり） */
-export function nextPlayCount(scenarioId: string, role: string): number {
-  const rec = loadPlays()[playKey(scenarioId, role)];
+export function nextPlayCount(scenarioId: string, role: string, mode: PlayMode = 'normal'): number {
+  const rec = loadPlays()[playKey(scenarioId, role, mode)];
   return rec ? rec.count + 1 : 1;
 }
 
 /** プレイ開始時に呼ぶ（回数を確定） */
-export function registerPlayStart(scenarioId: string, role: string): number {
+export function registerPlayStart(scenarioId: string, role: string, mode: PlayMode = 'normal'): number {
   const plays = loadPlays();
-  const key = playKey(scenarioId, role);
+  const key = playKey(scenarioId, role, mode);
   const rec: PlayRecord = plays[key] ?? { count: 0, first: null, best: null };
   rec.count += 1;
   plays[key] = rec;
@@ -214,9 +219,10 @@ export function recordResult(
   scenarioId: string,
   role: string,
   r: { rank: Rank; score: number; raw: number; playCount: number; at: string },
+  mode: PlayMode = 'normal',
 ): void {
   const plays = loadPlays();
-  const key = playKey(scenarioId, role);
+  const key = playKey(scenarioId, role, mode);
   const rec: PlayRecord = plays[key] ?? { count: 0, first: null, best: null };
   if (r.playCount > rec.count) rec.count = r.playCount;
   if (rec.first === null) {
@@ -363,6 +369,8 @@ function isPlayState(v: unknown): v is PlayState {
   if (typeof v.startedAt !== 'string') return false;
   if (!isPendingDraft(v.pendingDraft)) return false;
   if (typeof v.finished !== 'boolean') return false;
+  // 難易度は後から足した項目なので、無い保存（通常モード）も受け付ける
+  if (v.mode !== undefined && v.mode !== 'normal' && v.mode !== 'hard') return false;
   return true;
 }
 
