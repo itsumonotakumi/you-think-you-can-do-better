@@ -17,8 +17,10 @@ export interface RankingStore {
 
 export const NICKNAME_MAX = 16;
 
-const memory = new Map<string, string>();
 const EMPTY: RankingProfile = { nickname: '', consent: false, clientId: '' };
+/** 保存できなかった値。保存先ごとに持つ（次の読み込みで古い localStorage より優先する） */
+const fallback = new WeakMap<RankingStore, Map<string, string>>();
+const fallbackWithoutStore = new Map<string, string>();
 
 function defaultStore(): RankingStore | null {
   try {
@@ -30,7 +32,25 @@ function defaultStore(): RankingStore | null {
   return null;
 }
 
+function fallbackRaw(store: RankingStore | null): string | undefined {
+  if (!store) return fallbackWithoutStore.get(STORAGE_KEYS.ranking);
+  return fallback.get(store)?.get(STORAGE_KEYS.ranking);
+}
+
+function setFallback(store: RankingStore | null, value: string): void {
+  if (!store) {
+    fallbackWithoutStore.set(STORAGE_KEYS.ranking, value);
+    return;
+  }
+  const bucket = fallback.get(store) ?? new Map<string, string>();
+  bucket.set(STORAGE_KEYS.ranking, value);
+  fallback.set(store, bucket);
+}
+
 function readRaw(store: RankingStore | null): string | null {
+  // 保存に失敗した後は、メモリ上の値が最新。古い localStorage の値を返さない
+  const saved = fallbackRaw(store);
+  if (saved !== undefined) return saved;
   if (store) {
     try {
       return store.getItem(STORAGE_KEYS.ranking);
@@ -38,19 +58,20 @@ function readRaw(store: RankingStore | null): string | null {
       return null;
     }
   }
-  return memory.get(STORAGE_KEYS.ranking) ?? null;
+  return null;
 }
 
 function writeRaw(store: RankingStore | null, value: string): void {
   if (store) {
     try {
       store.setItem(STORAGE_KEYS.ranking, value);
+      fallback.get(store)?.delete(STORAGE_KEYS.ranking);
       return;
     } catch {
       // 保存できなくてもメモリへ退避する
     }
   }
-  memory.set(STORAGE_KEYS.ranking, value);
+  setFallback(store, value);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

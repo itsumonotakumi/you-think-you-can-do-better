@@ -6,7 +6,7 @@ import { parse } from 'yaml';
 import jaSource from '../../../locales/ja/ui/headline.yaml?raw';
 import enSource from '../../../locales/en/ui/headline.yaml?raw';
 import { computeResult } from '../../engine/scoring';
-import type { Lang, Localized, PlayState, Rank, Scenario } from '../../engine/types';
+import type { Choice, Lang, Localized, PlayState, Rank, Scenario } from '../../engine/types';
 
 export type HeadlineSituation =
   | 'pressFail'
@@ -129,6 +129,15 @@ function pressOutcome(state: PlayState): PressOutcome {
   return total < 0 ? 'mild' : 'ok';
 }
 
+/**
+ * 通知フェーズの選択が、実際に通知・公表したものか。
+ * 「全容が分かってから発表する」のような先送り・否定・保身は公表に数えない。
+ */
+export function isNotificationChoice(choice: Choice): boolean {
+  if (choice.coward) return false;
+  return choice.category === 'increase' || choice.category === 'recover' || choice.category === 'maintain';
+}
+
 /** 最初の「通知・公表」の判断を終えた時刻までの時間（時間単位）。無ければ null */
 function publicationHours(state: PlayState, scenario: Scenario): number | null {
   const role = scenario.roles[state.role];
@@ -137,7 +146,7 @@ function publicationHours(state: PlayState, scenario: Scenario): number | null {
     const point = role.points.find((item) => item.id === record.pointId);
     if (!point || point.phase !== 'notify') continue;
     const choice = point.choices.find((item) => item.id === record.choiceId);
-    if (!choice) continue;
+    if (!choice || !isNotificationChoice(choice)) continue;
     const minutes = (record.at.day - scenario.start.day) * 1440
       + (record.at.minutes - scenario.start.minutes) + choice.minutes;
     return Math.max(0, minutes) / 60;

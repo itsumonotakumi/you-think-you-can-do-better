@@ -17,6 +17,8 @@ export type AchievementStore = Record<string, AchievementRecord>;
 
 const KEY = STORAGE_KEYS.achievements;
 let memory: string | null = null;
+/** 保存に失敗した後は、メモリ上の値が最新（古い localStorage の値より優先する） */
+let memoryWins = false;
 
 function storage(): Storage | null {
   try {
@@ -29,6 +31,7 @@ function storage(): Storage | null {
 }
 
 function readRaw(): string | null {
+  if (memoryWins) return memory;
   const store = storage();
   if (store) {
     try {
@@ -44,12 +47,16 @@ function readRaw(): string | null {
 function writeRaw(value: string): void {
   memory = value;
   const store = storage();
-  if (!store) return;
-  try {
-    store.setItem(KEY, value);
-  } catch {
-    // 保存できないときはメモリ上だけに残す
+  if (store) {
+    try {
+      store.setItem(KEY, value);
+      memoryWins = false;
+      return;
+    } catch {
+      // 保存できないときはメモリ上だけに残す
+    }
   }
+  memoryWins = true;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

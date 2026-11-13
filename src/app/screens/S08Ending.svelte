@@ -35,13 +35,15 @@
   import { isRankingEnabled, RANKING_KEYS } from '../ranking';
   import { runFx } from '../effects';
   import { minutesBetween } from '../parts/logic';
+  import { headlineFor } from '../headline';
+  import { localizedFor } from '../share/data';
   import ShareButton from '../parts/ShareButton.svelte';
   import Headline from '../parts/Headline.svelte';
   import '../effects/effects.css';
 
   let recorded = false;
   const rankingEnabled = isRankingEnabled();
-  import { grantAchievements } from '../achievements';
+  import { grantAchievements, representativeTitle } from '../achievements';
   import type { Achievement } from '../../engine/types';
   /** このプレイで新しく獲得した称号（#9） */
   let newAchievements = $state<Achievement[]>([]);
@@ -55,6 +57,14 @@
   );
   const shownHours = $derived(publishedHours ?? elapsedHours);
   const headlineSource = $derived($play && $scenario ? { state: $play, scenario: $scenario } : null);
+  /** シェアに渡す見出しと称号。画面と同じ内容にする */
+  const shareHeadline = $derived(
+    $play && $scenario ? localizedFor(headlineFor($play, $scenario), $settings.lang) : '',
+  );
+  const shareTitle = $derived.by(() => {
+    const picked = representativeTitle(newAchievements);
+    return picked ? localizedFor(picked.title, $settings.lang) : '';
+  });
 
   $effect(() => {
     audio.setVolumes({ bgm: $settings.bgmVolume, se: $settings.seVolume, muted: $settings.muted });
@@ -226,7 +236,13 @@
         {t('sc.ending.next')}
       </button>
       {#if $play && $scenario}
-        <ShareButton scenario={$scenario} playState={$play} result={result} />
+        <ShareButton
+          scenario={$scenario}
+          playState={$play}
+          result={result}
+          headline={shareHeadline}
+          achievement={shareTitle}
+        />
       {/if}
     </div>
   {:else}
