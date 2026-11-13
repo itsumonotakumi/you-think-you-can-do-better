@@ -1,0 +1,147 @@
+# No.12 ソラノ（旅行予約・会員サービス）
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+id: no12-sorano
+version: '1.0.0'
+status: latest
+published: '2026-11-13'
+sourcePeriod: { ja: '2020年代のクラウド設定ミス事案の構造を参考にしたフィクション', en: '' }
+difficulty: 4
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: '誰でも見られる場所に、会員の名前があった', en: '' }
+tagline: { ja: '外部の研究者から「顧客情報が誰でも見られます」と連絡が来た。クラウドの設定ミス。アクセスの記録は、一部しか残っていない。', en: '' }
+company:
+  name: { ja: '株式会社ソラノ', en: '' }
+  industry: { ja: '旅行予約サイト・会員サービス', en: '' }
+  size: { ja: '従業員480名、会員320万人', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '三浦 涼子', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: officer
+      name: { ja: '柏木 修', en: '' }
+      title: { ja: '執行役員 経営管理本部長', en: '' }
+    - id: lead
+      name: { ja: '藤堂 真', en: '' }
+      title: { ja: '情報システム部長 兼 情報セキュリティ責任者', en: '' }
+    - id: analyst
+      name: { ja: '宮下 遥', en: '' }
+      title: { ja: '情報システム部 セキュリティ運用担当', en: '' }
+    - id: cs
+      name: { ja: '森川 彩', en: '' }
+      title: { ja: 'カスタマーサポート部長', en: '' }
+    - id: vendor
+      name: { ja: '大庭 健', en: '' }
+      title: { ja: '開発委託先アオバシステムズの責任者', en: '' }
+    - id: researcher
+      name: { ja: '峰岸 遼', en: '' }
+      title: { ja: '外部のセキュリティ研究者', en: '' }
+start: { day: 0, minutes: 540 }
+initialGauges: { damage: 30, flame: 0, trust: 70, stamina: 100 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-window
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '顧客情報は、いつから見られる状態だったのですか。', en: '' }
+      answers:
+        - { id: a-window-unknown, text: { ja: '調査中です。', en: '' }, points: -30 }
+        - { id: a-window-estimate, text: { ja: '設定変更の履歴から、少なくとも三か月前と推定しています。確定できない範囲は調査中です。', en: '' }, points: 30 }
+        - { id: a-window-note, text: { ja: '変更履歴と残っているログを保全し、推定の根拠と不明な範囲を公表します。', en: '' }, points: 80, requiresNote: note-window }
+    - id: q-researcher
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '指摘してきた研究者には、どう対応したのですか。', en: '' }
+      answers:
+        - { id: a-researcher-threat, text: { ja: '法的措置を検討しています。', en: '' }, points: -200 }
+        - { id: a-researcher-thanks, text: { ja: '礼を述べ、安全な連絡経路で詳細を受け取りました。', en: '' }, points: 30 }
+        - { id: a-researcher-note, text: { ja: '指摘者の意向を確認し、同意の範囲で謝辞を公表します。', en: '' }, points: 80, requiresNote: note-researcher }
+    - id: q-report
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: '個人情報保護委員会への報告は済んでいますか。', en: '' }
+      answers:
+        - { id: a-report-none, text: { ja: '報告義務はないと判断しました。', en: '' }, points: -150 }
+        - { id: a-report-prelim, text: { ja: '速報を提出しました。確報は30日以内に提出します。', en: '' }, points: 30 }
+        - { id: a-report-note, text: { ja: '速報を提出し、確報の期限と項目を整理して公表します。', en: '' }, points: 80, requiresNote: note-report }
+    - id: q-count
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '対象になる会員は何人ですか。', en: '' }
+      answers:
+        - { id: a-count-none, text: { ja: '漏れていません。', en: '' }, points: -100 }
+        - { id: a-count-range, text: { ja: '最大で数十万人の情報が含まれる可能性があります。', en: '' }, points: 30 }
+        - { id: a-count-unknown, text: { ja: '正確な人数はまだ確定していません。', en: '' }, points: -20 }
+    - id: q-vendor
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '委託先の設定ミスだそうですね。', en: '' }
+      answers:
+        - { id: a-vendor-blame, text: { ja: '委託先の責任です。', en: '' }, points: -100 }
+        - { id: a-vendor-joint, text: { ja: '委託先と共同で原因を確認しています。', en: '' }, points: 30 }
+        - { id: a-vendor-own, text: { ja: '当社の管理責任です。委託先と共同で再発防止を進めます。', en: '' }, points: 80, requiresNote: note-vendor }
+  extraQuestions:
+    - when: { flags: { threatenedResearcher: true } }
+      question:
+        id: q-threat
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '研究者を訴えると聞きましたが。', en: '' }
+        answers:
+          - { id: a-threat-admit, text: { ja: '法的措置を検討しています。', en: '' }, points: -200 }
+          - { id: a-threat-correct, text: { ja: '行き過ぎた対応でした。撤回し、謝罪します。', en: '' }, points: 30 }
+          - { id: a-threat-note, text: { ja: '窓口の対応を改め、指摘者との連絡経路を一本化しました。', en: '' }, points: 80, requiresNote: note-researcher }
+    - when: { flags: { hidExposure: true } }
+      question:
+        id: q-hidden
+        seconds: 30
+        timeoutPoints: -30
+        text: { ja: '公表が遅れたのはなぜですか。', en: '' }
+        answers:
+          - { id: a-hidden-avoid, text: { ja: '混乱を避けるためです。', en: '' }, points: -100 }
+          - { id: a-hidden-late, text: { ja: '公表が遅れました。', en: '' }, points: 30 }
+          - { id: a-hidden-correct, text: { ja: '隠す意図はありませんでしたが、最初の説明は不正確でした。', en: '' }, points: 80 }
+    - when: { flags: { paidCompensation: true } }
+      question:
+        id: q-compensation
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '補償は十分なのですか。', en: '' }
+        answers:
+          - { id: a-comp-request, text: { ja: '請求があった方に支払います。', en: '' }, points: -50 }
+          - { id: a-comp-plan, text: { ja: '一律の見舞金と、二次被害の実費を用意しています。', en: '' }, points: 30 }
+          - { id: a-comp-note, text: { ja: '対象と金額、申請の方法を公表します。', en: '' }, points: 80, requiresNote: note-compensation }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '公開設定はその日のうちに閉じられ、対象者への通知と相談窓口が動き出した。研究者は匿名のまま、再発防止の助言を続けてくれている。一年後、設定の監査は当たり前の工程になっていた。被害の責任は、設定を公開のままにした運用にある。問われたのは、指摘を受けた後に何をしたかだった。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが、会員と取引先の信頼は戻った。予約は翌週には通常に近づき、委託先との契約も作り直された。被害の責任は、設定を公開のままにした運用にある。問われたのは、指摘を受けた後に何をしたかだった。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '会社は立ち直ったが、会員の一部は他の予約サイトに流れた。調査報告書は公開されたが、公開期間の説明は最後まで完全にはならなかった。被害の責任は、設定を公開のままにした運用にある。問われたのは、指摘を受けた後に何をしたかだった。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '第三者委員会は、初動の遅れと委託先の管理不足を指摘した。社長は辞任し、残った社員が限られた予算で再建を進めている。被害の責任は、設定を公開のままにした運用にある。問われたのは、指摘を受けた後に何をしたかだった。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '行政指導と損害賠償の請求が重なり、新規予約の受付を長く止めた。会員からの電話は鳴り続けている。どこで判断を誤ったのか、記録を読み返す日が続く。被害の責任は、設定を公開のままにした運用にある。問われたのは、指摘を受けた後に何をしたかだった。', en: '' }
+headlines:
+  S: { ja: 'ソラノ、公開設定ミスを公表 通知と再発防止を徹底', en: '' }
+  A: { ja: 'ソラノ、会員情報の公開を認め謝罪 再発防止策を発表', en: '' }
+  B: { ja: 'ソラノ、クラウド設定ミスで会員情報が閲覧可能に', en: '' }
+  C: { ja: 'ソラノの情報管理に疑問 対応の遅れを指摘', en: '' }
+  D: { ja: 'ソラノ、説明が二転三転 会員離れが加速', en: '' }
+salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 10, min: 40, max: 130 }

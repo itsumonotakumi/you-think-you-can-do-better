@@ -1,0 +1,894 @@
+# No.12 ソラノ / セキュリティ担当者ロール（情報システム部 セキュリティ運用担当）
+# 見えるのは、監視端末、クラウドの設定画面、アクセスログ、現場からの連絡。
+# 判断ポイント15、細目は choices[].items と drafts の合計で80以上。
+estimateMinutes: 20
+intro: { ja: 'あなたは株式会社ソラノの情報システム部で、セキュリティ運用を担当している。午前9時、外部の研究者から「保存領域が公開されています」というメールが届いた。クラウドの設定画面を開くと、確かに公開になっていた。アクセスの記録は一部しか残っていない。まず何をするかで、その後の調査が変わる。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-coward-2
+  '3': v-coward-3
+  '4': v-coward-4
+deadlines:
+  - id: dl-analyst-prelim
+    ref: ppc-report-prelim
+    label: { ja: '速報の材料提出', en: '' }
+    points: -80
+    doneFlag: ppcPrelimFiled
+  - id: dl-analyst-final
+    ref: ppc-report-final
+    label: { ja: '確報の材料提出', en: '' }
+    points: -60
+    doneFlag: ppcFinalFiled
+events:
+  - id: ev-analyst-news
+    at: { day: 0, minutes: 1080 }
+    voices: [ v-ev-news ]
+    gauges: { flame: 10 }
+    sound: { se: [ notify_news ] }
+    caption: { ja: '旅行情報サイトの速報が、ソラノの保存領域の設定ミスを報じた。', en: '' }
+  - id: ev-analyst-vendor
+    at: { day: 1, minutes: 900 }
+    voices: [ v-ev-vendor ]
+    gauges: { flame: 5 }
+    sound: { se: [ mail_arrive ] }
+    caption: { ja: '開発委託先から、設定変更の作業記録が届いた。', en: '' }
+  - id: ev-analyst-night
+    at: { day: 2, minutes: 120 }
+    voices: [ v-ev-night ]
+    gauges: { stamina: -5 }
+    sound: { se: [ notify_chat ] }
+    caption: { ja: '深夜。監視画面のアラートが、同じパターンで鳴っている。', en: '' }
+  - id: ev-analyst-press
+    at: { day: 5, minutes: 480 }
+    voices: [ v-ev-press ]
+    gauges: { stamina: -5 }
+    sound: { se: [ phone_ring ] }
+    caption: { ja: '広報から、会見の技術的な質問への回答を求められた。', en: '' }
+points:
+  - id: p01-mail
+    at: { day: 0, minutes: 540 }
+    phase: detect
+    sound: { se: [ mail_arrive ] }
+    text: { ja: '午前9時。外部の研究者からメールが届いた。「御社の保存領域が公開されています。確認してください」。添付の手順書がある。', en: '' }
+    voices: [ v01-law, v01-shake, v01-ok ]
+    notable:
+      - { id: note-researcher, text: { ja: '午前9時、外部の研究者から保存領域の公開を知らされた。', en: '' } }
+    choices:
+      - id: p01-a-check
+        text: { ja: '内容を確認し、上長と安全な経路で返信する。', en: '' }
+        explain: { ja: "指摘の内容を確かめ、上長と共有している。安全な経路で返信すれば、連絡も続く。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 30
+        category: recover
+        points: 120
+        refs: [ jpcert-handling, nist-sp800-61r3 ]
+        gauges: { flame: -5, trust: 10, stamina: -5 }
+        setFlags: { researcherSafe: true }
+        items:
+          - { id: p01-a-order, points: 8, axis: order, refs: [ jpcert-handling ] }
+          - { id: p01-a-care, points: 8, axis: care, refs: [ nist-sp800-61r3 ] }
+          - id: p01-a-record
+            points: 5
+            axis: record
+            refs:
+              - jpcert-handling
+      - id: p01-b-hold
+        text: { ja: '添付を開かず、法務の指示を待つ方針。', en: '' }
+        explain: { ja: "添付を開かない判断は安全だが、確認が遅れると公開が続く。ただし、次の判断につなげる記録と共有が不足している。", en: "" }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [ jpcert-handling ]
+        gauges: { stamina: -5 }
+        items:
+          - { id: p01-b-order, points: 5, axis: order, refs: [ jpcert-handling ] }
+          - { id: p01-b-time, points: 3, axis: time, refs: [ jpcert-handling ] }
+      - id: p01-c-delete
+        text: { ja: 'いたずらとして削除し、記録も残さない。', en: '' }
+        explain: { ja: "削除すると、時刻も手順も失う。後から指摘の内容を確認できない。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 30
+        category: hurt
+        points: -120
+        refs: [ jpcert-handling ]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: p01-c-record, points: -10, axis: record, refs: [ jpcert-handling ] }
+          - { id: p01-c-care, points: -8, axis: care, refs: [ jpcert-handling ] }
+    lesson: { ja: "外部からの指摘メールは、内容を確認して上長に相談する。添付は安全な環境で開き、差出人には安全な連絡経路で返信する。削除すると、時刻も手順も失う。初動の記録が、その後の説明と検証の出発点になる。", en: "" }
+
+  - id: p02-close
+    at: { day: 0, minutes: 570 }
+    phase: contain
+    sound: { se: [ notify_chat ] }
+    text: { ja: '午前9時30分。メールの手順どおりに確認すると、保存領域が公開されていた。最初に何をするか。', en: '' }
+    voices: [ v02-vendor, v02-field, v02-ok ]
+    choices:
+      - id: p02-a-browse
+        text: { ja: 'ブラウザで何が見えるか確認し、その後に閉じる。', en: '' }
+        explain: { ja: "確認を優先した分、閲覧が続く。設定の記録を取る前に閉じる準備もできていない。ただし、次の判断につなげる記録と共有が不足している。", en: "" }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [ nist-sp800-61r3 ]
+        gauges: { damage: 5 }
+        items:
+          - { id: p02-a-order, points: 5, axis: order, refs: [ nist-sp800-61r3 ] }
+          - { id: p02-a-time, points: 3, axis: time, refs: [ nist-sp800-61r3 ] }
+      - id: p02-b-close
+        text: { ja: 'すぐ非公開にし、設定画面とアクセスログを保全する。', en: '' }
+        explain: { ja: "止める措置と証拠保全を同時に行っている。初動として最も妥当。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 30
+        category: recover
+        points: 120
+        refs: [ nist-sp800-61r3, jpcert-handling ]
+        gauges: { damage: -10, flame: -5, trust: 10, stamina: -5 }
+        setFlags: { closedBucket: true, logsPreserved: true }
+        items:
+          - { id: p02-b-order, points: 8, axis: order, refs: [ nist-sp800-61r3 ] }
+          - { id: p02-b-record, points: 8, axis: record, refs: [ jpcert-handling ] }
+          - { id: p02-b-time, points: 5, axis: time, refs: [ nist-sp800-61r3 ] }
+          - id: p02-b-content
+            points: 5
+            axis: content
+            refs:
+              - nist-sp800-61r3
+      - id: p02-c-tomorrow
+        text: { ja: '明日の作業時間に、まとめて設定を直す方針。', en: '' }
+        explain: { ja: "翌日まで公開が続く。作業をまとめる理由より、閲覧を止めることが優先。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 120
+        category: hurt
+        points: -150
+        refs: [ nist-sp800-61r3 ]
+        gauges: { damage: 20, flame: 10, trust: -10 }
+        coward: true
+        items:
+          - { id: p02-c-time, points: -12, axis: time, refs: [ nist-sp800-61r3 ] }
+          - { id: p02-c-record, points: -8, axis: record, refs: [ jpcert-handling ] }
+    lesson: { ja: "公開状態を見つけたら、まず非公開にする。設定画面の記録とアクセスログを保全し、確認した時刻を残す。閲覧の確認を先にすると、その間も公開が続く。止めた事実と時刻を残すことが、後の説明を支える。", en: "" }
+
+  - id: p03-logs
+    at: { day: 0, minutes: 720 }
+    phase: investigate
+    sound: { se: [ notify_chat ] }
+    text: { ja: '正午。アクセスログの保存期間は30日で、それ以前は消えている。どう記録するか。', en: '' }
+    voices: [ v03-law, v03-boss, v03-ok ]
+    notable:
+      - { id: note-window, text: { ja: 'アクセスログの保存期間は30日。それ以前の記録は残っていない。', en: '' } }
+    choices:
+      - id: p03-a-hide
+        text: { ja: 'ログの欠損には触れず、残っている分だけを報告する。', en: '' }
+        explain: { ja: "欠損を隠すと、後から事実が判明したときに説明が崩れる。調査の信頼も失う。この判断は、会社の説明責任そのものを損なう。", en: "" }
+        minutes: 60
+        category: fatal
+        points: -200
+        refs: [ jpcert-handling ]
+        gauges: { flame: 15, trust: -15 }
+        items:
+          - { id: p03-a-record, points: -15, axis: record, refs: [ jpcert-handling ] }
+          - { id: p03-a-content, points: -10, axis: content, refs: [ jpcert-handling ] }
+      - id: p03-b-partial
+        text: { ja: '残っているログを集め、欠損は口頭で伝える。', en: '' }
+        explain: { ja: "口頭だけでは記録に残らない。後から検証するときに、欠損の範囲が分からない。ただし、次の判断につなげる記録と共有が不足している。", en: "" }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [ jpcert-handling ]
+        gauges: { stamina: -10 }
+        items:
+          - { id: p03-b-record, points: 5, axis: record, refs: [ jpcert-handling ] }
+          - { id: p03-b-content, points: 3, axis: content, refs: [ jpcert-handling ] }
+      - id: p03-c-all
+        text: { ja: '保存期間と欠損を記録し、取得できるログをすべて集める。', en: '' }
+        explain: { ja: "欠損も事実として残し、取得できるログを集めている。後の検証に耐える。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [ jpcert-handling, nist-sp800-61r3 ]
+        gauges: { flame: -5, trust: 10, stamina: -15 }
+        setFlags: { logsPreserved: true }
+        items:
+          - { id: p03-c-record, points: 10, axis: record, refs: [ jpcert-handling ] }
+          - { id: p03-c-content, points: 8, axis: content, refs: [ nist-sp800-61r3 ] }
+          - { id: p03-c-time, points: 5, axis: time, refs: [ jpcert-handling ] }
+    lesson: { ja: "ログの保存期間と欠損は、隠さず事実として記録する。残っているログをすべて集め、設定履歴やCDNのログも合わせる。欠損を隠すと、後の説明が崩れる。分かったことと分からないことを分けて残す。", en: "" }
+
+  - id: p04-bucket
+    at: { day: 1, minutes: 600 }
+    phase: investigate
+    sound: { se: [ notify_chat ] }
+    text: { ja: '午前10時。保存領域の設定を詳しく見る。公開設定のほかに、署名付きURLの発行履歴もあった。何を確認するか。', en: '' }
+    voices: [ v04-expert, v04-vendor, v04-ok ]
+    choices:
+      - id: p04-a-all
+        text: { ja: '公開ポリシー、IAM、署名付きURLの発行履歴を確認する。', en: '' }
+        explain: { ja: "公開設定だけでなく、権限と署名付きURLまで見ている。別の経路の見落としを減らせる。", en: "" }
+        minutes: 120
+        category: recover
+        points: 120
+        refs: [ cissp-cbk-secops, no07-ipa-insider ]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { scopeKnown: true }
+        items:
+          - { id: p04-a-content, points: 8, axis: content, refs: [ cissp-cbk-secops ] }
+          - { id: p04-a-record, points: 8, axis: record, refs: [ no07-ipa-insider ] }
+          - { id: p04-a-order, points: 5, axis: order, refs: [ jpcert-handling ] }
+          - id: p04-a-care
+            points: 5
+            axis: care
+            refs:
+              - ppc-notify-person
+      - id: p04-b-public
+        text: { ja: '公開設定だけを確認し、直して終えるという判断。', en: '' }
+        explain: { ja: "公開設定だけ直すと、署名付きURLなど別の経路が残る。ただし、次の判断につなげる記録と共有が不足している。", en: "" }
+        minutes: 60
+        category: maintain
+        points: 10
+        refs: [ cissp-cbk-secops ]
+        gauges: { trust: 3 }
+        items:
+          - { id: p04-b-content, points: 3, axis: content, refs: [ cissp-cbk-secops ] }
+          - { id: p04-b-record, points: 3, axis: record, refs: [ jpcert-handling ] }
+      - id: p04-c-rebuild
+        text: { ja: '保存領域を作り直して、設定は最初からやり直す。', en: '' }
+        explain: { ja: "作り直すと、証拠も設定の履歴も失われる。原因の確認ができなくなる。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 180
+        category: hurt
+        points: -100
+        refs: [ nist-sp800-61r3 ]
+        gauges: { damage: 10, trust: -10 }
+        items:
+          - { id: p04-c-record, points: -12, axis: record, refs: [ nist-sp800-61r3 ] }
+          - { id: p04-c-content, points: -8, axis: content, refs: [ cissp-cbk-secops ] }
+    lesson: { ja: "保存領域の確認は、公開ポリシー、IAM、署名付きURLの発行履歴まで見る。公開設定だけ直すと、別の経路が残る。作り直すと、証拠も履歴も失う。分かったことと分からないことを分けて残す。", en: "" }
+
+  - id: p05-scope
+    at: { day: 1, minutes: 720 }
+    phase: investigate
+    sound: { se: [ notify_chat ] }
+    text: { ja: '正午。保存領域の中身を分類する。予約履歴、氏名、連絡先、パスポート番号の一部。対象をどう数えるか。', en: '' }
+    voices: [ v05-law, v05-popular, v05-ok ]
+    choices:
+      - id: p05-a-db
+        text: { ja: '顧客データベースの件数だけを数える方針。', en: '' }
+        explain: { ja: "データベースだけでは、バックアップや古いファイルの個人情報を取り逃がす。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 90
+        category: hurt
+        points: -100
+        refs: [ ppc-report-scope ]
+        gauges: { flame: 5, trust: -10 }
+        items:
+          - { id: p05-a-content, points: -10, axis: content, refs: [ ppc-report-scope ] }
+          - { id: p05-a-record, points: -8, axis: record, refs: [ jpcert-handling ] }
+      - id: p05-b-all
+        text: { ja: '全オブジェクトを分類し、項目と件数、重複を整理する。', en: '' }
+        explain: { ja: "全オブジェクトを分類し、重複も整理している。対象の説明に使える。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [ ppc-report-scope, jpcert-handling ]
+        gauges: { flame: -5, trust: 10, stamina: -15 }
+        setFlags: { scopeKnown: true }
+        items:
+          - { id: p05-b-content, points: 10, axis: content, refs: [ ppc-report-scope ] }
+          - { id: p05-b-record, points: 8, axis: record, refs: [ jpcert-handling ] }
+          - { id: p05-b-care, points: 5, axis: care, refs: [ ppc-notify-person ] }
+          - id: p05-b-order
+            points: 5
+            axis: order
+            refs:
+              - jpcert-handling
+      - id: p05-c-files
+        text: { ja: 'ファイル数を数え、そのまま人数と同じとみなす。', en: '' }
+        explain: { ja: "ファイル数と人数は同じではない。対象を誤ると、通知の漏れや過剰通知が起きる。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 60
+        category: hurt
+        points: -120
+        refs: [ ppc-report-scope ]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: p05-c-content, points: -12, axis: content, refs: [ ppc-report-scope ] }
+          - { id: p05-c-record, points: -8, axis: record, refs: [ jpcert-handling ] }
+    lesson: { ja: "対象は、全オブジェクトを分類し、項目と件数、重複を整理して数える。ファイル数と人数は同じではない。顧客データベースだけを数えると、通知の漏れが生じる。分かったことと分からないことを分けて残す。", en: "" }
+
+  - id: p06-timeline
+    at: { day: 1, minutes: 900 }
+    phase: organize
+    sound: { se: [ notify_chat ] }
+    text: { ja: '午後3時。時系列をまとめる。誰がいつ何をしたか、記録が散らばっている。どう残すか。', en: '' }
+    voices: [ v06-boss, v06-expert, v06-ok ]
+    choices:
+      - id: p06-a-memory
+        text: { ja: '記憶を頼りに、大まかな時系列を作る方針。', en: '' }
+        explain: { ja: "記憶は抜けたり変わったりする。時刻の裏付けがないと、検証に耐えない。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [ jpcert-handling ]
+        gauges: { trust: -10 }
+        items:
+          - { id: p06-a-record, points: -10, axis: record, refs: [ jpcert-handling ] }
+          - { id: p06-a-content, points: -8, axis: content, refs: [ jpcert-handling ] }
+      - id: p06-b-own
+        text: { ja: '自分の作業だけを記録し、他の部署には任せる。', en: '' }
+        explain: { ja: "自分の作業だけでは、全体の時系列にならない。他の部署の記録も必要。ただし、次の判断につなげる記録と共有が不足している。", en: "" }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [ jpcert-handling ]
+        gauges: { stamina: -5 }
+        items:
+          - { id: p06-b-record, points: 5, axis: record, refs: [ jpcert-handling ] }
+          - { id: p06-b-order, points: 3, axis: order, refs: [ jpcert-handling ] }
+      - id: p06-c-chain
+        text: { ja: '時刻、操作、担当を記録し、証拠の管理連鎖を作る。', en: '' }
+        explain: { ja: "時刻と操作、担当をセットで残している。証拠の取得から保管まで追える。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 180
+        category: recover
+        points: 120
+        refs: [ jpcert-handling, cissp-cbk-secops ]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { evidencePreserved: true, ppcPrelimFiled: true, reportedPpc: true }
+        items:
+          - { id: p06-c-record, points: 10, axis: record, refs: [ jpcert-handling ] }
+          - { id: p06-c-order, points: 8, axis: order, refs: [ cissp-cbk-secops ] }
+          - { id: p06-c-content, points: 5, axis: content, refs: [ jpcert-handling ] }
+          - id: p06-c-time
+            points: 5
+            axis: time
+            refs:
+              - jpcert-handling
+    lesson: { ja: "時系列は、時刻、操作、担当をセットで記録する。証拠の取得から保管までを追えるようにし、他の部署の記録も集める。記憶や自分の作業だけでは、後の検証に耐えない。役割と決定を記録し、関係者に共有することが欠かせない。", en: "" }
+
+  - id: p07-vendor
+    at: { day: 2, minutes: 540 }
+    phase: investigate
+    sound: { se: [ mail_arrive ] }
+    text: { ja: '午前9時。委託先の作業ログを取り寄せた。設定変更の記録はあるが、承認の記録がない。どう確認するか。', en: '' }
+    voices: [ v07-vendor, v07-public, v07-ok ]
+    notable:
+      - { id: note-vendor, text: { ja: '設定変更は委託先が実施。承認の記録がない。', en: '' } }
+    choices:
+      - id: p07-a-process
+        text: { ja: '作業手順と承認の流れを共同で確認し、記録の不足を埋める。', en: '' }
+        explain: { ja: "手順と承認の流れを共同で確認している。記録の不足も事実として残せる。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 180
+        category: recover
+        points: 120
+        refs: [ meti-csm-guideline, jpcert-handling ]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { vendorJoint: true }
+        items:
+          - { id: p07-a-order, points: 8, axis: order, refs: [ meti-csm-guideline ] }
+          - { id: p07-a-record, points: 8, axis: record, refs: [ jpcert-handling ] }
+          - id: p07-a-wording
+            points: 5
+            axis: wording
+            refs:
+              - meti-disclosure-guidance
+      - id: p07-b-record
+        text: { ja: '委託先に、承認記録の提出だけを求める方針を取る。', en: '' }
+        explain: { ja: "記録の提出だけを求めても、手順のどこが抜けたかは分からない。ただし、次の判断につなげる記録と共有が不足している。", en: "" }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [ meti-csm-guideline ]
+        gauges: { stamina: -5 }
+        items:
+          - { id: p07-b-record, points: 5, axis: record, refs: [ jpcert-handling ] }
+          - { id: p07-b-order, points: 3, axis: order, refs: [ meti-csm-guideline ] }
+      - id: p07-c-name
+        text: { ja: '委託先の担当者を名指しで責任者として報告する。', en: '' }
+        explain: { ja: "個人を名指しすると、事実の確認が止まり、手順の改善も進まない。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 60
+        category: hurt
+        points: -120
+        refs: [ meti-csm-guideline ]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: p07-c-care, points: -10, axis: care, refs: [ meti-csm-guideline ] }
+          - { id: p07-c-wording, points: -8, axis: wording, refs: [ meti-csm-guideline ] }
+    lesson: { ja: "委託先の作業は、手順と承認の流れを共同で確認する。記録がなくても、口頭の承認を再構成し、不足を記録する。個人を名指しすると、事実の確認が止まる。分かったことと分からないことを分けて残す。", en: "" }
+
+  - id: p08-other-buckets
+    at: { day: 2, minutes: 720 }
+    phase: contain
+    sound: { se: [ notify_chat ] }
+    text: { ja: '正午。同じクラウドの保存領域を点検する。数十個ある。どう回すか。', en: '' }
+    voices: [ v08-boss, v08-past, v08-ok ]
+    choices:
+      - id: p08-a-visual
+        text: { ja: '目視で数個を見て、問題なければ終える。', en: '' }
+        explain: { ja: "目視では全体を見落とす。同じ公開設定が残っていても気づけない。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 90
+        category: hurt
+        points: -100
+        refs: [ cissp-cbk-secops ]
+        gauges: { damage: 10 }
+        items:
+          - { id: p08-a-content, points: -10, axis: content, refs: [ cissp-cbk-secops ] }
+          - { id: p08-a-record, points: -8, axis: record, refs: [ jpcert-handling ] }
+      - id: p08-b-scan
+        text: { ja: '全保存領域の公開設定を一覧にし、公開を閉じる。', en: '' }
+        explain: { ja: "全件の設定を一覧にし、公開を閉じている。見落としを減らせる。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 120
+        category: recover
+        points: 150
+        refs: [ cissp-cbk-secops, nist-sp800-61r3 ]
+        gauges: { damage: -15, trust: 10, stamina: -10 }
+        setFlags: { allBucketsChecked: true }
+        items:
+          - { id: p08-b-content, points: 10, axis: content, refs: [ cissp-cbk-secops ] }
+          - { id: p08-b-order, points: 8, axis: order, refs: [ nist-sp800-61r3 ] }
+          - { id: p08-b-record, points: 5, axis: record, refs: [ jpcert-handling ] }
+      - id: p08-c-vendor
+        text: { ja: '委託先に点検を依頼し、回答が来るまで待つ。', en: '' }
+        explain: { ja: "委託先の回答を待つ間に、公開設定が残る。自社の確認も遅れる。ただし、次の判断につなげる記録と共有が不足している。", en: "" }
+        minutes: 90
+        category: maintain
+        points: 10
+        refs: [ meti-csm-guideline ]
+        gauges: { stamina: -5 }
+        items:
+          - { id: p08-c-order, points: 3, axis: order, refs: [ meti-csm-guideline ] }
+          - { id: p08-c-content, points: 3, axis: content, refs: [ meti-csm-guideline ] }
+    lesson: { ja: "同じクラウドの保存領域は、スクリプトで全件の設定を一覧にする。公開のまま残っているものを閉じ、結果を記録する。目視や委託先任せでは、見落としが残る。止めた事実と時刻を残すことが、後の説明を支える。", en: "" }
+
+  - id: p09-keys
+    at: { day: 3, minutes: 600 }
+    phase: contain
+    sound: { se: [ notify_chat ] }
+    text: { ja: '午前10時。保存領域にアクセスできる鍵の利用状況を調べる。使われていない鍵が三つあった。どうするか。', en: '' }
+    voices: [ v09-field, v09-law, v09-ok ]
+    choices:
+      - id: p09-a-delete
+        text: { ja: '三つの鍵を、確認なしにすべて削除する方針。', en: '' }
+        explain: { ja: "確認なしの削除は、必要な処理を止める。持ち主も分からなくなる。ただし、次の判断につなげる記録と共有が不足している。", en: "" }
+        minutes: 60
+        category: maintain
+        points: 10
+        refs: [ no07-ipa-insider ]
+        gauges: { trust: -5, stamina: -5 }
+        items:
+          - { id: p09-a-order, points: 3, axis: order, refs: [ no07-ipa-insider ] }
+          - { id: p09-a-record, points: 3, axis: record, refs: [ jpcert-handling ] }
+      - id: p09-b-watch
+        text: { ja: '鍵は残したまま、利用状況の監視だけを強める。', en: '' }
+        explain: { ja: "使われていない鍵を残すと、漏えいしたときの入口になる。監視だけでは足りない。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 90
+        category: hurt
+        points: -80
+        refs: [ no07-ipa-insider ]
+        gauges: { damage: 5, trust: -5 }
+        items:
+          - { id: p09-b-order, points: -8, axis: order, refs: [ no07-ipa-insider ] }
+          - { id: p09-b-record, points: -6, axis: record, refs: [ jpcert-handling ] }
+      - id: p09-c-review
+        text: { ja: '利用状況を確認し、不要な鍵を無効化して権限を分ける。', en: '' }
+        explain: { ja: "利用状況と持ち主を確認してから無効化している。必要な処理を守りながら整理できる。", en: "" }
+        minutes: 180
+        category: recover
+        points: 120
+        refs: [ no07-ipa-insider, cissp-cbk-secops ]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { keysReviewed: true }
+        items:
+          - { id: p09-c-order, points: 8, axis: order, refs: [ no07-ipa-insider ] }
+          - { id: p09-c-record, points: 8, axis: record, refs: [ cissp-cbk-secops ] }
+          - { id: p09-c-content, points: 5, axis: content, refs: [ cissp-cbk-secops ] }
+    lesson: { ja: "使われていない鍵は、持ち主と利用状況を確認してから無効化する。権限を分け、誰が何にアクセスできるかを一覧にする。確認なしの削除は、必要な処理を止める。止めた事実と時刻を残すことが、後の説明を支える。", en: "" }
+
+  - id: p10-report-material
+    at: { day: 3, minutes: 720 }
+    phase: notify
+    sound: { se: [ notify_chat ] }
+    text: { ja: '正午。個人情報保護委員会への速報の材料を作る。件数はまだ確定していない。どう書くか。', en: '' }
+    voices: [ v10-boss, v10-law, v10-ok ]
+    notable:
+      - { id: note-report, text: { ja: '速報の材料を準備中。件数は概算で、調査中と明記する。', en: '' } }
+    choices:
+      - id: p10-a-material
+        text: { ja: '分かる範囲と不明点を分け、概算と根拠を添えて提出する。', en: '' }
+        explain: { ja: "分かる範囲と不明点を分け、概算の根拠も添えている。速報の目的に合う。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 150
+        category: recover
+        points: 150
+        refs: [ ppc-report-prelim, jpcert-handling ]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { ppcPrelimFiled: true, reportedPpc: true }
+        detail: prelim-report
+        items:
+          - { id: p10-a-time, points: 10, axis: time, refs: [ ppc-report-prelim ] }
+          - { id: p10-a-content, points: 8, axis: content, refs: [ ppc-report-prelim ] }
+          - { id: p10-a-record, points: 5, axis: record, refs: [ jpcert-handling ] }
+          - id: p10-a-order
+            points: 5
+            axis: order
+            refs:
+              - ppc-report-prelim
+      - id: p10-b-wait
+        text: { ja: '件数が確定してから、まとめて提出する方針。', en: '' }
+        explain: { ja: "確定を待つと期限を過ぎるおそれがある。速報は概算でも出せる。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 120
+        category: hurt
+        points: -100
+        refs: [ ppc-report-prelim ]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: p10-b-time, points: -10, axis: time, refs: [ ppc-report-prelim ] }
+          - { id: p10-b-order, points: -6, axis: order, refs: [ ppc-report-prelim ] }
+      - id: p10-c-under
+        text: { ja: '件数を少なく見積もり、確定した数字として書く。', en: '' }
+        explain: { ja: "少なく見積もると、後で訂正が必要になる。報告の信頼を損なう。この判断は、会社の説明責任そのものを損なう。", en: "" }
+        minutes: 90
+        category: fatal
+        points: -200
+        refs: [ ppc-report-prelim, ppc-report-scope ]
+        gauges: { flame: 15, trust: -15 }
+        items:
+          - { id: p10-c-content, points: -15, axis: content, refs: [ ppc-report-scope ] }
+          - { id: p10-c-record, points: -10, axis: record, refs: [ ppc-report-prelim ] }
+    lesson: { ja: "速報は、分かる範囲と不明点を分けて書く。件数は概算でも、根拠と調査中であることを添える。確定を待つと期限を過ぎ、少なく見積もると訂正と不信を招く。伝える相手と順番を決め、記録に残す。", en: "" }
+
+  - id: p11-notify-data
+    at: { day: 4, minutes: 600 }
+    phase: notify
+    sound: { se: [ notify_chat ] }
+    text: { ja: '午前10時。本人通知の対象リストを作る。重複と退会者が混ざっている。どう作るか。', en: '' }
+    voices: [ v11-law, v11-boss, v11-ok ]
+    notable:
+      - { id: note-compensation, text: { ja: '本人通知の対象リストを準備している。', en: '' } }
+    choices:
+      - id: p11-a-current
+        text: { ja: '現会員のリストだけを作り、退会者は除く。', en: '' }
+        explain: { ja: "退会者を除くと、通知の漏れが生じる。過去の利用者の二次被害も防げない。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 120
+        category: hurt
+        points: -120
+        refs: [ ppc-notify-person ]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: p11-a-care, points: -12, axis: care, refs: [ ppc-notify-person ] }
+          - { id: p11-a-content, points: -8, axis: content, refs: [ ppc-notify-person ] }
+      - id: p11-b-all
+        text: { ja: '重複を除き、退会者も含めて、届く連絡先を整理する。', en: '' }
+        explain: { ja: "重複を除き、退会者も含めている。届く連絡先を整理し、通知の実効性を高める。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [ ppc-notify-person, no04-ppc-guideline-general ]
+        gauges: { flame: -5, trust: 15, stamina: -15 }
+        setFlags: { notifiedUsers: true }
+        items:
+          - { id: p11-b-care, points: 10, axis: care, refs: [ ppc-notify-person ] }
+          - { id: p11-b-content, points: 8, axis: content, refs: [ no04-ppc-guideline-general ] }
+          - { id: p11-b-record, points: 5, axis: record, refs: [ ppc-notify-person ] }
+          - id: p11-b-time
+            points: 5
+            axis: time
+            refs:
+              - ppc-notify-person
+      - id: p11-c-raw
+        text: { ja: '保存領域のファイルをそのまま名簿として使う。', en: '' }
+        explain: { ja: "重複や古い連絡先が混ざり、通知の誤送信や漏れが起きる。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [ ppc-notify-person ]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: p11-c-care, points: -10, axis: care, refs: [ ppc-notify-person ] }
+          - { id: p11-c-record, points: -8, axis: record, refs: [ ppc-notify-person ] }
+    lesson: { ja: "通知の対象は、重複を除き、退会者も含めて作る。届く連絡先を整理し、送れない人には別の手段を用意する。現会員だけにすると、退会者の二次被害を見逃す。伝える相手と順番を決め、記録に残す。", en: "" }
+
+  - id: p12-support-tech
+    at: { day: 5, minutes: 600 }
+    phase: notify
+    sound: { se: [ phone_ring ] }
+    text: { ja: '午前10時。問い合わせ窓口から、技術的な質問への回答を求められた。偽メールの見分け方も聞かれている。', en: '' }
+    voices: [ v12-expert, v12-public, v12-ok ]
+    choices:
+      - id: p12-a-jargon
+        text: { ja: '技術用語のまま資料を渡し、窓口で説明してもらう。', en: '' }
+        explain: { ja: "技術用語のままでは、窓口も会員も理解できない。説明がばらつく。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 90
+        category: hurt
+        points: -80
+        refs: [ meti-csm-guideline ]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: p12-a-wording, points: -10, axis: wording, refs: [ meti-csm-guideline ] }
+          - { id: p12-a-care, points: -6, axis: care, refs: [ meti-csm-guideline ] }
+      - id: p12-b-individual
+        text: { ja: '個別の質問に、その都度メールで答えるという判断。', en: '' }
+        explain: { ja: "個別回答だけでは、説明がばらつき、対応が追いつかない。ただし、次の判断につなげる記録と共有が不足している。", en: "" }
+        minutes: 120
+        category: maintain
+        points: 20
+        refs: [ meti-csm-guideline ]
+        gauges: { stamina: -10 }
+        items:
+          - { id: p12-b-care, points: 5, axis: care, refs: [ meti-csm-guideline ] }
+          - { id: p12-b-order, points: 3, axis: order, refs: [ meti-csm-guideline ] }
+      - id: p12-c-faq
+        text: { ja: 'FAQと照合方法、偽メールの見分け方を用意して窓口に渡す。', en: '' }
+        explain: { ja: "会員の行動に翻訳した資料を渡している。窓口も同じ説明ができる。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 150
+        category: recover
+        points: 120
+        refs: [ meti-csm-guideline, ppc-notify-person ]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { supportReady: true }
+        items:
+          - { id: p12-c-care, points: 8, axis: care, refs: [ ppc-notify-person ] }
+          - { id: p12-c-content, points: 8, axis: content, refs: [ meti-csm-guideline ] }
+          - { id: p12-c-record, points: 5, axis: record, refs: [ jpcert-handling ] }
+    lesson: { ja: "窓口には、FAQと照合方法、偽メールの見分け方を渡す。個別回答だけでは、説明がばらつき、対応が追いつかない。技術の言葉を、会員の行動に翻訳する。伝える相手と順番を決め、記録に残す。", en: "" }
+
+  - id: p13-monitor
+    at: { day: 7, minutes: 600 }
+    phase: after
+    sound: { se: [ notify_sns ] }
+    text: { ja: '午前10時。公開後の監視をどうするか。不正利用の兆候はまだ見つかっていない。', en: '' }
+    voices: [ v13-law, v13-boss, v13-ok ]
+    choices:
+      - id: p13-a-watch
+        text: { ja: '不正利用の兆候となりすましの監視を続ける。', en: '' }
+        explain: { ja: "兆候が出る前から監視を続けている。二次被害の初動を早められる。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 180
+        category: recover
+        points: 120
+        refs: [ cissp-cbk-secops, ppc-notify-person ]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { monitoring: true }
+        items:
+          - { id: p13-a-content, points: 8, axis: content, refs: [ cissp-cbk-secops ] }
+          - { id: p13-a-care, points: 8, axis: care, refs: [ ppc-notify-person ] }
+          - { id: p13-a-record, points: 5, axis: record, refs: [ jpcert-handling ] }
+      - id: p13-b-weekly
+        text: { ja: '週次のログ確認だけを、静かに続ける。', en: '' }
+        explain: { ja: "週次では、兆候を見つけるまで時間がかかる。初動が遅れる。ただし、次の判断につなげる記録と共有が不足している。", en: "" }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [ cissp-cbk-secops ]
+        gauges: { trust: 3 }
+        items:
+          - { id: p13-b-content, points: 5, axis: content, refs: [ cissp-cbk-secops ] }
+          - { id: p13-b-record, points: 3, axis: record, refs: [ jpcert-handling ] }
+      - id: p13-c-stop
+        text: { ja: '兆候が出るまで、監視を止めて待つ。', en: '' }
+        explain: { ja: "止めると、二次被害の初動が遅れる。兆候は自分からは知らせてくれない。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [ cissp-cbk-secops ]
+        gauges: { flame: 5, trust: -10 }
+        items:
+          - { id: p13-c-content, points: -10, axis: content, refs: [ cissp-cbk-secops ] }
+          - { id: p13-c-record, points: -8, axis: record, refs: [ jpcert-handling ] }
+    lesson: { ja: "公開後の監視は、不正利用の兆候、ダークウェブ、なりすましを対象にする。兆候が出る前から続け、見つけたときの連絡先を決めておく。止めると、二次被害の初動が遅れる。", en: "" }
+
+  - id: p14-recurrence
+    at: { day: 10, minutes: 600 }
+    phase: recover
+    sound: { se: [ notify_chat ] }
+    text: { ja: '午前10時。再発防止の運用を決める。設定の確認を誰が、いつ、どの記録で行うか。', en: '' }
+    voices: [ v14-expert, v14-vendor, v14-ok ]
+    choices:
+      - id: p14-a-checklist
+        text: { ja: 'チェックリストの項目を増やし、担当者の注意力に頼る。', en: '' }
+        explain: { ja: "チェックリストだけでは、注意力に頼ることになる。設定の変更は見落としやすい。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 120
+        category: hurt
+        points: -60
+        refs: [ ipa-sme-guideline ]
+        gauges: { trust: 3, stamina: -5 }
+        items:
+          - { id: p14-a-care, points: -8, axis: care, refs: [ ipa-sme-guideline ] }
+          - { id: p14-a-content, points: -6, axis: content, refs: [ ipa-sme-guideline ] }
+      - id: p14-b-combine
+        text: { ja: '設定の定期監査、自動検知、委託先の変更記録を組み合わせる。', en: '' }
+        explain: { ja: "監査と自動検知、委託先の記録を組み合わせている。仕組みで防ぐ対策になる。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 240
+        category: recover
+        points: 120
+        refs: [ cissp-cbk-secops, meti-csm-guideline ]
+        gauges: { trust: 10, stamina: -15 }
+        setFlags: { recurrencePlan: true }
+        items:
+          - { id: p14-b-content, points: 10, axis: content, refs: [ cissp-cbk-secops ] }
+          - { id: p14-b-order, points: 8, axis: order, refs: [ meti-csm-guideline ] }
+          - { id: p14-b-record, points: 5, axis: record, refs: [ jpcert-handling ] }
+      - id: p14-c-outsource
+        text: { ja: '委託先の確認結果だけを受け取り、自社では確認しない。', en: '' }
+        explain: { ja: "自社の確認を省くと、同じ見落としが残る。責任も曖昧になる。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 90
+        category: hurt
+        points: -100
+        refs: [ meti-csm-guideline ]
+        gauges: { trust: -10 }
+        items:
+          - { id: p14-c-order, points: -10, axis: order, refs: [ meti-csm-guideline ] }
+          - { id: p14-c-content, points: -8, axis: content, refs: [ cissp-cbk-secops ] }
+    lesson: { ja: "設定の確認は、定期監査と自動検知、委託先の変更記録を組み合わせる。チェックリストだけでは、注意力に頼ることになる。自社の確認を省くと、同じ見落としが残る。再開の条件と根拠を示すことが、信頼の回復につながる。", en: "" }
+
+  - id: p15-report
+    at: { day: 21, minutes: 600 }
+    phase: after
+    sound: { se: [ notify_news ] }
+    text: { ja: '午前10時。技術調査の報告書をまとめる。原因、影響、再発防止をどう書くか。確報の提出も控えている。', en: '' }
+    voices: [ v15-expert, v15-law, v15-ok ]
+    choices:
+      - id: p15-a-hide
+        text: { ja: '報告書は社内にだけ置き、外部への公開は見送る。', en: '' }
+        explain: { ja: "検証も再発防止の共有も進まない。会員と取引先への説明の材料も失う。この判断は、後の説明と再発防止の前提を崩す。", en: "" }
+        minutes: 90
+        category: hurt
+        points: -150
+        refs: [ meti-disclosure-guidance ]
+        gauges: { flame: 15, trust: -15 }
+        items:
+          - { id: p15-a-content, points: -12, axis: content, refs: [ meti-disclosure-guidance ] }
+          - { id: p15-a-wording, points: -8, axis: wording, refs: [ meti-disclosure-guidance ] }
+      - id: p15-b-summary
+        text: { ja: '要約だけを公開し、原因の詳細は伏せる方針。', en: '' }
+        explain: { ja: "概要は伝わるが、原因と判断の誤りが見えず、再発防止の検証ができない。ただし、次の判断につなげる記録と共有が不足している。", en: "" }
+        minutes: 120
+        category: maintain
+        points: 20
+        refs: [ meti-disclosure-guidance ]
+        gauges: { trust: 5 }
+        items:
+          - { id: p15-b-content, points: 5, axis: content, refs: [ meti-disclosure-guidance ] }
+          - { id: p15-b-record, points: 3, axis: record, refs: [ meti-disclosure-guidance ] }
+      - id: p15-c-full
+        text: { ja: '攻撃に使える詳細だけ伏せ、原因、影響、対策を公開する。', en: '' }
+        explain: { ja: "危険な情報を伏せつつ、検証に必要な情報を公開している。再発防止の実効性が高い。判断の根拠を記録に残すことも、後の説明に役立つ。", en: "" }
+        minutes: 240
+        category: increase
+        points: 350
+        fatalAlternate: 40
+        refs: [ meti-disclosure-guidance, ppc-report-final ]
+        gauges: { flame: -15, trust: 20, stamina: -15 }
+        setFlags: { fullDisclosure: true, ppcFinalFiled: true }
+        detail: incident-report
+        items:
+          - { id: p15-c-content, points: 10, axis: content, refs: [ meti-disclosure-guidance ] }
+          - { id: p15-c-record, points: 8, axis: record, refs: [ jpcert-handling ] }
+          - { id: p15-c-wording, points: 5, axis: wording, refs: [ meti-disclosure-guidance ] }
+    lesson: { ja: "技術報告書は、攻撃に使える詳細だけ伏せて公開する。原因、影響範囲、対策、進捗を書き、再現手順は伏せる。隠すと検証が止まり、同じ設定ミスが残る。検証と共有を続けることが、再発防止の実効性を高める。", en: "" }
+
+drafts:
+  prelim-report:
+    title: { ja: '速報の材料', en: '' }
+    slots:
+      - id: scope
+        label: { ja: '対象範囲', en: '' }
+        options:
+          - { id: ar-s-range, text: { ja: '分かる範囲と不明点を書く', en: '' }, points: 10, axis: content, refs: [ ppc-report-scope ], explain: { ja: "分かる範囲と不明点を分けることで、後から訂正しやすい。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ar-s-exact, text: { ja: '確定した件数だけを書く', en: '' }, points: -10, axis: content, refs: [ ppc-report-scope ], explain: { ja: "確定を待つと、速報の意味がなくなる。期限も過ぎる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ar-s-none, text: { ja: '対象を書かないという案。', en: '' }, points: -12, axis: content, refs: [ ppc-report-scope ], explain: { ja: "対象がないと、委員会も会員も判断できない。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+      - id: count
+        label: { ja: '件数', en: '' }
+        options:
+          - { id: ar-n-wait, text: { ja: '件数は空欄にする', en: '' }, points: -8, axis: content, refs: [ ppc-report-prelim ], explain: { ja: "空欄では、どれくらいの規模か伝わらない。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ar-n-estimate, text: { ja: '概算と根拠を書く', en: '' }, points: 10, axis: content, refs: [ ppc-report-prelim ], explain: { ja: "概算でも根拠があれば、調査の進み具合を伝えられる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ar-n-under, text: { ja: '少なく見積もって書く', en: '' }, points: -15, axis: content, refs: [ ppc-report-prelim ], explain: { ja: "少なく見積もると、後で訂正が必要になる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+      - id: cause
+        label: { ja: '原因', en: '' }
+        options:
+          - { id: ar-c-vague, text: { ja: '「設定の不備」とだけ書く', en: '' }, points: -10, axis: content, refs: [ jpcert-handling ], explain: { ja: "設定の不備だけでは、何が起きたか伝わらない。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ar-c-attack, text: { ja: '外部からの攻撃と書くという案。', en: '' }, points: -20, axis: content, refs: [ jpcert-handling ], explain: { ja: "設定ミスを攻撃のせいにすると、後で隠蔽と受け取られる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ar-c-config, text: { ja: '公開設定のミスと承認不足を書く', en: '' }, points: 10, axis: content, refs: [ jpcert-handling ], explain: { ja: "原因と承認の不足を具体的に書くことで、対策につながる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+      - id: window
+        label: { ja: '公開期間', en: '' }
+        options:
+          - { id: ar-w-estimate, text: { ja: '推定の期間と不明点を書く', en: '' }, points: 10, axis: content, refs: [ jpcert-handling ], explain: { ja: "推定の根拠と不明点を分けて書くことで、後から訂正しやすい。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ar-w-unknown, text: { ja: '「調査中」とだけ書く', en: '' }, points: -10, axis: content, refs: [ jpcert-handling ], explain: { ja: "「調査中」だけでは、いつから危険だったか分からない。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ar-w-long, text: { ja: '一年前からと書くという案。', en: '' }, points: -5, axis: content, refs: [ jpcert-handling ], explain: { ja: "根拠のない長期間は、不要な不安を生む。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+      - id: next
+        label: { ja: '次の報告', en: '' }
+        options:
+          - { id: ar-x-soon, text: { ja: '「できるだけ早く」と書く', en: '' }, points: -5, axis: content, refs: [ meti-disclosure-guidance ], explain: { ja: "「できるだけ早く」では、いつ報告が来るか分からない。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ar-x-date, text: { ja: '次の報告日を書くという案。', en: '' }, points: 8, axis: content, refs: [ meti-disclosure-guidance ], explain: { ja: "次の報告日があると、続報を待つ側の見通しが立つ。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ar-x-none, text: { ja: '次の報告を書かないという案。', en: '' }, points: -8, axis: content, refs: [ meti-disclosure-guidance ], explain: { ja: "次の報告がないと、情報の空白を憶測で埋められる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+  incident-report:
+    title: { ja: '技術調査の報告書', en: '' }
+    slots:
+      - id: cause
+        label: { ja: '原因', en: '' }
+        options:
+          - { id: ai-c-specific, text: { ja: '公開設定のミスと承認不足を書く', en: '' }, points: 10, axis: content, refs: [ nist-sp800-61r3 ], explain: { ja: "原因と承認の不足を具体的に書くことで、再発防止が実行できる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ai-c-vague, text: { ja: '「設定の不備」とだけ書く', en: '' }, points: -10, axis: content, refs: [ nist-sp800-61r3 ], explain: { ja: "設定の不備だけでは、何を直すのか分からない。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ai-c-person, text: { ja: '担当者個人の不注意と書く', en: '' }, points: -12, axis: content, refs: [ nist-sp800-61r3 ], explain: { ja: "個人の不注意にすると、手順と確認の仕組みが改善されない。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+      - id: scope
+        label: { ja: '対象', en: '' }
+        options:
+          - { id: ai-s-db, text: { ja: '顧客データベースだけを書く', en: '' }, points: -12, axis: content, refs: [ ppc-report-scope ], explain: { ja: "データベースだけでは、バックアップの個人情報を取り逃がす。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ai-s-all, text: { ja: '全オブジェクトを分類して書く', en: '' }, points: 10, axis: content, refs: [ ppc-report-scope ], explain: { ja: "全オブジェクトを分類することで、通知の漏れを減らせる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ai-s-sample, text: { ja: 'サンプルから推測して書く', en: '' }, points: -15, axis: content, refs: [ ppc-report-scope ], explain: { ja: "サンプルからの推測は、対象の漏れと訂正を招く。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+      - id: logs
+        label: { ja: 'ログの扱い', en: '' }
+        options:
+          - { id: ai-l-own, text: { ja: '自社のログだけを資料に載せる', en: '' }, points: -8, axis: record, refs: [ jpcert-handling ], explain: { ja: "自社のログだけでは、CDNや委託先のアクセスを取り逃がす。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ai-l-none, text: { ja: 'ログの欠損に触れないという案。', en: '' }, points: -15, axis: record, refs: [ jpcert-handling ], explain: { ja: "欠損に触れないと、後から事実が判明したときに説明が崩れる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ai-l-gap, text: { ja: '保存期間と欠損を記録して集める', en: '' }, points: 10, axis: record, refs: [ jpcert-handling ], explain: { ja: "保存期間と欠損を記録し、取得できるログを集めている。検証に耐える。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+      - id: containment
+        label: { ja: '封じ込め', en: '' }
+        options:
+          - { id: ai-k-close, text: { ja: '公開を止めて設定とログを保全したと書く', en: '' }, points: 10, axis: order, refs: [ nist-sp800-61r3 ], explain: { ja: "止めた措置と保全した記録を書くことで、初動が検証できる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ai-k-wait, text: { ja: '影響を確認してから止めたと書く', en: '' }, points: -8, axis: order, refs: [ nist-sp800-61r3 ], explain: { ja: "確認を待った分、閲覧が続いた。初動の順序として説明しにくい。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ai-k-rebuild, text: { ja: '環境を作り直したと書くという案。', en: '' }, points: -15, axis: record, refs: [ nist-sp800-61r3 ], explain: { ja: "作り直すと、原因の証拠も履歴も失われる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+      - id: measures
+        label: { ja: '再発防止', en: '' }
+        options:
+          - { id: ai-m-slogan, text: { ja: '「再発防止に努めます」と書く', en: '' }, points: -10, axis: content, refs: [ cissp-cbk-secops ], explain: { ja: "「努めます」だけでは、何をいつ誰がやるのか分からない。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ai-m-plan, text: { ja: '実施時期と担当を書くという案。', en: '' }, points: 10, axis: content, refs: [ cissp-cbk-secops ], explain: { ja: "時期と担当があれば、対策が実行されたか検証できる。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+          - { id: ai-m-none, text: { ja: '対策を書かないという案。', en: '' }, points: -15, axis: content, refs: [ cissp-cbk-secops ], explain: { ja: "対策がないと、同じ設定ミスが再発する。部品の選択は、読み手の理解と行動に影響する。", en: "" } }
+voices:
+  - { id: v01-law, media: board, misleading: true, type: law-ish, text: { ja: '法務「添付を開く前に、許可を取れ」。', en: '' }, trigger: { at: point } }
+  - { id: v01-shake, media: attacker, misleading: true, type: attacker-shake, text: { ja: '別の差出人「公表されたくなければ、今日中に連絡しろ」。', en: '' }, trigger: { at: point } }
+  - { id: v01-ok, media: chat, misleading: false, text: { ja: '上長「まず内容を確認して、一緒に返信しよう」。', en: '' }, trigger: { at: point } }
+  - { id: v01-after, media: sns, misleading: false, text: { ja: 'メール一本で、そこまでするのか。', en: '' }, trigger: { at: after, choice: p01-a-check } }
+  - { id: v02-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '設定を変えるなら、弊社に連絡してからにして。', en: '' }, trigger: { at: point } }
+  - { id: v02-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '見られたか分からないから、そのままでいい。', en: '' }, trigger: { at: point } }
+  - { id: v02-ok, media: chat, misleading: false, text: { ja: '上長「閉じてから記録しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v02-after, media: sns, misleading: false, text: { ja: '設定を止めるなんて、やりすぎだ。', en: '' }, trigger: { at: after, choice: p02-b-close } }
+  - { id: v03-law, media: board, misleading: true, type: law-ish, text: { ja: 'ログがないなら、何も言わなくていい。', en: '' }, trigger: { at: point } }
+  - { id: v03-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '欠損の話は、外に出さなくていい。', en: '' }, trigger: { at: point } }
+  - { id: v03-ok, media: chat, misleading: false, text: { ja: '上長「欠損も事実として記録しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v03-after, media: news, misleading: false, text: { ja: 'ログがないのに、よく調べられるな。', en: '' }, trigger: { at: after, choice: p03-c-all } }
+  - { id: v04-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '公開設定だけ直せば十分です。', en: '' }, trigger: { at: point } }
+  - { id: v04-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '署名付きURLは弊社の管理です。', en: '' }, trigger: { at: point } }
+  - { id: v04-ok, media: chat, misleading: false, text: { ja: '上長「ポリシーと権限も見ましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v04-after, media: sns, misleading: false, text: { ja: '権限まで見て、時間は足りるのか。', en: '' }, trigger: { at: after, choice: p04-a-all } }
+  - { id: v05-law, media: board, misleading: true, type: law-ish, text: { ja: '顧客データベースだけ数えればいい。', en: '' }, trigger: { at: point } }
+  - { id: v05-popular, media: sns, misleading: true, type: popular, text: { ja: '他社も概算で出している。', en: '' }, trigger: { at: point } }
+  - { id: v05-ok, media: chat, misleading: false, text: { ja: '上長「全オブジェクトを分類しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v05-after, media: news, misleading: false, text: { ja: '対象を広げすぎて、不安をあおるな。', en: '' }, trigger: { at: after, choice: p05-b-all } }
+  - { id: v06-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '時系列は後でいい。復旧を急げ。', en: '' }, trigger: { at: point } }
+  - { id: v06-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '記憶でまとめれば十分です。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '上長「時刻と操作を記録しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v06-after, media: news, misleading: false, text: { ja: '記録ばかりで、復旧は進むのか。', en: '' }, trigger: { at: after, choice: p06-c-chain } }
+  - { id: v07-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '承認は口頭で済ませていました。', en: '' }, trigger: { at: point } }
+  - { id: v07-public, media: sns, misleading: true, type: public-opinion, text: { ja: '委託先のずさんさを公表しろ。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '上長「作業手順を一緒に見直しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v07-after, media: vendor, misleading: false, text: { ja: '手順を見直すのか。現場は忙しい。', en: '' }, trigger: { at: after, choice: p07-a-process } }
+  - { id: v08-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '今回の場所だけでいい。', en: '' }, trigger: { at: point } }
+  - { id: v08-past, media: boss, misleading: true, type: past-success, text: { ja: '前回もそれで済んだ。', en: '' }, trigger: { at: point } }
+  - { id: v08-ok, media: chat, misleading: false, text: { ja: '上長「スクリプトで一覧にしましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v08-after, media: news, misleading: false, text: { ja: '全件点検して、時間は足りるのか。', en: '' }, trigger: { at: after, choice: p08-b-scan } }
+  - { id: v09-field, media: chat, misleading: true, type: well-meant-field, text: { ja: 'その鍵は古いですが、念のため残してください。', en: '' }, trigger: { at: point } }
+  - { id: v09-law, media: board, misleading: true, type: law-ish, text: { ja: '使っていないなら、止めても問題ない。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '上長「利用状況を確認して止めましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v09-after, media: sns, misleading: false, text: { ja: '鍵を止めて、現場が止まったらどうする。', en: '' }, trigger: { at: after, choice: p09-c-review } }
+  - { id: v10-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が固まるまで出さないでくれ。', en: '' }, trigger: { at: point } }
+  - { id: v10-law, media: board, misleading: true, type: law-ish, text: { ja: '概算なら書かなくていい。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '法務「分かる範囲と不明点を分けましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v10-after, media: news, misleading: false, text: { ja: '概算で報告して、後で訂正するのか。', en: '' }, trigger: { at: after, choice: p10-a-material } }
+  - { id: v11-law, media: board, misleading: true, type: law-ish, text: { ja: '現会員だけに送ればいい。', en: '' }, trigger: { at: point } }
+  - { id: v11-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '退会者は追わなくていい。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '上長「重複を除いて、退会者も含めましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v11-after, media: sns, misleading: false, text: { ja: '退会者にまで通知するのか。', en: '' }, trigger: { at: after, choice: p11-b-all } }
+  - { id: v12-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '技術の話は窓口に任せればいい。', en: '' }, trigger: { at: point } }
+  - { id: v12-public, media: sns, misleading: true, type: public-opinion, text: { ja: '早く答えを出せ。待たせるな。', en: '' }, trigger: { at: point } }
+  - { id: v12-ok, media: chat, misleading: false, text: { ja: '窓口「FAQと照合方法を渡しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v12-after, media: news, misleading: false, text: { ja: 'FAQを出しても、問い合わせは減らない。', en: '' }, trigger: { at: after, choice: p12-c-faq } }
+  - { id: v13-law, media: board, misleading: true, type: law-ish, text: { ja: '兆候がなければ、監視は要らない。', en: '' }, trigger: { at: point } }
+  - { id: v13-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '監視の費用はもうかけられない。', en: '' }, trigger: { at: point } }
+  - { id: v13-ok, media: chat, misleading: false, text: { ja: '上長「兆候を早く見つける仕組みが要ります」。', en: '' }, trigger: { at: point } }
+  - { id: v13-after, media: news, misleading: false, text: { ja: '監視を続けて、いつまで続けるのか。', en: '' }, trigger: { at: after, choice: p13-a-watch } }
+  - { id: v14-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: 'チェックリストを増やせば防げます。', en: '' }, trigger: { at: point } }
+  - { id: v14-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '委託先の確認を信じてください。', en: '' }, trigger: { at: point } }
+  - { id: v14-ok, media: chat, misleading: false, text: { ja: '上長「定期監査と自動検知を組み合わせましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v14-after, media: news, misleading: false, text: { ja: '監査を増やして、現場は回るのか。', en: '' }, trigger: { at: after, choice: p14-b-combine } }
+  - { id: v15-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '再現手順は書かないほうが安全です。', en: '' }, trigger: { at: point } }
+  - { id: v15-law, media: board, misleading: true, type: law-ish, text: { ja: '公開は義務ではない。', en: '' }, trigger: { at: point } }
+  - { id: v15-ok, media: chat, misleading: false, text: { ja: '調査委員「危険な部分だけ伏せましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v15-after, media: news, misleading: false, text: { ja: '今さら報告書を出して、宣伝か。', en: '' }, trigger: { at: after, choice: p15-c-full } }
+  - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「確認中」なんだ。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-3, media: sns, misleading: false, text: { ja: '責任を取りたくないだけだ。事なかれ主義の会社。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-4, media: news, misleading: false, text: { ja: '臆病な判断が、会員の不安を広げた。取引先が独自に対応を始めている。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-news, media: news, misleading: false, text: { ja: '旅行情報サイト「ソラノの保存領域が公開状態に。会員情報が閲覧可能か」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-vendor, media: vendor, misleading: false, text: { ja: '委託先「設定変更の作業記録です。承認の記録はありません」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-night, media: sns, misleading: false, text: { ja: '深夜の監視画面に、同じパターンのアラートが並んでいる。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-press, media: news, misleading: false, text: { ja: '記者「公開期間が三か月という根拠は何ですか」。', en: '' }, trigger: { at: manual } }
