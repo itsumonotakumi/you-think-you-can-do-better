@@ -1,0 +1,949 @@
+# No.11 ツムギマート / 経営者ロール（代表取締役社長）
+# 判断ポイント15、細目は choices[].items と drafts の合計で80以上。
+estimateMinutes: 30
+intro: { ja: 'あなたはツムギマートの代表取締役社長。生活雑貨・衣料・食品を扱う120店舗のチェーンで、通販の配送は物流会社に委託している。朝、その物流会社がランサムウェアの被害に遭ったと分かる。店は開いている。自社のシステムも無事だ。それでも今日から、何を止め、誰に何を説明するかを決めなければならない。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-coward-2
+  '3': v-coward-3
+  '4': v-coward-4
+deadlines:
+  - id: dl-ppc-prelim
+    ref: ppc-report-prelim
+    label: { ja: '個人情報保護委員会への速報', en: '' }
+    points: -150
+    doneFlag: ppcPrelimFiled
+  - id: dl-ppc-final
+    ref: ppc-report-final-malicious
+    label: { ja: '個人情報保護委員会への確報', en: '' }
+    points: -150
+    doneFlag: ppcFinalFiled
+events:
+  - id: ev-ransom
+    at: { day: 0, minutes: 555 }
+    voices: [v-ev-ransom]
+    sound: { se: [mail_arrive] }
+    caption: { ja: '物流会社が、ランサムウェアの被害を認めた。', en: '' }
+  - id: ev-stores
+    at: { day: 0, minutes: 720 }
+    voices: [v-ev-store]
+    gauges: { flame: 5 }
+    caption: { ja: '店頭で、通販の注文についての質問が出始めた。', en: '' }
+  - id: ev-news
+    at: { day: 0, minutes: 1110 }
+    voices: [v-ev-news]
+    gauges: { flame: 10 }
+    sound: { se: [notify_news] }
+    caption: { ja: '業界紙が、物流会社の障害と通販各社の停止を報じた。', en: '' }
+  - id: ev-customer
+    at: { day: 1, minutes: 720 }
+    voices: [v-ev-customer]
+    gauges: { flame: 5 }
+    sound: { se: [phone_ring] }
+    caption: { ja: '顧客からの問い合わせが、コールセンターに集中している。', en: '' }
+  - id: ev-peer
+    at: { day: 2, minutes: 540 }
+    voices: [v-ev-peer]
+    gauges: { flame: 5 }
+    caption: { ja: '同じ物流会社を使う大手通販が、記者会見を開いた。', en: '' }
+points:
+  - id: p01-outage
+    at: { day: 0, minutes: 480 }
+    phase: detect
+    sound: { se: [phone_ring] }
+    text: { ja: '午前8時。ハコブ物流から電話が入る。「出荷システムが止まり、今日の便が出せません」。通販の注文は止まらない。', en: '' }
+    voices: [v01-boss, v01-public, v01-ok]
+    notable:
+      - { id: note-outage, text: { ja: '午前8時、物流から出荷停止の連絡。9時15分、ランサムウェアと判明。', en: '' } }
+    choices:
+      - id: p01-a-stopall
+        text: { ja: '店舗も含めて全社の販売を止め、被害の全体像を待つ', en: '' }
+        explain: { ja: '物流の障害で店舗まで止める必要はない。止める範囲を広げるほど、従業員と顧客の不安が増え、説明の手間も膨らむ。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [no11-bcp-continuity]
+        gauges: { flame: 10, trust: -10, damage: 5 }
+        items:
+          - { id: p01-a-time, points: -8, axis: time, refs: [no11-bcp-continuity] }
+          - { id: p01-a-order, points: -10, axis: order, refs: [no11-bcp-continuity] }
+          - { id: p01-a-care, points: -5, axis: care, refs: [meti-disclosure-guidance] }
+      - id: p01-b-prepare
+        text: { ja: '通販の受注を止め、代替配送と顧客案内の準備を指示する', en: '' }
+        explain: { ja: '止める範囲を限定し、代替の手段と案内を同時に動かしている。店舗を通常営業のまま残した判断も、被害を広げない。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [no11-bcp-continuity, meti-disclosure-guidance]
+        gauges: { damage: -5, flame: -5, trust: 10, stamina: -10 }
+        setFlags: { ecStopped: true, altPrepared: true }
+        items:
+          - { id: p01-b-time, points: 5, axis: time, refs: [no11-bcp-continuity] }
+          - { id: p01-b-order, points: 8, axis: order, refs: [no11-bcp-continuity] }
+          - { id: p01-b-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: p01-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: p01-c-continue
+        text: { ja: '状況が分かるまで通販は通常どおり受注を続ける', en: '' }
+        explain: { ja: '出荷できないのに注文だけを受けると、遅延と問い合わせが積み上がる。復旧の見込みがないまま顧客の期待を膨らませる判断になる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -150
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -15, damage: 10 }
+        coward: true
+        setFlags: { continuedSales: true }
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { flame: 10, trust: -10 }, reason: { ja: '出荷できない注文が積み上がり、キャンセルの問い合わせが殺到した。', en: '' } }
+        items:
+          - { id: p01-c-time, points: -10, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: p01-c-order, points: -8, axis: order, refs: [no11-bcp-continuity] }
+          - { id: p01-c-care, points: -8, axis: care, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '委託先が止まったとき、自社のどの業務を止めるかを先に決める。物流に依存する通販は止めても、店舗まで巻き込む必要はない。止める範囲を限定し、代替の手段と顧客への案内を同時に動かす。', en: '' }
+
+  - id: p02-ransom
+    at: { day: 0, minutes: 555 }
+    phase: contain
+    sound: { se: [mail_arrive] }
+    text: { ja: '午前9時15分。物流から「復号には金が必要だ」と連絡。要求は物流宛てだが、こちらにも「配送データを公開する」とメールが来た。', en: '' }
+    voices: [v02-attacker, v02-vendor, v02-ok]
+    choices:
+      - id: p02-a-refuse
+        text: { ja: '支払わず、警察への相談と再開条件の整理を物流と進める', en: '' }
+        explain: { ja: '支払わない判断と警察への相談を、物流と足並みを揃えて進めている。復号の保証がないことを前提に、再開の条件を整理できている。', en: '' }
+        minutes: 90
+        category: recover
+        points: 130
+        refs: [npa-consult, no11-ppc-entrust-supervision]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { refusedRansom: true }
+        items:
+          - { id: p02-a-record, points: 8, axis: record, refs: [npa-consult] }
+          - { id: p02-a-order, points: 8, axis: order, refs: [npa-consult] }
+          - { id: p02-a-content, points: 5, axis: content, refs: [no11-ppc-entrust-supervision] }
+      - id: p02-b-keep
+        text: { ja: '物流の判断に任せ、自社は関与しないと伝える', en: '' }
+        explain: { ja: '委託先の問題として距離を置くと、配送データを預けた側の責任を果たせない。再開の見通しも立たず、顧客への説明が止まる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -120
+        refs: [no11-ppc-entrust-supervision]
+        gauges: { flame: 5, trust: -10, damage: 10 }
+        coward: true
+        items:
+          - { id: p02-b-order, points: -10, axis: order, refs: [no11-ppc-entrust-supervision] }
+          - { id: p02-b-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: p02-c-pay
+        text: { ja: '物流に代わって身代金を支払い、配送データを取り戻す', en: '' }
+        explain: { ja: '支払いは復号もデータの削除も保証せず、犯罪組織への資金提供になる。自社が払えば、取引先を巻き込む判断として後から重く問われる。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -300
+        refs: [npa-consult]
+        gauges: { damage: 20, flame: 20, trust: -20 }
+        setFlags: { paidRansom: true }
+        items:
+          - { id: p02-c-record, points: -10, axis: record, refs: [npa-consult] }
+          - { id: p02-c-content, points: -10, axis: content, refs: [npa-consult] }
+          - { id: p02-c-care, points: -5, axis: care, refs: [npa-consult] }
+    lesson: { ja: '身代金の要求は犯罪であり、支払いは復号も沈黙も保証しない。委託先が払うかどうかにかかわらず、自社は警察と法務に相談し、支払わない方針を明確にする。復旧の見込みと再開の条件を同時に整理する。', en: '' }
+
+  - id: p03-sales
+    at: { day: 0, minutes: 660 }
+    phase: contain
+    sound: { se: [notify_sns] }
+    text: { ja: '午前11時。通販サイトには「いつ届くのか」の声が並ぶ。受注を続けるか、止めるか。店舗は通常どおり開いている。', en: '' }
+    voices: [v03-public, v03-law, v03-ok]
+    choices:
+      - id: p03-a-continue
+        text: { ja: '注文は受け続け、発送が遅れることだけをサイトに表示する', en: '' }
+        explain: { ja: '出荷の見込みがないまま注文を積み上げると、後から大量のキャンセルと返金が発生する。顧客の期待を裏切る形になり、信頼の回復に時間がかかる。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -120
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -10, damage: 10 }
+        setFlags: { continuedSales: true }
+        items:
+          - { id: p03-a-time, points: -8, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: p03-a-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p03-a-content, points: -5, axis: content, refs: [no11-bcp-continuity] }
+      - id: p03-b-stop
+        text: { ja: '注文を止め、再開の見込みと問い合わせ窓口をサイトに出す', en: '' }
+        explain: { ja: '止める判断と、顧客が次に知りたいことを同時に示している。注文を受けない分の売上は減るが、返金と問い合わせの膨張を防げる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 130
+        refs: [meti-disclosure-guidance, no11-bcp-continuity]
+        gauges: { flame: -5, trust: 12, stamina: -5 }
+        setFlags: { ecStopped: true, customerWindow: true }
+        items:
+          - { id: p03-b-order, points: 8, axis: order, refs: [meti-disclosure-guidance] }
+          - { id: p03-b-content, points: 8, axis: content, refs: [no11-bcp-continuity] }
+          - { id: p03-b-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p03-b-record, points: 3, axis: record, refs: [jpcert-handling] }
+      - id: p03-c-maintenance
+        text: { ja: '注文を止めるが、理由は「システム保守」とだけ表示する', en: '' }
+        explain: { ja: '攻撃と物流の停止を伏せた発表は、後から判明したときに隠蔽と受け取られる。顧客が取るべき行動も伝わらず、問い合わせが増える。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 20, trust: -20 }
+        setFlags: { hidAttack: true }
+        delayed:
+          - { afterPhases: 2, points: -100, gauges: { flame: 20, trust: -15 }, reason: { ja: '物流のランサム被害が報道され、当初の説明が隠蔽と批判された。', en: '' } }
+        items:
+          - { id: p03-c-wording, points: -20, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p03-c-record, points: -10, axis: record, refs: [meti-disclosure-guidance] }
+          - { id: p03-c-care, points: -8, axis: care, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '出荷できないときは、注文を止める判断を早くする。理由を別の言葉で隠すと、後で必ず説明のやり直しになる。止める理由、再開の見込み、今すぐできることを、同じ案内に並べて出す。', en: '' }
+
+  - id: p04-stores
+    at: { day: 0, minutes: 780 }
+    phase: organize
+    sound: { se: [notify_chat] }
+    text: { ja: '午後1時。店舗は通常営業のまま。店頭には通販の広告が残り、レジで「ネットの注文はどうなるの」と聞かれ始めた。', en: '' }
+    voices: [v04-field, v04-past, v04-ok]
+    choices:
+      - id: p04-a-silent
+        text: { ja: '店舗では通販の話題に触れず、通常営業に徹する', en: '' }
+        explain: { ja: '聞かれた店員が答えられないと、顧客は本部やSNSに問い合わせる。店が知らせないことで、不安と臆測だけが広がる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -10 }
+        coward: true
+        items:
+          - { id: p04-a-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p04-a-order, points: -8, axis: order, refs: [meti-disclosure-guidance] }
+      - id: p04-b-notice
+        text: { ja: '店頭掲示とレジでの声かけで、停止と問い合わせ先を案内する', en: '' }
+        explain: { ja: '店舗という接点を、顧客への説明に使えている。店頭で知ることで、電話やSNSへの問い合わせ集中を減らせる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 100
+        refs: [meti-disclosure-guidance, no11-bcp-continuity]
+        gauges: { flame: -8, trust: 12, stamina: -5 }
+        setFlags: { storeNotice: true }
+        items:
+          - { id: p04-b-order, points: 8, axis: order, refs: [meti-disclosure-guidance] }
+          - { id: p04-b-content, points: 8, axis: content, refs: [no11-bcp-continuity] }
+          - { id: p04-b-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
+      - id: p04-c-check
+        text: { ja: '聞かれたときだけ、本部に確認すると店員が答える', en: '' }
+        explain: { ja: '店員が一次受けする形は作れているが、答えの中身がなく、確認のたびに時間がかかる。顧客はその場で状況を知ることができない。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [meti-disclosure-guidance]
+        gauges: { trust: 3, stamina: 0 }
+        items:
+          - { id: p04-c-order, points: 5, axis: order, refs: [meti-disclosure-guidance] }
+          - { id: p04-c-care, points: 3, axis: care, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '店舗が開いているなら、店頭は説明の場になる。掲示とレジでの声かけを揃え、何が止まっていて、どこに聞けばよいかを伝える。黙っていると、現場が個別に推測して答えることになる。', en: '' }
+
+  - id: p05-own
+    at: { day: 0, minutes: 900 }
+    phase: organize
+    sound: { se: [notify_chat] }
+    text: { ja: '午後3時。情報システム部から「自社の端末とサーバーに感染の痕跡はない」と報告。物流との接続点はまだ調べている途中だ。', en: '' }
+    voices: [v05-flattery, v05-expert, v05-ok]
+    choices:
+      - id: p05-a-declare
+        text: { ja: '自社は感染していないと、そのまま公表する', en: '' }
+        explain: { ja: '接続点の確認が終わる前に「感染なし」と断定すると、後で不審な通信が見つかったときに訂正が必要になる。断言は説明の自由度を下げる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -70
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 5, trust: -8 }
+        items:
+          - { id: p05-a-content, points: -10, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: p05-a-record, points: -5, axis: record, refs: [jpcert-handling] }
+      - id: p05-c-wait
+        text: { ja: '詳しい確認は物流の調査結果が出てからまとめて行う', en: '' }
+        explain: { ja: '委託先の調査を待つ間、自社の接続点が安全かは分からないままになる。自社で確認できる範囲を後回しにすると、説明も再開も遅れる。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { trust: 0, stamina: 3 }
+        coward: true
+        items:
+          - { id: p05-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: p05-c-time, points: -5, axis: time, refs: [jpcert-handling] }
+      - id: p05-b-verify
+        text: { ja: '接続点を確認し、自社の被害は今のところ無いと説明する', en: '' }
+        explain: { ja: '確認の範囲と現時点の結論を分けて伝えている。断定を避けつつ、自社が無事である可能性も示せており、訂正の余地を残せる。', en: '' }
+        minutes: 75
+        category: recover
+        points: 110
+        refs: [jpcert-handling, meti-disclosure-guidance]
+        gauges: { damage: -8, trust: 10, stamina: -10 }
+        setFlags: { ownChecked: true }
+        items:
+          - { id: p05-b-content, points: 8, axis: content, refs: [jpcert-handling] }
+          - { id: p05-b-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: p05-b-wording, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p05-b-time, points: 3, axis: time, refs: [jpcert-handling] }
+    lesson: { ja: '委託先が被害に遭ったとき、自社が無事かは自社で確かめる。確認の途中なら、確認した範囲と現時点の結論を分けて説明する。接続点を調べずに「無事」と断言すると、後で説明を訂正することになる。', en: '' }
+
+  - id: p06-first
+    at: { day: 0, minutes: 1080 }
+    phase: notify
+    sound: { se: [notify_news] }
+    text: { ja: '午後6時。広報が第一報の文案を持ってきた。物流の障害と自社の受注停止を、今夜のうちに出す。', en: '' }
+    voices: [v06-public, v06-law, v06-ok]
+    choices:
+      - id: p06-a-vague
+        text: { ja: '「委託先のシステム障害により出荷を停止」とだけ発表する', en: '' }
+        explain: { ja: '事実の一部は伝えているが、顧客が今するべきことや相談先がない。原因が攻撃だと分かった後の説明も、別物になってしまう。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 5, trust: 3 }
+        setFlags: { publicFirst: true }
+        detail: first-statement
+        items:
+          - { id: p06-a-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p06-a-time, points: 5, axis: time, refs: [meti-disclosure-guidance] }
+      - id: p06-c-hide
+        text: { ja: '出荷停止は公表せず、サイトに小さく注意書きを出すだけにする', en: '' }
+        explain: { ja: '影響の大きい停止を伏せると、後から判明したときに隠蔽と受け取られる。顧客が代替の手段を選ぶ機会も失い、批判が集中する。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 25, trust: -20 }
+        setFlags: { hidAttack: true }
+        delayed:
+          - { afterPhases: 2, points: -100, gauges: { flame: 20, trust: -15 }, reason: { ja: '通販の全面停止が報道され、説明の不足が批判された。', en: '' } }
+        items:
+          - { id: p06-c-wording, points: -20, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p06-c-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p06-c-record, points: -10, axis: record, refs: [meti-disclosure-guidance] }
+      - id: p06-b-first
+        text: { ja: '出荷停止と再開の見込み、顧客の問い合わせ先を第一報で示す', en: '' }
+        explain: { ja: '起きたこと、止まっていること、顧客が次にできることを一度に示している。情報が揃う前に出すからこそ、範囲と不明点の書き方が問われる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 120
+        refs: [meti-disclosure-guidance, no11-ppc-entrust-report]
+        gauges: { flame: 5, trust: 15, stamina: -10 }
+        setFlags: { publicFirst: true, customerWindow: true }
+        detail: first-statement
+        items:
+          - { id: p06-b-wording, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p06-b-content, points: 8, axis: content, refs: [no11-ppc-entrust-report] }
+          - { id: p06-b-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p06-b-time, points: 8, axis: time, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '第一報では、何が起きたか、何が止まっているか、顧客が今すぐ何をすればよいかを示す。原因が分からない部分は調査中と書き、隠さない。顧客の行動を書かない発表は、問い合わせを増やすだけになる。', en: '' }
+
+  - id: p07-ppc
+    at: { day: 1, minutes: 540 }
+    phase: notify
+    sound: { se: [typing] }
+    text: { ja: '午前9時。法務から「配送データの漏えい疑いを、個人情報保護委員会へ速報する必要がある」と連絡。件数はまだ確定しない。', en: '' }
+    voices: [v07-boss, v07-law, v07-ok]
+    popular: { choiceId: p07-a-wait, percent: 63 }
+    notable:
+      - { id: note-report, text: { ja: '配送データは氏名・住所・電話・注文商品。速報の期限は事態を知ってからおよそ3日。', en: '' } }
+    choices:
+      - id: p07-a-wait
+        text: { ja: '件数と範囲が確定するまで待ち、その後で報告をまとめる', en: '' }
+        explain: { ja: '確定を待つ間に速報の期限を過ぎるおそれがある。速報は分かった範囲で出し、後から訂正する方が、報告漏れより信頼を保てる。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -150
+        refs: [ppc-report-prelim]
+        gauges: { flame: 15, trust: -10, damage: 10 }
+        coward: true
+        setFlags: { delayedReport: true }
+        delayed:
+          - { afterPhases: 1, points: -40, gauges: { flame: 10 }, reason: { ja: '報道が先に「報告なし」と報じた。', en: '' } }
+        items:
+          - { id: p07-a-time, points: -10, axis: time, refs: [ppc-report-prelim] }
+          - { id: p07-a-record, points: -8, axis: record, refs: [ppc-report-prelim] }
+          - { id: p07-a-content, points: -5, axis: content, refs: [no11-ppc-entrust-report] }
+      - id: p07-b-file
+        text: { ja: '分かった範囲で速報し、本人通知と60日以内の確報準備も進める', en: '' }
+        explain: { ja: '速報の期限を守りつつ、本人通知と確報の見通しまで示している。不正の目的のおそれがあるため、確報は60日以内が目安になる。', en: '' }
+        minutes: 120
+        category: recover
+        points: 120
+        refs: [ppc-report-prelim, ppc-report-final-malicious, ppc-notify-person]
+        gauges: { trust: 12, stamina: -15 }
+        setFlags: { ppcPrelimFiled: true, notifyPrep: true }
+        items:
+          - { id: p07-b-time, points: 8, axis: time, refs: [ppc-report-prelim] }
+          - { id: p07-b-content, points: 8, axis: content, refs: [no11-ppc-entrust-report] }
+          - { id: p07-b-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: p07-b-record, points: 5, axis: record, refs: [ppc-report-final-malicious] }
+      - id: p07-c-prelim-only
+        text: { ja: '速報だけを出し、本人への通知は後日に回す', en: '' }
+        explain: { ja: '速報の期限は守れているが、本人通知が遅れると、顧客は自分が対象かを知らないまま不安を抱える。二次被害の防止も後手になる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [ppc-report-prelim]
+        gauges: { trust: 3, stamina: -5 }
+        setFlags: { ppcPrelimFiled: true }
+        items:
+          - { id: p07-c-time, points: 8, axis: time, refs: [ppc-report-prelim] }
+          - { id: p07-c-content, points: 5, axis: content, refs: [ppc-report-prelim] }
+    lesson: { ja: '漏えいの疑いでは、件数の確定を待たずに分かった範囲で速報する。不正の目的のおそれがあれば、件数に関係なく報告対象になる。本人通知と確報の準備を並行し、不明点は調査中と明記する。', en: '' }
+
+  - id: p08-subscription
+    at: { day: 1, minutes: 840 }
+    phase: notify
+    sound: { se: [notify_chat] }
+    text: { ja: '午後2時。定額サービスの担当者から「翌月分の請求はどうしますか。届かないのに請求はできない」と聞かれた。', en: '' }
+    voices: [v08-boss, v08-popular, v08-ok]
+    choices:
+      - id: p08-a-stop-billing
+        text: { ja: '翌月の請求を止め、休止と代替の受け取り方法を案内する', en: '' }
+        explain: { ja: '届かない商品の代金を取らない判断は、顧客との信頼を保つ。休止の案内と代替の受け取りまで示すことで、解約の連鎖も抑えられる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 100
+        refs: [no11-bcp-continuity, meti-disclosure-guidance]
+        gauges: { flame: -5, trust: 12, stamina: -5 }
+        setFlags: { subPaused: true }
+        items:
+          - { id: p08-a-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p08-a-content, points: 8, axis: content, refs: [no11-bcp-continuity] }
+          - { id: p08-a-order, points: 5, axis: order, refs: [no11-bcp-continuity] }
+      - id: p08-b-keep-billing
+        text: { ja: '請求は続け、届かない分は復旧後にまとめて送ると伝える', en: '' }
+        explain: { ja: '届かない商品の代金を先に取ると、顧客は不信感を持つ。まとめ送りがいつになるか分からないままでは、解約と返金の要求が増える。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -100
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -15 }
+        setFlags: { keptBilling: true }
+        items:
+          - { id: p08-b-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p08-b-content, points: -8, axis: content, refs: [no11-bcp-continuity] }
+      - id: p08-c-call
+        text: { ja: '会員に個別に電話し、休止か継続かを一人ずつ確認する', en: '' }
+        explain: { ja: '一人ずつ確認する姿勢は丁寧だが、対象が多いと連絡が終わらない。全員に同じ情報が届くまで時間がかかり、判断が人によってばらつく。', en: '' }
+        minutes: 240
+        category: maintain
+        points: 30
+        refs: [meti-disclosure-guidance]
+        gauges: { trust: 8, stamina: -15 }
+        items:
+          - { id: p08-c-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p08-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+    lesson: { ja: '定額サービスは、届かないのに請求しないことを先に決める。休止の案内と代替の受け取りを全員に同じ形で出し、個別の事情は窓口で受ける。一人ずつ電話するより、まず全員に同じ情報を届ける。', en: '' }
+
+  - id: p09-peers
+    at: { day: 2, minutes: 600 }
+    phase: investigate
+    sound: { se: [notify_news] }
+    text: { ja: '午前10時。同じ物流を使う大手通販が記者会見を開いた。「他社が公表したから、うちも出そう」と広報が言う。', en: '' }
+    voices: [v09-popular, v09-coward, v09-ok]
+    choices:
+      - id: p09-a-wait-peers
+        text: { ja: '他社の公表を待ち、横並びで同じ日に発表する', en: '' }
+        explain: { ja: '他社の出方を待つと、自社の顧客への説明が遅れる。同じ委託先を使う他社が公表しても、自社の被害の有無は自社で確かめるしかない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -90
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -10 }
+        coward: true
+        items:
+          - { id: p09-a-time, points: -10, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: p09-a-order, points: -8, axis: order, refs: [meti-disclosure-guidance] }
+      - id: p09-c-align
+        text: { ja: '他社の発表内容に合わせて、表現を揃えて出す', en: '' }
+        explain: { ja: '表現を揃えること自体は悪くないが、他社の事実と自社の事実は同じではない。合わせることに意識が向くと、自社の顧客への説明が薄くなる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [meti-disclosure-guidance]
+        gauges: { trust: 3, flame: 3 }
+        items:
+          - { id: p09-c-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p09-c-content, points: 3, axis: content, refs: [meti-disclosure-guidance] }
+      - id: p09-b-own
+        text: { ja: '他社と関係なく、自社で確認できた事実を公表する', en: '' }
+        explain: { ja: '他社の発表に合わせるのではなく、自社の事実と顧客への影響を軸にしている。横並びを待つ間に広がる臆測を、自分たちの説明で止められる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 100
+        refs: [meti-disclosure-guidance, no11-ppc-entrust-report]
+        gauges: { flame: -8, trust: 12, stamina: -5 }
+        setFlags: { ownDisclosure: true }
+        items:
+          - { id: p09-b-order, points: 8, axis: order, refs: [meti-disclosure-guidance] }
+          - { id: p09-b-content, points: 8, axis: content, refs: [no11-ppc-entrust-report] }
+          - { id: p09-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '同じ委託先を使う他社の発表は参考になるが、自社の説明を他社に合わせる必要はない。自社で確認した事実、顧客への影響、再開の見込みを軸に、待たずに出す。横並びを待つほど、臆測が先に広がる。', en: '' }
+
+  - id: p10-vendor
+    at: { day: 3, minutes: 600 }
+    phase: investigate
+    sound: { se: [phone_ring] }
+    text: { ja: '午前10時。物流の管理本部長が来社した。「弊社の権限管理が甘かった。契約の監督条項も曖昧だった」と認める。', en: '' }
+    voices: [v10-vendor, v10-law, v10-ok]
+    notable:
+      - { id: note-audit, text: { ja: '委託先は権限管理の甘さと、契約の監督条項の曖昧さを認めた。', en: '' } }
+    choices:
+      - id: p10-a-blame
+        text: { ja: '委託先の責任として、契約上の賠償を求める方針を固める', en: '' }
+        explain: { ja: '責任の追及を先に立てると、原因の共同確認が止まる。委託元としての監督責任も問われる立場で、相手だけを責める説明は通らない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [no11-ppc-entrust-supervision]
+        gauges: { flame: 8, trust: -10 }
+        items:
+          - { id: p10-a-content, points: -10, axis: content, refs: [no11-ppc-entrust-supervision] }
+          - { id: p10-a-order, points: -8, axis: order, refs: [no11-ppc-entrust-supervision] }
+      - id: p10-b-joint
+        text: { ja: '共同調査を求め、委託先の権限と契約の監督条項を点検する', en: '' }
+        explain: { ja: '原因の確認と自社の監督責任を同時に扱っている。契約と権限の点検まで踏み込むことで、同じ委託先を使う他の業務のリスクも下げられる。', en: '' }
+        minutes: 150
+        category: recover
+        points: 120
+        refs: [no11-ppc-entrust-supervision, meti-csm-guideline]
+        gauges: { trust: 12, stamina: -12 }
+        setFlags: { jointInvestigation: true, contractReview: true }
+        items:
+          - { id: p10-b-order, points: 8, axis: order, refs: [no11-ppc-entrust-supervision] }
+          - { id: p10-b-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: p10-b-record, points: 8, axis: record, refs: [jpcert-handling] }
+      - id: p10-c-check-clause
+        text: { ja: '契約に監督条項があるかどうかだけを確認する', en: '' }
+        explain: { ja: '条項の有無だけを見ても、実際の権限管理やログの確認までは分からない。契約があれば責任を果たしたことにはならず、再発防止にもつながらない。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [no11-ppc-entrust-supervision]
+        gauges: { trust: 0, stamina: -3 }
+        items:
+          - { id: p10-c-record, points: 5, axis: record, refs: [no11-ppc-entrust-supervision] }
+          - { id: p10-c-content, points: 3, axis: content, refs: [meti-csm-guideline] }
+    lesson: { ja: '委託先で起きた事故は、委託元の監督責任も問われる。責任の断定より、事実の共同確認を先にする。契約の条項だけでなく、権限、ログ、更新の実態を点検し、是正の期限と担当を決める。', en: '' }
+
+  - id: p11-alt
+    at: { day: 4, minutes: 600 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: '午前10時。物流の復旧は一週間かかる見込み。通販の再開には、別の配送会社を使う判断がいる。', en: '' }
+    voices: [v11-boss, v11-coward, v11-ok]
+    choices:
+      - id: p11-a-alt
+        text: { ja: '別の配送会社と契約し、対象地域から段階的に再開する', en: '' }
+        explain: { ja: '止め続ける損失を抑えながら、安全を確認できた範囲から戻している。段階的なら、問題が起きたときに止める範囲を限定できる。', en: '' }
+        minutes: 120
+        category: recover
+        points: 120
+        refs: [no11-bcp-continuity, meti-csm-guideline]
+        gauges: { damage: -10, trust: 12, stamina: -10 }
+        setFlags: { altCarrier: true, phasedResume: true }
+        items:
+          - { id: p11-a-order, points: 8, axis: order, refs: [no11-bcp-continuity] }
+          - { id: p11-a-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: p11-a-care, points: 5, axis: care, refs: [meti-disclosure-guidance] }
+      - id: p11-b-storepick
+        text: { ja: '店舗在庫の店頭受け取りだけを始め、通販は止めたままにする', en: '' }
+        explain: { ja: '店舗の在庫で応えられる範囲は限られ、遠方の顧客には届かない。通販を止めたままにする間の売上と信頼の損失が積み上がる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 30
+        refs: [no11-bcp-continuity]
+        gauges: { trust: 5, flame: -3 }
+        items:
+          - { id: p11-b-care, points: 5, axis: care, refs: [no11-bcp-continuity] }
+          - { id: p11-b-order, points: 3, axis: order, refs: [no11-bcp-continuity] }
+      - id: p11-c-wait
+        text: { ja: '物流の復旧を待ち、それまで通販は止めたままにする', en: '' }
+        explain: { ja: '一つの委託先の復旧に全面依存すると、再開の時期を自分で決められない。待つ間の売上と顧客の離脱が重なり、回復に時間がかかる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -90
+        refs: [no11-bcp-continuity]
+        gauges: { flame: 8, trust: -10, damage: 5 }
+        coward: true
+        items:
+          - { id: p11-c-time, points: -10, axis: time, refs: [no11-bcp-continuity] }
+          - { id: p11-c-order, points: -8, axis: order, refs: [no11-bcp-continuity] }
+    lesson: { ja: '委託先が止まったときの代替手段を、平時から決めておく。別の配送会社を使うなら、データの扱いと責任分界を確認してから契約する。復旧を待つだけにすると、再開の時期を自分で決められなくなる。', en: '' }
+
+  - id: p12-support
+    at: { day: 7, minutes: 600 }
+    phase: recover
+    sound: { se: [phone_ring] }
+    text: { ja: '午前10時。遅延とキャンセルの問い合わせが、一日で千件を超えた。送料の返金を求める声も多い。', en: '' }
+    voices: [v12-public, v12-flattery, v12-ok]
+    choices:
+      - id: p12-a-template
+        text: { ja: '定型のメールを一斉に送り、個別の問い合わせには応じない', en: '' }
+        explain: { ja: '一律の連絡は速いが、顧客ごとの事情に応えられない。返金や代替の相談ができないまま、問い合わせと不満が積み上がる。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -110
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 12, trust: -12 }
+        items:
+          - { id: p12-a-care, points: -10, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p12-a-care2, points: -8, axis: care, refs: [meti-disclosure-guidance] }
+      - id: p12-c-vip
+        text: { ja: '問い合わせの多い顧客だけに、個別に電話で対応する', en: '' }
+        explain: { ja: '声の大きい顧客への対応に偏ると、同じ被害を受けている他の顧客が置き去りになる。公平でない対応は、後から比較されて批判を招く。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [meti-disclosure-guidance]
+        gauges: { trust: 3, stamina: -10 }
+        items:
+          - { id: p12-c-care, points: 5, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p12-c-order, points: -5, axis: order, refs: [meti-disclosure-guidance] }
+      - id: p12-b-window
+        text: { ja: '窓口を増員し、遅延のお詫びと送料の返金を案内する', en: '' }
+        explain: { ja: '顧客が実際に困っていることへ、具体的な答えを返している。返金の条件を先に決めることで、現場の判断もぶれず、二次的な苦情を減らせる。', en: '' }
+        minutes: 180
+        category: recover
+        points: 100
+        refs: [meti-disclosure-guidance, no11-bcp-continuity]
+        gauges: { flame: -10, trust: 12, stamina: -15 }
+        setFlags: { supportWindow: true, refundReady: true }
+        items:
+          - { id: p12-b-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
+          - { id: p12-b-care2, points: 8, axis: care, refs: [no11-bcp-continuity] }
+          - { id: p12-b-content, points: 5, axis: content, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '問い合わせが集中したら、窓口を増やすだけでなく、返金や代替の条件を先に決める。全員に同じ基準を示し、個別の事情は窓口で受ける。声の大きい顧客だけを優先すると、公平さを失う。', en: '' }
+
+  - id: p13-leak
+    at: { day: 14, minutes: 600 }
+    phase: notify
+    sound: { se: [notify_news] }
+    text: { ja: '午前10時。物流から「攻撃者が配送データの一部を公開した」と連絡。氏名、住所、電話、注文した商品が含まれる。', en: '' }
+    voices: [v13-attacker, v13-coward, v13-ok]
+    notable:
+      - { id: note-leak, text: { ja: '攻撃者が配送データの一部を公開。氏名、住所、電話、注文商品が含まれる。', en: '' } }
+    choices:
+      - id: p13-a-wait
+        text: { ja: '可能性の段階では公表せず、確定するまで待つ', en: '' }
+        explain: { ja: '攻撃者が公開している以上、確定を待つ間に顧客が自分で情報を見つける。通知が遅れるほど、なりすましや二次被害への備えも遅れる。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -150
+        refs: [ppc-notify-person, ppc-report-scope]
+        gauges: { flame: 20, trust: -15, damage: 10 }
+        coward: true
+        items:
+          - { id: p13-a-time, points: -10, axis: time, refs: [ppc-notify-person] }
+          - { id: p13-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: p13-a-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: p13-b-notify
+        text: { ja: '対象の可能性がある顧客に通知し、相談窓口と二次被害の注意を出す', en: '' }
+        explain: { ja: '公開された事実を認め、対象者に具体的な行動と相談先を届けている。範囲が確定していなくても、可能性がある人に早く知らせることが優先になる。', en: '' }
+        minutes: 240
+        category: recover
+        points: 150
+        refs: [ppc-notify-person, no11-ppc-entrust-report]
+        gauges: { flame: -15, trust: 15, stamina: -20 }
+        setFlags: { leakNotified: true, supportWindow: true }
+        items:
+          - { id: p13-b-content, points: 8, axis: content, refs: [ppc-report-scope] }
+          - { id: p13-b-care, points: 10, axis: care, refs: [ppc-notify-person] }
+          - { id: p13-b-care2, points: 8, axis: care, refs: [no11-ppc-entrust-report] }
+          - { id: p13-b-wording, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: p13-c-deny
+        text: { ja: '漏れていないと断言し、物流の発表を待つよう案内する', en: '' }
+        explain: { ja: '公開されているデータを否定すると、顧客は自社の説明を信じられなくなる。事実と異なる断言は、隠蔽に近い対応として重く受け取られる。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -200
+        refs: [ppc-report-scope, meti-disclosure-guidance]
+        gauges: { flame: 25, trust: -20, damage: 15 }
+        setFlags: { deniedLeak: true }
+        items:
+          - { id: p13-c-wording, points: -15, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p13-c-content, points: -10, axis: content, refs: [ppc-report-scope] }
+          - { id: p13-c-care, points: -10, axis: care, refs: [ppc-notify-person] }
+    lesson: { ja: '攻撃者が情報を公開したら、確定を待たずに可能性がある人へ通知する。通知には、何が漏れたか、本人が何をすればよいか、どこに相談するかを入れる。否定を続けると、顧客は自力で情報を探し、二次被害に備えられない。', en: '' }
+
+  - id: p14-resume
+    at: { day: 21, minutes: 600 }
+    phase: recover
+    sound: { se: [notify_sns] }
+    text: { ja: '午前10時。物流の復旧と代替配送の体制が整った。全面再開の条件を決める。監視の手を緩めるかどうかも迷う。', en: '' }
+    voices: [v14-public, v14-past, v14-ok]
+    popular: { choiceId: p14-a-full, percent: 55 }
+    choices:
+      - id: p14-a-full
+        text: { ja: '物流の復旧に合わせて全面再開し、監視も通常に戻す', en: '' }
+        explain: { ja: '問題が起きていない状態を前提に、監視まで一度に戻している。再発の兆候を見逃すと、止める手段がないまま被害が広がる。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -150
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, flame: 10, trust: -10 }
+        delayed:
+          - { afterPhases: 1, points: -60, gauges: { damage: 15, trust: -15 }, reason: { ja: '再開後に不審な通信が見つかり、通販を再度止めた。', en: '' } }
+        items:
+          - { id: p14-a-time, points: -10, axis: time, refs: [nist-sp800-61r3] }
+          - { id: p14-a-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
+          - { id: p14-a-content, points: -8, axis: content, refs: [nist-sp800-61r3] }
+      - id: p14-c-delay
+        text: { ja: '店頭受け取りを続けながら、通販の全面再開を先に延ばす', en: '' }
+        explain: { ja: '安全側の判断ではあるが、再開の条件を決めずに延ばすと、いつ戻るのか分からない状態が続く。顧客の離脱と売上の損失が固定化する。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 30
+        refs: [no11-bcp-continuity]
+        gauges: { trust: 3, flame: 3 }
+        items:
+          - { id: p14-c-order, points: 5, axis: order, refs: [no11-bcp-continuity] }
+          - { id: p14-c-record, points: 3, axis: record, refs: [no11-bcp-continuity] }
+      - id: p14-b-phased
+        text: { ja: '段階再開を続け、注文と出荷の数を見て全面再開を決める', en: '' }
+        explain: { ja: '再開の範囲を広げながら、数字で次の判断を決めている。監視を維持したまま進めるため、問題が起きたときに止める範囲を限定できる。', en: '' }
+        minutes: 180
+        category: recover
+        points: 130
+        refs: [nist-sp800-61r3, no11-bcp-continuity]
+        gauges: { damage: -15, trust: 15, stamina: -10 }
+        setFlags: { phasedResume: true, monitorKept: true }
+        items:
+          - { id: p14-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: p14-b-content, points: 8, axis: content, refs: [no11-bcp-continuity] }
+          - { id: p14-b-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: p14-b-time, points: 3, axis: time, refs: [nist-sp800-61r3] }
+    lesson: { ja: '再開は、安全を確認できた範囲から段階的に広げる。監視を維持し、注文と出荷の数を見て次の判断を決める。全面再開と監視の解除を同時に行うと、再発したときに止める手段がなくなる。', en: '' }
+
+  - id: p15-report
+    at: { day: 30, minutes: 600 }
+    phase: after
+    sound: { se: [notify_news] }
+    text: { ja: '午前10時。調査報告書がまとまった。個人情報保護委員会への確報も出す。どこまで公開するかを決める。', en: '' }
+    voices: [v15-expert, v15-boss, v15-ok]
+    choices:
+      - id: p15-a-open
+        text: { ja: '監督の不備を含む報告書を公開し、再発防止の進捗を毎月出す', en: '' }
+        explain: { ja: '自社の監督責任まで含めて公開し、対策の進捗を継続して示している。一度の公表で終わらせず、改善を確かめられる形にした点が最も評価できる。', en: '' }
+        minutes: 240
+        category: increase
+        points: 300
+        fatalAlternate: 50
+        refs: [meti-disclosure-guidance, no11-ppc-entrust-supervision]
+        gauges: { flame: -15, trust: 20, stamina: -15 }
+        setFlags: { fullDisclosure: true, ppcFinalFiled: true }
+        detail: final-report
+        items:
+          - { id: p15-a-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: p15-a-record, points: 8, axis: record, refs: [no11-ppc-entrust-supervision] }
+          - { id: p15-a-care, points: 8, axis: care, refs: [ppc-notify-person] }
+      - id: p15-b-publish
+        text: { ja: '攻撃に使える詳細だけを伏せて、報告書を全文公開する', en: '' }
+        explain: { ja: '危険な詳細を伏せつつ、原因と対応を公開している。再発防止の材料として価値はあるが、進捗の継続公開までは踏み込んでいない。', en: '' }
+        minutes: 180
+        category: recover
+        points: 100
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        setFlags: { fullDisclosure: true, ppcFinalFiled: true }
+        detail: final-report
+        items:
+          - { id: p15-b-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: p15-b-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
+      - id: p15-c-hide
+        text: { ja: '報告書は公開せず、再発防止は社内だけで進めると説明する', en: '' }
+        explain: { ja: '攻撃に使える情報を伏せる配慮は必要だが、全文を隠すと検証が進まない。委託先の監督をどう直したのかも説明できず、再発への備えが見えない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -150
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -15 }
+        items:
+          - { id: p15-c-content, points: -10, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: p15-c-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: p15-c-record, points: -8, axis: record, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '報告書は、攻撃に使える詳細だけを伏せて公開する。自社の監督責任と原因を書き、再発防止の進捗を継続して示す。一度公開して終わりにすると、対策が形だけになっていないか確かめられない。', en: '' }
+
+drafts:
+  first-statement:
+    title: { ja: '第一報の文案', en: '' }
+    slots:
+      - id: scope
+        label: { ja: '対象', en: '' }
+        options:
+          - { id: fs-s-late, text: { ja: '停止後も注文した人だけ', en: '' }, points: -15, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '停止後に注文した人だけに絞ると、それ以前の注文者が自分は対象か分からない。問い合わせが窓口に集中する。', en: '' } }
+          - { id: fs-s-month, text: { ja: '直近一か月に注文した人', en: '' }, points: 3, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '直近一か月は分かりやすいが、それ以前の注文者を外す理由にはならない。対象を狭めた分、説明の追加が必要になる。', en: '' } }
+          - { id: fs-s-all, text: { ja: '通販の注文者全員', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '注文者全員を対象にすると、止まっている荷物に関係する人が自分事として動ける。対象を広く取るほど説明の抜けは減る。', en: '' } }
+      - id: cause
+        label: { ja: '原因の書き方', en: '' }
+        options:
+          - { id: fs-c-attack, text: { ja: '委託先のランサムウェア被害', en: '' }, points: 8, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '委託先の攻撃被害と書くと、原因が自社の障害ではないことと、起きている事態の重さが同時に伝わる。', en: '' } }
+          - { id: fs-c-system, text: { ja: '委託先のシステム障害', en: '' }, points: 3, axis: content, refs: [meti-disclosure-guidance], explain: { ja: 'システム障害と書くと、攻撃による被害だと分からない。後から判明したとき、説明の訂正が必要になる。', en: '' } }
+          - { id: fs-c-fault, text: { ja: '委託先の機器故障によるシステム障害', en: '' }, points: -20, axis: wording, refs: [meti-disclosure-guidance], explain: { ja: '機器故障と書くと、原因が異なる説明になる。攻撃と判明した後で、隠していたと受け取られる。', en: '' } }
+      - id: impact
+        label: { ja: '止まっていること', en: '' }
+        options:
+          - { id: fs-i-vague, text: { ja: '「一部の遅れ」とだけ書く', en: '' }, points: -10, axis: content, refs: [no11-bcp-continuity], explain: { ja: '一部の遅れでは、注文できるのか、いつ届くのかが分からない。顧客はサイトと窓口の両方に問い合わせる。', en: '' } }
+          - { id: fs-i-specific, text: { ja: '出荷停止と再開の見込み', en: '' }, points: 10, axis: content, refs: [no11-bcp-continuity], explain: { ja: '出荷が止まっていることと再開の見込みが分かると、顧客は待つか取り消すかを自分で選べる。', en: '' } }
+          - { id: fs-i-none, text: { ja: '影響の範囲を書かない', en: '' }, points: -12, axis: content, refs: [no11-bcp-continuity], explain: { ja: '影響の範囲がないと、自分の注文がどうなるか判断できない。憶測がSNSに流れ、問い合わせが増える。', en: '' } }
+      - id: action
+        label: { ja: '顧客が今すること', en: '' }
+        options:
+          - { id: fs-a-apology, text: { ja: '「申し訳ありません」とだけ書く', en: '' }, points: -10, axis: care, refs: [meti-disclosure-guidance], explain: { ja: '謝罪だけでは、顧客が注文を取り消せるのか、返金はあるのかが分からない。次の行動につながらない。', en: '' } }
+          - { id: fs-a-site, text: { ja: 'サイトの更新だけを案内する', en: '' }, points: 3, axis: care, refs: [meti-disclosure-guidance], explain: { ja: 'サイトを見るよう案内するだけでは、電話やメールで確認したい人に届かない。窓口の存在も伝わらない。', en: '' } }
+          - { id: fs-a-cancel, text: { ja: '注文の取り消しと返金の方法', en: '' }, points: 10, axis: care, refs: [meti-disclosure-guidance], explain: { ja: '取り消しと返金の方法が具体的だと、顧客は待つか戻すかを選べる。返金の問い合わせも減る。', en: '' } }
+      - id: contact
+        label: { ja: '問い合わせ窓口', en: '' }
+        options:
+          - { id: fs-w-hours, text: { ja: '専用窓口の番号と受付時間', en: '' }, points: 8, axis: care, refs: [no11-bcp-continuity], explain: { ja: '番号と受付時間があると、つながる見通しが立つ。夜間や休日の問い合わせも迷わない。', en: '' } }
+          - { id: fs-w-number, text: { ja: '番号だけを書く', en: '' }, points: -5, axis: care, refs: [no11-bcp-continuity], explain: { ja: '番号だけでは受付時間が分からず、夜間の問い合わせが迷う。窓口の混雑も伝わらない。', en: '' } }
+          - { id: fs-w-none, text: { ja: '問い合わせ先を書かない', en: '' }, points: -15, axis: care, refs: [meti-disclosure-guidance], explain: { ja: '問い合わせ先がないと、顧客はSNSや店舗に流れる。現場が個別に説明することになり、内容もばらつく。', en: '' } }
+      - id: apology
+        label: { ja: '謝罪の主語', en: '' }
+        options:
+          - { id: fs-ap-logistics, text: { ja: '「物流会社の事情」として謝罪する', en: '' }, points: -5, axis: wording, refs: [meti-disclosure-guidance], explain: { ja: '取引先の事情として謝罪すると、自社の提供責任が曖昧になる。顧客から見れば、注文した相手は自社だ。', en: '' } }
+          - { id: fs-ap-own, text: { ja: '「当社」として謝罪する', en: '' }, points: 5, axis: wording, refs: [meti-disclosure-guidance], explain: { ja: '提供主体として謝罪する姿勢が伝わる。委託先への責任追及とは別に、顧客への責任を明確にできる。', en: '' } }
+          - { id: fs-ap-vendor, text: { ja: '「委託先」の責任として謝罪する', en: '' }, points: -10, axis: wording, refs: [meti-disclosure-guidance], explain: { ja: '委託先の責任として謝罪すると、自社の説明責任を回避したと映る。顧客との信頼を損ない、再発防止の主体も曖昧になる。', en: '' } }
+      - id: next
+        label: { ja: '次の公表', en: '' }
+        options:
+          - { id: fs-n-none, text: { ja: '次回の予定を書かない', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '次の予定がないと、情報の空白を憶測で埋められる。問い合わせの終わりも見えない。', en: '' } }
+          - { id: fs-n-undecided, text: { ja: '次回は未定と書く', en: '' }, points: 2, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '未定と書くだけでは、いつ情報が出るのか分からない。待つ側の見通しが立たず、問い合わせが続く。', en: '' } }
+          - { id: fs-n-next, text: { ja: '次の公表予定を書く', en: '' }, points: 5, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '次の公表予定があると、続報を待つ側の見通しが立つ。憶測が広がる前に、次の接点を示せる。', en: '' } }
+      - id: approval
+        label: { ja: '社内の確認', en: '' }
+        options:
+          - { id: fs-v-share, text: { ja: '広報と法務、物流で文案を確認する', en: '' }, points: 5, axis: order, refs: [meti-csm-guideline], explain: { ja: '複数の立場で確認すると、事実誤認と表現の偏りを減らせる。委託先の情報との食い違いも防げる。', en: '' } }
+          - { id: fs-v-pr, text: { ja: '広報だけで確認して出す', en: '' }, points: 2, axis: order, refs: [meti-csm-guideline], explain: { ja: '広報だけで出すと、法務の確認が抜けやすい。法的な報告との整合が取れず、訂正が増える。', en: '' } }
+          - { id: fs-v-solo, text: { ja: '社長と広報だけで確認して出す', en: '' }, points: -10, axis: order, refs: [meti-csm-guideline], explain: { ja: '経営と広報だけで決めると、現場と法務の確認が抜ける。顧客対応の前提が揃わず、発表後に修正が重なる。', en: '' } }
+      - id: record
+        label: { ja: '記録', en: '' }
+        options:
+          - { id: fs-r-time, text: { ja: '公表の時刻だけを記録する', en: '' }, points: 2, axis: record, refs: [jpcert-handling], explain: { ja: '時刻だけでも記録は残るが、どの版を出したか分からない。訂正が必要になったとき、変更の経緯をたどれない。', en: '' } }
+          - { id: fs-r-log, text: { ja: '公表の時刻と版を記録する', en: '' }, points: 5, axis: record, refs: [jpcert-handling], explain: { ja: '時刻と版を記録すると、後から説明の経緯をたどれる。訂正が必要になった理由も示せる。', en: '' } }
+          - { id: fs-r-none, text: { ja: '記録を残さず、口頭だけで共有する', en: '' }, points: -8, axis: record, refs: [jpcert-handling], explain: { ja: '口頭だけの共有は、誰が何をいつ出したか残らない。後日の検証や訂正の根拠に耐えられない。', en: '' } }
+  final-report:
+    title: { ja: '調査報告書の公開範囲', en: '' }
+    slots:
+      - id: scope
+        label: { ja: '公開する範囲', en: '' }
+        options:
+          - { id: fr-s-partial, text: { ja: '攻撃に使える詳細だけ伏せて公開', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '危険な詳細だけを伏せる公開は、検証と再発防止の両立になる。委託先の監督の見直しも説明できる。', en: '' } }
+          - { id: fr-s-summary, text: { ja: '報告書の要約だけを公開する', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '要約だけでは、都合の悪い指摘が抜けていないか分からない。調査の透明性が下がり、再発防止も弱くなる。', en: '' } }
+          - { id: fr-s-hide, text: { ja: '報告書を公開しない', en: '' }, points: -20, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '公開しないと、原因も対策も検証されない。委託先の監督をどう直したのかも説明できず、顧客の信頼も戻らない。', en: '' } }
+      - id: cause
+        label: { ja: '原因の書き方', en: '' }
+        options:
+          - { id: fr-c-vague, text: { ja: '「外部からの攻撃」とだけ書く', en: '' }, points: -10, axis: content, refs: [nist-sp800-61r3], explain: { ja: '外部からの攻撃だけでは、どこを直すのか分からない。対策が精神論に流れ、検証もできない。', en: '' } }
+          - { id: fr-c-specific, text: { ja: '監督の不備と原因を具体的に書く', en: '' }, points: 10, axis: content, refs: [no11-ppc-entrust-supervision], explain: { ja: '委託先の権限管理と自社の監督のどこが不足したかを具体的に書くと、再発防止の優先順位が決まる。', en: '' } }
+          - { id: fr-c-vendor, text: { ja: '原因は委託先にあるとだけ書く', en: '' }, points: -8, axis: content, refs: [no11-ppc-entrust-supervision], explain: { ja: '原因を委託先だけに寄せると、自社の監督責任が見えない。同じ契約の他の委託先の点検も進まない。', en: '' } }
+      - id: vendor
+        label: { ja: '委託先の扱い', en: '' }
+        options:
+          - { id: fr-v-omit, text: { ja: '委託先の記載をすべて省く', en: '' }, points: -15, axis: content, refs: [no11-ppc-entrust-supervision], explain: { ja: '委託先に触れないと、同じ型のリスクが他の業務に残る。監督の見直しを説明する材料も失う。', en: '' } }
+          - { id: fr-v-name, text: { ja: '委託先の名前と契約だけを書く', en: '' }, points: -5, axis: content, refs: [no11-ppc-entrust-supervision], explain: { ja: '名前と契約だけでは、権限管理やログの確認がどうだったか分からない。再発防止の中身が見えない。', en: '' } }
+          - { id: fr-v-detail, text: { ja: '委託先の権限と契約の不備を書く', en: '' }, points: 10, axis: content, refs: [no11-ppc-entrust-supervision], explain: { ja: '権限と契約の不備を書くと、他の委託先の点検にもつながる。責任分界も整理でき、監督の実効性が伝わる。', en: '' } }
+      - id: measures
+        label: { ja: '再発防止策', en: '' }
+        options:
+          - { id: fr-m-plan, text: { ja: '再発防止の時期と担当を書く', en: '' }, points: 10, axis: content, refs: [cissp-cbk-secops], explain: { ja: '時期と担当があれば、対策が実行されたか検証できる。毎月の進捗の公開にもそのまま使える。', en: '' } }
+          - { id: fr-m-slogan, text: { ja: '「再発防止に努める」とだけ書く', en: '' }, points: -10, axis: content, refs: [cissp-cbk-secops], explain: { ja: '「努める」だけでは、何をいつ誰がやるのか分からない。実行されたかの検証もできない。', en: '' } }
+          - { id: fr-m-pending, text: { ja: '対策は検討中とだけ書く', en: '' }, points: -5, axis: content, refs: [cissp-cbk-secops], explain: { ja: '検討中とだけ書くと、対策の方向も期限も見えない。再発への備えが進んでいるのか判断できない。', en: '' } }
+      - id: thirdparty
+        label: { ja: '第三者委員会の意見', en: '' }
+        options:
+          - { id: fr-t-summary, text: { ja: '第三者委員会の意見は要約だけ載せる', en: '' }, points: -8, axis: content, refs: [cissp-cbk-secops], explain: { ja: '要約だけでは、都合の悪い指摘が抜けていないか分からない。調査の独立性が伝わらず、再発防止も弱くなる。', en: '' } }
+          - { id: fr-t-full, text: { ja: '第三者委員会の意見を全文載せる', en: '' }, points: 8, axis: content, refs: [cissp-cbk-secops], explain: { ja: '第三者委員会の意見を全文載せると、調査の独立性が伝わる。都合の悪い指摘も隠せない。', en: '' } }
+          - { id: fr-t-none, text: { ja: '第三者委員会の意見は載せない', en: '' }, points: -10, axis: content, refs: [cissp-cbk-secops], explain: { ja: '第三者委員会の意見を載せないと、調査の検証が外部から見えない。報告書の説得力が大きく下がる。', en: '' } }
+      - id: customers
+        label: { ja: '顧客への対応', en: '' }
+        options:
+          - { id: fr-p-none, text: { ja: '顧客への対応には触れない', en: '' }, points: -10, axis: care, refs: [ppc-notify-person], explain: { ja: '顧客への対応に触れないと、被害者の視点が抜けた報告になる。通知や返金の実績も伝わらない。', en: '' } }
+          - { id: fr-p-count, text: { ja: '通知した件数と返金の実績だけを書く', en: '' }, points: 3, axis: care, refs: [ppc-notify-person], explain: { ja: '件数と返金の実績は事実として必要だが、相談窓口や二次被害への備えが見えない。', en: '' } }
+          - { id: fr-p-support, text: { ja: '通知と返金、相談窓口の実績を書く', en: '' }, points: 8, axis: care, refs: [ppc-notify-person], explain: { ja: '通知と返金に加えて相談窓口の実績を書くと、顧客対応が実際に行われたことが伝わる。', en: '' } }
+      - id: progress
+        label: { ja: '進捗の公開', en: '' }
+        options:
+          - { id: fr-o-monthly, text: { ja: '進捗を毎月公開する', en: '' }, points: 10, axis: record, refs: [meti-disclosure-guidance], explain: { ja: '毎月の進捗公開は、対策が形だけになっていないか確かめられる。改善の速度も見える。', en: '' } }
+          - { id: fr-o-once, text: { ja: '一度だけ公開する', en: '' }, points: -5, axis: record, refs: [meti-disclosure-guidance], explain: { ja: '一度きりの公開では、その後の進み具合が分からない。未完了の対策が放置されやすい。', en: '' } }
+          - { id: fr-o-internal, text: { ja: '進捗は社内だけで確認する', en: '' }, points: -8, axis: record, refs: [meti-disclosure-guidance], explain: { ja: '社内だけで確認すると、対策が進んでいるかを外部が確かめられない。約束が守られたかの説明もできない。', en: '' } }
+      - id: industry
+        label: { ja: '業界への共有', en: '' }
+        options:
+          - { id: fr-g-keep, text: { ja: '得た教訓は自社の社内だけにとどめる', en: '' }, points: -5, axis: content, refs: [meti-csm-guideline], explain: { ja: '自社だけに留めると、同じ型のリスクが業界に残る。再発防止に取り組む姿勢も伝わらない。', en: '' } }
+          - { id: fr-g-share, text: { ja: '得た教訓を業界に無償で共有する', en: '' }, points: 10, axis: content, refs: [meti-csm-guideline], explain: { ja: '教訓を業界で共有すると、同じ被害を他の小売でも防げる。委託先の点検の輪も広がる。', en: '' } }
+          - { id: fr-g-none, text: { ja: '業界には何も共有しない', en: '' }, points: -8, axis: content, refs: [meti-csm-guideline], explain: { ja: '何も共有しないと、同じ物流会社を使う他社も同じリスクを抱えたままになる。自社の再発防止も検証されない。', en: '' } }
+voices:
+  - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '物流が戻るまで待てばいい。受注は止めるな。', en: '' }, trigger: { at: point } }
+  - { id: v01-public, media: sns, misleading: true, type: public-opinion, text: { ja: '通販だけ止めるのか。店は開いているのに。', en: '' }, trigger: { at: point } }
+  - { id: v01-ok, media: chat, misleading: false, text: { ja: '広報「止めるなら、理由と再開の見込みを同時に出しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v01-after, media: sns, misleading: false, text: { ja: '通販だけ止めて、店は続けるのか。', en: '' }, trigger: { at: after, choice: p01-b-prepare } }
+  - { id: v02-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '配送データを公開されたくなければ、支払え。', en: '' }, trigger: { at: point } }
+  - { id: v02-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '物流「弊社も一枚岩ではありません。早く復旧したい」。', en: '' }, trigger: { at: point } }
+  - { id: v02-ok, media: chat, misleading: false, text: { ja: '法務「支払いは復号も削除も保証しません。警察に相談を」。', en: '' }, trigger: { at: point } }
+  - { id: v02-after, media: sns, misleading: false, text: { ja: '払わないから、データが公開されたのではないか。', en: '' }, trigger: { at: after, choice: p02-a-refuse } }
+  - { id: v03-public, media: sns, misleading: true, type: public-opinion, text: { ja: '注文だけ受けておけば、復旧後にまとめて送れる。', en: '' }, trigger: { at: point } }
+  - { id: v03-law, media: board, misleading: true, type: law-ish, text: { ja: '止めたら売上の機会損失の方が大きい。損害賠償も怖い。', en: '' }, trigger: { at: point } }
+  - { id: v03-ok, media: chat, misleading: false, text: { ja: '通販責任者「顧客が今知りたいのは、いつ届くかです」。', en: '' }, trigger: { at: point } }
+  - { id: v03-after, media: news, misleading: false, text: { ja: '止めるなら、代替の受け取りを用意しろ。', en: '' }, trigger: { at: after, choice: p03-b-stop } }
+  - { id: v04-field, media: chat, misleading: true, type: well-meant-field, text: { ja: '店員「聞かれたら、本部に確認すると言っておきます」。', en: '' }, trigger: { at: point } }
+  - { id: v04-past, media: boss, misleading: true, type: past-success, text: { ja: '前の台風のときも、店は普通に開けて乗り切った。', en: '' }, trigger: { at: point } }
+  - { id: v04-ok, media: chat, misleading: false, text: { ja: '店舗運営「店頭で説明した方が、問い合わせは減ります」。', en: '' }, trigger: { at: point } }
+  - { id: v04-after, media: sns, misleading: false, text: { ja: '店頭で説明するなら、店員の負担も考えろ。', en: '' }, trigger: { at: after, choice: p04-b-notice } }
+  - { id: v05-flattery, media: chat, misleading: true, type: flattery, text: { ja: 'さすが社長。自社は無事だと早く言った方が安心されます。', en: '' }, trigger: { at: point } }
+  - { id: v05-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '専門家「接続点は関係ありません。自社は安全です」。', en: '' }, trigger: { at: point } }
+  - { id: v05-ok, media: chat, misleading: false, text: { ja: '情報システム部長「接続点の確認を、今日中に終わらせます」。', en: '' }, trigger: { at: point } }
+  - { id: v05-after, media: news, misleading: false, text: { ja: '自社は無事と言い切れないのか。', en: '' }, trigger: { at: after, choice: p05-b-verify } }
+  - { id: v06-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'まだ何も分かっていないのに、今夜出すのか。', en: '' }, trigger: { at: point } }
+  - { id: v06-law, media: board, misleading: true, type: law-ish, text: { ja: '「システム障害」で通せば、余計な混乱は避けられます。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '広報「顧客が今することと、問い合わせ先を入れましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v06-after, media: news, misleading: false, text: { ja: 'システム障害と言えば済んだものを。', en: '' }, trigger: { at: after, choice: p06-b-first } }
+  - { id: v07-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が固まるまで、外には出さないでくれ。', en: '' }, trigger: { at: point } }
+  - { id: v07-law, media: board, misleading: true, type: law-ish, text: { ja: '1,000件以下なら報告はいらないと聞きました。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '法務「不正の目的のおそれがあれば、件数に関係なく報告対象です」。', en: '' }, trigger: { at: point } }
+  - { id: v07-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに、報告するのか。', en: '' }, trigger: { at: after, choice: p07-b-file } }
+  - { id: v08-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '請求は止めるな。止めたら、解約が一気に増える。', en: '' }, trigger: { at: point } }
+  - { id: v08-popular, media: sns, misleading: true, type: popular, text: { ja: '他の会社も、届かなくても請求は続けているらしい。', en: '' }, trigger: { at: point } }
+  - { id: v08-ok, media: chat, misleading: false, text: { ja: '定額サービスの担当「届かないのに請求はできません」。', en: '' }, trigger: { at: point } }
+  - { id: v08-after, media: sns, misleading: false, text: { ja: '休止したら、再開の連絡はいつ来るんだ。', en: '' }, trigger: { at: after, choice: p08-a-stop-billing } }
+  - { id: v09-popular, media: sns, misleading: true, type: popular, text: { ja: '大手が公表するまで待てば、目立たずに済む。', en: '' }, trigger: { at: point } }
+  - { id: v09-coward, media: news, misleading: true, type: coward-critique, text: { ja: '他社より先に出るのは、臆病すぎる。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '広報「他社の内容ではなく、自社の事実を出しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v09-after, media: news, misleading: false, text: { ja: '他社より先に出て、目立つことはない。', en: '' }, trigger: { at: after, choice: p09-b-own } }
+  - { id: v10-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '物流「弊社の責任です。賠償の話を先にしましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v10-law, media: board, misleading: true, type: law-ish, text: { ja: '契約に監督条項がなければ、当社の責任は問われません。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '法務「監督責任は契約の有無にかかわらず、委託元にあります」。', en: '' }, trigger: { at: point } }
+  - { id: v10-after, media: vendor, misleading: false, text: { ja: '委託先に責任を押し付けるのか。', en: '' }, trigger: { at: after, choice: p10-b-joint } }
+  - { id: v11-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '別の会社を使うとコストがかかる。物流の復旧を待て。', en: '' }, trigger: { at: point } }
+  - { id: v11-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '一週間も通販を止めるのは臆病すぎる。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '物流担当「別会社の手配は、明日からできます」。', en: '' }, trigger: { at: point } }
+  - { id: v11-after, media: sns, misleading: false, text: { ja: '別の会社に変えて、責任は誰が取るのか。', en: '' }, trigger: { at: after, choice: p11-a-alt } }
+  - { id: v12-public, media: sns, misleading: true, type: public-opinion, text: { ja: '返金より、早く荷物を届けろ。', en: '' }, trigger: { at: point } }
+  - { id: v12-flattery, media: chat, misleading: true, type: flattery, text: { ja: '社長が謝罪文を書けば、それで収まります。', en: '' }, trigger: { at: point } }
+  - { id: v12-ok, media: chat, misleading: false, text: { ja: '顧客窓口「電話がつながらないという声が増えています」。', en: '' }, trigger: { at: point } }
+  - { id: v12-after, media: sns, misleading: false, text: { ja: '返金するなら、全員に同じようにしろ。', en: '' }, trigger: { at: after, choice: p12-b-window } }
+  - { id: v13-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '次の公開は、もっと多くの顧客だ。', en: '' }, trigger: { at: point } }
+  - { id: v13-coward, media: board, misleading: true, type: coward-critique, text: { ja: 'まだ可能性の段階だ。確定するまで黙っていよう。', en: '' }, trigger: { at: point } }
+  - { id: v13-ok, media: chat, misleading: false, text: { ja: '法務「可能性の段階でも、本人に知らせる判断があります」。', en: '' }, trigger: { at: point } }
+  - { id: v13-after, media: sns, misleading: false, text: { ja: 'まだ可能性なのに、通知するのか。', en: '' }, trigger: { at: after, choice: p13-b-notify } }
+  - { id: v14-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'いつまで段階再開だ。さっさと全面再開しろ。', en: '' }, trigger: { at: point } }
+  - { id: v14-past, media: boss, misleading: true, type: past-success, text: { ja: '前回の障害も、一気に戻して問題なかった。', en: '' }, trigger: { at: point } }
+  - { id: v14-ok, media: chat, misleading: false, text: { ja: '情報システム部長「監視を戻すのは、全面再開の後です」。', en: '' }, trigger: { at: point } }
+  - { id: v14-after, media: sns, misleading: false, text: { ja: '段階再開が遅い。他の店はもう動いている。', en: '' }, trigger: { at: after, choice: p14-b-phased } }
+  - { id: v15-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '報告書を出すと、攻撃者に手の内が分かります。', en: '' }, trigger: { at: point } }
+  - { id: v15-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '再発防止は社内でやればいい。外に出す必要はない。', en: '' }, trigger: { at: point } }
+  - { id: v15-ok, media: chat, misleading: false, text: { ja: '広報「監督の不備まで書くから、説明になります」。', en: '' }, trigger: { at: point } }
+  - { id: v15-after, media: news, misleading: false, text: { ja: '今さら報告書を出して、宣伝か。', en: '' }, trigger: { at: after, choice: p15-a-open } }
+  - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「確認中」なんだ。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-3, media: sns, misleading: false, text: { ja: '経営陣は責任を取りたくないだけだ。事なかれ主義の会社。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-4, media: news, misleading: false, text: { ja: '臆病な経営が、通販の再開を遅らせた。取引先が独自に調査を始めている。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-ransom, media: vendor, misleading: false, text: { ja: '物流「暗号化されました。復旧の見込みは立っていません」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-store, media: chat, misleading: false, text: { ja: '店舗「ネットの注文はどうなるのかと、聞かれています」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-news, media: news, misleading: false, text: { ja: '業界紙「物流会社の障害で、複数の通販が停止」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-customer, media: chat, misleading: false, text: { ja: '顧客「注文した商品は、いつ届くんですか」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-peer, media: news, misleading: false, text: { ja: '大手通販「委託先の被害で出荷を停止した」。', en: '' }, trigger: { at: manual } }
