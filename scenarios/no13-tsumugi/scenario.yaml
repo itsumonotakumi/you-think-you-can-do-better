@@ -1,0 +1,154 @@
+# No.13 ツムギ・アナリティクス（会員データ分析の受託）
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字はすべて架空。
+id: no13-tsumugi
+version: '1.0.0'
+status: latest
+published: '2026-11-13'
+sourcePeriod: { ja: '2020年代の、認証情報の窃取からSaaSを経由した漏えいの構造を参考にしたフィクション', en: '' }
+difficulty: 4
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: '預かったデータが、外に出た', en: '' }
+tagline: { ja: '取引先の会員データを分析する会社が、自分のIDを盗まれた。責任は誰のものか。', en: '' }
+company:
+  name: { ja: 'ツムギ・アナリティクス株式会社', en: '' }
+  industry: { ja: '会員データ分析の受託（小売・アプリ事業者向け）', en: '' }
+  size: { ja: '従業員86名、売上の8割が12社の委託元', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '真壁 遼', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: coo
+      name: { ja: '藤白 美鈴', en: '' }
+      title: { ja: '管理本部長', en: '' }
+    - id: cto
+      name: { ja: '一ノ瀬 慧', en: '' }
+      title: { ja: '技術部門長（情報セキュリティ責任者）', en: '' }
+    - id: analyst
+      name: { ja: '小柳 千尋', en: '' }
+      title: { ja: 'データ分析担当', en: '' }
+    - id: legal
+      name: { ja: '住吉 耕平', en: '' }
+      title: { ja: '法務・契約担当', en: '' }
+    - id: pr
+      name: { ja: '柏木 さやか', en: '' }
+      title: { ja: '広報担当', en: '' }
+start: { day: 0, minutes: 570 }
+initialGauges: { damage: 20, flame: 0, trust: 65, stamina: 100 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-mfa
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: 'なぜ多要素認証を設定していなかったのですか。', en: '' }
+      answers:
+        - { id: a-mfa-attack, text: { ja: '高度な攻撃で、防ぎようがありませんでした。', en: '' }, points: -80 }
+        - { id: a-mfa-own, text: { ja: '設定の運用が徹底できていませんでした。', en: '' }, points: 30 }
+        - { id: a-mfa-plan, text: { ja: '全アカウントの棚卸しと強制適用を今日から進めています。完了の日を示します。', en: '' }, points: 80, requiresNote: note-mfa }
+    - id: q-data
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: 'どの取引先の、どんなデータが持ち出されたのですか。', en: '' }
+      answers:
+        - { id: a-data-unknown, text: { ja: 'まだ調べています。', en: '' }, points: -30 }
+        - { id: a-data-scope, text: { ja: '会員IDと購入履歴の一部です。対象の取引先は特定しました。', en: '' }, points: 30 }
+        - { id: a-data-notify, text: { ja: '対象の取引先と項目を特定し、委託元と文面を揃えて本人通知を進めています。', en: '' }, points: 80, requiresNote: note-scope }
+    - id: q-order
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '取引先への連絡は、いつ、どの順で行いましたか。', en: '' }
+      answers:
+        - { id: a-order-all, text: { ja: '全社に同じ文書を一斉に送りました。', en: '' }, points: 10 }
+        - { id: a-order-order, text: { ja: '影響の大きい順に電話し、同日中に全社へ文書を出しました。', en: '' }, points: 80, requiresNote: note-client-order }
+        - { id: a-order-forget, text: { ja: '順番は覚えていません。', en: '' }, points: -60 }
+    - id: q-responsibility
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: '今回の責任は、どこにあるのですか。', en: '' }
+      answers:
+        - { id: a-res-client, text: { ja: '委託元の管理が不十分でした。', en: '' }, points: -100 }
+        - { id: a-res-saas, text: { ja: 'SaaS事業者の脆弱性が原因です。', en: '' }, points: -80 }
+        - { id: a-res-own, text: { ja: '当社の認証管理と権限の不備です。委託元とSaaS事業者と協力して再発防止を進めます。', en: '' }, points: 80 }
+    - id: q-report
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '個人情報保護委員会への報告は、どちらが行うのですか。', en: '' }
+      answers:
+        - { id: a-report-client, text: { ja: '委託元が行うので、当社は関係ありません。', en: '' }, points: -80 }
+        - { id: a-report-own, text: { ja: '委託元が主体です。当社は事実と時刻を提供します。', en: '' }, points: 30 }
+        - { id: a-report-both, text: { ja: '委託元の報告を支え、当社の従業員情報は当社で報告します。', en: '' }, points: 80 }
+  extraQuestions:
+    - when: { flags: { paidRansom: true } }
+      question:
+        id: q-ransom-paid
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '身代金は支払ったのですか。', en: '' }
+        answers:
+          - { id: a-ransom-paid-admit, text: { ja: '支払いました。判断の経緯と警察への相談を説明します。', en: '' }, points: 30 }
+          - { id: a-ransom-paid-deny, text: { ja: '支払っていません。', en: '' }, points: -200 }
+          - { id: a-ransom-paid-no, text: { ja: '答えられません。', en: '' }, points: -30 }
+    - when: { flags: { paidRansom: false } }
+      question:
+        id: q-ransom
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '攻撃者に支払ったのですか。', en: '' }
+        answers:
+          - { id: a-ransom-paid, text: { ja: '支払いました。', en: '' }, points: -100 }
+          - { id: a-ransom-refuse, text: { ja: '支払っていません。警察に相談し、削除の保証もないと説明を受けています。', en: '' }, points: 80 }
+          - { id: a-ransom-nocom, text: { ja: '答えられません。', en: '' }, points: -30 }
+    - when: { flags: { hidAttack: true } }
+      question:
+        id: q-hidden
+        seconds: 30
+        timeoutPoints: -30
+        text: { ja: '当初「設定の不具合」と説明したのはなぜですか。', en: '' }
+        answers:
+          - { id: a-hidden-avoid, text: { ja: '混乱を避けるためです。', en: '' }, points: -100 }
+          - { id: a-hidden-late, text: { ja: '攻撃と分かった時点で説明が遅れました。', en: '' }, points: 30 }
+          - { id: a-hidden-correct, text: { ja: '隠す意図はありませんでしたが、最初の説明は不正確でした。経緯を公表します。', en: '' }, points: 80 }
+    - when: { flags: { delayClient: true } }
+      question:
+        id: q-delay
+        seconds: 30
+        timeoutPoints: -30
+        text: { ja: '取引先への連絡が遅れたのはなぜですか。', en: '' }
+        answers:
+          - { id: a-delay-invest, text: { ja: '調査を優先したためです。', en: '' }, points: -50 }
+          - { id: a-delay-order, text: { ja: '連絡の順番を決められず、遅れました。', en: '' }, points: 30 }
+          - { id: a-delay-fix, text: { ja: '遅れました。理由と再発防止を説明します。', en: '' }, points: 80 }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '60日の確報を出し終えた頃、12社のうち11社が契約を続けていた。委託元の会員への通知は滞りなく届き、苦情は想定より少なかった。認証は全部署で多要素になり、分析はデータを預からない方式へ変わった。悪いのは攻撃した犯罪者だ。問われたのは、預かったデータを守る手順だった。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが、取引先の大半は残った。通知と補償の実績を評価する声があり、翌年には新規の相談も戻ってきた。認証と権限の見直しは続いている。悪いのは攻撃した犯罪者だ。問われたのは、預かったデータを守る手順だった。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '会社は残ったが、取引先の三社が契約を終えた。売上は元に戻らず、再発防止の投資と採用を同時に進めるのは難しい。それでも問い合わせには、一つずつ答え続けている。悪いのは攻撃した犯罪者だ。問われたのは、預かったデータを守る手順だった。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '委託元の一つが業務委託の見直しを公表し、他社も続いた。社長は半年で退任し、残った社員が限られた人数で再建を進めている。信頼を取り戻すには、年単位の時間がかかる。悪いのは攻撃した犯罪者だ。問われたのは、預かったデータを守る手順だった。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '取引先からの損害賠償と委託停止が重なり、会社は事業の大半を失った。分析の仕事は別の会社に移り、預かったデータの扱いは誰にも引き継がれない。どこで判断を誤ったのか、記録を読み返す日が続く。悪いのは攻撃した犯罪者だ。問われたのは、預かったデータを守る手順だった。', en: '' }
+headlines:
+  S: { ja: '分析会社の漏えい、再発防止の設計が評価される', en: '' }
+  A: { ja: '分析会社、取引先の大半と関係を維持', en: '' }
+  B: { ja: '分析会社の漏えい、三社が契約終了へ', en: '' }
+  C: { ja: '漏えい対応の遅れを指摘、社長が退任', en: '' }
+  D: { ja: '分析会社が事業を縮小、委託先の連鎖が止まらず', en: '' }
+salesModel: { base: 100, trustWeight: 0.35, fatalPenalty: 10, min: 40, max: 130 }

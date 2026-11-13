@@ -1,0 +1,826 @@
+# No.13 ツムギ・アナリティクス / 担当者ロール（データ分析担当）
+# 判断ポイント16、細目は choices[].items と drafts の合計で80以上。
+estimateMinutes: 38
+intro: { ja: 'あなたはツムギ・アナリティクスのデータ分析担当。取引先の会員データを預かって分析する仕事をしている。今朝、自分のアカウントの履歴に見慣れない操作があった。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-coward-2
+  '3': v-coward-3
+  '4': v-coward-4
+deadlines:
+  - id: dl-analyst-prelim
+    ref: ppc-report-prelim
+    label: { ja: '委託元の速報に使う対象者リストの提出', en: '' }
+    points: -150
+    doneFlag: ppcPrelimFiled
+  - id: dl-analyst-final
+    ref: ppc-report-final-malicious
+    label: { ja: '確報に使う点検結果の提出', en: '' }
+    points: -80
+    doneFlag: ppcFinalFiled
+events:
+  - id: ev-phone
+    at: { day: 0, minutes: 780 }
+    voices: [v-ev-phone]
+    gauges: { flame: 5 }
+    sound: { se: [phone_ring] }
+    caption: { ja: '取引先の担当者から「会員から問い合わせが来ている」と電話が入った。', en: '' }
+  - id: ev-news
+    at: { day: 1, minutes: 1140 }
+    voices: [v-ev-news]
+    gauges: { flame: 10 }
+points:
+  - id: p01-anomaly
+    at: { day: 0, minutes: 555 }
+    phase: detect
+    text: { ja: '午前9時15分。自分のアカウントに、見たことのない場所からのダウンロード履歴がある。件数は数千行分だ。', en: '' }
+    voices: [v01-a, v01-b, v01-ok]
+    choices:
+      - id: a01-c-report
+        text: { ja: '上司とSaaS事業者にすぐ連絡し、画面と時刻を残す', en: '' }
+        explain: { ja: '見たものをそのまま残して、すぐ共有している。この時刻の記録が、後の調査の起点になる。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [jpcert-handling, nist-sp800-61r3]
+        gauges: { damage: -10, trust: 5, stamina: -5 }
+        setFlags: { earlyReport: true }
+        items:
+          - { id: a01-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: a01-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+      - id: a01-b-password
+        text: { ja: '自分のパスワードを変えて、しばらく様子を見る', en: '' }
+        explain: { ja: '自分でできることを先にやる姿勢は良い。だが攻撃者は既にデータを持っており、報告の遅れだけが残る。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -5 }
+        items:
+          - { id: a01-b-content, points: 5, axis: content, refs: [ipa-sme-guideline] }
+          - { id: a01-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: a01-a-confirm
+        text: { ja: '誤操作かもしれないので、確かめてから報告する', en: '' }
+        explain: { ja: '誤報を避けたい気持ちは分かる。だが数千行のダウンロードは誤操作では説明できず、確かめる間に広がる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -110
+        refs: [nist-sp800-61r3]
+        gauges: { flame: 5, trust: -5 }
+        coward: true
+        items:
+          - { id: a01-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a01-a-time, points: -8, axis: time, refs: [jpcert-handling] }
+    lesson: { ja: '見慣れない操作を見つけたら、確かめる前に共有する。画面と時刻を残し、上司とSaaS事業者に同時に連絡する。誤報を恐れて待つ間にも、持ち出しは進み、報告の時刻だけが遅れる。', en: '' }
+
+  - id: p02-pc
+    at: { day: 0, minutes: 585 }
+    phase: detect
+    text: { ja: '午前9時45分。自分の端末に、見覚えのない常駐ソフトがある。昨日、業務用と称するツールを入れた。', en: '' }
+    voices: [v02-a, v02-b, v02-ok]
+    choices:
+      - id: a02-b-antivirus
+        text: { ja: 'セキュリティソフトで、まず駆除しておく', en: '' }
+        explain: { ja: '駆除すれば安心に見える。だが何をされたかの記録が消え、同じ手口の全容が分からなくなる。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -5 }
+        items:
+          - { id: a02-b-content, points: 5, axis: content, refs: [ipa-sme-guideline] }
+          - { id: a02-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: a02-c-isolate
+        text: { ja: 'ネットワークから切り離し、端末をそのまま保全する', en: '' }
+        explain: { ja: '端末を止めて残す判断は、地味だが効く。分析担当の端末は、何が盗まれたかを示す証拠になる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 130
+        refs: [nist-sp800-61r3, jpcert-handling]
+        gauges: { damage: -10, trust: 10, stamina: -10 }
+        setFlags: { pcIsolated: true }
+        items:
+          - { id: a02-c-record, points: 8, axis: record, refs: [nist-sp800-61r3] }
+          - { id: a02-c-order, points: 8, axis: order, refs: [jpcert-handling] }
+      - id: a02-a-reboot
+        text: { ja: '再起動して、そのまま業務を続けてしまう', en: '' }
+        explain: { ja: '業務を止めない判断は、現場の事情として理解できる。だが通信を続ければ、盗まれた情報も増える。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -130
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, flame: 5 }
+        items:
+          - { id: a02-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a02-a-record, points: -10, axis: record, refs: [jpcert-handling] }
+    lesson: { ja: '怪しいソフトを見つけたら、駆除より先に端末を切り離して残す。何をされたかの記録は、その端末にしかない。動かしたままにすると、盗まれる情報も増え、調査の根拠も失う。', en: '' }
+
+  - id: p03-credentials
+    at: { day: 0, minutes: 615 }
+    phase: contain
+    text: { ja: '午前10時15分。ブラウザには、仕事で使うサービスのパスワードが十件以上保存されている。', en: '' }
+    voices: [v03-a, v03-b, v03-ok]
+    notable:
+      - { id: note-mfa, text: { ja: 'ブラウザに保存したパスワードが窃取され、多要素認証は未設定だった。', en: '' } }
+    choices:
+      - id: a03-b-main
+        text: { ja: '仕事で使う主要なサービスだけを、先に変更する', en: '' }
+        explain: { ja: '主要なものから変える順番は妥当だ。ただ、保存されていた十件のうち、残りが使い回されていれば同じ結果になる。', en: '' }
+        minutes: 75
+        category: maintain
+        points: 25
+        refs: [nist-sp800-61r3]
+        gauges: { stamina: -10 }
+        items:
+          - { id: a03-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a03-b-order, points: 5, axis: order, refs: [ipa-sme-guideline] }
+      - id: a03-a-manager
+        text: { ja: 'パスワードの変更は、管理者に任せておくだけにする', en: '' }
+        explain: { ja: '任せれば漏れはないと思うかもしれない。だが本人しか知らない私的な使い回しまで、管理者は把握できない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [nist-sp800-61r3]
+        gauges: { trust: -5, damage: 10 }
+        items:
+          - { id: a03-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a03-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: a03-c-all
+        text: { ja: '全サービスのパスワードを変え、多要素認証を設定する', en: '' }
+        explain: { ja: '保存した全部を対象にし、認証も強くしている。一つでも残せば、そこから同じ手口で入り直せる。', en: '' }
+        minutes: 150
+        category: increase
+        points: 300
+        refs: [nist-sp800-61r3, ipa-sme-guideline]
+        gauges: { damage: -15, trust: 15, stamina: -15 }
+        setFlags: { credentialsRotated: true }
+        items:
+          - { id: a03-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a03-c-record, points: 8, axis: record, refs: [ipa-sme-guideline] }
+    lesson: { ja: 'ブラウザに保存した認証情報が盗まれたら、保存した全サービスのパスワードを変える。主要なものだけでは足りない。同時に多要素認証を設定し、同じ手口で入り直されるのを防ぐ。', en: '' }
+
+  - id: p04-evidence
+    at: { day: 0, minutes: 645 }
+    phase: investigate
+    text: { ja: '午前10時45分。調査会社から、昨日の操作を時系列で教えてほしいと言われた。正直に話すのが怖い。', en: '' }
+    voices: [v04-a, v04-b, v04-ok]
+    choices:
+      - id: a04-c-timeline
+        text: { ja: '時系列で操作を思い出し、警告の画面を提供する', en: '' }
+        explain: { ja: '自分が何をしたかを正確に出すことで、侵入の手順が再現できる。怖さより、事実を渡す判断を取っている。', en: '' }
+        minutes: 120
+        category: recover
+        points: 110
+        refs: [jpcert-handling, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { evidenceShared: true }
+        items:
+          - { id: a04-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: a04-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+      - id: a04-b-verbal
+        text: { ja: '分かる範囲のことを、口頭で説明しておく', en: '' }
+        explain: { ja: '口頭でも材料にはなる。ただ、時刻や画面が抜けると、調査は推測で埋めることになる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { stamina: -5 }
+        items:
+          - { id: a04-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a04-b-content, points: 5, axis: content, refs: [jpcert-handling] }
+      - id: a04-a-erase
+        text: { ja: '自分が疑われないように、履歴を消す', en: '' }
+        explain: { ja: '疑われたくない気持ちは分かる。だが履歴を消すと、自分が何をしたかを説明できなくなり、立場は悪くなる。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [jpcert-handling]
+        gauges: { flame: 20, trust: -20 }
+        setFlags: { hidAttack: true }
+        items:
+          - { id: a04-a-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a04-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+    lesson: { ja: '調査には、自分が何をしたかを時系列で出す。警告の画面や時刻も、そのまま渡す。履歴を消すと、疑いを晴らす材料を自分で捨てることになり、侵入の解明も止まる。事実を出す勇気が要る。', en: '' }
+
+  - id: p05-coworker
+    at: { day: 0, minutes: 720 }
+    phase: contain
+    text: { ja: '正午。同じツールを使っていた同僚が三人いる。うち一人は、今日も在宅で作業している。', en: '' }
+    voices: [v05-a, v05-b, v05-ok]
+    choices:
+      - id: a05-b-self
+        text: { ja: '同僚に、自分で確認してもらうだけにする', en: '' }
+        explain: { ja: '自分のことは自分で、という考えは公平だ。だが何を確認すべきかを知らない人が、同じ判断をできるとは限らない。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -5 }
+        items:
+          - { id: a05-b-content, points: 5, axis: content, refs: [ipa-sme-guideline] }
+          - { id: a05-b-order, points: 5, axis: order, refs: [ipa-sme-guideline] }
+      - id: a05-c-all
+        text: { ja: '同僚も同じ経路だと伝え、認証情報を失効させる', en: '' }
+        explain: { ja: '同じツールを使った全員に広げ、認証情報まで無効にしている。感染源が同じなら、一人だけ直しても意味がない。', en: '' }
+        minutes: 120
+        category: increase
+        points: 250
+        refs: [nist-sp800-61r3, ipa-sme-guideline]
+        gauges: { damage: -10, trust: 15, stamina: -15 }
+        setFlags: { teamChecked: true }
+        items:
+          - { id: a05-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a05-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+      - id: a05-a-silent
+        text: { ja: '自分のことで手一杯なので、黙っている', en: '' }
+        explain: { ja: '余裕がないのは事実だ。だが同じ手口が同僚に残れば、被害は自分の分より広がる。一人で抱え込まない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -120
+        refs: [nist-sp800-61r3]
+        gauges: { flame: 10, trust: -10 }
+        coward: true
+        items:
+          - { id: a05-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a05-a-care, points: -8, axis: care, refs: [ipa-sme-guideline] }
+    lesson: { ja: '同じツールを使った同僚には、すぐ声をかける。何を確認すべきかを伝え、認証情報を一緒に失効させる。自分の分だけで終えると、同じ侵入口から被害が広がる。声をかけることが被害を止める。', en: '' }
+
+  - id: p06-client-data
+    at: { day: 0, minutes: 930 }
+    phase: investigate
+    text: { ja: '午後3時30分。どの取引先のデータが出たのかを、自分の作業記録から追わなければならない。', en: '' }
+    voices: [v06-a, v06-b, v06-ok]
+    notable:
+      - { id: note-scope, text: { ja: 'データセットと取引先の対応表を作り、持ち出された範囲を示した。', en: '' } }
+    choices:
+      - id: a06-b-mine
+        text: { ja: '自分が担当した分だけを、先に伝えておく', en: '' }
+        explain: { ja: '自分の範囲を正確に出すのは基本だ。ただ、共有のデータセットを使った分が抜けると、範囲が狭く見える。', en: '' }
+        minutes: 75
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { stamina: -10 }
+        items:
+          - { id: a06-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a06-b-content, points: 5, axis: content, refs: [jpcert-handling] }
+      - id: a06-a-unknown
+        text: { ja: '記憶があいまいなので、分からないと答える', en: '' }
+        explain: { ja: '記憶に頼るのが危ういのはその通りだ。だが作業記録を見れば分かることが、分からないで終わってしまう。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [jpcert-handling]
+        gauges: { trust: -10, flame: 5 }
+        items:
+          - { id: a06-a-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a06-a-content, points: -8, axis: content, refs: [nist-sp800-61r3] }
+      - id: a06-c-table
+        text: { ja: 'データセットと取引先の対応表を作り、調査班に渡す', en: '' }
+        explain: { ja: '記憶ではなく、データセットと取引先の対応で示している。範囲の確定と、通知の設計に直結する作業だ。', en: '' }
+        minutes: 150
+        category: increase
+        points: 300
+        refs: [jpcert-handling, ppc-report-scope]
+        gauges: { trust: 15, stamina: -20, damage: -10 }
+        setFlags: { scopeFixed: true }
+        items:
+          - { id: a06-c-content, points: 8, axis: content, refs: [ppc-report-scope] }
+          - { id: a06-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+    lesson: { ja: '持ち出された範囲は、記憶ではなく記録で示す。データセットと取引先の対応表を作れば、誰に通知するかが決まる。自分の担当分だけでは、共有のデータが抜けて範囲が狭く見える。', en: '' }
+
+  - id: p07-notice-list
+    at: { day: 0, minutes: 1200 }
+    phase: notify
+    text: { ja: '午後8時。委託元から、通知の対象者リストを今夜中にほしいと言われた。会員は数万人規模になる。', en: '' }
+    voices: [v07-a, v07-b, v07-ok]
+    choices:
+      - id: a07-c-format
+        text: { ja: '委託元の書式で対象者を抽出し、退会者も確認する', en: '' }
+        explain: { ja: '相手の書式に合わせ、退会者まで含めて確認している。通知の漏れを減らし、そのまま送信に使える形だ。', en: '' }
+        minutes: 180
+        category: increase
+        points: 250
+        refs: [ppc-notify-person, ppc-report-scope]
+        gauges: { trust: 15, stamina: -20 }
+        setFlags: { ppcPrelimFiled: true, noticeListReady: true }
+        detail: notice-list
+        items:
+          - { id: a07-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: a07-c-content, points: 8, axis: content, refs: [ppc-report-scope] }
+      - id: a07-b-partial
+        text: { ja: '分かる範囲で、対象者を出しておくだけにする', en: '' }
+        explain: { ja: '限られた時間で出す姿勢は評価できる。ただ、範囲が後から増えると、通知のやり直しと訂正が必要になる。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [ppc-notify-person]
+        gauges: { stamina: -10 }
+        items:
+          - { id: a07-b-care, points: 5, axis: care, refs: [ppc-notify-person] }
+          - { id: a07-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: a07-a-rush
+        text: { ja: '名前と連絡先だけを、急いで出してしまう', en: '' }
+        explain: { ja: '急いで出せば間に合うように見える。だが項目が足りないと、何が漏れたかを伝えられず、通知の意味が薄れる。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -90
+        refs: [ppc-notify-person]
+        gauges: { trust: -10, flame: 5 }
+        items:
+          - { id: a07-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: a07-a-content, points: -8, axis: content, refs: [ppc-report-scope] }
+    lesson: { ja: '対象者リストは、委託元の書式に合わせて作る。退会者と申込み途中の人も確認し、重複を除いて名寄せする。名前と連絡先だけでは、何が漏れたかを伝えられない。渡す前の確認までが仕事だ。', en: '' }
+
+  - id: p08-client-call
+    at: { day: 1, minutes: 570 }
+    phase: notify
+    sound: { se: [phone_ring] }
+    text: { ja: '2日目午前9時30分。取引先の担当者から直接電話が来た。「会員から問い合わせが来ている。何が起きたのか」。', en: '' }
+    voices: [v08-a, v08-b, v08-ok]
+    choices:
+      - id: a08-b-callback
+        text: { ja: '担当役員から折り返すとだけ伝えて、電話を切る', en: '' }
+        explain: { ja: '担当を間違えない対応だ。ただ、その一言だけでは、相手は何も分からないまま待つことになる。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { stamina: -5 }
+        items:
+          - { id: a08-b-order, points: 5, axis: order, refs: [jpcert-handling] }
+          - { id: a08-b-care, points: 5, axis: care, refs: [meti-csm-guideline] }
+      - id: a08-c-facts
+        text: { ja: '分かっている事実と不明点を分け、担当役員につなぐ', en: '' }
+        explain: { ja: '事実と不明点を分けて伝え、判断できる人につないでいる。相手が会員に説明するための材料にもなる。', en: '' }
+        minutes: 75
+        category: recover
+        points: 110
+        refs: [jpcert-handling, meti-csm-guideline]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { clientAnswered: true }
+        items:
+          - { id: a08-c-care, points: 8, axis: care, refs: [meti-csm-guideline] }
+          - { id: a08-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+      - id: a08-a-hangup
+        text: { ja: '自分では分からないと答えて、そのまま電話を切る', en: '' }
+        explain: { ja: '知らないことを答えないのは誠実だ。だが取り次がずに切ると、相手は行き場を失い、憶測が広がる。', en: '' }
+        minutes: 15
+        category: hurt
+        points: -100
+        refs: [meti-csm-guideline]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: a08-a-care, points: -10, axis: care, refs: [meti-csm-guideline] }
+          - { id: a08-a-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '取引先からの電話は、分かっている事実と不明点を分けて伝え、判断できる人につなぐ。取り次がずに切ると、相手は会員に説明できない。電話の内容と時刻は、記録に残す。つなぐことが答えになる。', en: '' }
+
+  - id: p09-mfa-work
+    at: { day: 1, minutes: 660 }
+    phase: contain
+    text: { ja: '午前11時。多要素認証の設定作業を任された。社内には、複数人で使っている共有アカウントが残っている。', en: '' }
+    voices: [v09-a, v09-b, v09-ok]
+    choices:
+      - id: a09-b-self
+        text: { ja: '自分のアカウントだけに、先に設定しておく', en: '' }
+        explain: { ja: '自分の分を終えるのは前進だ。だが共有アカウントは誰の端末からでも使え、設定の穴として残る。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [nist-sp800-61r3]
+        gauges: { stamina: -5 }
+        items:
+          - { id: a09-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a09-b-order, points: 5, axis: order, refs: [ipa-sme-guideline] }
+      - id: a09-a-delay
+        text: { ja: '現場が混乱するので、設定を遅らせておくだけにする', en: '' }
+        explain: { ja: '混乱を避ける判断は、現場を思ってのことだ。だが設定を遅らせた分だけ、同じ手口の余地が残る。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [nist-sp800-61r3]
+        gauges: { flame: 5, trust: -5 }
+        coward: true
+        items:
+          - { id: a09-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a09-a-time, points: -8, axis: time, refs: [nist-sp800-61r3] }
+      - id: a09-c-inventory
+        text: { ja: '全アカウントを棚卸しし、共有アカウントを個人に分ける', en: '' }
+        explain: { ja: '設定の前に、アカウントの持ち主をはっきりさせている。共有を個人に分ければ、誰の操作かも追える。', en: '' }
+        minutes: 180
+        category: increase
+        points: 250
+        refs: [nist-sp800-61r3, ipa-sme-guideline]
+        gauges: { trust: 15, stamina: -20, damage: -10 }
+        setFlags: { accountsSplit: true }
+        items:
+          - { id: a09-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: a09-c-record, points: 8, axis: record, refs: [ipa-sme-guideline] }
+    lesson: { ja: '多要素認証は、自分の分だけで終わらせない。共有アカウントを棚卸しし、個人のアカウントに分ける。共有のままだと、誰が操作したかも分からず、設定の穴として残る。持ち主を決めるのが先だ。', en: '' }
+
+  - id: p10-log-review
+    at: { day: 1, minutes: 840 }
+    phase: investigate
+    text: { ja: '午後2時。基盤のアクセスログが届いた。行数は多く、どこから見ればよいか分からない。', en: '' }
+    voices: [v10-a, v10-b, v10-ok]
+    choices:
+      - id: a10-c-timeline
+        text: { ja: '時刻と操作を時系列に整理し、持ち出しの手順を再現する', en: '' }
+        explain: { ja: '操作を時系列に並べ、手順として再現している。攻撃者が何をしたかを説明できる形になる。', en: '' }
+        minutes: 180
+        category: recover
+        points: 120
+        refs: [jpcert-handling, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -15 }
+        setFlags: { logAnalyzed: true }
+        items:
+          - { id: a10-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: a10-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+      - id: a10-b-suspicious
+        text: { ja: '不審な行だけを、先に抜き出しておくだけにする', en: '' }
+        explain: { ja: '怪しい行を拾うだけでも材料になる。ただ、前後の操作が分からないと、手順の再現までは届かない。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { stamina: -10 }
+        items:
+          - { id: a10-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: a10-b-content, points: 5, axis: content, refs: [jpcert-handling] }
+      - id: a10-a-partial
+        text: { ja: 'ログが多すぎるので、一部だけを見て終える', en: '' }
+        explain: { ja: '全部を見る時間がないのは現実だ。だが一部だけで結論を出すと、持ち出しの範囲を取り違える。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -110
+        refs: [jpcert-handling]
+        gauges: { trust: -10, flame: 5 }
+        items:
+          - { id: a10-a-record, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a10-a-content, points: -8, axis: content, refs: [nist-sp800-61r3] }
+    lesson: { ja: 'ログは、不審な行を拾うだけで終わらせない。時刻と操作を時系列に並べ、持ち出しの手順として再現する。前後の操作が分かれば、範囲の説明と再発防止の設計ができる。並べ直すことが調査だ。', en: '' }
+
+  - id: p11-tools
+    at: { day: 1, minutes: 1020 }
+    phase: contain
+    text: { ja: '午後5時。業務で使っていたツールは、実は非公式の配布サイトから落としたものだった。他の端末にも入っている。', en: '' }
+    voices: [v11-a, v11-b, v11-ok]
+    choices:
+      - id: a11-b-needed
+        text: { ja: '必要な人だけに、入れておくだけにしておく', en: '' }
+        explain: { ja: '全員に配るよりリスクは小さい。ただ、出どころの怪しいものを、必要な人にだけ入れる理由にはならない。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -5 }
+        items:
+          - { id: a11-b-content, points: 5, axis: content, refs: [ipa-sme-guideline] }
+          - { id: a11-b-order, points: 5, axis: order, refs: [jpcert-handling] }
+      - id: a11-c-source
+        text: { ja: '提供元と導入元を確かめ、社内の配布経路を一本化する', en: '' }
+        explain: { ja: '道具の出どころを確かめ、配布の経路を一つにしている。同じ手口の再発を、仕組みで防ぐ判断だ。', en: '' }
+        minutes: 150
+        category: increase
+        points: 200
+        refs: [ipa-sme-guideline, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -15, damage: -5 }
+        setFlags: { toolsApproved: true }
+        items:
+          - { id: a11-c-content, points: 8, axis: content, refs: [ipa-sme-guideline] }
+          - { id: a11-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+      - id: a11-a-keep
+        text: { ja: '便利なので、そのまま使い続けることにする', en: '' }
+        explain: { ja: '便利さは分かる。だが今回の入口がその道具なら、使い続けることは同じ事故を招く。出どころを確かめるべきだ。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -130
+        refs: [ipa-sme-guideline]
+        gauges: { damage: 15, flame: 5 }
+        items:
+          - { id: a11-a-content, points: -10, axis: content, refs: [ipa-sme-guideline] }
+          - { id: a11-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+    lesson: { ja: '業務で使う道具は、提供元と導入元を確かめる。非公式の配布サイトから落としたものを、必要な人だけに配っても危険は残る。社内の配布経路を一本化し、承認したものだけを使う。', en: '' }
+
+  - id: p12-workload
+    at: { day: 2, minutes: 600 }
+    phase: recover
+    text: { ja: '3日目午前10時。調査の作業が山積みで、通常の分析業務も止められない。自分の体力も限界に近い。', en: '' }
+    voices: [v12-a, v12-b, v12-ok]
+    choices:
+      - id: a12-b-overtime
+        text: { ja: '残業して、調査と売上を両方こなす', en: '' }
+        explain: { ja: '両方を守ろうとする姿勢は真面目だ。だが疲労が重なると、ログの見落としという形で跳ね返る。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -20, damage: 5 }
+        items:
+          - { id: a12-b-care, points: 5, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a12-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: a12-a-sales
+        text: { ja: '調査よりも、売上を優先してしまう', en: '' }
+        explain: { ja: '売上を気にする理由は分かる。ただ、調査が止まれば範囲が確定せず、委託元の通知も遅れる。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -110
+        refs: [jpcert-handling]
+        gauges: { trust: -10, damage: 10 }
+        items:
+          - { id: a12-a-care, points: -10, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a12-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: a12-c-handover
+        text: { ja: '調査を優先し、担当を交代して負担を減らす', en: '' }
+        explain: { ja: '自分の限界を認めて、担当を交代している。調査の質を保つには、休む設計が要る。交代は後退ではない。', en: '' }
+        minutes: 90
+        category: recover
+        points: 110
+        refs: [ipa-sme-guideline, jpcert-handling]
+        gauges: { stamina: 15, trust: 10, damage: -5 }
+        setFlags: { workloadShared: true }
+        items:
+          - { id: a12-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a12-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+    lesson: { ja: '調査と通常業務を一人で抱えない。担当を交代し、休む時間を先に決める。根を詰めると確認漏れが起き、かえって調査が長引く。疲労は、事故の原因になる。休むことも対応のうちだ。', en: '' }
+
+  - id: p13-victim-call
+    at: { day: 3, minutes: 600 }
+    phase: notify
+    text: { ja: '4日目午前10時。委託元の会員から、当社に直接電話が来た。「私の情報は漏れたのか」。', en: '' }
+    voices: [v13-a, v13-b, v13-ok]
+    choices:
+      - id: a13-c-align
+        text: { ja: '委託元の窓口と内容を揃え、なりすましの注意を伝える', en: '' }
+        explain: { ja: '委託元の説明と食い違わないようにし、二次被害の注意まで伝えている。会員が次に動ける案内だ。', en: '' }
+        minutes: 90
+        category: recover
+        points: 100
+        refs: [ppc-notify-person, meti-disclosure-guidance]
+        gauges: { trust: 10, stamina: -10, flame: -5 }
+        setFlags: { victimAnswered: true }
+        items:
+          - { id: a13-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: a13-c-wording, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: a13-b-transfer
+        text: { ja: '委託元の窓口に、そのまま転送しておくだけにする', en: '' }
+        explain: { ja: '窓口を間違えない対応だ。ただ、転送の前に何も伝えないと、会員は不安を抱えたまま待つ。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [ppc-notify-person]
+        gauges: { stamina: -5 }
+        items:
+          - { id: a13-b-care, points: 5, axis: care, refs: [ppc-notify-person] }
+          - { id: a13-b-order, points: 5, axis: order, refs: [jpcert-handling] }
+      - id: a13-a-nothing
+        text: { ja: '何も答えられないと、正直に伝えて電話を切る', en: '' }
+        explain: { ja: '誠実な答え方に見える。だが取り次がずに切ると、会員はSNSで同じ問いを探し始める。', en: '' }
+        minutes: 15
+        category: hurt
+        points: -90
+        refs: [ppc-notify-person]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: a13-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: a13-a-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '会員からの電話は、委託元の窓口と説明を揃えて答える。なりすましへの注意も伝える。分からないことを伝えるのは誠実だが、取り次がずに切ると、会員は行き場を失う。まず受け止める。', en: '' }
+
+  - id: p14-training
+    at: { day: 7, minutes: 600 }
+    phase: after
+    text: { ja: '8日目午前10時。社内研修の講師を頼まれた。自分がやられた手口を、他の社員にも伝えることになる。', en: '' }
+    voices: [v14-a, v14-b, v14-ok]
+    choices:
+      - id: a14-b-general
+        text: { ja: '一般的な注意事項を、淡々と話しておくだけにする', en: '' }
+        explain: { ja: '無難にまとめた研修は、記憶に残りにくい。何が起きたかの具体性がないと、行動は変わらない。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -5 }
+        items:
+          - { id: a14-b-care, points: 5, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a14-b-content, points: 5, axis: content, refs: [ipa-sme-guideline] }
+      - id: a14-c-fail
+        text: { ja: '自分の失敗を手順にして、偽ツールの見分けを教える', en: '' }
+        explain: { ja: '自分の失敗を手順として出し、見分け方まで教えている。当事者の言葉は、注意喚起より届く。', en: '' }
+        minutes: 150
+        category: increase
+        points: 250
+        refs: [ipa-sme-guideline, nist-sp800-61r3]
+        gauges: { trust: 15, stamina: -15, damage: -5 }
+        setFlags: { trainingDone: true }
+        items:
+          - { id: a14-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a14-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+      - id: a14-a-luck
+        text: { ja: '自分が狙われたのは、運が悪かったと話しておく', en: '' }
+        explain: { ja: '運の話にすると、他人事になる。誰にでも起きる手口だと伝わらず、同じ行動が残る。当事者の言葉が要る。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ipa-sme-guideline]
+        gauges: { trust: -5, flame: 5 }
+        items:
+          - { id: a14-a-care, points: -8, axis: care, refs: [ipa-sme-guideline] }
+          - { id: a14-a-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '自分の失敗は、手順として共有する。偽のツールをどう見分けるかまで具体的に伝えれば、他の社員の行動が変わる。運の話にすると他人事になり、同じ手口の被害が繰り返される。', en: '' }
+
+  - id: p15-check
+    at: { day: 10, minutes: 600 }
+    phase: after
+    text: { ja: '11日目午前10時。全端末の設定を見直す作業。台数は八十台あり、一日では終わらない。', en: '' }
+    voices: [v15-a, v15-b, v15-c, v15-ok]
+    choices:
+      - id: a15-b-sample
+        text: { ja: '抜き取りの確認だけで、済ませておく', en: '' }
+        explain: { ja: '限られた時間で全体を見る方法としては合理的だ。ただ、外れた端末に不備が残れば意味が薄れる。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -10 }
+        items:
+          - { id: a15-b-record, points: 5, axis: record, refs: [ipa-sme-guideline] }
+          - { id: a15-b-content, points: 5, axis: content, refs: [jpcert-handling] }
+      - id: a15-a-manager
+        text: { ja: '管理者に任せて、確認しないでおく', en: '' }
+        explain: { ja: '任せる判断は、忙しさから出ている。だが自分の端末の状態は、自分でしか確認できない部分がある。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -90
+        refs: [ipa-sme-guideline]
+        gauges: { trust: -5, damage: 5 }
+        items:
+          - { id: a15-a-content, points: -10, axis: content, refs: [ipa-sme-guideline] }
+          - { id: a15-a-care, points: -8, axis: care, refs: [jpcert-handling] }
+      - id: a15-c-all
+        text: { ja: '全端末の設定を点検し、不備を記録して直す', en: '' }
+        explain: { ja: '八十台を全部見て、不備を記録している。時間はかかるが、確認した範囲を説明できる形になる。', en: '' }
+        minutes: 240
+        category: recover
+        points: 120
+        refs: [ipa-sme-guideline, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -20, damage: -10 }
+        setFlags: { ppcFinalFiled: true, allChecked: true }
+        items:
+          - { id: a15-c-record, points: 8, axis: record, refs: [ipa-sme-guideline] }
+          - { id: a15-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+    lesson: { ja: '再発防止の確認は、抜き取りで終わらせない。全端末の設定を点検し、不備を記録して直す。確認した範囲を説明できれば、委託元の監査にも耐えられる。記録が、対策の証拠になる。', en: '' }
+
+  - id: p16-share
+    at: { day: 30, minutes: 600 }
+    phase: after
+    text: { ja: '31日目午前10時。同業の勉強会から、今回の手口を話してほしいと誘われた。会社の評判が気になる。', en: '' }
+    voices: [v16-a, v16-b, v16-ok]
+    choices:
+      - id: a16-c-share
+        text: { ja: '手口と失敗を共有し、業界の注意喚起に協力する', en: '' }
+        explain: { ja: '自分の失敗まで出して共有している。同じ手口の被害を、他の会社で止められる可能性が上がる。', en: '' }
+        minutes: 120
+        category: increase
+        points: 250
+        refs: [meti-disclosure-guidance, ipa-sme-guideline]
+        gauges: { trust: 15, stamina: -10 }
+        setFlags: { fullDisclosure: true }
+        items:
+          - { id: a16-c-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: a16-c-care, points: 8, axis: care, refs: [ipa-sme-guideline] }
+      - id: a16-b-anon
+        text: { ja: '名前を伏せて、概要だけを話しておく', en: '' }
+        explain: { ja: '名前を伏せる配慮は必要だ。ただ、概要だけでは手口の具体的な危険が伝わらない。手口は具体的に話す。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [meti-disclosure-guidance]
+        gauges: { stamina: -5 }
+        items:
+          - { id: a16-b-content, points: 5, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: a16-b-care, points: 5, axis: care, refs: [ipa-sme-guideline] }
+      - id: a16-a-refuse
+        text: { ja: '自社の評判を考えて、出席を断っておく', en: '' }
+        explain: { ja: '評判を守る判断は分かる。だが同じ手口が広がれば、業界全体の信頼が下がり、自社も巻き込まれる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [meti-disclosure-guidance]
+        gauges: { trust: -10, flame: 5 }
+        coward: true
+        items:
+          - { id: a16-a-content, points: -8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: a16-a-care, points: -8, axis: care, refs: [ipa-sme-guideline] }
+    lesson: { ja: '同業への共有は、自社の評判より、同じ手口の被害を減らすことを優先する。名前を伏せる配慮はしつつ、手口と失敗は具体的に話す。共有が、業界全体の備えになる。話すことが次の防御だ。', en: '' }
+
+drafts:
+  notice-list:
+    title: { ja: '通知対象者リストの作り方', en: '' }
+    slots:
+      - id: timing
+        label: { ja: '渡す時刻', en: '' }
+        auto: true
+        items:
+          - { id: nl-t-12h, when: { withinHours: 12 }, points: 10, axis: time, refs: [ppc-notify-person] }
+          - { id: nl-t-24h, when: { withinHours: 24 }, points: 5, axis: time, refs: [ppc-notify-person] }
+          - { id: nl-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [ppc-notify-person] }
+      - id: scope
+        label: { ja: '対象の範囲', en: '' }
+        options:
+          - { id: nl-s-all, text: { ja: '影響のあった全会員と退会者', en: '' }, points: 10, axis: content, refs: [ppc-notify-person], explain: { ja: '退会者まで含めれば、通知の漏れによる二次被害を防げる。対象者が自分で判断できる範囲になる。', en: '' } }
+          - { id: nl-s-current, text: { ja: '現在の会員だけを対象にする', en: '' }, points: -10, axis: content, refs: [ppc-notify-person], explain: { ja: '退会者を外すと、データが残っていた人に通知が届かない。後から対象が増えれば訂正も必要になる。', en: '' } }
+          - { id: nl-s-pending, text: { ja: '申込み途中の人だけを対象にする', en: '' }, points: -5, axis: content, refs: [ppc-notify-person], explain: { ja: '申込み途中だけでは、購入履歴のある会員が抜ける。対象の切り方の理由も説明できない。', en: '' } }
+      - id: fields
+        label: { ja: '載せる項目', en: '' }
+        options:
+          - { id: nl-f-name, text: { ja: '氏名と連絡先だけを載せる', en: '' }, points: -5, axis: content, refs: [ppc-report-scope], explain: { ja: '氏名と連絡先だけでは、何が漏れたかを伝えられない。会員は自分事として動けない。', en: '' } }
+          - { id: nl-f-items, text: { ja: '氏名、連絡先、対象となった項目', en: '' }, points: 10, axis: content, refs: [ppc-report-scope], explain: { ja: '対象となった項目があれば、通知の文面にそのまま使える。会員も何を確認すべきか分かる。', en: '' } }
+          - { id: nl-f-id, text: { ja: '会員番号だけを載せておく', en: '' }, points: -10, axis: content, refs: [ppc-report-scope], explain: { ja: '会員番号だけでは、通知を送る宛先が分からない。突き合わせの作業が、委託元に戻ってしまう。', en: '' } }
+      - id: dedup
+        label: { ja: '重複の扱い', en: '' }
+        options:
+          - { id: nl-d-dup, text: { ja: '重複したままでもよいとする', en: '' }, points: -10, axis: record, refs: [ppc-notify-person], explain: { ja: '重複を残すと、同じ会員に複数の通知が届く。問い合わせが増え、不信にもつながる。', en: '' } }
+          - { id: nl-d-withdraw, text: { ja: '退会者だけを、先に除いておく', en: '' }, points: -5, axis: record, refs: [ppc-notify-person], explain: { ja: '退会者を除くと、データが残っていた人に通知が届かない。除く理由も説明できない。', en: '' } }
+          - { id: nl-d-merge, text: { ja: '重複と退会者を除いて名寄せする', en: '' }, points: 10, axis: record, refs: [ppc-notify-person], explain: { ja: '重複と退会者を除いて名寄せすれば、通知は一度で届く。対象の数も正確になる。', en: '' } }
+      - id: format
+        label: { ja: '渡す形式', en: '' }
+        options:
+          - { id: nl-o-client, text: { ja: '委託元の書式に合わせて渡す', en: '' }, points: 10, axis: order, refs: [ppc-notify-person], explain: { ja: '委託元の書式に合わせれば、そのまま送信に使える。突き合わせの手間も減り、期限に間に合う。', en: '' } }
+          - { id: nl-o-own, text: { ja: '自社の書式のままで渡す', en: '' }, points: -5, axis: order, refs: [ppc-notify-person], explain: { ja: '自社の書式のままだと、委託元で項目の対応づけが必要になる。その分だけ通知が遅れる。', en: '' } }
+          - { id: nl-o-manual, text: { ja: '手作業で作った一覧で渡す', en: '' }, points: -5, axis: record, refs: [ppc-notify-person], explain: { ja: '手作業の一覧は、転記の誤りが入りやすい。誤った宛先に通知が届けば、信頼を大きく損なう。', en: '' } }
+      - id: check
+        label: { ja: '確認の方法', en: '' }
+        options:
+          - { id: nl-v-solo, text: { ja: '自分の確認だけで渡してしまう', en: '' }, points: -10, axis: order, refs: [ppc-notify-person], explain: { ja: '一人の確認では、抽出条件の思い違いに気づけない。対象の漏れは、後から見つかることが多い。', en: '' } }
+          - { id: nl-v-peer, text: { ja: '抽出条件を別の担当に確認してもらう', en: '' }, points: 10, axis: order, refs: [ppc-notify-person], explain: { ja: '別の担当に条件を確認してもらえば、思い違いを減らせる。通知の漏れと重複を、渡す前に防げる。', en: '' } }
+          - { id: nl-v-none, text: { ja: '確認をせずに、そのまま渡す', en: '' }, points: -10, axis: order, refs: [ppc-notify-person], explain: { ja: '確認なしで渡すと、条件の誤りがそのまま通知になる。訂正の連絡は、被害者に二度の不安を与える。', en: '' } }
+      - id: protect
+        label: { ja: '受け渡しの方法', en: '' }
+        options:
+          - { id: nl-p-mail, text: { ja: 'メールにそのまま添付して送る', en: '' }, points: -10, axis: care, refs: [ppc-notify-person], explain: { ja: '個人情報の一覧をそのまま添付すると、経路の途中で漏れる危険がある。送り方も安全管理の一部だ。', en: '' } }
+          - { id: nl-p-share, text: { ja: '社内の共有の場所に置く', en: '' }, points: -5, axis: care, refs: [ppc-notify-person], explain: { ja: '共有の場所は便利だが、誰が見られるかの管理が要る。権限を決めないと、見てはいけない人まで見る。', en: '' } }
+          - { id: nl-p-safe, text: { ja: 'パスワードを付けて安全に送る', en: '' }, points: 10, axis: care, refs: [ppc-notify-person], explain: { ja: 'パスワードを別経路で伝えれば、途中で漏れても中身は守られる。受け渡しの安全管理になる。', en: '' } }
+      - id: record
+        label: { ja: '記録', en: '' }
+        options:
+          - { id: nl-r-date, text: { ja: '渡した日時と版を記録する', en: '' }, points: 10, axis: record, refs: [jpcert-handling], explain: { ja: '日時と版を記録すれば、後から対象の変更をたどれる。訂正が必要になった理由も示せる。', en: '' } }
+          - { id: nl-r-none, text: { ja: '記録は残さないでおく', en: '' }, points: -10, axis: record, refs: [jpcert-handling], explain: { ja: '記録がないと、いつ誰に何を渡したか説明できない。訂正のときの根拠も失う。', en: '' } }
+          - { id: nl-r-verbal, text: { ja: '口頭で伝えるだけにしておく', en: '' }, points: -5, axis: record, refs: [jpcert-handling], explain: { ja: '口頭だけでは、渡した内容が残らない。担当が変わると、経緯をたどれなくなる。', en: '' } }
+voices:
+  - { id: v01-a, media: chat, misleading: true, type: well-meant-field, text: { ja: 'たぶん誤操作です。大げさにしない方がいい。', en: '' }, trigger: { at: point } }
+  - { id: v01-b, media: boss, misleading: true, type: boss-pressure, text: { ja: '確かめてから報告しろ。誤報は困る。', en: '' }, trigger: { at: point } }
+  - { id: v01-ok, media: chat, misleading: false, text: { ja: '上司「その画面、消さずに待っていて」。', en: '' }, trigger: { at: point } }
+  - { id: v01-after, media: sns, misleading: false, text: { ja: '現場の人間が、先に騒いだのか。', en: '' }, trigger: { at: after, choice: a01-c-report } }
+  - { id: v02-a, media: chat, misleading: true, type: well-meant-field, text: { ja: 'そのソフト、みんな使ってますよ。大丈夫です。', en: '' }, trigger: { at: point } }
+  - { id: v02-b, media: vendor, misleading: true, type: fake-expert, text: { ja: '再起動すれば、たいてい直ります。', en: '' }, trigger: { at: point } }
+  - { id: v02-ok, media: chat, misleading: false, text: { ja: '技術部門「電源を切らずに、ケーブルを抜いてください」。', en: '' }, trigger: { at: point } }
+  - { id: v03-a, media: chat, misleading: true, type: well-meant-field, text: { ja: '主要なものだけ変えれば、十分でしょう。', en: '' }, trigger: { at: point } }
+  - { id: v03-b, media: boss, misleading: true, type: boss-pressure, text: { ja: '変更は管理者に任せて、業務に戻れ。', en: '' }, trigger: { at: point } }
+  - { id: v03-ok, media: chat, misleading: false, text: { ja: '技術部門「保存した全部を変えないと、また入られます」。', en: '' }, trigger: { at: point } }
+  - { id: v04-a, media: chat, misleading: true, type: well-meant-field, text: { ja: '口頭で説明すれば、十分伝わります。', en: '' }, trigger: { at: point } }
+  - { id: v04-b, media: boss, misleading: true, type: boss-pressure, text: { ja: '自分の履歴は、消しておいた方がいいぞ。', en: '' }, trigger: { at: point } }
+  - { id: v04-ok, media: chat, misleading: false, text: { ja: '調査会社「あなたの操作が分かると、手順が再現できます」。', en: '' }, trigger: { at: point } }
+  - { id: v05-a, media: chat, misleading: true, type: well-meant-field, text: { ja: '同僚は自分で気づくでしょう。', en: '' }, trigger: { at: point } }
+  - { id: v05-b, media: boss, misleading: true, type: boss-pressure, text: { ja: '自分のことだけやっておけ。', en: '' }, trigger: { at: point } }
+  - { id: v05-ok, media: chat, misleading: false, text: { ja: '同僚「同じツール、私も入れました」。', en: '' }, trigger: { at: point } }
+  - { id: v06-a, media: boss, misleading: true, type: boss-pressure, text: { ja: '記憶があいまいなら、分からないでいい。', en: '' }, trigger: { at: point } }
+  - { id: v06-b, media: chat, misleading: true, type: well-meant-field, text: { ja: '自分の担当分だけで、十分です。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '技術部門「作業記録に、データセットのIDが残っています」。', en: '' }, trigger: { at: point } }
+  - { id: v07-a, media: boss, misleading: true, type: boss-pressure, text: { ja: '名前と連絡先だけで、早く出せ。', en: '' }, trigger: { at: point } }
+  - { id: v07-b, media: chat, misleading: true, type: well-meant-field, text: { ja: '分かる範囲で出せば、後で足せばいい。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '委託元「退会した人にも、通知が要るかもしれません」。', en: '' }, trigger: { at: point } }
+  - { id: v07-after, media: news, misleading: false, text: { ja: 'リスト作りに、そんなに時間をかけるのか。', en: '' }, trigger: { at: after, choice: a07-c-format } }
+  - { id: v08-a, media: chat, misleading: true, type: well-meant-field, text: { ja: '担当役員に回せば、それで済みます。', en: '' }, trigger: { at: point } }
+  - { id: v08-b, media: boss, misleading: true, type: boss-pressure, text: { ja: '余計なことを言うな。回すだけでいい。', en: '' }, trigger: { at: point } }
+  - { id: v08-ok, media: chat, misleading: false, text: { ja: '上司「事実だけ伝えて、あとは私が話す」。', en: '' }, trigger: { at: point } }
+  - { id: v09-a, media: boss, misleading: true, type: boss-pressure, text: { ja: '現場が混乱する。設定は後にしろ。', en: '' }, trigger: { at: point } }
+  - { id: v09-b, media: chat, misleading: true, type: well-meant-field, text: { ja: '自分の分だけやっておけば、十分です。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '総務「共有アカウントが、まだ十個残っています」。', en: '' }, trigger: { at: point } }
+  - { id: v10-a, media: boss, misleading: true, type: boss-pressure, text: { ja: '全部見る時間はない。一部でいい。', en: '' }, trigger: { at: point } }
+  - { id: v10-b, media: chat, misleading: true, type: well-meant-field, text: { ja: '怪しい行だけ抜けば、分かりますよ。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '技術部門「前後の操作を並べると、手順が見えます」。', en: '' }, trigger: { at: point } }
+  - { id: v11-a, media: chat, misleading: true, type: well-meant-field, text: { ja: '便利なので、使い続けた方がいいですよ。', en: '' }, trigger: { at: point } }
+  - { id: v11-b, media: vendor, misleading: true, type: vendor-interest, text: { ja: '同じツールを、正式版として配り直します。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '技術部門「出どころの分からないものは、配らないでください」。', en: '' }, trigger: { at: point } }
+  - { id: v12-a, media: boss, misleading: true, type: boss-pressure, text: { ja: '売上を落とすな。残業してでもやれ。', en: '' }, trigger: { at: point } }
+  - { id: v12-b, media: chat, misleading: true, type: flattery, text: { ja: 'あなたなら、両方できますよ。', en: '' }, trigger: { at: point } }
+  - { id: v12-ok, media: chat, misleading: false, text: { ja: '上司「担当を替えるから、休んでいい」。', en: '' }, trigger: { at: point } }
+  - { id: v13-a, media: chat, misleading: true, type: well-meant-field, text: { ja: '委託元に転送すれば、それで済みます。', en: '' }, trigger: { at: point } }
+  - { id: v13-b, media: boss, misleading: true, type: boss-pressure, text: { ja: '何も答えるな。余計なことを言うな。', en: '' }, trigger: { at: point } }
+  - { id: v13-ok, media: chat, misleading: false, text: { ja: '上司「委託元と同じ説明を、短くていいから伝えて」。', en: '' }, trigger: { at: point } }
+  - { id: v14-a, media: chat, misleading: true, type: well-meant-field, text: { ja: '一般的な注意で、十分でしょう。', en: '' }, trigger: { at: point } }
+  - { id: v14-b, media: boss, misleading: true, type: boss-pressure, text: { ja: '自分の失敗を、わざわざ話すな。', en: '' }, trigger: { at: point } }
+  - { id: v14-ok, media: chat, misleading: false, text: { ja: '総務「当事者の話の方が、みんな聞きます」。', en: '' }, trigger: { at: point } }
+  - { id: v14-after, media: sns, misleading: false, text: { ja: '自分の失敗を話すなんて、恥ずかしくないのか。', en: '' }, trigger: { at: after, choice: a14-c-fail } }
+  - { id: v15-a, media: boss, misleading: true, type: boss-pressure, text: { ja: '八十台も見るな。抜き取りでいい。', en: '' }, trigger: { at: point } }
+  - { id: v15-b, media: chat, misleading: true, type: well-meant-field, text: { ja: '管理者が見ているから、大丈夫です。', en: '' }, trigger: { at: point } }
+  - { id: v15-c, media: board, misleading: true, type: fake-insider, text: { ja: '中の者だけど、実は全端末がまだ汚染されている。今すぐ全部止めろ。', en: '' }, trigger: { at: point } }
+  - { id: v15-ok, media: chat, misleading: false, text: { ja: '技術部門「点検した範囲を、記録に残してください」。', en: '' }, trigger: { at: point } }
+  - { id: v16-a, media: boss, misleading: true, type: boss-pressure, text: { ja: '評判が下がる。勉強会は断れ。', en: '' }, trigger: { at: point } }
+  - { id: v16-b, media: chat, misleading: true, type: flattery, text: { ja: '名前を伏せれば、問題ありません。', en: '' }, trigger: { at: point } }
+  - { id: v16-ok, media: chat, misleading: false, text: { ja: '同業「同じ手口が、うちにも来ています」。', en: '' }, trigger: { at: point } }
+  - { id: v-coward-2, media: sns, misleading: false, text: { ja: '現場の担当が、隠しているらしい。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-3, media: sns, misleading: false, text: { ja: '自分の失敗を隠すために、報告を遅らせた。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-4, media: news, misleading: false, text: { ja: '臆病な対応で、委託元への通知が遅れた。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-phone, media: chat, misleading: false, text: { ja: '取引先「会員から、同じ問い合わせが十件来ています」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-news, media: news, misleading: false, text: { ja: '業界紙「分析会社の担当者端末から、認証情報が流出か」。', en: '' }, trigger: { at: manual } }
