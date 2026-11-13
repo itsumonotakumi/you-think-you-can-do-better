@@ -56,7 +56,7 @@
   import {
     formatClock, mediaGlyph, minutesBetween,
   } from '../parts/logic';
-  import { choicePercent, fetchChoiceStats, isRankingEnabled } from '../ranking';
+  import { choicePercent, fetchChoiceStats, isRankingEnabled, RANKING_KEYS } from '../ranking';
 
   let refs = $state<Record<string, Reference>>({});
   let refsLoading = $state(true);
@@ -227,7 +227,7 @@
               </div>
               <p class="entry-choice">{choice ? loc(choice.text) : entry.choiceId}</p>
               {#if percent !== null}
-                <p class="choice-stats" data-choice-stats>{t('rk.review.line', { percent })}</p>
+                <p class="choice-stats" data-choice-stats>{t(RANKING_KEYS.reviewLine, { percent })}</p>
               {/if}
 
               <dl class="entry-points">

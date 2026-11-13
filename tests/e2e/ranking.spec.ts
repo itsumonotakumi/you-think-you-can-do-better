@@ -12,6 +12,8 @@ interface Captured {
   submissions: Array<Record<string, unknown>>;
   rankingPeriods: string[];
   statsRequests: number;
+  /** 実際に遊んだ判断だけを 42% として返すためのモック（選択肢は送信内容から作る） */
+  statsPoints: Record<string, Record<string, number>>;
 }
 
 async function enableRanking(page: Page): Promise<void> {
@@ -25,7 +27,14 @@ async function mockApi(page: Page, captured: Captured): Promise<void> {
     const url = new URL(route.request().url());
     if (url.pathname.endsWith('/api/plays')) {
       const body = route.request().postData();
-      captured.submissions.push(body ? JSON.parse(body) as Record<string, unknown> : {});
+      const payload = body ? JSON.parse(body) as Record<string, unknown> : {};
+      captured.submissions.push(payload);
+      const choices = Array.isArray(payload.choices) ? payload.choices : [];
+      for (const entry of choices as Array<{ pointId?: unknown; choiceId?: unknown }>) {
+        if (typeof entry.pointId === 'string' && typeof entry.choiceId === 'string') {
+          captured.statsPoints[entry.pointId] = { [entry.choiceId]: 42 };
+        }
+      }
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -61,7 +70,7 @@ async function mockApi(page: Page, captured: Captured): Promise<void> {
         body: JSON.stringify({
           scenarioId: url.searchParams.get('scenario') ?? '',
           role: url.searchParams.get('role') ?? 'executive',
-          points: { 'p01-call': { 'p01-command': 42 } },
+          points: captured.statsPoints,
           total: 40,
         }),
       });
@@ -72,7 +81,7 @@ async function mockApi(page: Page, captured: Captured): Promise<void> {
 }
 
 function emptyCapture(): Captured {
-  return { submissions: [], rankingPeriods: [], statsRequests: 0 };
+  return { submissions: [], rankingPeriods: [], statsRequests: 0, statsPoints: {} };
 }
 
 test.describe('ランキング', () => {
@@ -142,12 +151,27 @@ test.describe('ランキング', () => {
     expect(typeof body.clientId).toBe('string');
     expect((body.clientId as string).length).toBeGreaterThan(0);
     expect(body.turnstileToken).toBe('');
+    expect(body.role).toBe('executive');
+    expect(body.mode).toBe('normal');
+    expect(typeof body.scenarioId).toBe('string');
+    expect(typeof body.scenarioVersion).toBe('string');
     expect(Array.isArray(body.choices)).toBe(true);
     expect((body.choices as unknown[]).length).toBeGreaterThan(0);
+    // 報告書・記者会見は選んだ道によって到達しないことがあるので、形だけを確かめる
+    for (const choice of body.choices as Array<Record<string, unknown>>) {
+      expect(typeof choice.pointId).toBe('string');
+      expect(typeof choice.choiceId).toBe('string');
+    }
     expect(Array.isArray(body.drafts)).toBe(true);
-    expect((body.drafts as unknown[]).length).toBeGreaterThan(0);
+    for (const draft of body.drafts as Array<Record<string, unknown>>) {
+      expect(typeof draft.draftKey).toBe('string');
+      expect(typeof draft.slotId).toBe('string');
+      expect(typeof draft.optionId).toBe('string');
+    }
     expect(Array.isArray(body.press)).toBe(true);
-    expect((body.press as unknown[]).length).toBeGreaterThan(0);
+    for (const answer of body.press as Array<Record<string, unknown>>) {
+      expect(typeof answer.questionId).toBe('string');
+    }
     // 点数は送らない（サーバーが再計算する）
     expect(Object.hasOwn(body, 'score')).toBe(false);
 
@@ -163,11 +187,23 @@ test.describe('ランキング', () => {
 
     await openTitle(page);
     await startNewPlay(page);
+
+    // 本編の選択肢には選択率を出さない（正誤のヒントになるため）
+    await expect(page.locator('[data-screen="S05Main"] [data-choice-stats]')).toHaveCount(0);
+
     await playToEnding(page);
     await waitForScreen(page, 'S08Ending');
 
-    // 本編の選択肢には選択率を出さない（正誤のヒントになるため）
-    await expect(page.locator('[data-choice-stats]')).toHaveCount(0);
+    // 選択率は実際に遊んだ判断にだけ返す。参加して選択内容を作らせる
+    await page.locator('[data-ranking-join]').click();
+    await page.locator('[data-ranking-open]').click();
+    await page.locator('[data-ranking-nickname]').fill('はなこ');
+    await page.locator('[data-ranking-agree]').check();
+    await page.locator('[data-ranking-submit]').click();
+    await expect(page.locator('[data-ranking-result]')).toBeVisible();
+
+    await page.getByRole('button', { name: 'エンディングへ' }).click();
+    await waitForScreen(page, 'S08Ending');
 
     await openReview(page);
     await expect(page.locator('[data-screen="S09Review"] [data-choice-stats]').first())

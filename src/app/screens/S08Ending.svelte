@@ -31,7 +31,7 @@
   import { loc, notice, t } from '../../i18n';
   import { recordResult, saveProgress } from '../../storage';
   import { play, scenario, screen, settings } from '../store';
-  import { isRankingEnabled } from '../ranking';
+  import { isRankingEnabled, RANKING_KEYS } from '../ranking';
   import { runFx } from '../effects';
   import { minutesBetween } from '../parts/logic';
   import '../effects/effects.css';
@@ -173,7 +173,7 @@
           data-ranking-join
           onclick={() => screen.set('S12')}
         >
-          {t('rk.ending.join')}
+          {t(RANKING_KEYS.endingJoin)}
         </button>
       {/if}
       <button type="button" class="btn btn--ghost" onclick={() => screen.set('S01')}>

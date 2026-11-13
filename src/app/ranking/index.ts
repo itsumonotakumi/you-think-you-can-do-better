@@ -13,3 +13,4 @@ export {
 } from './submission';
 export { choicePercent } from './stats';
 export { loadTurnstile, mountTurnstile } from './turnstile';
+export { RANKING_KEYS } from './i18n';

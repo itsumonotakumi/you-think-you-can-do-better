@@ -30,7 +30,7 @@
   } from '../../i18n';
   import { loadProgress, saveProgress, saveSettings } from '../../storage';
   import { backTo, errorMessage, play, scenario, screen, selectedScenarioId, settings } from '../store';
-  import { isRankingEnabled } from '../ranking';
+  import { isRankingEnabled, RANKING_KEYS } from '../ranking';
   import type { Lang, PlayState } from '../../engine/types';
   import '../styles/base.css';
 
@@ -54,7 +54,7 @@
       credits: t('sa.common.credits'),
       language: t('sa.common.language'),
       credit: t('sa.title.credit'),
-      ranking: t('rk.intro.link'),
+      ranking: t(RANKING_KEYS.introLink),
       loading: t('sa.common.loading'),
       loadError: t('sa.scenarios.loadError'),
       purpose: notice('purpose'),
