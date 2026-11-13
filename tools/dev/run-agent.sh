@@ -52,7 +52,7 @@ opencode run -m "$MODEL" "$(cat "$PROMPT_FILE")" > "$LOG_DIR/$NAME.log" 2>&1 || 
 # コミット対象は作業フォルダだけ（.env などの未追跡ファイルを巻き込まない）
 for path in src tests tools docs scenarios references locales audio .github \
   package.json package-lock.json index.html README.md tsconfig.json vite.config.ts \
-  svelte.config.js playwright.config.ts HANDOFF.md; do
+  svelte.config.js playwright.config.ts HANDOFF.md functions migrations wrangler.toml public .gitattributes; do
   [ -e "$path" ] && git add -A -- "$path" || true
 done
 git commit -qm "agent($NAME): work" >/dev/null 2>&1 || true
