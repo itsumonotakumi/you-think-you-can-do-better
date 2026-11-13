@@ -74,7 +74,7 @@
       raw: value.raw,
       playCount: value.playCount,
       at: new Date().toISOString(),
-    });
+    }, state.mode === 'hard' ? 'hard' : 'normal');
     saveProgress(null);
 
     // 称号（#9）: 1回のプレイで決まるものと、積み重ねで決まるものをまとめて判定する

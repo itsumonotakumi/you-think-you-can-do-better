@@ -2,6 +2,7 @@
 import type {
   Cue,
   DecisionPoint,
+  PlayMode,
   PlayState,
   PlayerNote,
   Reference,
@@ -21,6 +22,8 @@ export function startPlay(
   prologue: PlayState['prologue'],
   startedAt: string,
   refs: Reference[],
+  /** 省略時は通常モード。本番モードは画面が制限時間を数える（#10） */
+  mode: PlayMode = 'normal',
 ): StepResult {
   const script = scenario.roles[role];
   if (!script) throw new Error(`role script not found: ${role}`);
@@ -50,6 +53,7 @@ export function startPlay(
     startedAt,
     pendingDraft: null,
     finished: false,
+    mode,
   };
 
   const cues: Cue[] = [];

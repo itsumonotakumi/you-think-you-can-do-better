@@ -5,7 +5,7 @@
   import { loadPrologue, nextPlayCount, registerPlayStart, saveProgress } from '../../storage';
   import { applyStep, scenario, screen, selectedScenarioId, settings } from '../store';
   import { portrait } from '../illustrations';
-  import type { RoleId, Scenario } from '../../engine/types';
+  import type { PlayMode, RoleId, Scenario } from '../../engine/types';
   import { ROLES } from '../../engine/types';
   // エンジン本体（src/engine/index.ts）は別担当。未着の間も型検査を通すため解決エラーだけ抑止する。
   // @ts-ignore -- 実装が入れば通常の import として解決される
@@ -18,6 +18,8 @@
   let phase = $state<Phase>('loading');
   let busy = $state<RoleId | null>(null);
   let error = $state('');
+  /** 難易度（#10）。本番は判断ごとに制限時間があり、時間切れは「判断の先送り」になる */
+  let mode = $state<PlayMode>('normal');
 
   $effect(() => {
     const id = $selectedScenarioId;
@@ -55,6 +57,11 @@
       retry: t('sa.common.retry'),
       loadError: t('sa.roles.loadError'),
       startError: t('sa.roles.startError'),
+      modeLegend: t('sa.roles.mode.legend'),
+      modeNormal: t('sa.roles.mode.normal'),
+      modeHard: t('sa.roles.mode.hard'),
+      modeHint: t('sa.roles.mode.hint'),
+      modeHardNotice: t('sa.roles.mode.hardNotice'),
     };
   });
 
@@ -73,7 +80,7 @@
         info: t(`sa.roles.info.${role}`),
         intro: loc(script.intro),
         estimate: t('sa.roles.estimate', { n: script.estimateMinutes }),
-        next: t('sa.roles.next', { n: nextPlayCount(sc.id, role) }),
+        next: t('sa.roles.next', { n: nextPlayCount(sc.id, role, mode) }),
       };
     });
   });
@@ -95,10 +102,10 @@
     error = '';
     try {
       const refs = await loadReferences();
-      const count = registerPlayStart(sc.id, role);
+      const count = registerPlayStart(sc.id, role, mode);
       const prologue = loadPrologue() ?? { comment: '', predictedHours: null };
       const startedAt = new Date().toISOString();
-      const result = startPlay(sc, role, count, prologue, startedAt, refs);
+      const result = startPlay(sc, role, count, prologue, startedAt, refs, mode);
       applyStep(result);
       saveProgress(result.state);
       // 本編の前にプロローグ（S02）を挟む
@@ -128,6 +135,24 @@
       <button class="btn" onclick={back}>{ui.back}</button>
     </div>
   {:else}
+    <fieldset class="mode-select">
+      <legend>{ui.modeLegend}</legend>
+      <div class="mode-options">
+        <label class="mode-option">
+          <input type="radio" name="mode" value="normal" bind:group={mode} />
+          <span>{ui.modeNormal}</span>
+        </label>
+        <label class="mode-option">
+          <input type="radio" name="mode" value="hard" bind:group={mode} />
+          <span>{ui.modeHard}</span>
+        </label>
+      </div>
+      <p class="hint">{ui.modeHint}</p>
+      {#if mode === 'hard'}
+        <p class="mode-notice" role="note">{ui.modeHardNotice}</p>
+      {/if}
+    </fieldset>
+
     <ul class="role-list">
       {#each roles as item (item.role)}
         <li class="role-card">
@@ -178,6 +203,54 @@
 </section>
 
 <style>
+  .mode-select {
+    margin: 0 0 0.8em;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    background: var(--panel);
+  }
+  .mode-select legend {
+    padding: 0 0.35em;
+    color: var(--muted);
+    font-size: 0.85em;
+    font-weight: 600;
+  }
+  .mode-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.2rem;
+  }
+  .mode-option {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    cursor: pointer;
+  }
+  .mode-option input[type='radio'] {
+    width: 1.1em;
+    height: 1.1em;
+    accent-color: var(--accent);
+  }
+  .mode-option input[type='radio']:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .mode-select .hint {
+    margin: 0.5em 0 0;
+    color: var(--muted);
+    font-size: 0.85em;
+    line-height: 1.7;
+  }
+  .mode-notice {
+    margin: 0.5em 0 0;
+    padding: 0.4rem 0.6rem;
+    border-left: 4px solid var(--warn);
+    border-radius: 4px;
+    background: var(--card-notice);
+    font-size: 0.85em;
+    line-height: 1.7;
+  }
   .role-card__head {
     display: flex;
     align-items: center;

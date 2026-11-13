@@ -36,7 +36,7 @@ common.bgmVolume: BGM volume
 common.seVolume: Sound effects volume
 common.mute: Mute
 common.reduceMotion: Reduce motion
-common.pressTimeScale: Press conference time extension
+common.pressTimeScale: Time limit extension
 common.clearData: Clear saved data
 common.clearConfirm: Play counts and first-time results will also be deleted. Clear all saved data?
 common.audioLoadFailed: Could not load audio

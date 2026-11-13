@@ -56,6 +56,12 @@ sb:
     noPoint: "いま起きていることはありません。"
     noChoices: "選べる行動はありません。"
     draftPending: "文案を作成してください。"
+    timer:
+      heading: "残り時間"
+      remaining: "残り{seconds}秒"
+      scale: "設定により制限時間を{scale}倍に延長しています。"
+      hint: "時間切れになると、その判断は「先送り」になり、最も消極的な選択で先に進みます。"
+      timeoutResult: "時間切れ：判断を先送りしました（{choice}）"
     abort:
       button: "中断してタイトルへ"
       heading: "タイトルへ戻りますか？"

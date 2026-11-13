@@ -73,6 +73,11 @@ sa.roles.info.analyst: 監視、検知、技術調査。攻撃の全体像を追
 sa.roles.choose: このロールで始める
 sa.roles.loadError: シナリオを読み込めませんでした。
 sa.roles.startError: プレイを開始できませんでした。もう一度試してください。
+sa.roles.mode.legend: 難易度
+sa.roles.mode.normal: 通常（時間の制限なし）
+sa.roles.mode.hard: 本番（1つの判断に60秒）
+sa.roles.mode.hint: 本番モードは判断ごとに制限時間があります。時間切れの判断は「先送り」として扱われ、その場で最も消極的な選択になります。制限時間は設定の「制限時間」で1.5倍・2倍に延ばせます。
+sa.roles.mode.hardNotice: 本番モードでは、判断の記録（メモ）は使えません。結果の解説は振り返りでまとめて表示します。
 
 # --- S10 設定 ---
 sa.settings.title: 設定
@@ -90,7 +95,7 @@ sa.settings.se: 効果音の音量
 sa.settings.muted: ミュート
 sa.settings.reduceMotion: 演出を減らす
 sa.settings.reduceMotionHint: 揺れ・フラッシュ・早送り・タイプ表示を止め、色と太字の変化だけにします。
-sa.settings.pressTime: 記者会見の制限時間
+sa.settings.pressTime: 制限時間（記者会見・本番モード）
 sa.settings.pressTime1: 標準
 sa.settings.pressTime15: 1.5倍
 sa.settings.pressTime2: 2倍

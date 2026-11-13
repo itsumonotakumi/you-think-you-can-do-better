@@ -62,6 +62,10 @@ sc:
   review:
     title: "振り返り"
     summaryHeading: "結果"
+    mode:
+      normal: "通常モード"
+      hard: "本番モード"
+    modeNote: "本番モード：各判断に制限時間があり、時間切れは「判断の先送り」として扱いました。"
     resultLine: "素点 {raw} ／ 公式スコア {official} ／ ランク {rank}"
     entriesHeading: "各判断"
     noEntries: "判断の記録はありません。"
