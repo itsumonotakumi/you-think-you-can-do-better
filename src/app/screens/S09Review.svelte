@@ -183,8 +183,8 @@
     <h1>{t('sc.review.title')}</h1>
     {#if report}
       <p class="play-count">{t('sc.playCount', { n: report.playCount })}</p>
-      <p class="mode-badge" data-mode={$play.mode === 'hard' ? 'hard' : 'normal'}>
-        {t($play.mode === 'hard' ? 'sc.review.mode.hard' : 'sc.review.mode.normal')}
+      <p class="mode-badge" data-mode={$play?.mode === 'hard' ? 'hard' : 'normal'}>
+        {t($play?.mode === 'hard' ? 'sc.review.mode.hard' : 'sc.review.mode.normal')}
       </p>
     {/if}
     {#if debug}
@@ -202,7 +202,7 @@
           rank: report.result.rank,
         })}
       </p>
-      {#if $play.mode === 'hard'}
+      {#if $play?.mode === 'hard'}
         <p class="hint">{t('sc.review.modeNote')}</p>
       {/if}
     </section>

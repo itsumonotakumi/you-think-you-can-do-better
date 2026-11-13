@@ -1,4 +1,4 @@
-// No.11 ツムギマート / 経路と法定期限の検査。
+// No.11 ヒナタマート / 経路と法定期限の検査。
 // 物流委託先のランサムウェア被害で通販が止まる話を、4ロールすべてで最後まで通せるかを見る。
 import { describe, it, expect } from 'vitest';
 import { parse } from 'yaml';

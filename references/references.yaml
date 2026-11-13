@@ -273,6 +273,8 @@
   version: "2026-11"
   section: { ja: "メールの誤送信が起きたときの対応", en: "Responding to misdirected email" }
   summary: { ja: "誤送信も漏えい等に当たりうる。報告の対象かは要配慮個人情報、不正の目的、件数などで判断し、本人への通知と再発防止を検討する", en: "Misdirected email can be a breach; judge reportability by sensitive data, malicious intent and volume, and notify affected persons" }
+  checkedAt: "2026-11-08"
+  legalPack: "jp"
 - id: no11-ppc-entrust-supervision
   title: { ja: "個人情報保護法 委託先の監督", en: "APPI supervision of entrusted processors" }
   issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
