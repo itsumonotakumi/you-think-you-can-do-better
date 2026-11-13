@@ -33,6 +33,7 @@
   import { play, scenario, screen, settings } from '../store';
   import { runFx } from '../effects';
   import { minutesBetween } from '../parts/logic';
+  import ShareButton from '../parts/ShareButton.svelte';
   import '../effects/effects.css';
 
   let recorded = false;
@@ -170,6 +171,9 @@
       <button type="button" class="btn btn--primary" onclick={() => screen.set('S09')}>
         {t('sc.ending.next')}
       </button>
+      {#if $play && $scenario}
+        <ShareButton scenario={$scenario} playState={$play} result={result} />
+      {/if}
     </div>
   {:else}
     <div class="panel stack">
