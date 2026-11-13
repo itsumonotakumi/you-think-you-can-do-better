@@ -1,0 +1,17 @@
+# Cloudflare Pages + D1（ランキング API #7）
+# フロントは GitHub Pages 版と共通の dist をそのまま置く。
+name = "yattemite"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-11-01"
+
+# D1 の database_id は `npx wrangler d1 create yattemite-ranking` の出力で置き換える
+[[d1_databases]]
+binding = "DB"
+database_name = "yattemite-ranking"
+database_id = "TO_BE_FILLED"
+
+[vars]
+# 本番では TURNSTILE_SECRET を設定したうえで "true" にする（未設定なら 503 で書き込みを止める）
+REQUIRE_TURNSTILE = "false"
+# 1日の書き込み上限（無料枠の安全装置）。超えたら 503
+DAILY_WRITE_LIMIT = "50000"
