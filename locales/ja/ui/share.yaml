@@ -1,0 +1,23 @@
+# S08 結果のシェア（画像・投稿文）（日本語）
+# キーは share. で始まる。ja と en で同じキーを持つこと。
+
+share.open: 結果をシェア
+share.title: 結果をシェア
+share.close: 閉じる
+share.imageAlt: 結果のシェア画像（シナリオ題名・ロール・ランク・公式スコア）
+share.generating: 画像を作成しています…
+share.imageFailed: 画像を作成できませんでした。投稿文はコピーできます。
+share.platform: 投稿先
+share.platform.x: X
+share.platform.linkedin: LinkedIn
+share.platform.threads: Threads
+share.platform.bluesky: Bluesky
+share.postText: 投稿文
+share.save: 画像を保存
+share.saved: 画像を保存しました
+share.copy: 投稿文をコピー
+share.copied: コピーしました
+share.copyFailed: コピーできませんでした。投稿文を選んでコピーしてください。
+share.share: 共有する
+share.shareFailed: 共有できませんでした。画像の保存と投稿文のコピーをお使いください。
+share.hint: 画像と投稿文はこの端末の中で作ります。外部には送信しません。

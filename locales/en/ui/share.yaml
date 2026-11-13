@@ -1,0 +1,23 @@
+# S08 share result (image and post text) (English)
+# Keys must match the Japanese file.
+
+share.open: Share result
+share.title: Share result
+share.close: Close
+share.imageAlt: Share image with the scenario title, role, rank, and score
+share.generating: Creating the image…
+share.imageFailed: The image could not be created. You can still copy the post text.
+share.platform: Post to
+share.platform.x: X
+share.platform.linkedin: LinkedIn
+share.platform.threads: Threads
+share.platform.bluesky: Bluesky
+share.postText: Post text
+share.save: Save image
+share.saved: Image saved
+share.copy: Copy post text
+share.copied: Copied
+share.copyFailed: Could not copy. Select the post text and copy it manually.
+share.share: Share
+share.shareFailed: Could not share. Use Save image and Copy post text instead.
+share.hint: The image and post text are created on this device. Nothing is sent to a server.
