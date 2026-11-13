@@ -81,6 +81,8 @@ export interface Scenario {
   endings: Record<Rank, { text: Localized; bgm: string }>;
   salesModel: { base: number; trustWeight: number; fatalPenalty: number; min: number; max: number };
   illustrations?: Illustration[];
+  /** #8 翌朝の新聞見出し（任意）。ランクごと。無ければ共通の雛形を使う */
+  headlines?: Partial<Record<Rank, Localized>>;
 }
 
 export interface RoleScript {
@@ -270,7 +272,11 @@ export interface PlayState {
   /** 文案作成待ちの draft キー */
   pendingDraft: string | null;
   finished: boolean;
+  /** 難易度。省略時 normal（#10 本番モード: 判断ごとに制限時間、解説は最後にまとめて） */
+  mode?: PlayMode;
 }
+
+export type PlayMode = 'normal' | 'hard';
 
 // ---------------- 演出キュー（正誤情報を入れない: 10章） ----------------
 
@@ -366,7 +372,35 @@ export const STORAGE_KEYS = {
   plays: 'ytcdb:v1:plays',
   progress: 'ytcdb:v1:progress',
   prologue: 'ytcdb:v1:prologue',
+  /** #9 獲得した称号: Record<AchievementId, { at: string; scenarioId: string; role: RoleId }> */
+  achievements: 'ytcdb:v1:achievements',
+  /** #7 ランキング: { nickname: string; consent: boolean; clientId: string } */
+  ranking: 'ytcdb:v1:ranking',
 } as const;
+
+// ---------------- #9 称号 ----------------
+export interface Achievement { id: string; title: Localized; description: Localized }
+
+// ---------------- #7 ランキング API（Cloudflare Pages Functions + D1） ----------------
+// 点数はクライアントから送らない。サーバーがエンジンを再実行して決める（改ざん防止）。
+export interface PlaySubmission {
+  scenarioId: string;
+  scenarioVersion: string;
+  role: RoleId;
+  mode: PlayMode;
+  /** 選んだ順の選択（判断 id と選択肢 id）、報告書の選択、記者会見の回答 */
+  choices: { pointId: string; choiceId: string }[];
+  drafts: { draftKey: string; slotId: string; optionId: string }[];
+  press: { questionId: string; answerId: string | null }[];
+  nickname: string;     // 1〜16文字。不適切語はサーバーで拒否
+  clientId: string;     // 端末ごとの乱数 ID（個人情報ではない）。初回のみ登録の判定に使う
+  turnstileToken: string;
+}
+export interface SubmissionResult { ok: boolean; score?: number; rank?: Rank; position?: number; total?: number; percentile?: number; error?: string }
+export interface RankingEntry { position: number; nickname: string; score: number; rank: Rank; at: string }
+export interface RankingResponse { scenarioId: string; role: RoleId; mode: PlayMode; period: 'week' | 'all'; entries: RankingEntry[]; total: number }
+/** 判断ごとの選択率（振り返り画面でだけ表示。本編では正誤のヒントになるので出さない） */
+export interface ChoiceStatsResponse { scenarioId: string; role: RoleId; points: Record<string, Record<string, number>>; total: number }
 
 // ---------------- 音素材 ----------------
 
