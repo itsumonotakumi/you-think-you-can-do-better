@@ -1,0 +1,863 @@
+# No.11 ツムギマート / セキュリティ部門長ロール（情報システム部長）
+# プレイヤーは情報システム部長。自社は感染していないが、委託先の被害と自社の接続点を扱う。
+# 経営への翻訳、証拠の保全、監視、委託先の監督、段階再開の条件が仕事。
+# 判断ポイント15、細目は choices[].items と drafts の合計で80以上。
+estimateMinutes: 30
+intro: { ja: 'あなたはツムギマートの情報システム部長、瀬川 理恵。朝、配送を委託するハコブ物流の出荷システムが止まったと連絡が入った。自社の端末とサーバーに感染の痕跡はない。だが、委託先には顧客の配送データを渡している。何を確かめ、どこまで経営に伝えるかが、今日の仕事だ。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-coward-2
+  '3': v-coward-3
+  '4': v-coward-4
+deadlines:
+  - id: dl-lead-ppc-prelim
+    ref: ppc-report-prelim
+    label: { ja: '個人情報保護委員会への速報の材料', en: '' }
+    points: -150
+    doneFlag: ppcPrelimFiled
+  - id: dl-lead-ppc-final
+    ref: ppc-report-final-malicious
+    label: { ja: '個人情報保護委員会への確報の材料', en: '' }
+    points: -120
+    doneFlag: ppcFinalFiled
+events:
+  - id: ev-lead-ransom
+    at: { day: 0, minutes: 555 }
+    voices: [v-ev-ransom]
+    gauges: { flame: 5 }
+    sound: { se: [mail_arrive] }
+    caption: { ja: '物流会社が、ランサムウェアの被害を認めた。', en: '' }
+  - id: ev-lead-alert
+    at: { day: 0, minutes: 750 }
+    voices: [v-ev-alert]
+    sound: { se: [notify_chat] }
+    caption: { ja: '監視の画面に、普段と違う通信の記録が出た。', en: '' }
+  - id: ev-lead-news
+    at: { day: 0, minutes: 1200 }
+    voices: [v-ev-news]
+    gauges: { flame: 8 }
+    sound: { se: [notify_news] }
+    caption: { ja: '業界紙が、物流会社の障害と通販各社の停止を報じた。', en: '' }
+  - id: ev-lead-peer
+    at: { day: 2, minutes: 540 }
+    voices: [v-ev-peer]
+    gauges: { flame: 5 }
+    caption: { ja: '同じ物流を使う大手通販が、記者会見を開いた。', en: '' }
+  - id: ev-lead-board
+    at: { day: 3, minutes: 540 }
+    voices: [v-ev-board]
+    gauges: { flame: 5 }
+    sound: { se: [phone_ring] }
+    caption: { ja: '取締役から、再開の時期と予算の見通しを聞かれた。', en: '' }
+points:
+  - id: l01-first
+    at: { day: 0, minutes: 480 }
+    phase: detect
+    sound: { se: [phone_ring] }
+    text: { ja: '午前8時。ハコブ物流の出荷システムが止まった。自社の通販は止まるが、店舗は動いている。情報システム部として、まず何を押さえるか。', en: '' }
+    voices: [v01-boss, v01-coward, v01-ok]
+    notable:
+      - { id: note-lead-first, text: { ja: '午前8時、委託先の出荷停止。自社の受注と出荷は物流の接続点で止まっている。', en: '' } }
+    choices:
+      - id: l01-a-scope
+        text: { ja: '自社の受注と出荷の接続点を確認する体制を作る', en: '' }
+        explain: { ja: '委託先の障害が自社に及ぶ範囲を先に切り分けている。調べる範囲と担当が見えるため、経営への報告も早くなる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [jpcert-handling, no11-bcp-continuity]
+        gauges: { damage: -5, flame: -5, trust: 10, stamina: -10 }
+        setFlags: { scopeChecked: true }
+        items:
+          - { id: l01-a-time, points: 5, axis: time, refs: [jpcert-handling] }
+          - { id: l01-a-order, points: 8, axis: order, refs: [jpcert-handling] }
+          - { id: l01-a-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: l01-a-content, points: 5, axis: content, refs: [no11-bcp-continuity] }
+      - id: l01-b-wait
+        text: { ja: '物流の復旧を待ち、その間に通常の業務を続ける', en: '' }
+        explain: { ja: '委託先の復旧を待つ間に、自社の接続点は調べられない。影響の範囲が分からないまま、経営への報告も止まる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -110
+        refs: [jpcert-handling]
+        gauges: { flame: 8, trust: -10, damage: 5 }
+        coward: true
+        items:
+          - { id: l01-b-time, points: -10, axis: time, refs: [jpcert-handling] }
+          - { id: l01-b-order, points: -8, axis: order, refs: [jpcert-handling] }
+      - id: l01-c-cut
+        text: { ja: '全社の端末を一斉にネットワークから切り離す', en: '' }
+        explain: { ja: '感染の痕跡がない段階で全部を切ると、店舗と受注の業務まで止まる。止める範囲を根拠なく広げる判断になる。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -120
+        refs: [no11-bcp-continuity]
+        gauges: { damage: 15, flame: 10, trust: -10 }
+        items:
+          - { id: l01-c-order, points: -10, axis: order, refs: [no11-bcp-continuity] }
+          - { id: l01-c-time, points: -8, axis: time, refs: [no11-bcp-continuity] }
+          - { id: l01-c-care, points: -5, axis: care, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '委託先が止まったら、まず自社のどこがつながっているかを確かめる。範囲と担当を決めて調べれば、影響の切り分けが早くなる。感染の痕跡がない段階で全部を止めると、動かす必要のない業務まで止まる。', en: '' }
+
+  - id: l02-evidence
+    at: { day: 0, minutes: 555 }
+    phase: contain
+    sound: { se: [mail_arrive] }
+    text: { ja: '午前9時15分。物流から「暗号化された。復旧には時間がかかる」と連絡。原因の調査には、機器と記録が要る。', en: '' }
+    voices: [v02-vendor, v02-past, v02-ok]
+    choices:
+      - id: l02-a-reset
+        text: { ja: '復旧を優先し、機器の初期化を物流に勧める', en: '' }
+        explain: { ja: '初期化すると侵入の経路と時刻が分からなくなる。原因が分からなければ、同じ手口への備えも作れない。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -140
+        refs: [jpcert-handling, nist-sp800-61r3]
+        gauges: { damage: 10, trust: -10 }
+        items:
+          - { id: l02-a-record, points: -15, axis: record, refs: [jpcert-handling] }
+          - { id: l02-a-content, points: -8, axis: content, refs: [nist-sp800-61r3] }
+      - id: l02-b-preserve
+        text: { ja: 'ログと機器の保全を、時刻と範囲を決めて文書で依頼する', en: '' }
+        explain: { ja: '何を、いつから、どの範囲で残すかを決めて依頼している。調査の前提が揃い、復旧の手順も根拠を持てる。', en: '' }
+        minutes: 75
+        category: recover
+        points: 120
+        refs: [jpcert-handling, nist-sp800-61r3]
+        gauges: { damage: -5, trust: 10, stamina: -10 }
+        setFlags: { evidenceKept: true }
+        items:
+          - { id: l02-b-record, points: 10, axis: record, refs: [jpcert-handling] }
+          - { id: l02-b-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l02-b-content, points: 8, axis: content, refs: [jpcert-handling] }
+      - id: l02-c-leave
+        text: { ja: '証拠の扱いは物流の判断に任せ、こちらは関与しない', en: '' }
+        explain: { ja: '委託先に任せきると、こちらの預けたデータの扱いを確かめられない。調査の前提が崩れ、報告の根拠も弱くなる。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { trust: 0, stamina: -3 }
+        items:
+          - { id: l02-c-record, points: 5, axis: record, refs: [jpcert-handling] }
+          - { id: l02-c-order, points: -5, axis: order, refs: [nist-sp800-61r3] }
+    lesson: { ja: '復旧の前に、残すものを決める。ログ、機器、作業の記録について、時刻と範囲を指定して保全を依頼する。初期化してからでは、侵入の経路も時刻も分からず、同じ手口への備えを作れない。', en: '' }
+
+  - id: l03-own
+    at: { day: 0, minutes: 690 }
+    phase: contain
+    sound: { se: [notify_chat] }
+    text: { ja: '午前11時30分。ECサイトと受注データベースの調査が途中だ。物流との接続に、普段と違う通信が残っている。', en: '' }
+    voices: [v03-expert, v03-public, v03-ok]
+    choices:
+      - id: l03-a-clear
+        text: { ja: '問題なしと社内に断言し、調査を打ち切る', en: '' }
+        explain: { ja: '接続点の確認が終わる前に断言すると、後で不審な通信が見つかったときに訂正が要る。説明の自由度が下がる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -110
+        refs: [jpcert-handling]
+        gauges: { flame: 8, trust: -10 }
+        items:
+          - { id: l03-a-content, points: -12, axis: content, refs: [jpcert-handling] }
+          - { id: l03-a-record, points: -6, axis: record, refs: [jpcert-handling] }
+      - id: l03-b-reboot
+        text: { ja: '全システムを再起動し、様子を見て判断する', en: '' }
+        explain: { ja: '再起動で消える記録があり、原因の手がかりを失う。様子を見る間に、接続点の調査も進まない。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 5, stamina: -5 }
+        items:
+          - { id: l03-b-record, points: -8, axis: record, refs: [nist-sp800-61r3] }
+          - { id: l03-b-time, points: 5, axis: time, refs: [jpcert-handling] }
+      - id: l03-c-triage
+        text: { ja: '通信経路とアカウントを点検し、影響を切り分ける', en: '' }
+        explain: { ja: '怪しい通信の中身と、使われたアカウントを確かめている。影響の範囲が分かれば、止める範囲も説明も決められる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 120
+        refs: [jpcert-handling, nist-sp800-61r3]
+        gauges: { damage: -8, trust: 10, stamina: -10 }
+        setFlags: { ownChecked: true }
+        items:
+          - { id: l03-c-content, points: 8, axis: content, refs: [jpcert-handling] }
+          - { id: l03-c-record, points: 8, axis: record, refs: [nist-sp800-61r3] }
+          - { id: l03-c-order, points: 8, axis: order, refs: [jpcert-handling] }
+    lesson: { ja: '自社が無事かを語る前に、接続点を調べる。通信の行き先と使われたアカウントを確かめ、影響の範囲を切り分ける。再起動や断言は、記録を失い、後で説明をやり直す原因になる。', en: '' }
+
+  - id: l04-board
+    at: { day: 0, minutes: 900 }
+    phase: organize
+    sound: { se: [notify_chat] }
+    text: { ja: '午後3時。経営会議が開かれる。調査は途中で、分かったことと分からないことが混ざっている。何をどう伝えるか。', en: '' }
+    voices: [v04-boss, v04-law, v04-ok]
+    choices:
+      - id: l04-a-onepage
+        text: { ja: '事実、不明点、決めてほしいことを1枚にまとめて上申する', en: '' }
+        explain: { ja: '分かったことと分からないことを分け、経営に決めてほしいことを添えている。会議で判断が止まらず、次の手も決まる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [meti-csm-guideline, nist-sp800-61r3]
+        gauges: { flame: -5, trust: 12, stamina: -8 }
+        setFlags: { boardInformed: true }
+        detail: status-note
+        items:
+          - { id: l04-a-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: l04-a-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: l04-a-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: l04-b-detail
+        text: { ja: '技術的な調査結果を、見つかった順に全部並べて報告する', en: '' }
+        explain: { ja: '情報は多いが、どこが事実でどこが不明か、何を決めてほしいのかが伝わらない。会議は共有で終わり、判断が持ち越される。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [meti-csm-guideline]
+        gauges: { trust: 3, stamina: -5 }
+        items:
+          - { id: l04-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
+          - { id: l04-b-record, points: 3, axis: record, refs: [jpcert-handling] }
+      - id: l04-c-hold
+        text: { ja: '確認できるまで経営には報告せず、調査を続ける', en: '' }
+        explain: { ja: '確定を待つ間に、経営は止める範囲も公表も決められない。技術の判断だけで組織が動き、後から整合を取る手間が増える。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [meti-csm-guideline]
+        gauges: { flame: 8, trust: -10 }
+        coward: true
+        items:
+          - { id: l04-c-order, points: -10, axis: order, refs: [meti-csm-guideline] }
+          - { id: l04-c-time, points: -8, axis: time, refs: [jpcert-handling] }
+    lesson: { ja: '技術の調査は、経営が判断できる形に翻訳して出す。事実、不明点、決めてほしいことを1枚にまとめる。全部を並べても判断は進まず、確定を待てば組織は止まったままになる。', en: '' }
+
+  - id: l05-monitor
+    at: { day: 0, minutes: 1140 }
+    phase: notify
+    sound: { se: [notify_chat] }
+    text: { ja: '午後7時。委託先との接続をどう監視するか。通常の監視では、今回のような横移動は見つけにくい。', en: '' }
+    voices: [v05-past, v05-expert, v05-ok]
+    choices:
+      - id: l05-a-normal
+        text: { ja: '通常の監視のまま、様子を見て判断する', en: '' }
+        explain: { ja: 'いつもの監視では、委託先を経由した動きを見逃す。異常に気づくのが遅れ、止める判断も後ろにずれる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -110
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 10, flame: 5, trust: -8 }
+        items:
+          - { id: l05-a-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
+          - { id: l05-a-time, points: -8, axis: time, refs: [nist-sp800-61r3] }
+      - id: l05-b-watch
+        text: { ja: '委託先との接続の監視を強め、検知の条件を追加する', en: '' }
+        explain: { ja: '見る場所と条件を増やし、異常に早く気づける形にしている。再開の判断にも、監視の結果を使える。', en: '' }
+        minutes: 90
+        category: recover
+        points: 110
+        refs: [nist-sp800-61r3, jpcert-handling]
+        gauges: { damage: -8, trust: 10, stamina: -10 }
+        setFlags: { monitorKept: true }
+        items:
+          - { id: l05-b-record, points: 8, axis: record, refs: [nist-sp800-61r3] }
+          - { id: l05-b-content, points: 8, axis: content, refs: [jpcert-handling] }
+          - { id: l05-b-order, points: 5, axis: order, refs: [nist-sp800-61r3] }
+      - id: l05-c-block
+        text: { ja: '外部との通信を全部止め、安全を確認してから戻す', en: '' }
+        explain: { ja: '全部を止めれば安全に見えるが、店舗の決済も受注も止まる。止める範囲を広げるほど、戻す作業と説明が重くなる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [no11-bcp-continuity]
+        gauges: { damage: 10, flame: 5, trust: -5 }
+        items:
+          - { id: l05-c-order, points: -8, axis: order, refs: [no11-bcp-continuity] }
+          - { id: l05-c-care, points: 3, axis: care, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '委託先を経由した動きは、通常の監視では見つけにくい。接続の監視を強め、検知の条件を具体的に足す。全部の通信を止める判断は、店舗と受注まで止めるため、範囲を分けて考える。', en: '' }
+
+  - id: l06-ppc
+    at: { day: 1, minutes: 540 }
+    phase: notify
+    sound: { se: [typing] }
+    text: { ja: '午前9時。法務が速報の材料を待っている。委託先に渡したデータの項目と期間を、自社の台帳で確かめる必要がある。', en: '' }
+    voices: [v06-boss, v06-vendor, v06-ok]
+    choices:
+      - id: l06-a-ledger
+        text: { ja: '委託したデータ項目と期間を台帳で確定し、速報の材料にする', en: '' }
+        explain: { ja: '自社が何をいつから預けたかを台帳で示している。件数が確定しなくても、報告の対象と範囲を説明できる。', en: '' }
+        minutes: 90
+        category: recover
+        points: 120
+        refs: [ppc-report-prelim, no11-ppc-entrust-report]
+        gauges: { trust: 12, stamina: -12 }
+        setFlags: { ppcPrelimFiled: true, dataScopeKnown: true }
+        items:
+          - { id: l06-a-time, points: 8, axis: time, refs: [ppc-report-prelim] }
+          - { id: l06-a-content, points: 8, axis: content, refs: [no11-ppc-entrust-report] }
+          - { id: l06-a-record, points: 8, axis: record, refs: [no11-ppc-entrust-supervision] }
+      - id: l06-b-wait
+        text: { ja: '物流の集計が来るまで待ち、材料はそれから作る', en: '' }
+        explain: { ja: '委託先の集計を待つ間に、速報の期限が近づく。自社が預けた範囲は自社の台帳で分かるのに、報告が遅れる。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -150
+        refs: [ppc-report-prelim]
+        gauges: { flame: 15, trust: -10, damage: 10 }
+        coward: true
+        setFlags: { delayedReport: true }
+        items:
+          - { id: l06-b-time, points: -10, axis: time, refs: [ppc-report-prelim] }
+          - { id: l06-b-record, points: -8, axis: record, refs: [ppc-report-prelim] }
+      - id: l06-c-partial
+        text: { ja: '代表的な項目だけを伝え、細かい範囲は後回しにする', en: '' }
+        explain: { ja: '代表的な項目だけでは、住所や電話が含まれるか分からない。報告の範囲が曖昧なまま、後で訂正が必要になる。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [no11-ppc-entrust-report]
+        gauges: { trust: 3, stamina: -5 }
+        items:
+          - { id: l06-c-content, points: 5, axis: content, refs: [no11-ppc-entrust-report] }
+          - { id: l06-c-time, points: 3, axis: time, refs: [ppc-report-prelim] }
+    lesson: { ja: '速報の材料は、自社の台帳で作る。いつから何を預けたかは、委託先の集計を待たなくても分かる。項目を絞って伝えると、後で範囲の訂正が必要になり、報告の信頼を落とす。', en: '' }
+
+  - id: l07-permission
+    at: { day: 1, minutes: 900 }
+    phase: organize
+    sound: { se: [mail_arrive] }
+    text: { ja: '午後3時。物流の権限管理が問題になった。委託先には、こちらの注文データを読めるアカウントがある。', en: '' }
+    voices: [v07-vendor, v07-law, v07-ok]
+    choices:
+      - id: l07-a-clause
+        text: { ja: '契約書の監督条項だけを確認して、対応を決める', en: '' }
+        explain: { ja: '条項の有無だけでは、実際の権限やログの運用は分からない。契約があれば監督を果たしたことにはならない。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [no11-ppc-entrust-supervision]
+        gauges: { trust: 0, stamina: -3 }
+        items:
+          - { id: l07-a-record, points: 5, axis: record, refs: [no11-ppc-entrust-supervision] }
+          - { id: l07-a-content, points: 3, axis: content, refs: [meti-csm-guideline] }
+      - id: l07-b-leave
+        text: { ja: '物流に任せ、点検の結果だけを受け取る', en: '' }
+        explain: { ja: '委託元として確かめるべき権限とログを、相手の報告だけで済ませている。同じ状態が残っていても気づけない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -110
+        refs: [no11-ppc-entrust-supervision]
+        gauges: { flame: 8, trust: -10, damage: 5 }
+        coward: true
+        items:
+          - { id: l07-b-order, points: -10, axis: order, refs: [no11-ppc-entrust-supervision] }
+          - { id: l07-b-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: l07-c-inventory
+        text: { ja: '委託先のアカウントと権限の棚卸しを、期限を決めて求める', en: '' }
+        explain: { ja: '誰がどのデータを見られるかを、期限を決めて確かめている。不要な権限を消せれば、同じ手口の被害を減らせる。', en: '' }
+        minutes: 120
+        category: recover
+        points: 120
+        refs: [no11-ppc-entrust-supervision, meti-csm-guideline]
+        gauges: { trust: 12, stamina: -12 }
+        setFlags: { permissionChecked: true }
+        items:
+          - { id: l07-c-order, points: 8, axis: order, refs: [no11-ppc-entrust-supervision] }
+          - { id: l07-c-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: l07-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+    lesson: { ja: '委託先の監督は、契約の条項を確かめるだけでは足りない。誰がどのデータを見られるかを棚卸しし、不要な権限を消す期限を決める。任せきりにすると、同じ状態が残ったまま再発する。', en: '' }
+
+  - id: l08-other
+    at: { day: 2, minutes: 600 }
+    phase: investigate
+    sound: { se: [notify_chat] }
+    text: { ja: '午前10時。同じ物流会社は、返品の受け付けと店舗への補充でも使っている。他の業務のリスクをどう見るか。', en: '' }
+    voices: [v08-past, v08-boss, v08-ok]
+    choices:
+      - id: l08-a-ecom
+        text: { ja: '通販の業務だけを見直し、他は通常どおり続ける', en: '' }
+        explain: { ja: '同じ委託先を使う返品や補充に、同じ手口が残る。通販だけを直しても、別の業務から同じ被害が出る。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [no11-ppc-entrust-supervision]
+        gauges: { trust: 3, stamina: -3 }
+        items:
+          - { id: l08-a-content, points: 5, axis: content, refs: [no11-ppc-entrust-supervision] }
+          - { id: l08-a-record, points: 3, axis: record, refs: [meti-csm-guideline] }
+      - id: l08-b-inventory
+        text: { ja: '同じ委託先を使う業務を洗い出し、データの範囲を確かめる', en: '' }
+        explain: { ja: '同じ委託先を使う業務と、渡しているデータの範囲を一度に把握している。点検の優先順位を、影響の大きさで決められる。', en: '' }
+        minutes: 120
+        category: recover
+        points: 110
+        refs: [no11-ppc-entrust-supervision, meti-csm-guideline]
+        gauges: { trust: 12, stamina: -10 }
+        setFlags: { otherBizChecked: true }
+        items:
+          - { id: l08-b-order, points: 8, axis: order, refs: [no11-ppc-entrust-supervision] }
+          - { id: l08-b-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: l08-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: l08-c-wait
+        text: { ja: '他社が同じ委託先をどう扱うかを見てから決める', en: '' }
+        explain: { ja: '他社の判断を待つ間に、自社の業務は同じ状態のまま残る。他社と自社では、預けているデータも契約も違う。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -90
+        refs: [no11-ppc-entrust-supervision]
+        gauges: { flame: 8, trust: -8 }
+        coward: true
+        items:
+          - { id: l08-c-time, points: -10, axis: time, refs: [meti-csm-guideline] }
+          - { id: l08-c-content, points: -6, axis: content, refs: [no11-ppc-entrust-supervision] }
+    lesson: { ja: '同じ委託先を使う業務は、まとめて洗い出す。渡しているデータの範囲が分かれば、点検の順番を影響の大きさで決められる。通販だけを直しても、返品や補充から同じ被害が出る。', en: '' }
+
+  - id: l09-logs
+    at: { day: 3, minutes: 600 }
+    phase: investigate
+    sound: { se: [typing] }
+    text: { ja: '午前10時。物流から「ログはあるが、量が多い」と言われた。何を、どの期間、どの形で受け取るか。', en: '' }
+    voices: [v09-vendor, v09-expert, v09-ok]
+    choices:
+      - id: l09-a-scoped
+        text: { ja: '期間と項目を決めてログの提供を依頼し、自社で突合する', en: '' }
+        explain: { ja: '必要な期間と項目を絞って依頼し、自社の注文台帳と突き合わせている。対象の特定まで、自分たちで確かめられる。', en: '' }
+        minutes: 150
+        category: recover
+        points: 120
+        refs: [jpcert-handling, ppc-report-scope]
+        gauges: { trust: 12, stamina: -15 }
+        setFlags: { logMatched: true }
+        items:
+          - { id: l09-a-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: l09-a-content, points: 8, axis: content, refs: [ppc-report-scope] }
+          - { id: l09-a-order, points: 8, axis: order, refs: [jpcert-handling] }
+      - id: l09-b-all
+        text: { ja: 'すべてのログを求め続け、分析は後回しにする', en: '' }
+        explain: { ja: '全部を集めようとすると、受け取るだけで時間がかかる。対象の特定が遅れ、通知の準備も始まらない。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { trust: 0, stamina: -10 }
+        items:
+          - { id: l09-b-time, points: -8, axis: time, refs: [jpcert-handling] }
+          - { id: l09-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: l09-c-wait
+        text: { ja: '物流の分析結果が出るまで待ち、自社では調べない', en: '' }
+        explain: { ja: '委託先の分析だけを待つと、自社の注文との突合ができない。対象の範囲が、相手の集計に縛られる。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -100
+        refs: [ppc-report-scope]
+        gauges: { flame: 8, trust: -8, damage: 5 }
+        coward: true
+        items:
+          - { id: l09-c-time, points: -10, axis: time, refs: [ppc-report-scope] }
+          - { id: l09-c-content, points: -8, axis: content, refs: [jpcert-handling] }
+    lesson: { ja: 'ログは、期間と項目を決めて依頼する。受け取った記録を自社の注文台帳と突き合わせれば、対象の範囲を自分たちで説明できる。全部を集めようとすると、時間だけが過ぎる。', en: '' }
+
+  - id: l10-newcarrier
+    at: { day: 4, minutes: 600 }
+    phase: recover
+    sound: { se: [mail_arrive] }
+    text: { ja: '午前10時。別の配送会社を使う案が出た。明日から手配できるが、配送先のデータを渡すことになる。', en: '' }
+    voices: [v10-boss, v10-popular, v10-ok]
+    choices:
+      - id: l10-a-fast
+        text: { ja: '早さを優先し、最低限の確認で契約する', en: '' }
+        explain: { ja: '確認が浅いまま配送データを渡すと、同じ事故が起きたときに責任の所在も分からない。急ぐほど、条件を先に決める必要がある。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -110
+        refs: [no11-ppc-entrust-supervision]
+        gauges: { flame: 8, trust: -10, damage: 5 }
+        items:
+          - { id: l10-a-order, points: -10, axis: order, refs: [no11-ppc-entrust-supervision] }
+          - { id: l10-a-content, points: -8, axis: content, refs: [meti-csm-guideline] }
+      - id: l10-b-check
+        text: { ja: 'データの受け渡し方法と責任分界を確かめて契約する', en: '' }
+        explain: { ja: '渡すデータの範囲と、事故のときの責任を先に決めている。急いでいても、同じ失敗を繰り返さない条件を揃えられる。', en: '' }
+        minutes: 120
+        category: recover
+        points: 120
+        refs: [no11-ppc-entrust-supervision, meti-csm-guideline]
+        gauges: { trust: 12, stamina: -10 }
+        setFlags: { newCarrierChecked: true }
+        items:
+          - { id: l10-b-order, points: 8, axis: order, refs: [no11-ppc-entrust-supervision] }
+          - { id: l10-b-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: l10-b-record, points: 8, axis: record, refs: [jpcert-handling] }
+      - id: l10-c-slow
+        text: { ja: '確認に時間をかけ、再開の時期は決めない', en: '' }
+        explain: { ja: '確認を丁寧にしても、再開の条件と時期を決めなければ、止まったままになる。安全と再開は、同時に設計できる。', en: '' }
+        minutes: 180
+        category: maintain
+        points: 20
+        refs: [no11-bcp-continuity]
+        gauges: { trust: 3, stamina: -8 }
+        items:
+          - { id: l10-c-content, points: 5, axis: content, refs: [no11-bcp-continuity] }
+          - { id: l10-c-time, points: -5, axis: time, refs: [no11-bcp-continuity] }
+    lesson: { ja: '代替の配送会社には、渡すデータの範囲と、事故のときの責任分界を先に確かめる。急ぐときほど条件を決めておく。確認に時間をかけるだけで、再開の時期を決めないと、止まったままになる。', en: '' }
+
+  - id: l11-gate
+    at: { day: 5, minutes: 900 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: '午後3時。段階再開の条件を決める。監視は続けている。どこまで戻せばよいかを、数字で示す必要がある。', en: '' }
+    voices: [v11-public, v11-past, v11-ok]
+    choices:
+      - id: l11-a-full
+        text: { ja: '問題が出なければ、次の週に全面へ戻す', en: '' }
+        explain: { ja: '問題が出なければ、では何を見て判断するか分からない。兆候を見逃したときに、止める基準もないまま広げる。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -120
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 10, flame: 8, trust: -8 }
+        items:
+          - { id: l11-a-record, points: -10, axis: record, refs: [nist-sp800-61r3] }
+          - { id: l11-a-content, points: -8, axis: content, refs: [nist-sp800-61r3] }
+      - id: l11-b-hold
+        text: { ja: '通販は止めたままにして、条件は後で決める', en: '' }
+        explain: { ja: '条件を決めないまま止め続けると、いつ戻るのか誰も説明できない。現場も顧客も、待つ理由を持てない。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [no11-bcp-continuity]
+        gauges: { trust: 3, flame: 3 }
+        coward: true
+        items:
+          - { id: l11-b-order, points: 5, axis: order, refs: [no11-bcp-continuity] }
+          - { id: l11-b-record, points: 3, axis: record, refs: [no11-bcp-continuity] }
+      - id: l11-c-numbers
+        text: { ja: '再開の条件を数値で決め、監視を続けたまま広げる', en: '' }
+        explain: { ja: '注文と出荷の数、監視の結果を条件にしている。止める基準も同じ形で示せるため、広げた後も判断がぶれない。', en: '' }
+        minutes: 120
+        category: recover
+        points: 130
+        refs: [nist-sp800-61r3, no11-bcp-continuity]
+        gauges: { damage: -12, trust: 15, stamina: -10 }
+        setFlags: { gateSet: true, monitorKept: true }
+        items:
+          - { id: l11-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l11-c-content, points: 8, axis: content, refs: [no11-bcp-continuity] }
+          - { id: l11-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: l11-c-time, points: 3, axis: time, refs: [nist-sp800-61r3] }
+    lesson: { ja: '段階再開は、条件を数字で決める。注文と出荷の数、監視の結果を条件にすれば、広げた後も止める判断がぶれない。条件を後回しにすると、止めたままか一気に戻すかの二択になる。', en: '' }
+
+  - id: l12-fix
+    at: { day: 7, minutes: 600 }
+    phase: organize
+    sound: { se: [mail_arrive] }
+    text: { ja: '午前10時。物流から是正計画が出た。「権限を整理し、監視を強化する」と書いてあるが、期限も担当もない。', en: '' }
+    voices: [v12-vendor, v12-law, v12-ok]
+    choices:
+      - id: l12-a-evidence
+        text: { ja: '是正項目に期限と証跡を求め、月次で確認する', en: '' }
+        explain: { ja: '何をいつまでに直すかを決め、証跡で確かめる形にしている。対策が実行されたかを、後から検証できる。', en: '' }
+        minutes: 120
+        category: recover
+        points: 110
+        refs: [no11-ppc-entrust-supervision, meti-csm-guideline]
+        gauges: { trust: 12, stamina: -10 }
+        setFlags: { fixScheduled: true }
+        detail: audit-plan
+        items:
+          - { id: l12-a-order, points: 8, axis: order, refs: [no11-ppc-entrust-supervision] }
+          - { id: l12-a-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: l12-a-content, points: 5, axis: content, refs: [meti-csm-guideline] }
+      - id: l12-b-accept
+        text: { ja: '是正計画を受け取って、対応は任せる', en: '' }
+        explain: { ja: '計画を受け取っただけで、期限も証跡も確かめない。実行されなかったときに気づく手段がない。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [no11-ppc-entrust-supervision]
+        gauges: { trust: 0, stamina: -3 }
+        items:
+          - { id: l12-b-record, points: 5, axis: record, refs: [no11-ppc-entrust-supervision] }
+          - { id: l12-b-order, points: -5, axis: order, refs: [meti-csm-guideline] }
+      - id: l12-c-drop
+        text: { ja: '契約を解除し、別の会社にすぐ替える', en: '' }
+        explain: { ja: '契約の解除は原因の確認を止め、現場の混乱も招く。替えた先で同じ管理の甘さがあれば、また同じ事故になる。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -110
+        refs: [no11-ppc-entrust-supervision]
+        gauges: { flame: 10, trust: -10, damage: 5 }
+        items:
+          - { id: l12-c-order, points: -10, axis: order, refs: [no11-ppc-entrust-supervision] }
+          - { id: l12-c-content, points: -8, axis: content, refs: [meti-csm-guideline] }
+    lesson: { ja: '是正計画は、期限と証跡をセットで求める。何をいつまでに直したかを記録で確かめれば、対策が実行されたか検証できる。契約の解除を急ぐと、原因の確認も、替えた先の確認も抜ける。', en: '' }
+
+  - id: l13-verify
+    at: { day: 14, minutes: 600 }
+    phase: notify
+    sound: { se: [notify_news] }
+    text: { ja: '午前10時。攻撃者が配送データの一部を公開した。自社の台帳と突き合わせ、対象を特定する必要がある。', en: '' }
+    voices: [v13-attacker, v13-vendor, v13-ok]
+    notable:
+      - { id: note-lead-leak, text: { ja: '公開されたデータには、氏名、住所、電話、注文商品が含まれる。', en: '' } }
+    choices:
+      - id: l13-a-wait
+        text: { ja: '物流の発表を待ち、公開の範囲は相手に任せる', en: '' }
+        explain: { ja: '公開された範囲の特定を相手に任せると、自社の顧客が対象かを確かめられない。通知の準備も進まない。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -120
+        refs: [ppc-report-scope]
+        gauges: { flame: 12, trust: -10, damage: 8 }
+        coward: true
+        items:
+          - { id: l13-a-time, points: -10, axis: time, refs: [ppc-report-scope] }
+          - { id: l13-a-content, points: -8, axis: content, refs: [ppc-notify-person] }
+      - id: l13-b-match
+        text: { ja: '公開データと自社の台帳を突合し、対象を特定する', en: '' }
+        explain: { ja: '公開された内容と自社の注文台帳を突き合わせ、対象を絞っている。通知に必要な情報を、自分たちで作れる。', en: '' }
+        minutes: 180
+        category: recover
+        points: 150
+        refs: [ppc-report-scope, ppc-notify-person]
+        gauges: { flame: -12, trust: 15, stamina: -15 }
+        setFlags: { leakMatched: true }
+        items:
+          - { id: l13-b-content, points: 8, axis: content, refs: [ppc-report-scope] }
+          - { id: l13-b-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: l13-b-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: l13-b-order, points: 5, axis: order, refs: [ppc-report-scope] }
+      - id: l13-c-small
+        text: { ja: '公開されたのは一部だと社内に伝え、様子を見る', en: '' }
+        explain: { ja: '一部だと伝えても、対象の人が自分かどうかは分からない。社内の安心が先に立ち、通知の準備が遅れる。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -200
+        refs: [ppc-report-scope, meti-disclosure-guidance]
+        gauges: { flame: 20, trust: -18, damage: 12 }
+        setFlags: { deniedLeak: true }
+        items:
+          - { id: l13-c-content, points: -12, axis: content, refs: [ppc-report-scope] }
+          - { id: l13-c-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '公開されたデータは、自社の台帳と突き合わせて対象を特定する。範囲を委託先に任せると、自分の顧客が対象か確かめられない。一部だから大丈夫という説明は、対象の人には何も伝えない。', en: '' }
+
+  - id: l14-bcp
+    at: { day: 21, minutes: 600 }
+    phase: recover
+    sound: { se: [typing] }
+    text: { ja: '午前10時。今回の対応を振り返り、事業継続の手順を見直す。次に同じことが起きたとき、動ける形にできるか。', en: '' }
+    voices: [v14-past, v14-boss, v14-ok]
+    choices:
+      - id: l14-a-doc
+        text: { ja: '手順書の文言だけを今回の内容に合わせて直す', en: '' }
+        explain: { ja: '文言を直しても、動けるかは別の問題だ。誰が何をするかを試していないため、次の事故でも同じところで止まる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [no11-bcp-continuity]
+        gauges: { trust: 3, stamina: -3 }
+        items:
+          - { id: l14-a-record, points: 5, axis: record, refs: [no11-bcp-continuity] }
+          - { id: l14-a-content, points: 3, axis: content, refs: [no11-bcp-continuity] }
+      - id: l14-b-enough
+        text: { ja: '今回の対応で十分だったとし、見直しをしない', en: '' }
+        explain: { ja: '今回は運よく戻せたが、手順の穴は残ったままだ。見直さないと、次は同じ判断を一からやり直すことになる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [no11-bcp-continuity]
+        gauges: { flame: 8, trust: -10 }
+        items:
+          - { id: l14-b-record, points: -10, axis: record, refs: [no11-bcp-continuity] }
+          - { id: l14-b-content, points: -8, axis: content, refs: [no11-bcp-continuity] }
+      - id: l14-c-drill
+        text: { ja: '復旧手順を更新し、次の訓練の日程と担当を決める', en: '' }
+        explain: { ja: '手順を直したうえで、試す日程と担当まで決めている。動けるかどうかを、次の事故の前に確かめられる。', en: '' }
+        minutes: 150
+        category: recover
+        points: 110
+        refs: [no11-bcp-continuity, nist-sp800-61r3]
+        gauges: { trust: 12, stamina: -12 }
+        setFlags: { drillPlanned: true }
+        items:
+          - { id: l14-c-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: l14-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+          - { id: l14-c-content, points: 8, axis: content, refs: [no11-bcp-continuity] }
+    lesson: { ja: '事業継続の手順は、直して終わりにしない。復旧の手順を更新し、訓練の日程と担当を決めて、動けるかを確かめる。今回うまくいったことは、次も同じようにできる理由にはならない。', en: '' }
+
+  - id: l15-budget
+    at: { day: 30, minutes: 600 }
+    phase: after
+    sound: { se: [notify_news] }
+    text: { ja: '午前10時。再発防止の予算を経営に諮る。監視の強化、委託先の点検、訓練のどれを、どの規模で求めるか。', en: '' }
+    voices: [v15-vendor, v15-boss, v15-ok]
+    choices:
+      - id: l15-a-ask
+        text: { ja: '予算要求と効果の測り方を示して経営に出す', en: '' }
+        explain: { ja: '何にいくら使い、何がどう変わるかを示している。対策の効果を後から確かめられるため、次の予算も説明できる。', en: '' }
+        minutes: 120
+        category: increase
+        points: 300
+        fatalAlternate: 50
+        refs: [meti-csm-guideline, no11-ppc-entrust-supervision]
+        gauges: { flame: -12, trust: 18, stamina: -12 }
+        setFlags: { budgetAsked: true, ppcFinalFiled: true }
+        items:
+          - { id: l15-a-content, points: 8, axis: content, refs: [meti-csm-guideline] }
+          - { id: l15-a-record, points: 8, axis: record, refs: [no11-ppc-entrust-supervision] }
+          - { id: l15-a-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+      - id: l15-b-product
+        text: { ja: '監視の製品を導入し、運用は現場に任せる', en: '' }
+        explain: { ja: '製品を入れても、誰が何を見て判断するかが決まらなければ動かない。導入が目的になり、効果の確認もできない。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [nist-sp800-61r3]
+        gauges: { trust: 3, stamina: -3 }
+        items:
+          - { id: l15-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: l15-b-record, points: 3, axis: record, refs: [meti-csm-guideline] }
+      - id: l15-c-skip
+        text: { ja: '予算要求は見送り、現場の運用で対応する', en: '' }
+        explain: { ja: '現場の運用だけで補うと、点検も訓練も後回しになる。同じ事故が起きたときに、また同じところで止まる。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -100
+        refs: [no11-ppc-entrust-supervision]
+        gauges: { flame: 8, trust: -10 }
+        items:
+          - { id: l15-c-content, points: -10, axis: content, refs: [no11-ppc-entrust-supervision] }
+          - { id: l15-c-record, points: -8, axis: record, refs: [meti-csm-guideline] }
+    lesson: { ja: '再発防止の予算は、何にいくら使い、何がどう変わるかを添えて求める。効果の測り方があれば、次の年に確かめられる。製品の導入や現場の努力だけで済ませると、対策は続かない。', en: '' }
+
+drafts:
+  status-note:
+    title: { ja: '経営への上申メモ', en: '' }
+    slots:
+      - id: facts
+        label: { ja: '分かったこと', en: '' }
+        options:
+          - { id: sn-f-vague, text: { ja: '委託先で障害が起きた', en: '' }, points: -8, axis: content, refs: [meti-csm-guideline], explain: { ja: '障害が起きただけでは、自社のどこが止まっているか分からない。経営は止める範囲を決められない。', en: '' } }
+          - { id: sn-f-own, text: { ja: '自社の接続点と感染の有無', en: '' }, points: 10, axis: content, refs: [jpcert-handling], explain: { ja: '自社のどこがつながり、感染があるかを示すと、経営は止める範囲を判断できる。', en: '' } }
+          - { id: sn-f-vendor, text: { ja: '委託先の復旧の見込みだけ', en: '' }, points: 3, axis: content, refs: [no11-bcp-continuity], explain: { ja: '復旧の見込みだけでは、自社の顧客への影響が分からない。判断の材料としては足りない。', en: '' } }
+      - id: unknown
+        label: { ja: '不明なこと', en: '' }
+        options:
+          - { id: sn-u-list, text: { ja: '分かっていない点を並べる', en: '' }, points: 10, axis: content, refs: [meti-csm-guideline], explain: { ja: '不明な点を先に示すと、経営は何を待てばよいか分かる。後から見つかった事実も、説明の延長として扱える。', en: '' } }
+          - { id: sn-u-none, text: { ja: '不明な点は特に書かない', en: '' }, points: -10, axis: content, refs: [meti-csm-guideline], explain: { ja: '不明な点を書かないと、分かったこととの境目が消える。後から判明したときに、説明が二転三転したように見える。', en: '' } }
+          - { id: sn-u-later, text: { ja: '後で口頭で補足するだけにする', en: '' }, points: -5, axis: record, refs: [jpcert-handling], explain: { ja: '口頭の補足は記録に残らず、会議の結論も曖昧になる。同じ説明を何度もやり直すことになる。', en: '' } }
+      - id: ask
+        label: { ja: '決めてほしいこと', en: '' }
+        options:
+          - { id: sn-k-none, text: { ja: '特に書かない', en: '' }, points: -8, axis: order, refs: [meti-csm-guideline], explain: { ja: '決めてほしいことがないと、会議は共有で終わる。判断が持ち越され、次の手が決まらない。', en: '' } }
+          - { id: sn-k-wait, text: { ja: '判断は任せると書く', en: '' }, points: 2, axis: order, refs: [meti-csm-guideline], explain: { ja: '任せると書いても、何を判断するのかが分からない。経営は質問を返すことになる。', en: '' } }
+          - { id: sn-k-decide, text: { ja: '止める範囲と公表の時期', en: '' }, points: 10, axis: order, refs: [meti-csm-guideline], explain: { ja: '止める範囲と公表の時期を具体的に求めると、会議で結論が出る。現場も次の手に移れる。', en: '' } }
+      - id: risk
+        label: { ja: '起きうるリスク', en: '' }
+        options:
+          - { id: sn-r-none, text: { ja: 'リスクは書かない', en: '' }, points: -8, axis: content, refs: [nist-sp800-61r3], explain: { ja: 'リスクを書かないと、判断の重みが伝わらない。対策の優先順位も付けられない。', en: '' } }
+          - { id: sn-r-data, text: { ja: '配送データの流出の可能性', en: '' }, points: 10, axis: content, refs: [no11-ppc-entrust-report], explain: { ja: '預けたデータが危ない可能性を示すと、報告と通知の準備を同時に始められる。', en: '' } }
+          - { id: sn-r-all, text: { ja: '考えられるリスクを全部書く', en: '' }, points: 3, axis: content, refs: [nist-sp800-61r3], explain: { ja: '全部を並べると、どれが今決めるべきことか分からない。優先順位が伝わらない。', en: '' } }
+      - id: next
+        label: { ja: '次の報告', en: '' }
+        options:
+          - { id: sn-n-time, text: { ja: '次の報告の時刻を決める', en: '' }, points: 8, axis: order, refs: [meti-csm-guideline], explain: { ja: '次の報告の時刻を決めると、経営は待つ間の判断ができる。情報の空白も生まれない。', en: '' } }
+          - { id: sn-n-open, text: { ja: '分かったら連絡する', en: '' }, points: 2, axis: order, refs: [meti-csm-guideline], explain: { ja: '分かったら連絡する、では待つ側の見通しが立たない。会議が終わっても、次の接点がない。', en: '' } }
+          - { id: sn-n-none, text: { ja: '次は書かない', en: '' }, points: -5, axis: order, refs: [meti-csm-guideline], explain: { ja: '次の報告を書かないと、情報が出るまで憶測が広がる。経営も現場も、同じ問いを抱えたままになる。', en: '' } }
+  audit-plan:
+    title: { ja: '委託先の点検計画', en: '' }
+    slots:
+      - id: scope
+        label: { ja: '点検する範囲', en: '' }
+        options:
+          - { id: ap-s-all, text: { ja: '委託先の全システム', en: '' }, points: 3, axis: content, refs: [no11-ppc-entrust-supervision], explain: { ja: '全部を対象にすると、どこから手を付けるか決まらない。今回の事故に関係する範囲から始める方が実効的だ。', en: '' } }
+          - { id: ap-s-contract, text: { ja: '契約を結んだシステムだけ', en: '' }, points: 2, axis: content, refs: [no11-ppc-entrust-supervision], explain: { ja: '契約の範囲だけを見ると、再委託先の環境が抜ける。データが渡っている先まで確かめる必要がある。', en: '' } }
+          - { id: ap-s-data, text: { ja: 'データが渡る範囲すべて', en: '' }, points: 10, axis: content, refs: [no11-ppc-entrust-supervision], explain: { ja: 'データが渡る範囲をすべて対象にすると、再委託先の環境も点検に入る。今回の事故と同じ穴を塞げる。', en: '' } }
+      - id: evidence
+        label: { ja: '確かめる証跡', en: '' }
+        options:
+          - { id: ap-e-log, text: { ja: '権限の一覧と操作の記録', en: '' }, points: 10, axis: record, refs: [jpcert-handling], explain: { ja: '権限の一覧と操作の記録があれば、誰が何を見られたかを確かめられる。口頭の説明より検証できる。', en: '' } }
+          - { id: ap-e-hear, text: { ja: '担当者への聞き取りだけ', en: '' }, points: 2, axis: record, refs: [jpcert-handling], explain: { ja: '聞き取りだけでは、記録と食い違ったときに確かめようがない。証跡として残らない。', en: '' } }
+          - { id: ap-e-none, text: { ja: '証跡は求めない', en: '' }, points: -10, axis: record, refs: [no11-ppc-entrust-supervision], explain: { ja: '証跡を求めないと、対策が実行されたか分からない。同じ状態が残っていても気づけない。', en: '' } }
+      - id: deadline
+        label: { ja: '期限の決め方', en: '' }
+        options:
+          - { id: ap-d-none, text: { ja: '期限は決めない', en: '' }, points: -8, axis: time, refs: [no11-ppc-entrust-supervision], explain: { ja: '期限がないと、点検は後回しになる。忙しい時期に入ると、そのまま忘れられる。', en: '' } }
+          - { id: ap-d-item, text: { ja: '項目ごとに期限を決める', en: '' }, points: 10, axis: time, refs: [no11-ppc-entrust-supervision], explain: { ja: '項目ごとに期限を決めると、進み具合を確かめられる。遅れた項目も見える化できる。', en: '' } }
+          - { id: ap-d-later, text: { ja: '来期までに済ませる', en: '' }, points: 3, axis: time, refs: [no11-ppc-entrust-supervision], explain: { ja: '来期まで、では具体的な時期が分からない。優先順位も決まらず、点検が止まりやすい。', en: '' } }
+      - id: report
+        label: { ja: '結果の報告先', en: '' }
+        options:
+          - { id: ap-r-board, text: { ja: '経営会議に定期で報告する', en: '' }, points: 10, axis: order, refs: [meti-csm-guideline], explain: { ja: '経営会議に定期で報告すると、点検が止まらない。予算と体制の判断も同時にできる。', en: '' } }
+          - { id: ap-r-dept, text: { ja: '情報システム部の中だけで共有する', en: '' }, points: 3, axis: order, refs: [meti-csm-guideline], explain: { ja: '部の中だけだと、予算や体制の話が進まない。点検の結果が改善につながらない。', en: '' } }
+          - { id: ap-r-none, text: { ja: '報告はしない', en: '' }, points: -8, axis: order, refs: [meti-csm-guideline], explain: { ja: '報告しないと、点検をした事実も残らない。再発防止の進み具合を、誰も確かめられない。', en: '' } }
+voices:
+  - { id: v01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '自社は無事なんだろう。余計なことはするな。', en: '' }, trigger: { at: point } }
+  - { id: v01-coward, media: sns, misleading: true, type: coward-critique, text: { ja: 'まだ何も起きていないのに、大げさだ。', en: '' }, trigger: { at: point } }
+  - { id: v01-ok, media: chat, misleading: false, text: { ja: '運用「接続点の一覧は、去年の点検で作っています」。', en: '' }, trigger: { at: point } }
+  - { id: v01-after, media: sns, misleading: false, text: { ja: '自社は無事なのに、何を調べているんだ。', en: '' }, trigger: { at: after, choice: l01-a-scope } }
+  - { id: v02-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '物流「初期化すれば、明日には戻せます」。', en: '' }, trigger: { at: point } }
+  - { id: v02-past, media: boss, misleading: true, type: past-success, text: { ja: '前の障害も、再起動で直っただろう。', en: '' }, trigger: { at: point } }
+  - { id: v02-ok, media: chat, misleading: false, text: { ja: '法務「ログの保全は、文書で依頼しておきましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v02-after, media: vendor, misleading: false, text: { ja: '初期化した方が早いのに。', en: '' }, trigger: { at: after, choice: l02-b-preserve } }
+  - { id: v03-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '専門家「接続点は関係ありません。自社は安全です」。', en: '' }, trigger: { at: point } }
+  - { id: v03-public, media: sns, misleading: true, type: public-opinion, text: { ja: '早く再開しろ。調査は後でいい。', en: '' }, trigger: { at: point } }
+  - { id: v03-ok, media: chat, misleading: false, text: { ja: '運用「怪しい通信の宛先は、まだ絞れていません」。', en: '' }, trigger: { at: point } }
+  - { id: v03-after, media: news, misleading: false, text: { ja: '自社は無事と言い切れないのか。', en: '' }, trigger: { at: after, choice: l03-c-triage } }
+  - { id: v04-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '技術の話はいい。いつ戻るかだけ言え。', en: '' }, trigger: { at: point } }
+  - { id: v04-law, media: board, misleading: true, type: law-ish, text: { ja: '報告は確定してからでいい。間違えると責任を問われる。', en: '' }, trigger: { at: point } }
+  - { id: v04-ok, media: chat, misleading: false, text: { ja: '経営企画「決めてほしいことを、1枚にまとめてください」。', en: '' }, trigger: { at: point } }
+  - { id: v04-after, media: board, misleading: false, text: { ja: '技術の話をもっと詳しく聞きたい。', en: '' }, trigger: { at: after, choice: l04-a-onepage } }
+  - { id: v05-past, media: boss, misleading: true, type: past-success, text: { ja: '今の監視で、これまで問題は起きていない。', en: '' }, trigger: { at: point } }
+  - { id: v05-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '専門家「監視を増やしても、誤検知が増えるだけです」。', en: '' }, trigger: { at: point } }
+  - { id: v05-ok, media: chat, misleading: false, text: { ja: '運用「接続先ごとの通信量なら、今日から見られます」。', en: '' }, trigger: { at: point } }
+  - { id: v05-after, media: sns, misleading: false, text: { ja: '監視を強めて、何が見つかったんだ。', en: '' }, trigger: { at: after, choice: l05-b-watch } }
+  - { id: v06-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '件数が固まるまで、報告は待て。', en: '' }, trigger: { at: point } }
+  - { id: v06-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '物流「集計はこちらでやります。待ってください」。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '法務「預けた範囲は、当社の台帳で分かります」。', en: '' }, trigger: { at: point } }
+  - { id: v06-after, media: news, misleading: false, text: { ja: 'まだ分かっていないのに、報告するのか。', en: '' }, trigger: { at: after, choice: l06-a-ledger } }
+  - { id: v07-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '物流「権限は、こちらで整理します」。', en: '' }, trigger: { at: point } }
+  - { id: v07-law, media: board, misleading: true, type: law-ish, text: { ja: '契約に監督条項があるから、当社は大丈夫です。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '委託先管理「読めるアカウントの一覧を、出してもらえます」。', en: '' }, trigger: { at: point } }
+  - { id: v07-after, media: vendor, misleading: false, text: { ja: 'うちの権限まで見るのか。', en: '' }, trigger: { at: after, choice: l07-c-inventory } }
+  - { id: v08-past, media: boss, misleading: true, type: past-success, text: { ja: '通販以外は、今まで問題が起きていない。', en: '' }, trigger: { at: point } }
+  - { id: v08-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '関係ない業務まで止めるな。', en: '' }, trigger: { at: point } }
+  - { id: v08-ok, media: chat, misleading: false, text: { ja: '物流担当「返品の受け付けも、同じ端末を使っています」。', en: '' }, trigger: { at: point } }
+  - { id: v08-after, media: chat, misleading: false, text: { ja: '点検する範囲が広すぎる。', en: '' }, trigger: { at: after, choice: l08-b-inventory } }
+  - { id: v09-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '物流「ログは膨大です。こちらで分析します」。', en: '' }, trigger: { at: point } }
+  - { id: v09-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '専門家「ログは専門の会社に任せるべきです」。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '運用「注文の時刻と突き合わせれば、対象が絞れます」。', en: '' }, trigger: { at: point } }
+  - { id: v09-after, media: vendor, misleading: false, text: { ja: '自社で分析して、間に合うのか。', en: '' }, trigger: { at: after, choice: l09-a-scoped } }
+  - { id: v10-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '明日から動かせ。確認は後でいい。', en: '' }, trigger: { at: point } }
+  - { id: v10-popular, media: sns, misleading: true, type: popular, text: { ja: '他の会社も、同じ会社に任せているらしい。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '法務「責任分界は、契約の前に決めておきましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v10-after, media: sns, misleading: false, text: { ja: '確認ばかりで、再開はいつだ。', en: '' }, trigger: { at: after, choice: l10-b-check } }
+  - { id: v11-public, media: sns, misleading: true, type: public-opinion, text: { ja: 'いつまで段階再開だ。さっさと戻せ。', en: '' }, trigger: { at: point } }
+  - { id: v11-past, media: boss, misleading: true, type: past-success, text: { ja: '前回も、一気に戻して問題なかった。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '運用「注文と出荷の数は、毎朝見られます」。', en: '' }, trigger: { at: point } }
+  - { id: v11-after, media: sns, misleading: false, text: { ja: '条件を決めたのに、まだ戻さないのか。', en: '' }, trigger: { at: after, choice: l11-c-numbers } }
+  - { id: v12-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '物流「期限は、こちらで決めます」。', en: '' }, trigger: { at: point } }
+  - { id: v12-law, media: board, misleading: true, type: law-ish, text: { ja: '計画が出たなら、当社は終わりでいい。', en: '' }, trigger: { at: point } }
+  - { id: v12-ok, media: chat, misleading: false, text: { ja: '法務「期限と証跡がないと、実行を確かめられません」。', en: '' }, trigger: { at: point } }
+  - { id: v12-after, media: vendor, misleading: false, text: { ja: '証跡まで求めるのか。', en: '' }, trigger: { at: after, choice: l12-a-evidence } }
+  - { id: v13-attacker, media: attacker, misleading: true, type: attacker-shake, text: { ja: '次の公開は、もっと多くの顧客だ。', en: '' }, trigger: { at: point } }
+  - { id: v13-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '物流「公開の範囲は、こちらで特定します」。', en: '' }, trigger: { at: point } }
+  - { id: v13-ok, media: chat, misleading: false, text: { ja: '法務「自社の台帳と突き合わせれば、対象が分かります」。', en: '' }, trigger: { at: point } }
+  - { id: v13-after, media: sns, misleading: false, text: { ja: 'まだ一部なのに、対象を特定するのか。', en: '' }, trigger: { at: after, choice: l13-b-match } }
+  - { id: v14-past, media: boss, misleading: true, type: past-success, text: { ja: '今回は乗り切った。見直す必要はない。', en: '' }, trigger: { at: point } }
+  - { id: v14-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '訓練は現場の負担になる。やめておけ。', en: '' }, trigger: { at: point } }
+  - { id: v14-ok, media: chat, misleading: false, text: { ja: '運用「次の訓練の日程なら、来月に取れます」。', en: '' }, trigger: { at: point } }
+  - { id: v14-after, media: chat, misleading: false, text: { ja: '訓練の日を決めて、現場は回るのか。', en: '' }, trigger: { at: after, choice: l14-c-drill } }
+  - { id: v15-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: 'ベンダー「この製品を入れれば、全部解決します」。', en: '' }, trigger: { at: point } }
+  - { id: v15-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '予算は厳しい。現場の努力で頼む。', en: '' }, trigger: { at: point } }
+  - { id: v15-ok, media: chat, misleading: false, text: { ja: '経営企画「効果の測り方があれば、通せます」。', en: '' }, trigger: { at: point } }
+  - { id: v15-after, media: board, misleading: false, text: { ja: '予算を取って、効果は出るのか。', en: '' }, trigger: { at: after, choice: l15-a-ask } }
+  - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「確認中」なんだ。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-3, media: sns, misleading: false, text: { ja: '情報システムは、責任を取りたくないだけだ。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-4, media: news, misleading: false, text: { ja: '臆病な判断が、通販の再開を遅らせた。取引先が独自に調査を始めている。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-ransom, media: vendor, misleading: false, text: { ja: '物流「暗号化されました。復旧の見込みは立っていません」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-alert, media: chat, misleading: false, text: { ja: '運用「委託先の接続から、普段と違う通信が出ています」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-news, media: news, misleading: false, text: { ja: '業界紙「物流会社の障害で、複数の通販が停止」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-peer, media: news, misleading: false, text: { ja: '大手通販「委託先の被害で出荷を停止した」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-board, media: boss, misleading: false, text: { ja: '取締役「再開の時期と、予算の見通しを教えてくれ」。', en: '' }, trigger: { at: manual } }
