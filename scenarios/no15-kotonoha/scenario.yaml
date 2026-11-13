@@ -1,0 +1,142 @@
+# No.15 シラカバソフトウェア（中堅の受託開発会社）
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字・地名はすべて架空。
+# 社員が業務で外部の生成AIに顧客の設計情報・ソースコード・個人情報を入力していた事例。
+id: no15-kotonoha
+version: '1.0.0'
+status: latest
+published: '2026-11-13'
+sourcePeriod: { ja: '2020年代半ばの生成AI利用にまつわる事案の構造を参考にしたフィクション', en: '' }
+difficulty: 2
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: '顧客の設計書が、外部のAIの中にあった', en: '' }
+tagline: { ja: '社員は顧客の設計情報と個人情報を外部AIに入れていた。社内規程は、何も決めていなかった。', en: '' }
+company:
+  name: { ja: 'シラカバソフトウェア株式会社', en: '' }
+  industry: { ja: '受託ソフトウェア開発（物流・小売・公共系の業務システム）', en: '' }
+  size: { ja: '従業員180名、取引先40社', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '大槻 誠', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: officer
+      name: { ja: '押田 みゆき', en: '' }
+      title: { ja: '専務取締役・管理本部長', en: '' }
+    - id: lead
+      name: { ja: '更科 亮', en: '' }
+      title: { ja: '開発本部長', en: '' }
+    - id: analyst
+      name: { ja: '三雲 千尋', en: '' }
+      title: { ja: '情報システム室長', en: '' }
+    - id: hr
+      name: { ja: '苅田 真澄', en: '' }
+      title: { ja: '人事部長', en: '' }
+    - id: sales
+      name: { ja: '東海林 直', en: '' }
+      title: { ja: '営業本部長', en: '' }
+    - id: lawyer
+      name: { ja: '灰谷 修', en: '' }
+      title: { ja: '外部の顧問弁護士', en: '' }
+start: { day: 0, minutes: 600 }
+initialGauges: { damage: 15, flame: 0, trust: 68, stamina: 95 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_mid
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_high
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-scope
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '外部に出たのは、何ですか。', en: '' }
+      answers:
+        - { id: a-scope-vague, text: { ja: '一部の情報です。', en: '' }, points: -50 }
+        - { id: a-scope-list, text: { ja: '顧客の設計情報とソースコード、テスト用の個人情報1,200人分です。', en: '' }, points: 30 }
+        - { id: a-scope-note, text: { ja: '設計情報12件、ソースコード5件、個人情報1,200人分です。範囲は顧客ごとに説明しています。', en: '' }, points: 80, requiresNote: note-scope }
+    - id: q-learn
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '入力した内容は、AIの学習に使われたのですか。', en: '' }
+      answers:
+        - { id: a-learn-no, text: { ja: '使われていません。', en: '' }, points: -120 }
+        - { id: a-learn-unknown, text: { ja: '確認中です。', en: '' }, points: -20 }
+        - { id: a-learn-note, text: { ja: '無料の個人アカウントは、入力が学習に使われうる設定でした。削除を求めています。', en: '' }, points: 80, requiresNote: note-terms }
+    - id: q-why
+      seconds: 35
+      timeoutPoints: -30
+      text: { ja: 'なぜ、止められなかったのですか。', en: '' }
+      answers:
+        - { id: a-why-person, text: { ja: '社員の意識が低かったからです。', en: '' }, points: -80 }
+        - { id: a-why-rule, text: { ja: '社内規程が曖昧で、何を入れてよいか決めていませんでした。', en: '' }, points: 30 }
+        - { id: a-why-note, text: { ja: '規程も教育も曖昧で、入力を止める仕組みもありませんでした。', en: '' }, points: 80, requiresNote: note-rule }
+    - id: q-discipline
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '入力した社員を、処分するのですか。', en: '' }
+      answers:
+        - { id: a-disc-none, text: { ja: '処分はしません。', en: '' }, points: 0 }
+        - { id: a-disc-fire, text: { ja: '懲戒解雇にします。', en: '' }, points: -60 }
+        - { id: a-disc-fix, text: { ja: '本人の申告で分かりました。処分より先に、入力できない仕組みを作ります。', en: '' }, points: 80 }
+    - id: q-customer
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '顧客への説明は、いつ、誰が行うのですか。', en: '' }
+      answers:
+        - { id: a-customer-later, text: { ja: '調査が終わってから説明します。', en: '' }, points: -50 }
+        - { id: a-customer-mail, text: { ja: '担当からメールで連絡します。', en: '' }, points: -10 }
+        - { id: a-customer-note, text: { ja: '影響の大きい顧客から順に、担当役員が訪問して文書で説明します。', en: '' }, points: 80, requiresNote: note-customer }
+  extraQuestions:
+    - when: { flags: { hidFromCustomer: true } }
+      question:
+        id: q-hidden
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '当初、顧客に伝えていなかったのはなぜですか。', en: '' }
+        answers:
+          - { id: a-hidden-avoid, text: { ja: '調査が終わるまで待ってもらうためです。', en: '' }, points: -100 }
+          - { id: a-hidden-late, text: { ja: '伝えるのが遅れました。今日中に説明します。', en: '' }, points: 30 }
+          - { id: a-hidden-own, text: { ja: '迷って遅れました。今日中に説明し、経緯も公表します。', en: '' }, points: 60 }
+    - when: { flags: { deletionRequested: false } }
+      question:
+        id: q-delete-not
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: 'AI事業者には、削除を求めたのですか。', en: '' }
+        answers:
+          - { id: a-delete-claimed, text: { ja: '求めました。', en: '' }, points: -120 }
+          - { id: a-delete-will, text: { ja: 'まだです。これから書面で求めます。', en: '' }, points: 30 }
+          - { id: a-delete-why, text: { ja: '必要だと考えていませんでした。求め方を確認して実行します。', en: '' }, points: 10 }
+    - when: { flags: { deletionRequested: true } }
+      question:
+        id: q-delete-done
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: 'AI事業者への削除依頼は、どうなりましたか。', en: '' }
+        answers:
+          - { id: a-delete-done-claim, text: { ja: 'すでに削除されました。', en: '' }, points: -100 }
+          - { id: a-delete-done-wait, text: { ja: '回答はまだです。', en: '' }, points: -10 }
+          - { id: a-delete-done-note, text: { ja: '書面で求め、回答を受け取りました。学習の停止も確認しています。', en: '' }, points: 80, requiresNote: note-delete }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '半年後、失った顧客のうち二社が戻り、新規の引き合いも増えた。社内には入力の判定と記録の仕組みが残り、若手が顧客の設計をAIで整理するときも、迷わず窓口に聞いている。入力した社員は開発を続けている。事件のあと、社内報にはこう書かれた。「道具を責めず、使い方を直した」。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが、顧客との取引は続いた。規程と教育は定着し、現場は慎重にAIを使っている。失った信頼の一部は戻らないが、次の案件で説明できる材料は増えた。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '会社は立ち直ったが、大口の顧客を一つ失った。再発防止の仕組みは動いている。ただ現場では、AIを使うこと自体を避ける空気が残り、開発の速さは事件前より落ちた。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '第三者委員会は、初動の遅れと規程の不備を指摘した。社長は退任し、新しい体制で再建を進めている。入力した社員は残ったが、当時の判断を説明する機会はなかった。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '顧客の契約が相次いで打ち切られ、行政からも指導を受けた。開発本部は縮小し、残った社員は別の会社の下請けとして働いている。あのとき、何を決めておけばよかったのか。記録はもう、どこにも残っていない。', en: '' }
+salesModel: { base: 100, trustWeight: 0.5, fatalPenalty: 20, min: 40, max: 130 }
