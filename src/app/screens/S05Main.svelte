@@ -164,8 +164,9 @@
 
   /** 残り時間を数える。0 になったら「判断の先送り」として最も消極的な選択で進む */
   function countDown(): void {
-    if (!timerRunning || busy || abortOpen) return;
-    if (document.hidden) {
+    if (!timerRunning) return;
+    // 中断の確認中や選択の処理中、背面に回っている間は数えない
+    if (busy || abortOpen || document.hidden) {
       lastTick = null;
       return;
     }
