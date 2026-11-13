@@ -35,6 +35,7 @@
   import { runFx } from '../effects';
   import { minutesBetween } from '../parts/logic';
   import ShareButton from '../parts/ShareButton.svelte';
+  import Headline from '../parts/Headline.svelte';
   import '../effects/effects.css';
 
   let recorded = false;
@@ -48,6 +49,7 @@
     $play && $scenario ? Math.max(0, minutesBetween($scenario.start, $play.clock)) / 60 : 0,
   );
   const shownHours = $derived(publishedHours ?? elapsedHours);
+  const headlineSource = $derived($play && $scenario ? { state: $play, scenario: $scenario } : null);
 
   $effect(() => {
     audio.setVolumes({ bgm: $settings.bgmVolume, se: $settings.seVolume, muted: $settings.muted });
@@ -88,6 +90,10 @@
       <p class="play-count">{t('sc.playCount', { n: result.playCount })}</p>
     {/if}
   </header>
+
+  {#if headlineSource}
+    <Headline state={headlineSource.state} scenario={headlineSource.scenario} />
+  {/if}
 
   {#if result}
     <div class="stamp-wrap">

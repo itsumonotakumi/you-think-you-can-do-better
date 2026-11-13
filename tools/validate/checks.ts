@@ -1,4 +1,4 @@
-// シナリオ検査 C01〜C25（C11〜C13 は実エンジンの貪欲シミュレーション）。
+// シナリオ検査 C01〜C26（C11〜C13 は実エンジンの貪欲シミュレーション）。
 import {
   CATEGORY_RANGE,
   PHASES,
@@ -1534,6 +1534,45 @@ export function checkC25(project: Project): Issue[] {
   return out;
 }
 
+// ---------------- C26 翌朝の新聞見出し（#8） ----------------
+//
+// Scenario.headlines は任意。指定するときだけ、ランクごとの Localized であることを確かめる。
+// 共通の雛形（locales/*/ui/headline.yaml）はここでは検査しない（文言の検査は C17）。
+
+export function checkC26(project: Project): Issue[] {
+  const out: Issue[] = [];
+  for (const sc of project.scenarios) {
+    const scene = sceneOf(sc);
+    if (scene.headlines === undefined) continue;
+    if (!isObj(scene.headlines)) {
+      report(out, sc.file, scene, 'headlines', 'C26',
+        'headlines はランク（S/A/B/C/D）ごとのオブジェクトで書く');
+      continue;
+    }
+    for (const [rank, value] of Object.entries(scene.headlines)) {
+      if (!RANKS.includes(rank)) {
+        report(out, sc.file, scene.headlines, rank, 'C26',
+          `headlines のキーは S/A/B/C/D のどれか: ${rank}`);
+        continue;
+      }
+      if (!isObj(value)) {
+        report(out, sc.file, scene.headlines, rank, 'C26',
+          `headlines.${rank} は { ja: ..., en: ... } の形で書く`);
+        continue;
+      }
+      checkLocalized(value, (message) =>
+        report(out, sc.file, value, 'text', 'C26', `headlines.${rank}: ${message}`));
+      for (const lang of Object.keys(value as Obj)) {
+        if (!LANGS.includes(lang as (typeof LANGS)[number])) {
+          report(out, sc.file, value, lang, 'C26',
+            `headlines.${rank} に未知の言語: ${lang}`);
+        }
+      }
+    }
+  }
+  return out;
+}
+
 // ---------------- C11〜C13 経路シミュレーション ----------------
 //
 // 実エンジンを貪欲に走らせた結果を使う簡略版。厳密な全経路探索はしない。
@@ -1666,6 +1705,7 @@ const CHECKS = [
   checkC23,
   checkC24,
   checkC25,
+  checkC26,
 ];
 
 /** skipPaths: 経路検査（C11〜C13、重い）を省く。build-data 用（validate は必ず全検査する） */
