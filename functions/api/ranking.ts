@@ -5,6 +5,7 @@ import { isSameOrigin, jsonError, jsonResponse } from '../_lib/http';
 import { findScenario } from '../_lib/scenarios';
 import { parseClientId, parseMode, parsePeriod, parseRole, WEEK_MS } from '../_lib/params';
 import { countPlays, countRankedBefore, findPlayByClient, listTopPlays } from '../_lib/db';
+import { cacheKey, readCache, sharedCache, writeCache, READ_CACHE_SECONDS, type CacheLike } from '../_lib/cache';
 
 export const TOP_LIMIT = 50;
 
@@ -15,6 +16,9 @@ export interface RankingPayload extends RankingResponse {
 
 export interface HandlerDeps {
   now?: number;
+  /** テストで差し替える共有キャッシュ。null で無効 */
+  cache?: CacheLike | null;
+  waitUntil?: (promise: Promise<unknown>) => void;
 }
 
 export async function handleRanking(
@@ -40,17 +44,26 @@ export async function handleRanking(
   if (!period) return jsonError(400, 'invalid_period');
 
   const key = { scenarioId, role, mode };
-  const since = period === 'week' ? now - WEEK_MS : null;
+  const cache = deps.cache === undefined ? sharedCache() : deps.cache;
+  const cacheQuery = new URLSearchParams({ scenario: scenarioId, role, mode, period }).toString();
+  const cacheStoreKey = cacheKey(request, cacheQuery);
 
-  const rows = await listTopPlays(env.DB, key, since, TOP_LIMIT);
-  const entries: RankingEntry[] = rows.map((row, index) => ({
-    position: index + 1,
-    nickname: row.nickname,
-    score: row.score,
-    rank: row.rank as RankingEntry['rank'],
-    at: new Date(row.created_at).toISOString(),
-  }));
-  const total = await countPlays(env.DB, key, since);
+  // 上位一覧は誰が見ても同じなので共有キャッシュに載せる（自分の順位は載せない）
+  let shared = (await readCache(cache, cacheStoreKey)) as RankingResponse | null;
+  if (!shared) {
+    const since = period === 'week' ? now - WEEK_MS : null;
+    const rows = await listTopPlays(env.DB, key, since, TOP_LIMIT);
+    const entries: RankingEntry[] = rows.map((row, index) => ({
+      position: index + 1,
+      nickname: row.nickname,
+      score: row.score,
+      rank: row.rank as RankingEntry['rank'],
+      at: new Date(row.created_at).toISOString(),
+    }));
+    const total = await countPlays(env.DB, key, since);
+    shared = { scenarioId, role, mode, period, entries, total };
+    writeCache(cache, cacheStoreKey, shared, deps.waitUntil ?? ((promise) => void promise));
+  }
 
   let self: RankingPayload['self'] = null;
   if (clientId) {
@@ -67,16 +80,10 @@ export async function handleRanking(
     }
   }
 
-  const payload: RankingPayload = {
-    scenarioId,
-    role,
-    mode,
-    period,
-    entries,
-    total,
-    self,
-  };
-  return jsonResponse(payload);
+  const payload: RankingPayload = { ...shared, self };
+  // 自分の順位を含む応答は共有キャッシュに載せない
+  return jsonResponse(payload, 200, self ? 0 : READ_CACHE_SECONDS);
 }
 
-export const onRequest: PagesFunction = ({ request, env }) => handleRanking(request, env);
+export const onRequest: PagesFunction = ({ request, env, waitUntil }) =>
+  handleRanking(request, env, { waitUntil });

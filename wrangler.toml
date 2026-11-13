@@ -11,7 +11,16 @@ database_name = "yattemite-ranking"
 database_id = "TO_BE_FILLED"
 
 [vars]
-# 本番では TURNSTILE_SECRET を設定したうえで "true" にする（未設定なら 503 で書き込みを止める）
-REQUIRE_TURNSTILE = "false"
-# 1日の書き込み上限（無料枠の安全装置）。超えたら 503
-DAILY_WRITE_LIMIT = "50000"
+# 既定は Turnstile 必須。秘密鍵が無ければ 503 で書き込みを止める。
+# 検証の省略はローカル開発だけ（.dev.vars に ALLOW_NO_TURNSTILE="true" を置く。ここには書かない）。
+REQUIRE_TURNSTILE = "true"
+# siteverify が返す hostname の許可リスト（カンマ区切り）
+ALLOWED_HOSTS = "yattemite.pages.dev,localhost"
+# 1日の登録件数上限（無料枠の安全装置）。超えたら 503
+DAILY_WRITE_LIMIT = "20000"
+# 同じ IP ハッシュが 1 日に登録できる件数
+MAX_REGISTRATIONS_PER_IP = "20"
+
+# 秘密鍵は wrangler secret put で設定する（このファイルには書かない）
+#   TURNSTILE_SECRET  Turnstile のシークレットキー（未設定なら書き込みは 503）
+#   IP_HASH_SECRET    IP の HMAC 用の鍵（未設定なら書き込みは 503）

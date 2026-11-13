@@ -7,9 +7,18 @@ import { makePlayRequest, playThrough, submissionBody, TEST_SCENARIO } from './p
 
 const NOW = Date.parse('2026-05-01T12:00:00.000Z');
 const played = playThrough(TEST_SCENARIO, 'lead');
+/** 検証を通る siteverify の応答（ホストと action を合わせる） */
+const TURNSTILE_OK = { success: true, hostname: 'yattemite.pages.dev', action: 'submit-play' };
 
 function makeEnv(db: FakeD1, overrides: Partial<Env> = {}): Env {
-  return { DB: db, ...overrides };
+  return {
+    DB: db,
+    // IP のハッシュ鍵は必須（未設定なら 503）
+    IP_HASH_SECRET: 'test-secret',
+    // 検証の省略はローカル開発の明示フラグだけ（Turnstile を見ないテスト用）
+    ALLOW_NO_TURNSTILE: 'true',
+    ...overrides,
+  };
 }
 
 async function call(
@@ -143,7 +152,9 @@ describe('handlePlays', () => {
 
   it('Turnstile が必須の設定で秘密鍵が無ければ 503', async () => {
     const db = new FakeD1();
-    const result = await call(db, submissionBody(played), { env: { REQUIRE_TURNSTILE: 'true' } });
+    const result = await call(db, submissionBody(played), {
+      env: { REQUIRE_TURNSTILE: 'true', ALLOW_NO_TURNSTILE: undefined },
+    });
     expect(result.status).toBe(503);
     expect(result.body.error).toBe('turnstile_not_configured');
   });
@@ -163,13 +174,21 @@ describe('handlePlays', () => {
   it('Turnstile の検証に成功すれば登録する', async () => {
     const db = new FakeD1();
     const fetcher = (async () =>
-      new Response(JSON.stringify({ success: true }), { status: 200 })) as unknown as typeof fetch;
+      new Response(JSON.stringify(TURNSTILE_OK), { status: 200 })) as unknown as typeof fetch;
     const result = await call(db, submissionBody(played, { turnstileToken: 'x' }), {
       env: { TURNSTILE_SECRET: 'secret' },
       fetcher,
     });
     expect(result.status).toBe(200);
     expect(db.plays).toHaveLength(1);
+  });
+
+  it('IP ハッシュの秘密鍵が無ければ 503', async () => {
+    const db = new FakeD1();
+    const result = await call(db, submissionBody(played), { env: { IP_HASH_SECRET: undefined } });
+    expect(result.status).toBe(503);
+    expect(result.body.error).toBe('ip_hash_not_configured');
+    expect(db.plays).toHaveLength(0);
   });
 
   it('知らないシナリオと版の違いを拒否する', async () => {

@@ -5,11 +5,23 @@ import { isSameOrigin, jsonError, jsonResponse } from '../_lib/http';
 import { findScenario } from '../_lib/scenarios';
 import { parseMode, parseRole } from '../_lib/params';
 import { countPlays, listChoicesJson } from '../_lib/db';
+import { cacheKey, readCache, sharedCache, writeCache, READ_CACHE_SECONDS, type CacheLike } from '../_lib/cache';
 
 /** これ未満の件数では選択率を出さない（少数の回答から推測されないようにする） */
 export const MIN_SAMPLE = 20;
 
-export async function handleStats(request: Request, env: Env): Promise<Response> {
+export interface HandlerDeps {
+  /** テストで差し替える共有キャッシュ。null で無効 */
+  cache?: CacheLike | null;
+  /** キャッシュの保存を応答後に回す（Pages の waitUntil） */
+  waitUntil?: (promise: Promise<unknown>) => void;
+}
+
+export async function handleStats(
+  request: Request,
+  env: Env,
+  deps: HandlerDeps = {},
+): Promise<Response> {
   if (request.method !== 'GET') return jsonError(405, 'method_not_allowed');
   if (!isSameOrigin(request)) return jsonError(403, 'cross_origin');
 
@@ -23,8 +35,13 @@ export async function handleStats(request: Request, env: Env): Promise<Response>
   if (!role) return jsonError(400, 'invalid_role');
   if (!mode) return jsonError(400, 'invalid_mode');
 
-  const key = { scenarioId, role, mode };
-  const rows = await listChoicesJson(env.DB, key);
+  const cache = deps.cache === undefined ? sharedCache() : deps.cache;
+  const key = cacheKey(request, new URLSearchParams({ scenario: scenarioId, role, mode }).toString());
+  const cached = await readCache(cache, key);
+  if (cached) return jsonResponse(cached, 200, READ_CACHE_SECONDS);
+
+  const playKey = { scenarioId, role, mode };
+  const rows = await listChoicesJson(env.DB, playKey);
 
   const counts = new Map<string, Map<string, number>>();
   for (const json of rows) {
@@ -61,9 +78,12 @@ export async function handleStats(request: Request, env: Env): Promise<Response>
     scenarioId,
     role,
     points,
-    total: await countPlays(env.DB, key),
+    total: await countPlays(env.DB, playKey),
   };
-  return jsonResponse(payload);
+
+  writeCache(cache, key, payload, deps.waitUntil ?? ((promise) => void promise));
+  return jsonResponse(payload, 200, READ_CACHE_SECONDS);
 }
 
-export const onRequest: PagesFunction = ({ request, env }) => handleStats(request, env);
+export const onRequest: PagesFunction = ({ request, env, waitUntil }) =>
+  handleStats(request, env, { waitUntil });

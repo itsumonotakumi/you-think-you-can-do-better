@@ -35,6 +35,12 @@ export interface NewPlay {
 const PLAY_COLUMNS =
   'id, client_id, scenario_id, role, mode, nickname, score, rank, choices_json, created_at';
 
+/**
+ * 選択率の集計に使う記録の上限。
+ * 無料枠（読み取り 500 万行/日）を守るため、新しい 1000 件だけを見る。
+ */
+export const LIST_CHOICES_LIMIT = 1000;
+
 function comboWhere(hasSince: boolean): string {
   return hasSince
     ? 'scenario_id = ? AND role = ? AND mode = ? AND created_at >= ?'
@@ -62,12 +68,21 @@ export async function findPlayByClient(
     .first<PlayRow>();
 }
 
-/** 初回の 1 件だけを登録する。2 件目は UNIQUE 制約に当たるので何もしない */
-export async function insertPlay(db: D1Database, play: NewPlay): Promise<void> {
-  await db
+/**
+ * 初回の 1 件だけを、日次上限の範囲で登録する。
+ * 上限の判定と挿入を 1 文で行い、登録できたかを返す（重複・上限超過は false）。
+ */
+export async function insertPlayWithinBudget(
+  db: D1Database,
+  play: NewPlay,
+  day: number,
+  dailyLimit: number,
+): Promise<boolean> {
+  const result = await db
     .prepare(
       'INSERT INTO plays (client_id, scenario_id, role, mode, nickname, score, rank, choices_json, created_at)'
-      + ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      + ' SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?'
+      + ' WHERE COALESCE((SELECT count FROM daily_writes WHERE day = ?), 0) < ?'
       + ' ON CONFLICT(client_id, scenario_id, role, mode) DO NOTHING',
     )
     .bind(
@@ -80,8 +95,44 @@ export async function insertPlay(db: D1Database, play: NewPlay): Promise<void> {
       play.rank,
       play.choicesJson,
       play.createdAt,
+      day,
+      dailyLimit,
     )
     .run();
+  return (result.meta?.changes ?? 0) > 0;
+}
+
+/** 書き込み行数の目安を 1 増やす（登録できたときだけ呼ぶ） */
+export async function recordDailyWrite(db: D1Database, day: number): Promise<void> {
+  await db
+    .prepare(
+      'INSERT INTO daily_writes (day, count) VALUES (?, 1)'
+      + ' ON CONFLICT(day) DO UPDATE SET count = count + 1',
+    )
+    .bind(day)
+    .run();
+}
+
+/**
+ * 同じ IP ハッシュが 1 日に登録できる件数を数える。判定と加算は 1 文で行う。
+ * 上限を超えていれば false（行が返らない）。
+ */
+export async function takeDailyRegistrationSlot(
+  db: D1Database,
+  ipHash: string,
+  day: number,
+  limit: number,
+): Promise<boolean> {
+  const result = await db
+    .prepare(
+      'INSERT INTO ip_registrations (ip_hash, day, count) VALUES (?, ?, 1)'
+      + ' ON CONFLICT(ip_hash, day) DO UPDATE SET count = count + 1'
+      + ' WHERE count < ? RETURNING count',
+    )
+    .bind(ipHash, day, limit)
+    .run<{ count: number }>();
+  const row = result.results?.[0];
+  return typeof row?.count === 'number' && row.count > 0;
 }
 
 /** 自分より上の件数（同点は先着が上） */
@@ -132,24 +183,12 @@ export async function listTopPlays(
   return result.results ?? [];
 }
 
-/** 指定時刻以降の総書き込み件数（無料枠の安全装置に使う） */
-export async function countPlaysSince(db: D1Database, sinceMs: number): Promise<number> {
-  const row = await db
-    .prepare('SELECT COUNT(*) AS n FROM plays WHERE created_at >= ?')
-    .bind(sinceMs)
-    .first<{ n: number }>();
-  return row?.n ?? 0;
-}
-
-/**
- * 判断ごとの選択率の集計に使う選択の記録。
- * 行数が増えても Worker のメモリを食いすぎないよう、新しい 5000 件だけを見る。
- */
+/** 判断ごとの選択率の集計に使う、新しい順の選択の記録 */
 export async function listChoicesJson(db: D1Database, key: PlayKey): Promise<string[]> {
   const result = await db
     .prepare(
       'SELECT choices_json FROM plays WHERE scenario_id = ? AND role = ? AND mode = ?'
-      + ' ORDER BY created_at DESC LIMIT 5000',
+      + ` ORDER BY created_at DESC LIMIT ${LIST_CHOICES_LIMIT}`,
     )
     .bind(key.scenarioId, key.role, key.mode)
     .all<{ choices_json: string }>();
