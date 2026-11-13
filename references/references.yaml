@@ -243,3 +243,27 @@
   summary: { ja: "個人データを生成AIに入力するときは、利用目的、事業者の取扱い、本人への説明を確認する", en: "Before entering personal data, check purposes, provider handling, and explanation to data subjects" }
   checkedAt: 2026-11-08
   legalPack: jp
+- id: no11-ppc-entrust-supervision
+  title: { ja: "個人情報保護法 委託先の監督", en: "APPI supervision of entrusted processors" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
+  version: "2026-11"
+  section: { ja: "法第25条。個人データの取扱いを委託する場合の、必要かつ適切な監督", en: "APPI Art. 25. Necessary and appropriate supervision when entrusting personal data" }
+  summary: { ja: "委託元は、委託先の安全管理措置を契約で定め、定期的に確認し、事故時の報告と調査協力の体制を決めておく", en: "The entrusting party defines security measures in the contract, reviews them regularly, and prepares reporting and investigation support" }
+  checkedAt: "2026-11-08"
+  legalPack: "jp"
+- id: "no11-ppc-entrust-report"
+  title: { ja: "委託先で起きた漏えい等の報告", en: "Reporting breaches that occur at an entrusted processor" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
+  version: "2026-11"
+  section: { ja: "法第26条第1項、施行規則第8条。委託元の報告義務と、委託先からの通知", en: "APPI Art. 26(1), Enforcement Rules Art. 8. Reporting duty of the entrusting party and notice from the processor" }
+  summary: { ja: "委託先で漏えい等が起きたとき、委託元も自社の報告義務の有無を確認し、委託先の通知を待たずに事実を集める", en: "When a processor suffers a breach, the entrusting party checks its own reporting duty and gathers facts without waiting for the processor" }
+  checkedAt: "2026-11-08"
+  legalPack: "jp"
+- id: "no11-bcp-continuity"
+  title: { ja: "事業継続ガイドライン", en: "Business Continuity Guidelines" }
+  issuer: { ja: "内閣府", en: "Cabinet Office" }
+  version: "2023"
+  section: { ja: "重要業務の選定、目標復旧時間、代替手段の確保", en: "Selecting critical operations, recovery time objectives, and alternative means" }
+  summary: { ja: "物流や受発注を委託していても、止まったときに代替の手段と再開の順序を平時から決めておく", en: "Even when logistics and ordering are outsourced, decide alternative means and the order of resumption in advance" }
+  checkedAt: "2026-11-08"
+  legalPack: "jp"
