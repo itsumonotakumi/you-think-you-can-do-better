@@ -1,0 +1,55 @@
+# Next morning's newspaper headline (#8). {company} is replaced with the scenario company name.
+# The common templates are read by src/app/headline/index.ts and are also used for share images.
+headline:
+  region: Next morning's newspaper headline
+  paper: Toto Daily
+  edition: Morning edition
+  date: The morning after
+  note: This headline is fictional. It does not refer to any real newspaper, company, or person.
+  template:
+    # Fallback by rank
+    plain:
+      S: "{company} praised for swift response; experts call it a model case"
+      A: "{company} draws measured praise, though questions remain"
+      B: "{company} response leaves room for improvement, experts say"
+      C: "{company} faces doubts over information handling; prevention urged"
+      D: "{company} criticized for slow response; management under scrutiny"
+    # Signs of a cover-up (high / mid / low rank)
+    coverup:
+      high: "{company} pressed over shifting explanations amid cover-up claims"
+      mid: "Cover-up accusations mount as {company} statements conflict"
+      low: "{company} suspected of concealment; calls grow for outside inquiry"
+    # Public backlash
+    flame:
+      high: "Outcry against {company} floods social media"
+      mid: "Backlash against {company} continues over delayed response"
+      low: "{company} engulfed in criticism as PR efforts backfire"
+    # Growing damage
+    damage:
+      high: "Damage widens at {company}, reaching business partners"
+      mid: "Full scope of damage at {company} still unclear; probe to drag on"
+      low: "{company} admits wider damage; recovery timeline uncertain"
+    # Loss of trust
+    trustLost:
+      high: "Trust in {company} wavers as critics cite poor explanations"
+      mid: "No clear path to restoring trust at {company}; customers drift away"
+      low: "{company} loses trust; partners suspend deals and customers cancel"
+    # Missed legal deadline
+    deadline:
+      high: "{company} misses legal reporting deadline; regulators seek explanation"
+      mid: "{company} report filed late, prompting administrative guidance"
+      low: "{company} far past reporting deadline; trust hard to rebuild"
+    # Press conference went badly
+    pressFail:
+      high: "{company} news conference draws fire for evasive answers"
+      mid: "Criticism at {company} briefing as core questions go unanswered"
+      low: "{company} briefing descends into chaos as time runs out"
+    # Prompt disclosure
+    quick:
+      high: "{company} wins praise for speedy disclosure and early action"
+      mid: "{company} issues early statement; transparency noted"
+      low: "{company} promises early disclosure; follow-through in focus"
+    # Fatal misstep
+    fatal: "Serious misjudgment at {company} draws sharp criticism"
+    # Ransom payment
+    ransom: "{company} admits paying ransom; concerns over investigation impact"

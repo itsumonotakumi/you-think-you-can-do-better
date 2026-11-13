@@ -1,0 +1,55 @@
+# 翌朝の新聞見出し（#8）。{company} はシナリオの会社名に置き換える。
+# 共通の雛形は src/app/headline/index.ts が読み、シェア画像からも使う。
+headline:
+  region: 翌朝の新聞の見出し
+  paper: 東都日報
+  edition: 朝刊
+  date: 事件翌朝
+  note: この見出しはフィクションです。実在の新聞・企業・人物とは関係ありません。
+  template:
+    # 状況に当てはまらないとき（ランク別）
+    plain:
+      S: "{company}、初動の判断が信頼に　識者「対応の手本になった」"
+      A: "{company}の対応に一定の評価　一方で課題も"
+      B: "{company}、対応に改善の余地　専門家が指摘"
+      C: "{company}の情報管理に疑問の声　再発防止が急務"
+      D: "{company}、後手の対応に批判　問われる経営責任"
+    # 隠蔽ぎみ（ランクが高い／中位／低い）
+    coverup:
+      high: "{company}、説明の一貫性に疑問　「隠蔽では」との指摘も"
+      mid: "{company}の「隠蔽体質」批判強まる　説明資料に矛盾"
+      low: "{company}、隠蔽の疑い　第三者委員会の設置を求める声"
+    # 炎上
+    flame:
+      high: "{company}への批判が殺到　関連語がトレンドに"
+      mid: "{company}、炎上収まらず　対応の遅れを指摘する声"
+      low: "{company}、批判の嵐　広報の対応が裏目に"
+    # 被害拡大
+    damage:
+      high: "{company}の被害拡大　取引先にも影響が波及"
+      mid: "{company}、被害の全容なお不明　調査は長期化へ"
+      low: "{company}、被害拡大を認める　復旧の見通し立たず"
+    # 信頼の失墜
+    trustLost:
+      high: "{company}への信頼揺らぐ　説明不足を指摘する声"
+      mid: "{company}、信頼回復の道筋見えず　利用者離れも"
+      low: "{company}、信頼失墜　取引停止や解約の動き"
+    # 法定期限の超過
+    deadline:
+      high: "{company}、法定期限に間に合わず　当局が経緯を確認へ"
+      mid: "{company}の報告が期限超過　行政の指導も"
+      low: "{company}、報告期限を大幅に超過　信頼回復は困難に"
+    # 記者会見の失敗
+    pressFail:
+      high: "{company}会見、釈明に終始　記者「説明になっていない」"
+      mid: "{company}の会見に批判　核心を避けた回答"
+      low: "{company}会見は紛糾　「時間切れ」連発に反発"
+    # 迅速な公表
+    quick:
+      high: "{company}、迅速な公表に評価の声　初動の判断が信頼に"
+      mid: "{company}が速報を公表　透明性の確保を評価する声"
+      low: "{company}、早めの公表を表明　今後の対応が焦点に"
+    # 致命的な失点
+    fatal: "{company}、重大な判断ミス　関係者から厳しい声"
+    # 身代金の支払い
+    ransom: "{company}、身代金の支払いを認める　捜査への影響を懸念"
