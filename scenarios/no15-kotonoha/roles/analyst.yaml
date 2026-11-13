@@ -1,0 +1,782 @@
+# No.15 シラカバソフトウェア / 担当者ロール（情報システム室長）
+# 判断ポイント15、細目は choices[].items と drafts の合計で80以上。
+estimateMinutes: 30
+intro: { ja: 'あなたはシラカバソフトウェアの情報システム室長。社員が外部AIに顧客の情報を入力していた件で、実態の調査と記録の保全を任された。全件を調べると、上司の名前も出てくる。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-coward-2
+  '3': v-coward-3
+  '4': v-coward-4
+deadlines:
+  - id: dl-prelim
+    ref: ppc-report-prelim
+    label: { ja: '個人情報保護委員会への速報', en: '' }
+    points: -150
+    doneFlag: prelimFiled
+  - id: dl-final
+    ref: ppc-report-final
+    label: { ja: '個人情報保護委員会への確報', en: '' }
+    points: -150
+    doneFlag: finalFiled
+events:
+  - id: ev-news
+    at: { day: 1, minutes: 1200 }
+    voices: [v-ev-news]
+    gauges: { flame: 5 }
+    sound: { se: [notify_news] }
+    caption: { ja: '業界紙が、顧客の設計情報が外部AIに入力されていたと報じた。', en: '' }
+  - id: ev-caller
+    at: { day: 5, minutes: 960 }
+    voices: [v-ev-caller]
+    gauges: { flame: 5 }
+    sound: { se: [phone_ring] }
+    caption: { ja: '「御社の情報を持っている」という電話が、代表番号にかかってきた。', en: '' }
+points:
+  - id: a01-survey
+    at: { day: 0, minutes: 720 }
+    phase: detect
+    sound: { se: [typing] }
+    text: { ja: '正午。調査の範囲を決める。報告が上がっているのは一人だが、同じ使い方をした社員はほかにもいるとみられる。全件を調べるには、時間も手も足りない。', en: '' }
+    voices: [v01-flattery, v01-ok]
+    notable:
+      - { id: note-scope, text: { ja: '入力が確認できたのは、設計情報12件、ソースコード5件、テスト用の個人情報1,200人分。', en: '' } }
+    lesson: { ja: '調査は、端末の履歴と申請書、私用アカウントの申告を突き合わせます。一人だけを詳しく調べても、同じ使い方は見つかりません。全社の実態が、顧客への説明の土台になります。', en: '' }
+    choices:
+      - id: a01-all
+        text: { ja: '全社の端末と申請書、私用の申告を突き合わせる。', en: '' }
+        explain: { ja: '三つの情報を突き合わせることで、申請されていない利用も見つかります。範囲が広く取れ、顧客への説明も正確になります。', en: '' }
+        minutes: 300
+        category: recover
+        points: 130
+        refs: [no10-ai-guideline, cissp-cbk-secops]
+        gauges: { damage: -10, trust: 8, stamina: -15 }
+        setFlags: { fullSurvey: true, hiddenUseKnown: true }
+        items:
+          - { id: a01-c1, points: 10, axis: content, refs: [no10-ai-guideline] }
+          - { id: a01-c2, points: 8, axis: record, refs: [cissp-cbk-secops] }
+      - id: a01-one
+        text: { ja: '報告のあった一人の端末だけを詳しく調べる。', en: '' }
+        explain: { ja: '一人だけを調べると、同じ使い方をした人が残ります。入力の範囲も、顧客に説明できないままです。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -100
+        refs: [no10-ai-guideline]
+        gauges: { damage: 10, trust: -8 }
+        items:
+          - { id: a01-a1, points: -10, axis: content, refs: [no10-ai-guideline] }
+          - { id: a01-a2, points: -5, axis: record, refs: [cissp-cbk-secops] }
+      - id: a01-sample
+        text: { ja: '無作為に十人を抽出して、聞き取りを行う。', en: '' }
+        explain: { ja: '抽出では、外れた人の利用が分かりません。聞き取りは本人の記憶に頼るため、入力の記録も残りません。', en: '' }
+        minutes: 180
+        category: maintain
+        points: 20
+        refs: [cissp-cbk-secops]
+        gauges: { trust: 2 }
+        items:
+          - { id: a01-b1, points: -5, axis: content, refs: [cissp-cbk-secops] }
+          - { id: a01-b2, points: 5, axis: order, refs: [no10-ai-guideline] }
+
+  - id: a02-evidence
+    at: { day: 0, minutes: 1200 }
+    phase: contain
+    sound: { se: [notify_chat] }
+    text: { ja: '午後8時。入力に使った端末をどうするか。本人は「明日も仕事で使う」と言い、上司は「初期化して早く戻せ」と言う。', en: '' }
+    voices: [v02-past, v02-ok]
+    lesson: { ja: '端末と入力の記録は、調査の証拠として保全します。初期化して戻すと、何が入力されたかを示せなくなります。本人には代替の端末を渡し、仕事を止めない形にします。代替の端末で、仕事を続けます。', en: '' }
+    choices:
+      - id: a02-wipe
+        text: { ja: '入力に使った端末を初期化し、まっさらにする。', en: '' }
+        explain: { ja: '初期化すると、入力の履歴も証拠も消えます。何が出たのかを説明できず、報告も訂正だらけになります。', en: '' }
+        minutes: 90
+        category: fatal
+        points: -210
+        refs: [jpcert-handling]
+        gauges: { flame: 15, trust: -15 }
+        setFlags: { hidEvidence: true }
+        items:
+          - { id: a02-a1, points: -15, axis: record, refs: [jpcert-handling] }
+          - { id: a02-a2, points: -10, axis: content, refs: [cissp-cbk-secops] }
+      - id: a02-keep
+        text: { ja: '端末と入力の記録を保全し、調査に使える形で保管する。', en: '' }
+        explain: { ja: '端末と記録を保全することで、入力の範囲を後から確認できます。代替の端末を渡せば、本人の仕事も止まりません。', en: '' }
+        minutes: 180
+        category: recover
+        points: 120
+        refs: [jpcert-handling, cissp-cbk-secops]
+        gauges: { damage: -8, trust: 8, stamina: -10 }
+        setFlags: { evidenceKept: true }
+        items:
+          - { id: a02-c1, points: 10, axis: record, refs: [jpcert-handling] }
+          - { id: a02-c2, points: 8, axis: order, refs: [cissp-cbk-secops] }
+      - id: a02-return
+        text: { ja: '端末は本人に返し、そのまま使わせ続ける。', en: '' }
+        explain: { ja: 'そのまま使わせると、履歴が上書きされます。後から範囲を確認したくても、材料が残りません。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -120
+        refs: [jpcert-handling]
+        gauges: { damage: 10, trust: -10 }
+        items:
+          - { id: a02-b1, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a02-b2, points: -8, axis: content, refs: [cissp-cbk-secops] }
+
+  - id: a03-scope
+    at: { day: 1, minutes: 900 }
+    phase: investigate
+    sound: { se: [typing] }
+    text: { ja: '午後3時。何が入力されたかを復元する。本人は「もう覚えていない」と言う。チャットには、AIの回答を貼ったメッセージが残っている。', en: '' }
+    voices: [v03-ok, v03-coward]
+    lesson: { ja: '入力の範囲は、チャットと端末の履歴、AIの回答を突き合わせて特定します。本人の記憶だけに頼ると、抜けが出ます。分からない部分は、分からないと記録します。記録の突き合わせが、範囲を確定します。', en: '' }
+    choices:
+      - id: a03-ask
+        text: { ja: '本人の記憶を頼りに、入力した内容を聞き取っていく。', en: '' }
+        explain: { ja: '記憶は抜けます。忙しい時期の入力ほど忘れられ、顧客に説明できない部分が残ります。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 30
+        refs: [jpcert-handling]
+        gauges: { trust: 2 }
+        items:
+          - { id: a03-b1, points: 5, axis: content, refs: [jpcert-handling] }
+          - { id: a03-b2, points: 5, axis: order, refs: [cissp-cbk-secops] }
+      - id: a03-log
+        text: { ja: 'チャットと端末の履歴、AIの回答を突き合わせて範囲を特定する。', en: '' }
+        explain: { ja: '三つの記録を突き合わせると、本人が忘れた入力も拾えます。範囲が確定すれば、顧客への説明も報告も正確になります。', en: '' }
+        minutes: 240
+        category: recover
+        points: 120
+        refs: [jpcert-handling, cissp-cbk-secops]
+        gauges: { damage: -8, trust: 10, stamina: -12 }
+        setFlags: { scopeKnown: true }
+        items:
+          - { id: a03-c1, points: 10, axis: content, refs: [jpcert-handling] }
+          - { id: a03-c2, points: 8, axis: record, refs: [cissp-cbk-secops] }
+      - id: a03-none
+        text: { ja: '入力の内容は分からないので、範囲は調査中のままにする。', en: '' }
+        explain: { ja: '調査中のままにすると、顧客は自分の影響を判断できません。報告の範囲も、いつまでも確定しません。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [ppc-report-scope]
+        gauges: { trust: -8 }
+        items:
+          - { id: a03-a1, points: -10, axis: content, refs: [ppc-report-scope] }
+          - { id: a03-a2, points: -5, axis: time, refs: [jpcert-handling] }
+
+  - id: a04-terms
+    at: { day: 2, minutes: 660 }
+    phase: investigate
+    sound: { se: [notify_chat] }
+    text: { ja: '午前11時。学習利用の設定を確認する。無料の個人アカウントが使われており、事業者の規約には、入力がサービス改善に使われる場合があると書かれている。', en: '' }
+    voices: [v04-expert, v04-ok]
+    notable:
+      - { id: note-terms, text: { ja: '無料の個人アカウントの規約では、入力が学習に利用されうる設定だった。', en: '' } }
+      - { id: note-delete, text: { ja: 'AI事業者に削除と学習利用の停止を書面で求め、回答を受け取った。', en: '' } }
+    lesson: { ja: '学習に使われたかは、規約とアカウントの設定を確認して事実として記録します。事業者の説明をそのまま信じると、後から事実が違ったときに訂正が必要になります。事実の記録が、説明の根拠になります。', en: '' }
+    choices:
+      - id: a04-believe
+        text: { ja: '事業者の説明をそのまま信じ、学習には使われていないと記録する。', en: '' }
+        explain: { ja: '確認せずに記録すると、後から事実が違ったときに訂正が必要になります。顧客への説明も崩れます。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -120
+        refs: [no10-ppc-genai]
+        gauges: { flame: 8, trust: -10 }
+        items:
+          - { id: a04-a1, points: -10, axis: content, refs: [no10-ppc-genai] }
+          - { id: a04-a2, points: -8, axis: record, refs: [no10-ai-guideline] }
+      - id: a04-skip
+        text: { ja: '学習の有無は、確認しても分からないので飛ばしておく。', en: '' }
+        explain: { ja: '分からないまま飛ばすと、顧客の質問に答えられません。報告書からも、重要な事実が抜けます。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -100
+        refs: [no10-ppc-genai]
+        gauges: { trust: -8 }
+        items:
+          - { id: a04-b1, points: -10, axis: content, refs: [no10-ppc-genai] }
+          - { id: a04-b2, points: -5, axis: care, refs: [ppc-notify-person] }
+      - id: a04-terms
+        text: { ja: '規約とアカウント設定を確認し、学習に使われうる設定だと記録する。', en: '' }
+        explain: { ja: '規約と設定を確認して事実を記録しています。学習に使われうる設定なら、そのまま説明する材料になります。', en: '' }
+        minutes: 180
+        category: recover
+        points: 130
+        refs: [no10-ppc-genai, no10-ai-guideline]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { termsChecked: true }
+        items:
+          - { id: a04-c1, points: 10, axis: content, refs: [no10-ppc-genai] }
+          - { id: a04-c2, points: 8, axis: record, refs: [no10-ai-guideline] }
+
+  - id: a05-report
+    at: { day: 2, minutes: 1080 }
+    phase: notify
+    sound: { se: [notify_news] }
+    text: { ja: '午後6時。委員会への報告をまとめる。テスト用とはいえ、顧客の利用者1,200人分の氏名と連絡先が入力されている。全件の特定はまだ終わっていない。', en: '' }
+    voices: [v05-law, v05-ok]
+    notable:
+      - { id: note-report, text: { ja: '速報の期限は事実を知ってから3日、確報は30日。報告の中心は、入力した情報の種類と件数になる。', en: '' } }
+    lesson: { ja: '1,200人分の個人データは、件数だけで報告の対象です。全件の特定を待たず、分かっている範囲で速報を出します。テスト用という理由で外すと、報告漏れになります。速報は、待たずに出すものです。', en: '' }
+    choices:
+      - id: a05-prelim
+        text: { ja: '1,200人分の個人情報を速報に載せ、不明点は調査中と書く。', en: '' }
+        explain: { ja: '確定前でも、分かった範囲を出しています。件数が報告の根拠になり、不明点も調査中と明記できます。', en: '' }
+        minutes: 120
+        category: recover
+        points: 130
+        refs: [ppc-report-prelim, ppc-report-scope]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { prelimFiled: true }
+        items:
+          - { id: a05-c1, points: 10, axis: time, refs: [ppc-report-prelim] }
+          - { id: a05-c2, points: 8, axis: content, refs: [ppc-report-scope] }
+      - id: a05-wait
+        text: { ja: '全件の特定が終わるまで待ってから、委員会に報告する。', en: '' }
+        explain: { ja: '全件を待つ間に、速報の期限が過ぎます。1,200人分の個人データは、確定前でも対象です。', en: '' }
+        minutes: 240
+        category: hurt
+        points: -150
+        refs: [ppc-report-prelim]
+        gauges: { flame: 12, trust: -12 }
+        items:
+          - { id: a05-a1, points: -12, axis: time, refs: [ppc-report-prelim] }
+          - { id: a05-a2, points: -8, axis: record, refs: [ppc-report-scope] }
+      - id: a05-omit
+        text: { ja: '個人情報はテスト用なので、報告には含めないでおく。', en: '' }
+        explain: { ja: 'テスト用でも、実在する人の氏名と連絡先なら個人データです。報告から外すと、報告漏れになります。', en: '' }
+        minutes: 60
+        category: fatal
+        points: -200
+        refs: [ppc-report-scope]
+        gauges: { flame: 15, trust: -15 }
+        setFlags: { hidPersonal: true }
+        items:
+          - { id: a05-b1, points: -15, axis: content, refs: [ppc-report-scope] }
+          - { id: a05-b2, points: -10, axis: time, refs: [ppc-report-prelim] }
+
+  - id: a06-detect
+    at: { day: 4, minutes: 900 }
+    phase: recover
+    sound: { se: [typing] }
+    text: { ja: '午後3時。再発を防ぐ仕組みを作るか。教育で防ぐという意見と、入力そのものを技術で止めるという意見がある。予算は限られている。', en: '' }
+    voices: [v06-popular, v06-ok]
+    lesson: { ja: '教育だけでは、忙しいときに判断が戻ります。外部AIへの入力を技術で検知し、必要な申請だけ通す仕組みを作ります。記録が残れば、何が起きたかも後から確認できます。仕組みが、再発を防ぎます。', en: '' }
+    choices:
+      - id: a06-dlp
+        text: { ja: '入力の検知と申請の仕組みを入れ、記録を残す。', en: '' }
+        explain: { ja: '技術で止め、申請と記録を残しています。現場の判断に頼らず、再発を防げます。記録も残ります。', en: '' }
+        minutes: 300
+        category: recover
+        points: 120
+        refs: [no10-ai-guideline, no10-ipa-genai]
+        gauges: { damage: -8, trust: 10, stamina: -12 }
+        setFlags: { safeEnv: true, managedAI: true }
+        items:
+          - { id: a06-c1, points: 10, axis: record, refs: [no10-ai-guideline] }
+          - { id: a06-c2, points: 8, axis: content, refs: [no10-ipa-genai] }
+      - id: a06-edu
+        text: { ja: '監視はできていないので、教育で防ぐ。', en: '' }
+        explain: { ja: '教育は大切ですが、入力の記録は残りません。忙しいときほど、同じ判断が選ばれます。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -90
+        refs: [no10-ipa-genai]
+        gauges: { trust: -5 }
+        items:
+          - { id: a06-a1, points: -8, axis: content, refs: [no10-ipa-genai] }
+          - { id: a06-a2, points: -5, axis: record, refs: [no10-ai-guideline] }
+      - id: a06-later
+        text: { ja: '仕組みは来年度の予算で検討することにする。', en: '' }
+        explain: { ja: '来年度まで待つ間、入力は見えないまま続きます。事故が起きてからでは、記録も残っていません。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [no10-ai-guideline]
+        gauges: { trust: -3 }
+        coward: true
+        items:
+          - { id: a06-b1, points: -5, axis: order, refs: [no10-ai-guideline] }
+          - { id: a06-b2, points: 5, axis: content, refs: [no10-ipa-genai] }
+
+  - id: a07-notice
+    at: { day: 6, minutes: 600 }
+    phase: notify
+    sound: { se: [mail_arrive] }
+    text: { ja: '午前10時。顧客への通知文を作る。営業は「短くしてほしい」と言い、顧客の技術担当は「何が入ったか知りたい」と言っている。', en: '' }
+    voices: [v07-coward, v07-ok]
+    notable:
+      - { id: note-customer, text: { ja: '顧客への説明は、影響の大きい5社から順に訪問で行った。', en: '' } }
+    lesson: { ja: '通知文には、出た情報の種類と時期、再発防止を具体的に書きます。短くするために情報を削ると、顧客は自分の影響を確認できません。曖昧な表現は、問い合わせを増やします。', en: '' }
+    choices:
+      - id: a07-vague
+        text: { ja: '「情報管理の不備により」とだけ書く。', en: '' }
+        explain: { ja: '何が外に出たかが分からないと、顧客は自分事として捉えられません。問い合わせだけが増えます。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -100
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 8, trust: -8 }
+        items:
+          - { id: a07-a1, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: a07-a2, points: -5, axis: content, refs: [ppc-notify-person] }
+      - id: a07-specific
+        text: { ja: '出た情報の種類と時期、再発防止を具体的に書く。', en: '' }
+        explain: { ja: '種類と時期が具体的だと、顧客は影響を照合できます。再発防止まで書けば、取引を続ける判断もしやすくなります。', en: '' }
+        minutes: 180
+        category: recover
+        points: 110
+        refs: [meti-disclosure-guidance, ppc-notify-person]
+        gauges: { damage: -8, trust: 10, stamina: -10 }
+        setFlags: { customerTold: true }
+        detail: analyst-notice
+        items:
+          - { id: a07-c1, points: 10, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: a07-c2, points: 8, axis: care, refs: [ppc-notify-person] }
+      - id: a07-min
+        text: { ja: '影響のある顧客だけに、短く伝えて終える。', en: '' }
+        explain: { ja: '影響があるかどうかは、顧客自身にも分かりません。短く伝えると、対象から漏れた人に情報が届きません。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -80
+        refs: [ppc-notify-person]
+        gauges: { trust: -6 }
+        items:
+          - { id: a07-b1, points: -8, axis: content, refs: [ppc-notify-person] }
+          - { id: a07-b2, points: -5, axis: care, refs: [meti-disclosure-guidance] }
+
+  - id: a08-private
+    at: { day: 8, minutes: 600 }
+    phase: organize
+    sound: { se: [notify_chat] }
+    text: { ja: '午前10時。私用アカウントの扱いを決める。申告を求めると、処分を恐れて誰も名乗り出ないかもしれない。上司の名前も、申告の中にあった。', en: '' }
+    voices: [v08-insider, v08-ok]
+    lesson: { ja: '私用アカウントの利用は、申告者を不利益に扱わないと伝えて集めます。上司の名前が出ても、同じ基準で扱います。処分をちらつかせると、実態は見えないまま残ります。同じ基準で扱うことが、信頼になります。', en: '' }
+    choices:
+      - id: a08-declare
+        text: { ja: '申告者を不利益に扱わないと伝え、利用の実態を集める。', en: '' }
+        explain: { ja: '申告を責めないと決めることで、隠れた利用が見えます。上司の分も同じ基準で扱えば、記録の信用も保てます。', en: '' }
+        minutes: 180
+        category: recover
+        points: 120
+        refs: [no10-ipa-genai, no10-ai-guideline]
+        gauges: { trust: 10, flame: -5, stamina: -8 }
+        setFlags: { speakUp: true, hiddenUseKnown: true }
+        items:
+          - { id: a08-c1, points: 10, axis: care, refs: [no10-ipa-genai] }
+          - { id: a08-c2, points: 8, axis: record, refs: [no10-ai-guideline] }
+      - id: a08-punish
+        text: { ja: '私用アカウントを使った社員を全員処分する。', en: '' }
+        explain: { ja: '全員処分にすると、以後の申告はゼロになります。実態が見えなくなり、再発防止の材料も失います。', en: '' }
+        minutes: 150
+        category: hurt
+        points: -130
+        refs: [no10-ai-guideline]
+        gauges: { flame: 10, trust: -12 }
+        items:
+          - { id: a08-a1, points: -12, axis: care, refs: [no10-ai-guideline] }
+          - { id: a08-a2, points: -8, axis: record, refs: [no10-ipa-genai] }
+      - id: a08-ignore
+        text: { ja: '私用の利用は会社の管理外なので、調べない。', en: '' }
+        explain: { ja: '会社の管理外としても、顧客の情報が外に出た事実は変わりません。範囲を説明できず、報告も不完全になります。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -100
+        refs: [no10-ai-guideline]
+        gauges: { damage: 8, trust: -8 }
+        items:
+          - { id: a08-b1, points: -10, axis: content, refs: [no10-ai-guideline] }
+          - { id: a08-b2, points: -5, axis: record, refs: [no10-ipa-genai] }
+
+  - id: a09-block
+    at: { day: 10, minutes: 600 }
+    phase: recover
+    sound: { se: [typing] }
+    text: { ja: '午前10時。技術的な対策をどこまで入れるか。外部AIへの入力を止める製品はあるが、導入には費用と調整がかかる。現場からは反発も予想される。', en: '' }
+    voices: [v09-vendor, v09-ok]
+    lesson: { ja: '外部AIへの入力は、技術で検知して止めます。必要な申請だけを通す形にすれば、現場の仕事も続けられます。注意の表示だけでは、入力は止まりません。技術の対策が、記録も残します。', en: '' }
+    choices:
+      - id: a09-block
+        text: { ja: '外部AIへの入力を技術で止め、必要な申請だけ通す。', en: '' }
+        explain: { ja: '技術で止め、申請で通す形にしています。現場の判断に頼らず、入力の記録も残せます。', en: '' }
+        minutes: 300
+        category: recover
+        points: 120
+        refs: [no10-ai-guideline, no10-ipa-genai]
+        gauges: { damage: -8, trust: 10, stamina: -12 }
+        setFlags: { safeEnv: true, managedAI: true }
+        items:
+          - { id: a09-c1, points: 10, axis: record, refs: [no10-ai-guideline] }
+          - { id: a09-c2, points: 8, axis: content, refs: [no10-ipa-genai] }
+      - id: a09-popup
+        text: { ja: '注意のポップアップを画面に出すだけにする。', en: '' }
+        explain: { ja: 'ポップアップは、忙しいときに読み飛ばされます。入力は止まらず、記録も残りません。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -60
+        refs: [no10-ipa-genai]
+        gauges: { trust: -4 }
+        items:
+          - { id: a09-a1, points: -8, axis: content, refs: [no10-ipa-genai] }
+          - { id: a09-a2, points: -5, axis: record, refs: [no10-ai-guideline] }
+      - id: a09-none
+        text: { ja: '対策はせず、規程の周知だけを行って終える。', en: '' }
+        explain: { ja: '周知だけでは、入力の実態は変わりません。事故が起きてから、また同じ調査をやり直すことになります。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -90
+        refs: [no10-ai-guideline]
+        gauges: { damage: 8, trust: -6 }
+        items:
+          - { id: a09-b1, points: -10, axis: content, refs: [no10-ai-guideline] }
+          - { id: a09-b2, points: -5, axis: order, refs: [no10-ipa-genai] }
+
+  - id: a10-verify
+    at: { day: 14, minutes: 600 }
+    phase: recover
+    sound: { se: [notify_chat] }
+    text: { ja: '午前10時。安全な環境を全社に配る前に、検証するか。事業者は「学習に使いません」と言うが、設定の画面は英語で分かりにくい。', en: '' }
+    voices: [v10-vendor, v10-ok]
+    lesson: { ja: '事業者の説明だけで全社に配らず、契約と設定を実際に確かめます。試験利用で入力の記録が残るかも確認します。確認した内容は、顧客への説明の根拠になります。確認した内容が、説明を支えます。', en: '' }
+    choices:
+      - id: a10-trust
+        text: { ja: '事業者の言うとおり、安全だとして全社に配る。', en: '' }
+        explain: { ja: '確認せずに配ると、設定が学習に使う側のままでしたという事故が起きます。説明の根拠もありません。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -110
+        refs: [no10-ppc-genai]
+        gauges: { damage: 10, trust: -8 }
+        items:
+          - { id: a10-a1, points: -10, axis: content, refs: [no10-ppc-genai] }
+          - { id: a10-a2, points: -5, axis: record, refs: [no10-ai-guideline] }
+      - id: a10-wait
+        text: { ja: '予算が下りるまで、何も試さずにただ待ち続ける。', en: '' }
+        explain: { ja: '待つ間に、現場は私用の端末で使い続けます。検証も進まず、再開の見通しが立ちません。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [no10-ipa-genai]
+        gauges: { trust: -3 }
+        coward: true
+        items:
+          - { id: a10-b1, points: -5, axis: order, refs: [no10-ipa-genai] }
+          - { id: a10-b2, points: 5, axis: content, refs: [no10-ai-guideline] }
+      - id: a10-verify
+        text: { ja: '学習に使われない契約と設定を確かめ、試験利用で検証する。', en: '' }
+        explain: { ja: '契約と設定を実際に確かめ、試験で記録も見ています。確認した内容が、そのまま説明の根拠になります。', en: '' }
+        minutes: 240
+        category: recover
+        points: 120
+        refs: [no10-ppc-genai, no10-ai-guideline]
+        gauges: { damage: -8, trust: 12, stamina: -12 }
+        setFlags: { safeEnv: true, managedAI: true }
+        items:
+          - { id: a10-c1, points: 10, axis: content, refs: [no10-ppc-genai] }
+          - { id: a10-c2, points: 8, axis: record, refs: [no10-ai-guideline] }
+
+  - id: a11-record
+    at: { day: 18, minutes: 600 }
+    phase: recover
+    sound: { se: [typing] }
+    text: { ja: '午前10時。入力の記録をどう管理するか。調査は一段落したが、誰がいつ何を入力したかの一覧は、まだ個人の端末に散らばっている。', en: '' }
+    voices: [v11-coward, v11-ok]
+    lesson: { ja: '誰がいつ何を入力したかの記録を作り、会社の管理下に置きます。個人の端末に置いたままだと、異動や退職で失われます。記録は、次の説明と再発防止の材料になります。記録が、次の説明を支えます。', en: '' }
+    choices:
+      - id: a11-none
+        text: { ja: '入力の記録は残さず、終わったものとして扱う。', en: '' }
+        explain: { ja: '記録がないと、同じ質問に答えるたびに調査をやり直します。再発防止の効果も測れません。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -90
+        refs: [jpcert-handling]
+        gauges: { trust: -6 }
+        items:
+          - { id: a11-a1, points: -10, axis: record, refs: [jpcert-handling] }
+          - { id: a11-a2, points: -5, axis: content, refs: [cissp-cbk-secops] }
+      - id: a11-log
+        text: { ja: '誰がいつ何を入力したかの記録を作り、保管する。', en: '' }
+        explain: { ja: '記録を会社の管理下に置くことで、後から経緯を確認できます。再発防止が進んだかの確認にも使えます。', en: '' }
+        minutes: 180
+        category: recover
+        points: 110
+        refs: [jpcert-handling, cissp-cbk-secops]
+        gauges: { trust: 8, stamina: -10 }
+        setFlags: { evidenceKept: true, recordKept: true }
+        items:
+          - { id: a11-c1, points: 10, axis: record, refs: [jpcert-handling] }
+          - { id: a11-c2, points: 8, axis: content, refs: [cissp-cbk-secops] }
+      - id: a11-personal
+        text: { ja: '個人の端末に記録を置いたままにする。', en: '' }
+        explain: { ja: '個人の端末に置くと、異動や退職で記録が失われます。会社として説明できる材料になりません。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -80
+        refs: [jpcert-handling]
+        gauges: { trust: -5 }
+        items:
+          - { id: a11-b1, points: -8, axis: record, refs: [jpcert-handling] }
+          - { id: a11-b2, points: -5, axis: content, refs: [cissp-cbk-secops] }
+
+  - id: a12-cause
+    at: { day: 22, minutes: 600 }
+    phase: investigate
+    sound: { se: [typing] }
+    text: { ja: '午前10時。調査の原因分析をまとめる。現場には、申請の流れも、入力の判定もなかった。忙しい時期ほど、個人の判断でAIが使われていた。', en: '' }
+    voices: [v12-boss, v12-ok]
+    notable:
+      - { id: note-rule, text: { ja: '生成AIに関する社内規程はなく、外部サービスの利用申請も形だけだった。', en: '' } }
+    lesson: { ja: '原因は、申請の流れと入力の判定がなかったこととして書きます。利用者の知識不足に寄せると、同じ環境で同じ判断が繰り返されます。仕組みの欠けを示すのが調査の役割です。', en: '' }
+    choices:
+      - id: a12-flow
+        text: { ja: '申請の流れと入力の判定がなかったことを原因として書く。', en: '' }
+        explain: { ja: '仕組みの欠けを原因として書くと、対策の担当と期限を決められます。個人を責めずに再発を防げます。', en: '' }
+        minutes: 180
+        category: recover
+        points: 120
+        refs: [no10-ai-guideline, cissp-cbk-secops]
+        gauges: { trust: 8, stamina: -10 }
+        setFlags: { causeSystem: true }
+        items:
+          - { id: a12-c1, points: 10, axis: content, refs: [no10-ai-guideline] }
+          - { id: a12-c2, points: 8, axis: record, refs: [cissp-cbk-secops] }
+      - id: a12-user
+        text: { ja: '利用者の知識不足と意識の問題としてまとめる。', en: '' }
+        explain: { ja: '知識不足に寄せると、教育を増やすだけの対策になります。忙しさや申請の使いにくさは、直りません。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -100
+        refs: [no10-ai-guideline]
+        gauges: { trust: -8 }
+        items:
+          - { id: a12-a1, points: -10, axis: content, refs: [no10-ai-guideline] }
+          - { id: a12-a2, points: -5, axis: care, refs: [no10-ipa-genai] }
+      - id: a12-tool
+        text: { ja: '外部AIの危険性だけを強調して話を終える。', en: '' }
+        explain: { ja: '道具の危険性だけを書くと、自社の仕組みの欠けが見えません。同じ使い方が残ります。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -80
+        refs: [no10-ai-guideline]
+        gauges: { trust: -5 }
+        items:
+          - { id: a12-b1, points: -8, axis: wording, refs: [no10-ai-guideline] }
+          - { id: a12-b2, points: -5, axis: content, refs: [cissp-cbk-secops] }
+
+  - id: a13-final
+    at: { day: 26, minutes: 600 }
+    phase: after
+    sound: { se: [notify_news] }
+    text: { ja: '午前10時。確報を出す時期になった。入力の範囲は八割ほど特定できたが、残りは私用アカウントの分で、まだ確認できていない。', en: '' }
+    voices: [v13-expert, v13-ok]
+    lesson: { ja: '確報は期限どおりに出し、入力の範囲と件数を書きます。確定していない部分は調査中と明記します。期限を過ぎると、速報で示した姿勢まで疑われます。期限を守ることが、信頼の前提です。', en: '' }
+    choices:
+      - id: a13-late
+        text: { ja: '確報は調査が終わる来月まで待ってから出す。', en: '' }
+        explain: { ja: '来月に回すと、確報の期限を過ぎます。期限を守らなかった事実は、対応全体の信頼を落とします。', en: '' }
+        minutes: 45
+        category: fatal
+        points: -210
+        refs: [ppc-report-final]
+        gauges: { flame: 15, trust: -12 }
+        setFlags: { skippedFinal: true }
+        items:
+          - { id: a13-a1, points: -15, axis: time, refs: [ppc-report-final] }
+          - { id: a13-a2, points: -10, axis: record, refs: [ppc-report-final] }
+      - id: a13-file
+        text: { ja: '確報を期限どおり出し、入力の範囲と件数を書く。', en: '' }
+        explain: { ja: '期限を守り、範囲と件数を書いています。確定していない部分も、調査中として説明できます。', en: '' }
+        minutes: 180
+        category: recover
+        points: 120
+        refs: [ppc-report-final, ppc-report-scope]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { finalFiled: true }
+        items:
+          - { id: a13-c1, points: 10, axis: record, refs: [ppc-report-final] }
+          - { id: a13-c2, points: 8, axis: content, refs: [ppc-report-scope] }
+      - id: a13-partial
+        text: { ja: '確報は出すが、学習利用の可能性を書かない。', en: '' }
+        explain: { ja: '学習利用の可能性を省くと、顧客が最も知りたい点が抜けます。後から分かれば、説明の訂正が必要です。', en: '' }
+        minutes: 120
+        category: hurt
+        points: -100
+        refs: [no10-ppc-genai]
+        gauges: { trust: -8 }
+        items:
+          - { id: a13-b1, points: -10, axis: content, refs: [no10-ppc-genai] }
+          - { id: a13-b2, points: -5, axis: care, refs: [ppc-notify-person] }
+
+  - id: a14-press
+    at: { day: 34, minutes: 600 }
+    phase: after
+    sound: { se: [shutter] }
+    text: { ja: '午前10時。会見で使う資料を作るか。広報は「一覧があると助かる」と言い、現場は「技術の詳細まで出せと言われるのでは」と心配している。', en: '' }
+    voices: [v14-expert, v14-ok]
+    lesson: { ja: '会見の資料には、何がどこまで出たかの一覧と、確認中の範囲を載せます。技術の詳細を全部載せると論点がぼれ、何も載せないと説明が口頭だけになります。一覧と範囲が、説明を支えます。', en: '' }
+    choices:
+      - id: a14-none
+        text: { ja: '資料は作らず、その場の口頭説明だけで答える。', en: '' }
+        explain: { ja: '資料がないと、範囲や件数が伝わりません。聞き手によって理解がばらつき、憶測が残ります。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -70
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 8, trust: -6 }
+        items:
+          - { id: a14-a1, points: -8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: a14-a2, points: -5, axis: wording, refs: [jpcert-handling] }
+      - id: a14-many
+        text: { ja: '資料を厚くして、技術的な詳細を全部載せる。', en: '' }
+        explain: { ja: '詳細を全部載せると、論点が技術の話に移ります。顧客と社員への説明が埋もれてしまいます。', en: '' }
+        minutes: 180
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { trust: 2 }
+        items:
+          - { id: a14-b1, points: 5, axis: content, refs: [jpcert-handling] }
+          - { id: a14-b2, points: 5, axis: record, refs: [meti-disclosure-guidance] }
+      - id: a14-chart
+        text: { ja: '何がどこまで出たかの一覧と、確認中の範囲を資料にする。', en: '' }
+        explain: { ja: '一覧と確認中の範囲を示すと、聞き手は全体像をつかめます。分からない部分も、隠さずに伝えられます。', en: '' }
+        minutes: 210
+        category: recover
+        points: 110
+        refs: [jpcert-handling, meti-disclosure-guidance]
+        gauges: { flame: -10, trust: 10, stamina: -10 }
+        setFlags: { pressReady: true }
+        items:
+          - { id: a14-c1, points: 8, axis: content, refs: [jpcert-handling] }
+          - { id: a14-c2, points: 8, axis: care, refs: [meti-disclosure-guidance] }
+
+  - id: a15-share
+    at: { day: 45, minutes: 600 }
+    phase: after
+    sound: { se: [notify_chat] }
+    text: { ja: '午前10時。調査が終わり、記録が残った。学んだことを社内と業界に共有するか。記録をしまえば、同じ調査を他の会社が繰り返すことになる。', en: '' }
+    voices: [v15-coward, v15-ok]
+    lesson: { ja: '学んだことを社内と業界に共有し、規程を見直します。入力の判定と記録の方法は、同じ道具を使う他の会社にも役立ちます。共有は、自社の再発防止の定着にもつながります。', en: '' }
+    choices:
+      - id: a15-close
+        text: { ja: '今回の件は終わったので、記録はしまっておく。', en: '' }
+        explain: { ja: '記録をしまえば、次の担当者は同じ調査をやり直します。学んだことが、会社の知識になりません。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -90
+        refs: [no10-ipa-genai]
+        gauges: { trust: -6 }
+        items:
+          - { id: a15-a1, points: -8, axis: record, refs: [no10-ipa-genai] }
+          - { id: a15-a2, points: -5, axis: content, refs: [cissp-cbk-secops] }
+      - id: a15-share
+        text: { ja: '学んだことを社内と業界に共有し、規程を見直す。', en: '' }
+        explain: { ja: '社内と業界に共有し、規程まで見直しています。同じ道具を使う他社の事故を減らし、自社の対策も定着します。', en: '' }
+        minutes: 240
+        category: increase
+        points: 300
+        fatalAlternate: 40
+        refs: [no10-ipa-genai, cissp-cbk-secops]
+        gauges: { flame: -10, trust: 18, stamina: -12 }
+        setFlags: { industryShare: true, educationPlan: true, speakUp: true }
+        items:
+          - { id: a15-c1, points: 10, axis: content, refs: [no10-ipa-genai] }
+          - { id: a15-c2, points: 8, axis: record, refs: [cissp-cbk-secops] }
+      - id: a15-min
+        text: { ja: '社内の勉強会を開くだけで終わらせる。', en: '' }
+        explain: { ja: '社内だけで終えると、同じ型の事故が業界に残ります。規程の見直しも進まず、対策が一部にとどまります。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 30
+        refs: [no10-ipa-genai]
+        gauges: { trust: 3 }
+        items:
+          - { id: a15-b1, points: 5, axis: content, refs: [no10-ipa-genai] }
+          - { id: a15-b2, points: 5, axis: care, refs: [cissp-cbk-secops] }
+
+drafts:
+  analyst-notice:
+    title: { ja: '顧客への通知文', en: '' }
+    slots:
+      - id: timing
+        label: { ja: '出す時刻', en: '' }
+        auto: true
+        items:
+          - { id: ad-t-10d, when: { withinHours: 240 }, points: 10, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: ad-t-20d, when: { withinHours: 480 }, points: 3, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: ad-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [meti-disclosure-guidance] }
+      - id: scope
+        label: { ja: '対象の書き方', en: '' }
+        options:
+          - { id: ad-s-code, text: { ja: 'ソースコードだけを対象として書いておく', en: '' }, points: -15, axis: content, refs: [ppc-report-scope], explain: { ja: 'コードだけに絞ると、設計情報と個人情報が通知から抜けます。後から対象の訂正が必要になります。', en: '' } }
+          - { id: ad-s-anon, text: { ja: '顧客名は伏せ、業種と時期だけを書く', en: '' }, points: -10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '顧客名を伏せると、自分の案件かどうかを判断できません。照合の材料が足りません。顧客が照合できません。', en: '' } }
+          - { id: ad-s-all, text: { ja: '設計情報、コード、個人情報の範囲を分けて書く', en: '' }, points: 10, axis: content, refs: [ppc-report-scope], explain: { ja: '三つの種類を分けて書くと、顧客は自分の情報がどこまで含まれるか確認できます。通知の範囲も明確です。', en: '' } }
+      - id: content
+        label: { ja: '何が起きたか', en: '' }
+        options:
+          - { id: ad-c-vague, text: { ja: '「情報管理に不備がありました」とだけ書く', en: '' }, points: -10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '「情報管理の不備」だけでは、何が外に出たか分かりません。顧客は行動を決められません。', en: '' } }
+          - { id: ad-c-specific, text: { ja: '入力された情報の種類と時期を具体的に書く', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '種類と時期を具体的に書くと、顧客は自分の情報が含まれるか照合できます。行動もしやすくなります。', en: '' } }
+      - id: cause
+        label: { ja: '原因の書き方', en: '' }
+        options:
+          - { id: ad-ca-system, text: { ja: '入力の判定と申請の仕組みがなかったと書く', en: '' }, points: 10, axis: content, refs: [no10-ai-guideline], explain: { ja: '仕組みの不在を原因として書くと、再発防止の内容とつながります。顧客も対策を評価できます。', en: '' } }
+          - { id: ad-ca-person, text: { ja: '担当者の知識が足りなかったと書く', en: '' }, points: -15, axis: wording, refs: [no10-ai-guideline], explain: { ja: '個人の知識に寄せると、仕組みの失敗が見えません。同じ環境の社員が、また同じ判断をします。', en: '' } }
+      - id: action
+        label: { ja: 'お客様が今すること', en: '' }
+        options:
+          - { id: ad-a-generic, text: { ja: '「十分ご注意ください」とだけ書いて終える', en: '' }, points: -10, axis: care, refs: [ppc-notify-person], explain: { ja: '注意を促すだけでは、何をすればよいか分かりません。問い合わせが窓口に集中します。', en: '' } }
+          - { id: ad-a-concrete, text: { ja: '確認すべき自社の設定と、連絡先を書く', en: '' }, points: 10, axis: care, refs: [ppc-notify-person], explain: { ja: '確認すべき設定と連絡先を示すと、顧客は自分で影響を確かめられます。問い合わせも減ります。', en: '' } }
+      - id: contact
+        label: { ja: '問い合わせ窓口', en: '' }
+        options:
+          - { id: ad-co-none, text: { ja: '問い合わせ窓口は一切書かない', en: '' }, points: -15, axis: care, refs: [ppc-notify-person], explain: { ja: '窓口がないと、顧客は担当者個人に連絡します。情報が集まらず、対応の記録も残りません。', en: '' } }
+          - { id: ad-co-number, text: { ja: '問い合わせの電話番号だけを書く', en: '' }, points: -5, axis: care, refs: [ppc-notify-person], explain: { ja: '番号だけでは受付時間が分からず、つながらないときに顧客は次の手段を失います。受付時間も示します。', en: '' } }
+          - { id: ad-co-window, text: { ja: '専用窓口の番号、受付時間、担当を書く', en: '' }, points: 8, axis: care, refs: [ppc-notify-person], explain: { ja: '窓口の使い方まで示すと、顧客は迷わず問い合わせられます。集中しても受け止められます。', en: '' } }
+      - id: staff
+        label: { ja: '社員への配慮', en: '' }
+        options:
+          - { id: ad-st-punish, text: { ja: '入力した社員への処分だけを書く', en: '' }, points: -10, axis: care, refs: [no10-ai-guideline], explain: { ja: '処分だけを書くと、社員は報告を控えます。再発防止の担い手が失われ、現場の協力も得られません。', en: '' } }
+          - { id: ad-st-care, text: { ja: '入力した社員への配慮と相談窓口を書く', en: '' }, points: 5, axis: care, refs: [no10-ai-guideline], explain: { ja: '社員への配慮と相談窓口を示すと、次の入力も相談として上がります。報告を罰しない姿勢が伝わります。', en: '' } }
+      - id: next
+        label: { ja: '次の連絡', en: '' }
+        options:
+          - { id: ad-n-next, text: { ja: '次の連絡の予定を書く', en: '' }, points: 5, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '次の予定があると、続報を待つ顧客の見通しが立ちます。憶測が広がる前に接点を示せます。', en: '' } }
+          - { id: ad-n-none, text: { ja: '次回の予定は書かない', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '次回の予定がないと、情報の空白を憶測で埋められます。問い合わせの終わりも見えません。', en: '' } }
+voices:
+  - { id: v01-flattery, media: chat, misleading: true, type: flattery, text: { ja: '室長が一人で見れば済みます。他の人を巻き込むと、話が広がります。', en: '' }, trigger: { at: point } }
+  - { id: v01-ok, media: chat, misleading: false, text: { ja: '総務「申請書と端末の履歴は、こちらで揃えられます」。', en: '' }, trigger: { at: point } }
+  - { id: v02-past, media: chat, misleading: true, type: past-success, text: { ja: '前の端末も、初期化して返したら問題なかった。', en: '' }, trigger: { at: point } }
+  - { id: v02-ok, media: chat, misleading: false, text: { ja: '総務「代替の端末なら、今日中に用意できます」。', en: '' }, trigger: { at: point } }
+  - { id: v03-coward, media: sns, misleading: true, type: public-opinion, text: { ja: '細かい範囲まで調べるのは、時間の無駄だ。', en: '' }, trigger: { at: point } }
+  - { id: v03-ok, media: chat, misleading: false, text: { ja: '更科「チャットの履歴は、まだ消していません」。', en: '' }, trigger: { at: point } }
+  - { id: v04-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '事業者が学習に使っていないと言うなら、それが答えです。', en: '' }, trigger: { at: point } }
+  - { id: v04-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「規約と設定の画面は、記録に残しておきましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v05-law, media: board, misleading: true, type: law-ish, text: { ja: 'テスト用のデータなら、報告の対象ではありません。', en: '' }, trigger: { at: point } }
+  - { id: v05-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「実在する人の情報なら、テスト用でも対象です」。', en: '' }, trigger: { at: point } }
+  - { id: v06-popular, media: sns, misleading: true, type: popular, text: { ja: '他の会社も、教育だけで済ませていますよ。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '更科「検知の製品なら、試験導入できます」。', en: '' }, trigger: { at: point } }
+  - { id: v07-coward, media: sns, misleading: true, type: coward-critique, text: { ja: '細かく書くと、顧客が離れる。短くまとめろ。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '顧客の技術担当「何が入ったか、具体的に知りたい」。', en: '' }, trigger: { at: point } }
+  - { id: v08-insider, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、私用で使った人はもっと多い。全員処分しろ。', en: '' }, trigger: { at: point } }
+  - { id: v08-ok, media: chat, misleading: false, text: { ja: '人事部長「申告した人を責めないと決めれば、話してくれます」。', en: '' }, trigger: { at: point } }
+  - { id: v09-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '検知の製品を入れると、現場の仕事が止まりますよ。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '更科「申請を通す形なら、現場は止まりません」。', en: '' }, trigger: { at: point } }
+  - { id: v10-vendor, media: vendor, misleading: true, type: vendor-interest, text: { ja: '設定はこちらで確認済みです。そのまま配れます。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「契約と設定は、こちらの目でも確かめましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v11-coward, media: sns, misleading: true, type: public-opinion, text: { ja: 'もう終わった話だ。記録を残してどうする。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '総務「記録の置き場所は、すぐ用意できます」。', en: '' }, trigger: { at: point } }
+  - { id: v12-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '原因は担当者の知識不足でまとめろ。会社の問題にするな。', en: '' }, trigger: { at: point } }
+  - { id: v12-ok, media: chat, misleading: false, text: { ja: '更科「申請が使いにくかったのは、現場の共通の声です」。', en: '' }, trigger: { at: point } }
+  - { id: v13-expert, media: vendor, misleading: true, type: fake-expert, text: { ja: '残りは私用の分です。確報には含めなくて大丈夫です。', en: '' }, trigger: { at: point } }
+  - { id: v13-ok, media: chat, misleading: false, text: { ja: '顧問弁護士「確定していない部分は、調査中と書けます」。', en: '' }, trigger: { at: point } }
+  - { id: v14-expert, media: sns, misleading: true, type: fake-expert, text: { ja: '技術の詳細を全部出せば、納得してもらえます。', en: '' }, trigger: { at: point } }
+  - { id: v14-ok, media: chat, misleading: false, text: { ja: '広報「一覧があれば、範囲は伝わります」。', en: '' }, trigger: { at: point } }
+  - { id: v15-coward, media: news, misleading: true, type: coward-critique, text: { ja: '共有しても、また叩かれるだけだ。黙っていよう。', en: '' }, trigger: { at: point } }
+  - { id: v15-ok, media: chat, misleading: false, text: { ja: '更科「同じ道具を使う会社は、この記録を待っています」。', en: '' }, trigger: { at: point } }
+  - { id: v15-after, media: news, misleading: false, text: { ja: 'また自慢か。被害者のことはどうなった。', en: '' }, trigger: { at: after, choice: a15-share } }
+  - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'いつまで「確認中」なんだ。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-3, media: sns, misleading: false, text: { ja: '責任を取りたくないだけだ。事なかれ主義の会社。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-4, media: news, misleading: false, text: { ja: '臆病な判断が、顧客を離れさせた。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-news, media: news, misleading: false, text: { ja: '業界紙「中堅ソフト会社が、顧客の設計情報を外部AIに」', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-caller, media: attacker, misleading: true, type: attacker-shake, text: { ja: '「御社の情報を持っている。連絡がなければ公開する」。', en: '' }, trigger: { at: manual } }
