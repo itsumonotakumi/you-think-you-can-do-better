@@ -243,3 +243,19 @@
   summary: { ja: "個人データを生成AIに入力するときは、利用目的、事業者の取扱い、本人への説明を確認する", en: "Before entering personal data, check purposes, provider handling, and explanation to data subjects" }
   checkedAt: 2026-11-08
   legalPack: jp
+- id: no14-credential-stuffing
+  title: { ja: "パスワードリスト攻撃への対策", en: "Countermeasures against password list attacks" }
+  issuer: { ja: "IPA（情報処理推進機構）", en: "IPA" }
+  version: "2026-11"
+  section: { ja: "不正ログインの検知、試行回数の制限、多要素認証による防御", en: "Detecting unauthorized logins, rate limiting, and multi-factor authentication" }
+  summary: { ja: "他社から流出した ID とパスワードの使い回しを狙う攻撃では、自社からの漏えいがなくても被害が出る。ログイン試行の監視と多要素認証が有効", en: "Credential stuffing uses leaked credentials from other services; monitor login attempts and require multi-factor authentication" }
+  checkedAt: 2026-11-08
+  legalPack: jp
+- id: no14-mfa-guideline
+  title: { ja: "多要素認証の導入と運用", en: "Deploying and operating multi-factor authentication" }
+  issuer: { ja: "総務省・IPA", en: "MIC and IPA" }
+  version: "2026-11"
+  section: { ja: "パスワード単独に頼らない認証、段階的な導入、利用者への案内", en: "Authentication beyond passwords, phased rollout, user guidance" }
+  summary: { ja: "パスワードのみの認証は使い回しに弱い。多要素認証を段階的に導入し、設定できない利用者への代替手段も用意する", en: "Password-only authentication is weak against reuse; roll out MFA in stages with alternatives for those who cannot use it" }
+  checkedAt: 2026-11-08
+  legalPack: jp
