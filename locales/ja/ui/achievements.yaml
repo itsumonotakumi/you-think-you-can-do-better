@@ -1,0 +1,13 @@
+# S13 称号一覧と、S08 の「新しく獲得した称号」（#9）。キーは ach. で始まる。
+ach.open: 称号一覧
+ach.eyebrow: 称号と実績
+ach.title: 称号一覧
+ach.count: "{got} / {total} 獲得"
+ach.scope.play: 1回のプレイ
+ach.scope.total: 通算
+ach.locked: 未獲得
+ach.earnedAt: "{date} に獲得"
+ach.back: タイトルへ戻る
+ach.hintNote: 未獲得の称号は、条件をぼかしたヒントだけを表示します。
+ach.newHeading: 新しく獲得した称号
+ach.newNote: 称号はこの端末に保存されます。タイトル画面の「称号一覧」で見られます。

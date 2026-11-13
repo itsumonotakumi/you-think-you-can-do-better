@@ -29,7 +29,8 @@
   import { computeResult } from '../../engine';
   import { audio } from '../../audio';
   import { loc, notice, t } from '../../i18n';
-  import { recordResult, saveProgress } from '../../storage';
+  import { loadPlays, recordResult, saveProgress } from '../../storage';
+  import { loadIndex } from '../../data/loader';
   import { play, scenario, screen, settings } from '../store';
   import { isRankingEnabled, RANKING_KEYS } from '../ranking';
   import { runFx } from '../effects';
@@ -40,6 +41,10 @@
 
   let recorded = false;
   const rankingEnabled = isRankingEnabled();
+  import { grantAchievements } from '../achievements';
+  import type { Achievement } from '../../engine/types';
+  /** このプレイで新しく獲得した称号（#9） */
+  let newAchievements = $state<Achievement[]>([]);
 
   const result = $derived($play && $scenario ? computeResult($play, $scenario) : null);
   const ending = $derived(result && $scenario ? $scenario.endings[result.rank] : null);
@@ -71,6 +76,22 @@
       at: new Date().toISOString(),
     });
     saveProgress(null);
+
+    // 称号（#9）: 1回のプレイで決まるものと、積み重ねで決まるものをまとめて判定する
+    const at = new Date().toISOString();
+    const grant = (scenarioIds?: string[]): Achievement[] => grantAchievements({
+      state, scenario: current, result: value, plays: loadPlays(), scenarioIds, at,
+    });
+    newAchievements = grant();
+    // 全シナリオ制覇は公開中のシナリオ一覧が要る。読み込めたときだけ追加で判定する
+    void loadIndex()
+      .then((list) => {
+        const more = grant(list.map((item) => item.id));
+        if (more.length > 0) newAchievements = [...newAchievements, ...more];
+      })
+      .catch(() => {
+        // 一覧が読めなくても、その他の称号は判定済み
+      });
 
     audio.playBgm(current.endings[value.rank].bgm);
     audio.playSe('stamp');
@@ -135,6 +156,21 @@
       </dl>
       <p class="hint">{t('sc.ending.salesNote')}</p>
     </section>
+
+    {#if newAchievements.length > 0}
+      <section class="panel achievements" aria-labelledby="ending-achievements-heading">
+        <h2 id="ending-achievements-heading">{t('ach.newHeading')}</h2>
+        <ul>
+          {#each newAchievements as item (item.id)}
+            <li>
+              <strong>{loc(item.title)}</strong>
+              <span>{loc(item.description)}</span>
+            </li>
+          {/each}
+        </ul>
+        <p class="hint">{t('ach.newNote')}</p>
+      </section>
+    {/if}
 
     <section class="panel" aria-labelledby="ending-prologue-heading">
       <h2 id="ending-prologue-heading">{t('sc.ending.prologueHeading')}</h2>
@@ -321,6 +357,28 @@
     background: var(--bg-soft);
     color: var(--text-soft);
     line-height: 1.8;
+  }
+  .achievements ul {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .achievements li {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg-soft);
+  }
+  .achievements strong {
+    color: var(--accent);
+  }
+  .achievements span {
+    color: var(--text-soft);
+    font-size: 0.9em;
   }
   .actions {
     display: flex;

@@ -31,12 +31,15 @@
   import { loadProgress, saveProgress, saveSettings } from '../../storage';
   import { backTo, errorMessage, play, scenario, screen, selectedScenarioId, settings } from '../store';
   import { isRankingEnabled, RANKING_KEYS } from '../ranking';
+  import { ACHIEVEMENTS_LABEL_KEY } from '../achievements';
+  import S13Achievements from './S13Achievements.svelte';
   import type { Lang, PlayState } from '../../engine/types';
   import '../styles/base.css';
 
   let progress = $state<PlayState | null>(loadProgress());
   let resuming = $state(false);
   const rankingEnabled = isRankingEnabled();
+  let showingAchievements = $state(false);
 
   const ui = $derived.by(() => {
     setLang($settings.lang);
@@ -52,6 +55,7 @@
       langEn: t('sa.title.langEn'),
       settings: t('sa.common.settings'),
       credits: t('sa.common.credits'),
+      achievements: t(ACHIEVEMENTS_LABEL_KEY),
       language: t('sa.common.language'),
       credit: t('sa.title.credit'),
       ranking: t(RANKING_KEYS.introLink),
@@ -169,6 +173,7 @@
     <div class="row row--center">
       <button class="btn btn--ghost" onclick={() => open('S10')}>{ui.settings}</button>
       <button class="btn btn--ghost" onclick={() => open('S11')}>{ui.credits}</button>
+      <button class="btn btn--ghost" onclick={() => (showingAchievements = true)}>{ui.achievements}</button>
     </div>
   </div>
 
@@ -184,4 +189,8 @@
   </div>
 
   <p class="footer-note">{ui.credit}</p>
+
+  {#if showingAchievements}
+    <S13Achievements onBack={() => (showingAchievements = false)} />
+  {/if}
 </section>
