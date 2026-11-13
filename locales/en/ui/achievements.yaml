@@ -1,0 +1,13 @@
+# S13 achievements list and S08 "newly earned titles" (#9). Keys start with "ach.".
+ach.open: Achievements
+ach.eyebrow: Titles and achievements
+ach.title: Achievements
+ach.count: "{got} / {total} earned"
+ach.scope.play: Single play
+ach.scope.total: All time
+ach.locked: Locked
+ach.earnedAt: "Earned {date}"
+ach.back: Back to title
+ach.hintNote: Locked achievements show only a vague hint.
+ach.newHeading: Newly earned titles
+ach.newNote: Titles are saved on this device. Open Achievements from the title screen to see them.
