@@ -1,0 +1,844 @@
+# No.13 ツムギ・アナリティクス / 経営者ロール（代表取締役社長）
+# 判断ポイント16、細目は choices[].items と drafts の合計で80以上。
+estimateMinutes: 30
+intro: { ja: 'あなたはツムギ・アナリティクスの社長。取引先の会員データを預かって分析する会社で、朝から基盤の警告が鳴っている。預かったデータは、自社のものではない。その重さを、今日ほど意識した日はない。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-coward-2
+  '3': v-coward-3
+  '4': v-coward-4
+deadlines:
+  - id: dl-prelim
+    ref: ppc-report-prelim
+    label: { ja: '個人情報保護委員会への速報', en: '' }
+    points: -150
+    doneFlag: ppcPrelimFiled
+  - id: dl-final
+    ref: ppc-report-final-malicious
+    label: { ja: '個人情報保護委員会への確報（不正の目的のおそれ）', en: '' }
+    points: -80
+    doneFlag: ppcFinalFiled
+events:
+  - id: ev-attacker
+    at: { day: 0, minutes: 870 }
+    voices: [v-ev-attacker]
+    gauges: { flame: 5 }
+    sound: { se: [mail_arrive] }
+    caption: { ja: '差出人不明のメール。本文には、持ち出したデータの一部と支払いの期限が書かれていた。', en: '' }
+  - id: ev-news
+    at: { day: 1, minutes: 1320 }
+    voices: [v-ev-news]
+    gauges: { flame: 10 }
+  - id: ev-client
+    at: { day: 2, minutes: 480 }
+    voices: [v-ev-client]
+    caption: { ja: '最大の委託元から、役員が午後に訪ねると連絡が入った。', en: '' }
+points:
+  - id: p01-alert
+    at: { day: 0, minutes: 570 }
+    phase: detect
+    sound: { se: [mail_arrive] }
+    text: { ja: '午前9時30分。預かりデータの分析基盤に、海外から大量ダウンロードの警告が出た。技術部門は原因をまだ掴んでいない。', en: '' }
+    voices: [v01-a, v01-b, v01-ok]
+    notable:
+      - { id: note-mfa, text: { ja: '基盤の多要素認証は全社で未設定だった。', en: '' } }
+    choices:
+      - id: e01-c-stop
+        text: { ja: '全セッションを止め、調査と取引先への連絡を同時に始める', en: '' }
+        explain: { ja: '被害を止める操作と、預かり主への連絡を同時に始めている。原因が確定する前でも、止める判断はできる。', en: '' }
+        minutes: 90
+        category: increase
+        points: 300
+        refs: [nist-sp800-61r3, meti-csm-guideline]
+        gauges: { damage: -15, trust: 10, stamina: -15 }
+        setFlags: { contained: true, earlyNotice: true }
+        items:
+          - { id: e01-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: e01-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+      - id: e01-b-wait
+        text: { ja: '調査結果が出るまで、技術部門に任せて待機する', en: '' }
+        explain: { ja: '技術の判断を任せること自体は悪くない。ただ、預かり主への連絡を待たせると、報告の時計も遅れる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { stamina: -5 }
+        items:
+          - { id: e01-b-content, points: 5, axis: content, refs: [jpcert-handling] }
+          - { id: e01-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: e01-a-hide
+        text: { ja: '原因が分かるまで、社外には一切知らせないでおく', en: '' }
+        explain: { ja: '漏えいの事実は、分かってからでは遅い。沈黙の間に攻撃者はデータを広げ、委託元の報告も遅れる。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -120
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -10 }
+        coward: true
+        setFlags: { hidAttack: true }
+        items:
+          - { id: e01-a-content, points: -10, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: e01-a-time, points: -10, axis: time, refs: [ppc-report-prelim] }
+    lesson: { ja: '預かったデータの異常は、原因が確定する前に止める。全セッションの失効と、預かり主への第一報を同時に始める。隠している間にも攻撃は進み、報告の期限だけが過ぎていく。', en: '' }
+
+  - id: p02-mfa
+    at: { day: 0, minutes: 660 }
+    phase: contain
+    text: { ja: '午前11時。基盤の多要素認証は未設定だった。技術部門は全社導入に三か月はかかると言う。', en: '' }
+    voices: [v02-a, v02-b, v02-ok]
+    notable:
+      - { id: note-mfa, text: { ja: '多要素認証の未設定が、今回の侵入を許した。', en: '' } }
+    choices:
+      - id: e02-a-later
+        text: { ja: '現場の負担を考え、来期の計画に載せるだけにする', en: '' }
+        explain: { ja: '負担への配慮は分かるが、同じ手口は明日も来る。期限を切らない計画は、実行されないまま終わりやすい。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -110
+        refs: [nist-sp800-61r3]
+        gauges: { trust: -10, flame: 5 }
+        coward: true
+        items:
+          - { id: e02-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: e02-a-time, points: -8, axis: time, refs: [nist-sp800-61r3] }
+      - id: e02-c-all
+        text: { ja: '全社と全基盤に即時導入し、例外は期限付きで認める', en: '' }
+        explain: { ja: '対象を絞らず、例外にも期限と承認を付けている。漏れを作らずに進める形で、再発防止の実効性が高い。', en: '' }
+        minutes: 150
+        category: increase
+        points: 250
+        refs: [nist-sp800-61r3, ipa-sme-guideline]
+        gauges: { damage: -10, trust: 15, stamina: -15 }
+        setFlags: { mfaRollout: true }
+        items:
+          - { id: e02-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: e02-c-record, points: 8, axis: record, refs: [ipa-sme-guideline] }
+      - id: e02-b-key
+        text: { ja: '重要な基盤だけを対象に、今週中に必須化する', en: '' }
+        explain: { ja: '重要度で優先する判断は筋が通る。ただし境界が曖昧なままだと、後から足りない基盤が出てくる。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [nist-sp800-61r3]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: e02-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: e02-b-order, points: 5, axis: order, refs: [ipa-sme-guideline] }
+    lesson: { ja: '認証の穴は、負担を理由に先送りすると必ず残る。全社と全基盤を対象にし、例外には期限と承認を付ける。優先順位で絞るなら、対象外にした理由を記録して後で確認し、見直しは続ける。', en: '' }
+
+  - id: p03-ransom
+    at: { day: 0, minutes: 900 }
+    phase: contain
+    sound: { se: [mail_arrive] }
+    text: { ja: '午後3時。攻撃者から、72時間以内に支払わなければ取引先のデータを公開するとのメールが届いた。', en: '' }
+    voices: [v03-a, v03-b, v03-ok]
+    notable:
+      - { id: note-scope, text: { ja: '攻撃者は取引先のデータの一部を、メールに添付して見せてきた。', en: '' } }
+    choices:
+      - id: e03-a-pay
+        text: { ja: '支払って削除の証明を受け取り、公表は避ける', en: '' }
+        explain: { ja: '支払っても削除は保証されず、犯罪組織の資金になる。公表を避けても、データは戻らない前提で動くべきだ。', en: '' }
+        minutes: 120
+        category: fatal
+        points: -260
+        refs: [npa-consult]
+        gauges: { flame: 20, trust: -20, damage: 15 }
+        setFlags: { paidRansom: true, hidAttack: true }
+        items:
+          - { id: e03-a-content, points: -10, axis: content, refs: [npa-consult] }
+          - { id: e03-a-record, points: -10, axis: record, refs: [npa-consult] }
+      - id: e03-b-hold
+        text: { ja: '支払いは保留し、警察への相談だけを進める', en: '' }
+        explain: { ja: '支払わない方向は正しい。ただ、保留のまま社内に置くと、現場が独自に交渉を始める余地が残る。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [npa-consult]
+        gauges: { damage: -5 }
+        items:
+          - { id: e03-b-content, points: 5, axis: content, refs: [npa-consult] }
+          - { id: e03-b-order, points: 5, axis: order, refs: [npa-consult] }
+      - id: e03-c-refuse
+        text: { ja: '支払わない方針を即断し、警察と委託元に相談する', en: '' }
+        explain: { ja: '方針を先に決め、相談先も同時に押さえている。現場が独自に交渉する余地をなくし、委託元にも判断を共有できる。', en: '' }
+        minutes: 120
+        category: recover
+        points: 130
+        refs: [npa-consult, meti-disclosure-guidance]
+        gauges: { flame: -10, trust: 10, stamina: -15 }
+        setFlags: { noRansom: true }
+        items:
+          - { id: e03-c-content, points: 8, axis: content, refs: [npa-consult] }
+          - { id: e03-c-wording, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '脅迫への対応は、支払わない方針を先に決めて共有する。削除も非公開も保証されない以上、支払いは資金を渡すだけになる。警察と委託元に相談し、現場が独自に交渉しない形を作る。', en: '' }
+
+  - id: p04-statement
+    at: { day: 0, minutes: 960 }
+    phase: organize
+    text: { ja: '午後4時。持ち出された範囲はまだ確定しない。広報は、今夜に第一報を出すかどうかを聞いてきた。', en: '' }
+    voices: [v04-a, v04-b, v04-ok]
+    choices:
+      - id: e04-c-first
+        text: { ja: '分かっている範囲で今夜第一報を出し、更新の予定を添える', en: '' }
+        explain: { ja: '確定を待たずに事実を出し、次の接点を示している。憶測が広がる前に、会社の説明の軸を作れる。', en: '' }
+        minutes: 120
+        category: recover
+        points: 120
+        refs: [meti-disclosure-guidance, jpcert-handling]
+        gauges: { flame: -10, trust: 10, stamina: -15 }
+        setFlags: { firstStatement: true }
+        items:
+          - { id: e04-c-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: e04-c-time, points: 8, axis: time, refs: [jpcert-handling] }
+      - id: e04-a-later
+        text: { ja: '確定するまで公表せず、社内の整理を優先する', en: '' }
+        explain: { ja: '確定を待つ間に、委託元の会員は自分で情報を探し始める。沈黙は隠蔽と受け取られ、説明の前提を失う。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -130
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -15 }
+        coward: true
+        setFlags: { hidAttack: true }
+        items:
+          - { id: e04-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: e04-a-time, points: -10, axis: time, refs: [meti-disclosure-guidance] }
+      - id: e04-b-client
+        text: { ja: '取引先と相談して、公表の時期と内容を決める', en: '' }
+        explain: { ja: '預かり主との調整は欠かせない。ただし調整に時間を取られると、一次情報のない時間が長く続く。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [meti-disclosure-guidance]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: e04-b-order, points: 5, axis: order, refs: [meti-disclosure-guidance] }
+          - { id: e04-b-content, points: 5, axis: content, refs: [jpcert-handling] }
+    lesson: { ja: '第一報は、確定を待たずに分かった範囲で出す。不明点は調査中と書き、次の公表の予定を添える。委託元との調整は必要だが、調整の間の沈黙が憶測を育てる。次の予定が、沈黙を埋める。', en: '' }
+
+  - id: p05-clients
+    at: { day: 0, minutes: 1110 }
+    phase: organize
+    sound: { se: [phone_ring] }
+    text: { ja: '午後6時30分。取引先は12社。影響の大きさも、契約の重さも違う。どこから連絡するかを決めなければならない。', en: '' }
+    voices: [v05-a, v05-b, v05-ok]
+    notable:
+      - { id: note-client-order, text: { ja: '影響の大きい委託元から順に、役員が直接電話し、同日中に全社へ文書を出した。', en: '' } }
+    choices:
+      - id: e05-a-big
+        text: { ja: '売上の大きい取引先二社にだけ、先に伝えておく', en: '' }
+        explain: { ja: '大きい取引先を優先する気持ちは分かる。だが小さい委託元ほど、後から知ったときの不信は大きい。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [meti-csm-guideline]
+        gauges: { flame: 10, trust: -10 }
+        setFlags: { delayClient: true }
+        items:
+          - { id: e05-a-order, points: -10, axis: order, refs: [meti-csm-guideline] }
+          - { id: e05-a-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: e05-c-direct
+        text: { ja: '影響の大きい順に役員が電話し、同日中に全社へ文書を出す', en: '' }
+        explain: { ja: '順番の理由が明確で、全社に同じ日に届く。直接の電話は、委託元が報告を判断する材料にもなる。', en: '' }
+        minutes: 210
+        category: increase
+        points: 300
+        refs: [meti-csm-guideline, ppc-report-scope]
+        gauges: { trust: 15, stamina: -20, flame: -5 }
+        setFlags: { clientNotified: true }
+        items:
+          - { id: e05-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: e05-c-care, points: 8, axis: care, refs: [ppc-report-scope] }
+      - id: e05-b-mail
+        text: { ja: '全社に同じ文書を一斉に送るだけで済ませておく', en: '' }
+        explain: { ja: '全社に同じ日に届く点は良い。ただ、影響の大きい委託元ほど、電話での説明を期待している。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [meti-csm-guideline]
+        gauges: { trust: 5 }
+        items:
+          - { id: e05-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: e05-b-content, points: 5, axis: content, refs: [jpcert-handling] }
+    lesson: { ja: '取引先への連絡は、影響の大きい順に直接伝え、同じ日のうちに全社へ文書を出す。順番の理由を説明できる形にし、小さい委託元を後回しにしない。連絡の遅れは、隠蔽と受け取られる。', en: '' }
+
+  - id: p06-ppc
+    at: { day: 1, minutes: 540 }
+    phase: notify
+    text: { ja: '2日目午前9時。委託元の法務から「報告はどちらがするのか」と聞かれた。当社の従業員の情報も漏れている。', en: '' }
+    voices: [v06-a, v06-b, v06-ok]
+    choices:
+      - id: e06-a-wait
+        text: { ja: '委託元の報告を待ち、当社からの報告は不要と判断する', en: '' }
+        explain: { ja: '委託元の報告義務を理解していても、自社の従業員情報は別だ。自社分を置き去りにすると、報告漏れになる。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -140
+        refs: [no02-ppc-report-entrusted, ppc-report-scope]
+        gauges: { trust: -10, flame: 5 }
+        setFlags: { hidAttack: true }
+        items:
+          - { id: e06-a-content, points: -10, axis: content, refs: [ppc-report-scope] }
+          - { id: e06-a-time, points: -10, axis: time, refs: [ppc-report-prelim] }
+      - id: e06-b-client
+        text: { ja: '委託元に任せたうえで、求められた資料を出す', en: '' }
+        explain: { ja: '委託元が主体という理解は正しい。ただ、求められる前に出す姿勢が、報告の期限を守る鍵になる。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [no02-ppc-report-entrusted]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: e06-b-content, points: 5, axis: content, refs: [no02-ppc-report-entrusted] }
+          - { id: e06-b-order, points: 5, axis: order, refs: [jpcert-handling] }
+      - id: e06-c-both
+        text: { ja: '委託元の速報を支え、自社の従業員分は自社で出す', en: '' }
+        explain: { ja: '委託元と自社の義務を分けて、両方を同じ日に進めている。報告主体の違いを理解した、実務に沿う判断だ。', en: '' }
+        minutes: 180
+        category: increase
+        points: 350
+        refs: [no02-ppc-report-entrusted, ppc-report-prelim]
+        gauges: { trust: 15, stamina: -20 }
+        setFlags: { ppcPrelimFiled: true, reportShared: true }
+        items:
+          - { id: e06-c-content, points: 8, axis: content, refs: [no02-ppc-report-entrusted] }
+          - { id: e06-c-record, points: 8, axis: record, refs: [ppc-report-prelim] }
+    lesson: { ja: '委託元から預かったデータは、委託元が報告主体になる。委託先は事実と時刻を渡し、報告を支える。自社の従業員情報は自社の義務として、同じ日に速報を出す。二つを混ぜない。', en: '' }
+
+  - id: p07-employee
+    at: { day: 1, minutes: 660 }
+    phase: notify
+    text: { ja: '午前11時。社員のアカウント情報も持ち出されていた。総務は「社内の説明だけで足りる」と言う。', en: '' }
+    voices: [v07-a, v07-b, v07-ok]
+    choices:
+      - id: e07-c-people
+        text: { ja: '社員にも本人通知と説明会を行い、変更と監視を案内する', en: '' }
+        explain: { ja: '従業員も被害者として扱い、具体的な行動まで示している。現場の不安を下げ、内部からの漏えいも防げる。', en: '' }
+        minutes: 150
+        category: recover
+        points: 120
+        refs: [ppc-notify-person, ipa-sme-guideline]
+        gauges: { trust: 10, stamina: -15 }
+        setFlags: { employeeNotified: true }
+        items:
+          - { id: e07-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: e07-c-content, points: 8, axis: content, refs: [ipa-sme-guideline] }
+      - id: e07-a-secret
+        text: { ja: '動揺を避けるため、社員には詳しく伝えないでおく', en: '' }
+        explain: { ja: '隠されたと知ったときの反発は大きい。自分の情報が漏れた事実を知らせないのは、通知の放棄でもある。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -100
+        refs: [ppc-notify-person]
+        gauges: { trust: -10, flame: 5 }
+        coward: true
+        items:
+          - { id: e07-a-care, points: -10, axis: care, refs: [ppc-notify-person] }
+          - { id: e07-a-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: e07-b-mail
+        text: { ja: '社内のアナウンスと注意だけで済ませておく', en: '' }
+        explain: { ja: '周知は最低限できる。ただ、何をすればよいかの案内がなく、パスワードの使い回しが残る。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { stamina: -5 }
+        items:
+          - { id: e07-b-care, points: 5, axis: care, refs: [ipa-sme-guideline] }
+          - { id: e07-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+    lesson: { ja: '従業員も被害者として扱う。本人通知と説明会を行い、パスワードの変更、多要素認証、不審な連絡への注意を具体的に案内する。社内アナウンスだけでは、行動は変わらない。', en: '' }
+
+  - id: p08-meeting
+    at: { day: 1, minutes: 900 }
+    phase: notify
+    sound: { se: [phone_ring] }
+    text: { ja: '午後3時。最大の委託元の役員が訪ねてきた。会議室には、向こうの法務と情報システムの責任者も同席している。', en: '' }
+    voices: [v08-a, v08-b, v08-ok]
+    choices:
+      - id: e08-a-saas
+        text: { ja: 'SaaS事業者の設定不備が原因だと説明する', en: '' }
+        explain: { ja: '他社の責任に寄せると、自社の認証管理の話が抜ける。委託元は、自分たちが何をすべきかを知りたい。', en: '' }
+        minutes: 90
+        category: hurt
+        points: -120
+        refs: [meti-csm-guideline]
+        gauges: { flame: 10, trust: -15 }
+        items:
+          - { id: e08-a-content, points: -10, axis: content, refs: [meti-csm-guideline] }
+          - { id: e08-a-wording, points: -8, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: e08-c-deadline
+        text: { ja: '調査結果と再発防止の期限を示し、監査を受け入れる', en: '' }
+        explain: { ja: '原因と対策を期限付きで示し、検証も受け入れる。委託元が契約を続けるかどうかを判断する材料になる。', en: '' }
+        minutes: 210
+        category: increase
+        points: 300
+        refs: [meti-csm-guideline, nist-sp800-61r3]
+        gauges: { trust: 20, stamina: -20, flame: -10 }
+        setFlags: { auditAccepted: true }
+        items:
+          - { id: e08-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: e08-c-record, points: 8, axis: record, refs: [meti-csm-guideline] }
+      - id: e08-b-later
+        text: { ja: '調査が進んだら、改めて説明すると伝える', en: '' }
+        explain: { ja: '誠実な態度ではある。だが今日知りたいのは、明日から預けても大丈夫かという点だ。その間にも、委託元の不安は募る。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 20
+        refs: [meti-csm-guideline]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: e08-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: e08-b-wording, points: 5, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '委託元との面談では、原因の押し付け合いより、これからの手順を示す。調査の結果、再発防止の期限、監査の受け入れをセットで伝える。相手は契約を続けるかを、その場で判断している。', en: '' }
+
+  - id: p09-police
+    at: { day: 1, minutes: 1200 }
+    phase: investigate
+    text: { ja: '午後8時。警察への相談を進めるかどうか。捜索が入れば、明日の業務は止まる。', en: '' }
+    voices: [v09-a, v09-b, v09-ok]
+    choices:
+      - id: e09-a-no
+        text: { ja: '捜索で業務が止まるので、警察には伝えないでおく', en: '' }
+        explain: { ja: '業務継続は大事だが、脅迫とデータの公開は犯罪だ。届け出ないことで、攻撃者の圧力が強まる。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -90
+        refs: [npa-consult]
+        gauges: { trust: -10, flame: 5 }
+        coward: true
+        setFlags: { noPolice: true }
+        items:
+          - { id: e09-a-content, points: -10, axis: content, refs: [npa-consult] }
+          - { id: e09-a-record, points: -8, axis: record, refs: [jpcert-handling] }
+      - id: e09-c-report
+        text: { ja: '被害届と相談を進め、業務に影響しない形で証拠を残す', en: '' }
+        explain: { ja: '犯罪として扱う道筋を作りながら、証拠の保全と業務の両立を考えている。攻撃者への圧力にもなる。', en: '' }
+        minutes: 150
+        category: recover
+        points: 100
+        refs: [npa-consult, jpcert-handling]
+        gauges: { trust: 10, stamina: -15 }
+        setFlags: { policeNotified: true }
+        items:
+          - { id: e09-c-content, points: 8, axis: content, refs: [npa-consult] }
+          - { id: e09-c-record, points: 8, axis: record, refs: [jpcert-handling] }
+      - id: e09-b-consult
+        text: { ja: '警察には相談だけして、届け出は様子を見る', en: '' }
+        explain: { ja: '相談は前進だが、届け出を見送る理由が「様子見」では弱い。公開が始まってからでは遅い。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [npa-consult]
+        gauges: { trust: 5 }
+        items:
+          - { id: e09-b-content, points: 5, axis: content, refs: [npa-consult] }
+          - { id: e09-b-order, points: 5, axis: order, refs: [npa-consult] }
+    lesson: { ja: '脅迫や不正アクセスは犯罪として扱う。警察に相談し、証拠を保全したうえで届け出る。捜索や事情聴取は業務に影響するが、届け出ないことで守れるものは少ない。記録と時刻は残す。', en: '' }
+
+  - id: p10-vendor
+    at: { day: 2, minutes: 600 }
+    phase: recover
+    text: { ja: '3日目午前10時。SaaS事業者は「当社の認証は正常に動いていた」と主張している。契約書には責任分界の条項が薄い。', en: '' }
+    voices: [v10-a, v10-b, v10-ok]
+    choices:
+      - id: e10-c-joint
+        text: { ja: 'ログ提供と共同調査を文書で求め、責任分界は後で整理する', en: '' }
+        explain: { ja: '原因の断定を避け、事実の提供を先に求めている。契約が薄くても、調査への協力は別に取り付けられる。', en: '' }
+        minutes: 150
+        category: recover
+        points: 130
+        refs: [meti-csm-guideline, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -15 }
+        setFlags: { jointReview: true }
+        items:
+          - { id: e10-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: e10-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+      - id: e10-a-blame
+        text: { ja: 'SaaS事業者の責任だと公表して終わらせる', en: '' }
+        explain: { ja: '責任を先に決めると、調査が相手の反論を潰す作業になる。自社の設定不備も見えなくなる。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -120
+        refs: [meti-csm-guideline]
+        gauges: { flame: 15, trust: -10 }
+        items:
+          - { id: e10-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: e10-a-content, points: -8, axis: content, refs: [meti-csm-guideline] }
+      - id: e10-b-log
+        text: { ja: 'SaaS事業者にログの提供だけを求めて終える', en: '' }
+        explain: { ja: '必要な資料は押さえている。ただ、調査の分担と費用の話をしないと、後に揉める。分担を決めないまま調査を終えると、費用の負担で争いになる。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 25
+        refs: [nist-sp800-61r3]
+        gauges: { stamina: -5 }
+        items:
+          - { id: e10-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+          - { id: e10-b-order, points: 5, axis: order, refs: [jpcert-handling] }
+    lesson: { ja: 'SaaS事業者との責任分界は、調査の前に決め切らない。まずログの提供と共同調査を文書で求め、事実を揃える。そのうえで、契約の薄さを補う条項を次の更新で入れる。契約は次の更新で直す。', en: '' }
+
+  - id: p11-compensation
+    at: { day: 3, minutes: 600 }
+    phase: recover
+    text: { ja: '4日目午前10時。二社が契約の解除を検討している。補償の枠を示さなければ、話が先に進まない。', en: '' }
+    voices: [v11-a, v11-b, v11-ok]
+    choices:
+      - id: e11-a-contract
+        text: { ja: '契約に補償条項がないとして、応じない方針にする', en: '' }
+        explain: { ja: '契約の範囲を守る姿勢は理解できる。ただ、信頼を失えば、補償を免れても売上が消える。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -130
+        refs: [meti-csm-guideline]
+        gauges: { flame: 10, trust: -15 }
+        items:
+          - { id: e11-a-wording, points: -10, axis: wording, refs: [meti-csm-guideline] }
+          - { id: e11-a-care, points: -8, axis: care, refs: [ppc-notify-person] }
+      - id: e11-b-negotiate
+        text: { ja: '契約に書かれた範囲だけで、補償を協議する', en: '' }
+        explain: { ja: '誠実に協議する姿勢はある。ただ、範囲を限定すると、実費すら出ない場合に不信が残る。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 20
+        refs: [meti-csm-guideline]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: e11-b-care, points: 5, axis: care, refs: [ppc-notify-person] }
+          - { id: e11-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: e11-c-support
+        text: { ja: '補償の枠を決め、解約する委託元には移行まで支援する', en: '' }
+        explain: { ja: '残る相手にも去る相手にも誠実な姿勢で、長い目で見れば評判を守る。現場の負担は大きいが筋が通る。', en: '' }
+        minutes: 240
+        category: increase
+        points: 200
+        refs: [meti-csm-guideline, ppc-notify-person]
+        gauges: { trust: 20, stamina: -20, flame: -10 }
+        setFlags: { compensation: true }
+        items:
+          - { id: e11-c-care, points: 8, axis: care, refs: [ppc-notify-person] }
+          - { id: e11-c-wording, points: 8, axis: wording, refs: [meti-csm-guideline] }
+    lesson: { ja: '補償は、契約の有無だけで決めない。実費と再発防止の分担を示し、解約する委託元にもデータの移行と削除の証明を申し出る。去る相手への対応が、残る相手の判断に影響する。', en: '' }
+
+  - id: p12-press-prep
+    at: { day: 4, minutes: 540 }
+    phase: notify
+    sound: { se: [shutter] }
+    text: { ja: '5日目午前9時。記者会見の日取りが決まった。広報は「質問は四つ、十五分で終わらせたい」と言う。', en: '' }
+    voices: [v12-a, v12-b, v12-ok]
+    choices:
+      - id: e12-a-short
+        text: { ja: '質問の範囲を絞ったうえで、十五分で打ち切る', en: '' }
+        explain: { ja: '短くまとめても、聞かれたくない質問を避けたと映る。会員と委託元への説明の機会も失う。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -110
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -10 }
+        coward: true
+        items:
+          - { id: e12-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: e12-a-care, points: -8, axis: care, refs: [meti-csm-guideline] }
+      - id: e12-b-facts
+        text: { ja: '事実だけを答え、不明点は確認してから答える', en: '' }
+        explain: { ja: '事実と不明点を分ける姿勢は良い。ただ、最初に誰へ謝るかが決まっておらず、焦点がぼやける。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 25
+        refs: [jpcert-handling]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: e12-b-wording, points: 5, axis: wording, refs: [jpcert-handling] }
+          - { id: e12-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: e12-c-ready
+        text: { ja: '事実と不明点を分け、取引先と会員への対応を最初に述べる', en: '' }
+        explain: { ja: '答える内容と順番を揃え、最初に被害者のことを置いている。会見の焦点が、説明責任に定まる。', en: '' }
+        minutes: 150
+        category: increase
+        points: 250
+        refs: [meti-csm-guideline, meti-disclosure-guidance]
+        gauges: { flame: -10, trust: 15, stamina: -15 }
+        setFlags: { pressReady: true }
+        items:
+          - { id: e12-c-order, points: 8, axis: order, refs: [meti-csm-guideline] }
+          - { id: e12-c-care, points: 8, axis: care, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '会見では、取引先と会員への対応を最初に述べ、事実と不明点を分けて答える。質問を制限すると隠していると映る。想定問答を役員で揃え、分からないことは回答の期限を伝える。', en: '' }
+
+  - id: p13-budget
+    at: { day: 5, minutes: 600 }
+    phase: recover
+    text: { ja: '6日目午前10時。調査費用と再発防止の投資を、どこまで出すか。今期の利益は、ほぼ消える見込みだ。', en: '' }
+    voices: [v13-a, v13-b, v13-ok]
+    choices:
+      - id: e13-c-invest
+        text: { ja: '保険と弁護士を交えて費用の枠を確保し、再発防止を急ぐ', en: '' }
+        explain: { ja: '費用の出どころを確保したうえで、再発防止を優先している。調査を途中で止めない前提を作った点が良い。', en: '' }
+        minutes: 180
+        category: recover
+        points: 110
+        refs: [meti-csm-guideline, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -15, damage: -10 }
+        setFlags: { budgetSecured: true }
+        items:
+          - { id: e13-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: e13-c-record, points: 8, axis: record, refs: [meti-csm-guideline] }
+      - id: e13-a-cut
+        text: { ja: '費用を抑えるために、調査をここで打ち切る', en: '' }
+        explain: { ja: '費用の圧力は現実だ。だが範囲が確定しないまま終わると、再発防止の設計もできない。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -120
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 15, trust: -10 }
+        items:
+          - { id: e13-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: e13-a-record, points: -10, axis: record, refs: [jpcert-handling] }
+      - id: e13-b-insurance
+        text: { ja: '保険と補償の手続きだけを、先に進めておくことにする', en: '' }
+        explain: { ja: '資金の手当ては前進だ。ただ、保険金は対策の代わりにならず、調査の範囲も決まらない。', en: '' }
+        minutes: 90
+        category: maintain
+        points: 20
+        refs: [meti-csm-guideline]
+        gauges: { stamina: -10 }
+        items:
+          - { id: e13-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
+          - { id: e13-b-order, points: 5, axis: order, refs: [jpcert-handling] }
+    lesson: { ja: '調査と再発防止の費用は、保険と法務を交えて先に枠を決める。利益が消える局面でも、範囲の確定を止めない。調査を打ち切ると、同じ手口に対する備えが間に合わない。投資の根拠は記録する。', en: '' }
+
+  - id: p14-contract
+    at: { day: 14, minutes: 600 }
+    phase: recover
+    text: { ja: '15日目午前10時。委託契約の更新が迫っている。今の契約には、インシデント時の連絡も費用負担も書かれていない。', en: '' }
+    voices: [v14-a, v14-b, v14-ok]
+    choices:
+      - id: e14-a-nothing
+        text: { ja: '契約は変えないまま、現場の注意で対応する', en: '' }
+        explain: { ja: '現場の努力に頼る形は、人が変われば崩れる。連絡の順番も費用も、次の事件でまた揉める。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -80
+        refs: [meti-csm-guideline]
+        gauges: { trust: -5, damage: 5 }
+        items:
+          - { id: e14-a-content, points: -8, axis: content, refs: [meti-csm-guideline] }
+          - { id: e14-a-record, points: -8, axis: record, refs: [meti-csm-guideline] }
+      - id: e14-b-template
+        text: { ja: '契約の雛形だけを更新し、次回の更新で反映する', en: '' }
+        explain: { ja: '雛形を直すだけでは、今の契約は変わらない。事件の記憶が薄れる前に、全部を揃えたい。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 20
+        refs: [meti-csm-guideline]
+        gauges: { stamina: -10 }
+        items:
+          - { id: e14-b-content, points: 5, axis: content, refs: [meti-csm-guideline] }
+          - { id: e14-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+      - id: e14-c-all
+        text: { ja: '全契約で、責任分界と連絡・費用負担を明文化する', en: '' }
+        explain: { ja: '事件で露呈した空白を、契約の言葉で埋めている。委託元と委託先の役割が、次の事件で迷わない形になる。', en: '' }
+        minutes: 240
+        category: increase
+        points: 250
+        refs: [meti-csm-guideline, no02-ppc-report-entrusted]
+        gauges: { trust: 15, stamina: -20 }
+        setFlags: { contractFixed: true }
+        items:
+          - { id: e14-c-content, points: 8, axis: content, refs: [no02-ppc-report-entrusted] }
+          - { id: e14-c-record, points: 8, axis: record, refs: [meti-csm-guideline] }
+    lesson: { ja: '事件のあとに契約を見直す。インシデント時の連絡順、報告主体、費用負担、再発防止の分担を全契約に書き込む。現場の注意に頼る運用は、担当者が変わった時点で失われる。', en: '' }
+
+  - id: p15-final
+    at: { day: 30, minutes: 600 }
+    phase: after
+    text: { ja: '31日目午前10時。調査報告書がまとまった。確報の期限は60日後。報告書をどこまで公開するかを決める。', en: '' }
+    voices: [v15-a, v15-b, v15-ok]
+    choices:
+      - id: e15-a-hide
+        text: { ja: '報告書は公開せず、取引先にだけ渡して終える', en: '' }
+        explain: { ja: '攻撃に使える情報を伏せる配慮は要る。だが全文を隠すと、検証も教訓の共有も止まる。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -140
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 15, trust: -15 }
+        coward: true
+        setFlags: { hidReport: true }
+        items:
+          - { id: e15-a-content, points: -10, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: e15-a-wording, points: -10, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: e15-b-client
+        text: { ja: '要約だけを作って、取引先に渡すだけで済ませる', en: '' }
+        explain: { ja: '要約は説明の助けになる。ただ、判断の誤りまで要約で薄めると、再発防止の焦点が消える。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 25
+        refs: [meti-disclosure-guidance]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: e15-b-content, points: 5, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: e15-b-record, points: 5, axis: record, refs: [jpcert-handling] }
+      - id: e15-c-publish
+        text: { ja: '危険な詳細だけ伏せて全文公開し、進捗を毎月出す', en: '' }
+        explain: { ja: '検証できる形で公開し、その後の進み具合まで約束している。委託元と同業の備えにもつながる。', en: '' }
+        minutes: 240
+        category: increase
+        points: 300
+        refs: [meti-disclosure-guidance, cissp-cbk-secops]
+        gauges: { flame: -15, trust: 20, stamina: -15 }
+        setFlags: { ppcFinalFiled: true, fullDisclosure: true }
+        detail: final-report
+        items:
+          - { id: e15-c-content, points: 8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: e15-c-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+    lesson: { ja: '報告書は、攻撃に使える詳細だけを伏せて公開する。原因と判断の誤りを書き、再発防止の進捗を毎月示す。隠すと検証が止まり、同業他社も同じ手口の被害を受ける。公開が、次の備えになる。', en: '' }
+
+  - id: p16-future
+    at: { day: 45, minutes: 600 }
+    phase: after
+    text: { ja: '46日目午前10時。新規の相談が戻り始めた。同じ方式でデータを預かる仕事を、続けるかどうか。', en: '' }
+    voices: [v16-a, v16-b, v16-ok]
+    choices:
+      - id: e16-c-design
+        text: { ja: '預からない分析方式に切り替え、第三者認証を取る', en: '' }
+        explain: { ja: 'データを預からなければ、同じ事故の影響を小さくできる。認証で外部にも説明できる形になる。', en: '' }
+        minutes: 300
+        category: increase
+        points: 200
+        refs: [nist-sp800-61r3, meti-csm-guideline]
+        gauges: { trust: 20, stamina: -20, damage: -10 }
+        setFlags: { redesign: true }
+        items:
+          - { id: e16-c-content, points: 8, axis: content, refs: [nist-sp800-61r3] }
+          - { id: e16-c-record, points: 8, axis: record, refs: [meti-csm-guideline] }
+      - id: e16-a-resume
+        text: { ja: '売上を優先し、これまでどおりの方式で再開する', en: '' }
+        explain: { ja: '売上を戻す判断は分かる。ただ、預かり続ける限り同じリスクが残り、委託元も同じ不安を抱える。', en: '' }
+        minutes: 60
+        category: hurt
+        points: -100
+        refs: [nist-sp800-61r3]
+        gauges: { damage: 10, trust: -10 }
+        items:
+          - { id: e16-a-content, points: -10, axis: content, refs: [nist-sp800-61r3] }
+          - { id: e16-a-care, points: -8, axis: care, refs: [ppc-notify-person] }
+      - id: e16-b-pause
+        text: { ja: '新規の受注を止め、体制が整うまで待つ', en: '' }
+        explain: { ja: '慎重な判断だが、止めている間も委託元は代わりの会社を探す。期限を切らない停止は長引く。', en: '' }
+        minutes: 120
+        category: maintain
+        points: 25
+        refs: [meti-csm-guideline]
+        gauges: { trust: 5, stamina: -10 }
+        items:
+          - { id: e16-b-order, points: 5, axis: order, refs: [meti-csm-guideline] }
+          - { id: e16-b-content, points: 5, axis: content, refs: [nist-sp800-61r3] }
+    lesson: { ja: '再発防止は、注意ではなく仕組みで示す。データを預からない方式に変え、第三者認証を取る。売上を戻す速度より、同じ事故を繰り返さない設計を先に決める。その順番が、委託元の判断材料になる。', en: '' }
+
+drafts:
+  final-report:
+    title: { ja: '調査報告書の公開範囲', en: '' }
+    slots:
+      - id: scope
+        label: { ja: '公開する範囲', en: '' }
+        options:
+          - { id: fr-s-full, text: { ja: '攻撃に使える詳細だけ伏せて全文公開する', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '危険な詳細だけを伏せる公開は、検証と再発防止を両立させる。委託元も同業も判断の材料にできる。', en: '' } }
+          - { id: fr-s-hide, text: { ja: '公開せず、取引先にだけ渡して終える', en: '' }, points: -20, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '公開しないと、原因も対策も検証されない。同じ手口の被害が、別の会社で繰り返される。', en: '' } }
+      - id: cause
+        label: { ja: '原因の書き方', en: '' }
+        options:
+          - { id: fr-c-vague, text: { ja: '外部からの攻撃とだけ書いて終える', en: '' }, points: -10, axis: content, refs: [nist-sp800-61r3], explain: { ja: '外部からの攻撃とだけ書くと、どこを直すのか分からない。対策が精神論になり、検証もできない。', en: '' } }
+          - { id: fr-c-saas, text: { ja: 'SaaS事業者の脆弱性だとして書いておく', en: '' }, points: -10, axis: wording, refs: [meti-csm-guideline], explain: { ja: '他社の脆弱性に寄せると、自社の認証の設定が抜ける。委託元は説明の不足を不誠実と受け取る。', en: '' } }
+          - { id: fr-c-cause, text: { ja: '認証情報の窃取と権限の不備を書く', en: '' }, points: 10, axis: content, refs: [nist-sp800-61r3], explain: { ja: '侵入口と権限の不足を具体的に書くと、対策の優先順位が決まる。読み手も同じ穴を確認できる。', en: '' } }
+      - id: responsibility
+        label: { ja: '責任分界の書き方', en: '' }
+        options:
+          - { id: fr-r-own, text: { ja: '当社の認証管理、SaaSの設定、委託元の指示を分けて書く', en: '' }, points: 10, axis: content, refs: [no02-ppc-report-entrusted], explain: { ja: '三者の役割を分けて書くと、同じ事故を防ぐ分担が決まる。責任の押し付け合いも避けられる。', en: '' } }
+          - { id: fr-r-client, text: { ja: '委託元の管理不足が原因だと、報告書で強調する', en: '' }, points: -15, axis: wording, refs: [meti-csm-guideline], explain: { ja: '委託元に責任を寄せると、自社の認証管理の不備が見えなくなる。取引先の信頼も損なう。', en: '' } }
+      - id: clients
+        label: { ja: '取引先への記載', en: '' }
+        options:
+          - { id: fr-l-none, text: { ja: '取引先の社名は書かないでおく', en: '' }, points: -5, axis: care, refs: [ppc-notify-person], explain: { ja: '社名を伏せる配慮は必要。ただし対象と通知の実績まで伏せると、委託元の説明と食い違う。', en: '' } }
+          - { id: fr-l-notice, text: { ja: '対象の取引先と本人通知の実績を書く', en: '' }, points: 8, axis: care, refs: [ppc-notify-person], explain: { ja: '通知の実績は、実際に対応した証拠になる。委託元が会員に説明するときの支えにもなる。', en: '' } }
+      - id: measures
+        label: { ja: '再発防止策', en: '' }
+        options:
+          - { id: fr-m-slogan, text: { ja: '再発防止に努めますとだけ書く', en: '' }, points: -10, axis: content, refs: [cissp-cbk-secops], explain: { ja: '努めますだけでは、何をいつ誰がやるのか分からない。実行の確認もできない。', en: '' } }
+          - { id: fr-m-tool, text: { ja: '新しい製品を導入したとだけ書く', en: '' }, points: -5, axis: content, refs: [cissp-cbk-secops], explain: { ja: '製品の導入は手段でしかない。何を守るためにどう使うかが書かれないと、効果を確かめられない。', en: '' } }
+          - { id: fr-m-plan, text: { ja: '対策の時期と担当を、具体的に書く', en: '' }, points: 10, axis: content, refs: [cissp-cbk-secops], explain: { ja: '時期と担当があれば、対策が実行されたか検証できる。毎月の進捗公開にもそのまま使える。', en: '' } }
+      - id: thirdparty
+        label: { ja: '第三者検証', en: '' }
+        options:
+          - { id: fr-t-summary, text: { ja: '要約だけを載せて終える', en: '' }, points: -8, axis: record, refs: [cissp-cbk-secops], explain: { ja: '要約だけでは、都合の悪い指摘が抜けていないか分からない。調査の独立性が伝わらない。', en: '' } }
+          - { id: fr-t-full, text: { ja: '第三者検証の意見を全文載せる', en: '' }, points: 8, axis: record, refs: [cissp-cbk-secops], explain: { ja: '第三者検証を全文載せると、調査の独立性が伝わる。都合の悪い指摘も隠せない。', en: '' } }
+      - id: progress
+        label: { ja: '進捗の公開', en: '' }
+        options:
+          - { id: fr-o-once, text: { ja: '一度だけ公開する', en: '' }, points: -5, axis: record, refs: [meti-disclosure-guidance], explain: { ja: '一度きりの公開では、その後の進み具合が分からない。未完了の対策が放置されやすい。', en: '' } }
+          - { id: fr-o-monthly, text: { ja: '進捗を毎月公開する', en: '' }, points: 10, axis: record, refs: [meti-disclosure-guidance], explain: { ja: '毎月の進捗公開は、対策が形だけになっていないか確かめられる。改善の速度も見える。', en: '' } }
+      - id: share
+        label: { ja: '同業への共有', en: '' }
+        options:
+          - { id: fr-g-share, text: { ja: '得た教訓を同業と委託元に共有する', en: '' }, points: 10, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '教訓を共有すると、同じ手口の被害を他の会社で防げる。委託元の備えも上がる。', en: '' } }
+          - { id: fr-g-keep, text: { ja: '自社の中だけにとどめておく', en: '' }, points: -5, axis: content, refs: [meti-disclosure-guidance], explain: { ja: '自社だけに留めると、同じ型のリスクが業界に残る。再発防止に取り組む姿勢も伝わらない。', en: '' } }
+voices:
+  - { id: v01-a, media: sns, misleading: true, type: public-opinion, text: { ja: 'まだ漏れたと決まったわけではない。発表すれば信用問題だ。', en: '' }, trigger: { at: point } }
+  - { id: v01-b, media: boss, misleading: true, type: boss-pressure, text: { ja: '取引先に言うのは、原因が分かってからでいい。', en: '' }, trigger: { at: point } }
+  - { id: v01-ok, media: chat, misleading: false, text: { ja: '技術部門「セッションは生きたままです。先に切らないと、また持ち出されます」。', en: '' }, trigger: { at: point } }
+  - { id: v01-after, media: sns, misleading: false, text: { ja: 'すぐ止めたのか。業務を止めた損害は、誰が払うんだ。', en: '' }, trigger: { at: after, choice: e01-c-stop } }
+  - { id: v02-a, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場は今、認証の設定どころじゃありません。', en: '' }, trigger: { at: point } }
+  - { id: v02-b, media: vendor, misleading: true, type: vendor-interest, text: { ja: '導入支援は来期の予算で、まとめてやりましょう。', en: '' }, trigger: { at: point } }
+  - { id: v02-ok, media: chat, misleading: false, text: { ja: '技術部門「管理者アカウントだけでも、今日やるべきです」。', en: '' }, trigger: { at: point } }
+  - { id: v03-a, media: attacker, misleading: true, type: attacker-shake, text: { ja: '払えば削除する。公開されたくなければ、72時間で決めろ。', en: '' }, trigger: { at: point } }
+  - { id: v03-b, media: news, misleading: true, type: fake-expert, text: { ja: '専門家「払った会社は、静かに収まっていますよ」。', en: '' }, trigger: { at: point } }
+  - { id: v03-ok, media: chat, misleading: false, text: { ja: '法務「削除の保証はありません。警察に相談しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v03-after, media: news, misleading: false, text: { ja: '払わないから、データが公開されたのではないか。', en: '' }, trigger: { at: after, choice: e03-c-refuse } }
+  - { id: v04-a, media: sns, misleading: true, type: public-opinion, text: { ja: '確定していないのに発表するのか。余計な混乱を招く。', en: '' }, trigger: { at: point } }
+  - { id: v04-b, media: boss, misleading: true, type: boss-pressure, text: { ja: '取引先に怒られる。今夜は黙っておけ。', en: '' }, trigger: { at: point } }
+  - { id: v04-ok, media: chat, misleading: false, text: { ja: '広報「分かっている範囲で出せます。次の予定も添えましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v05-a, media: boss, misleading: true, type: boss-pressure, text: { ja: '大きい取引先を逃したら終わりだ。そこだけ先に回れ。', en: '' }, trigger: { at: point } }
+  - { id: v05-b, media: chat, misleading: true, type: well-meant-field, text: { ja: '全社に一斉メールで十分でしょう。', en: '' }, trigger: { at: point } }
+  - { id: v05-ok, media: chat, misleading: false, text: { ja: '営業「電話で話した方が、委託元も報告の判断ができます」。', en: '' }, trigger: { at: point } }
+  - { id: v05-after, media: sns, misleading: false, text: { ja: 'うちは後から知った。順番があるだろう。', en: '' }, trigger: { at: after, choice: e05-c-direct } }
+  - { id: v06-a, media: board, misleading: true, type: law-ish, text: { ja: '預かりデータは委託元のものだ。当社は報告しなくていい。', en: '' }, trigger: { at: point } }
+  - { id: v06-b, media: news, misleading: true, type: fake-expert, text: { ja: '専門家「委託元がやるなら、二重に出す必要はありません」。', en: '' }, trigger: { at: point } }
+  - { id: v06-ok, media: chat, misleading: false, text: { ja: '法務「自社の従業員情報は、自社の報告分です」。', en: '' }, trigger: { at: point } }
+  - { id: v06-after, media: news, misleading: false, text: { ja: '委託元に任せきりか。自分の会社の情報はどうした。', en: '' }, trigger: { at: after, choice: e06-c-both } }
+  - { id: v07-a, media: chat, misleading: true, type: well-meant-field, text: { ja: '社員を動揺させると、仕事になりません。', en: '' }, trigger: { at: point } }
+  - { id: v07-b, media: boss, misleading: true, type: boss-pressure, text: { ja: 'パスワードの話は、総務から軽く言っておけ。', en: '' }, trigger: { at: point } }
+  - { id: v07-ok, media: chat, misleading: false, text: { ja: '総務「自分の情報が漏れたなら、本人に伝えるべきです」。', en: '' }, trigger: { at: point } }
+  - { id: v08-a, media: vendor, misleading: true, type: vendor-interest, text: { ja: '原因はSaaS側です。そう説明すれば、うちの責任は軽くなります。', en: '' }, trigger: { at: point } }
+  - { id: v08-b, media: boss, misleading: true, type: boss-pressure, text: { ja: '今日は謝って帰ってもらえ。中身は後でいい。', en: '' }, trigger: { at: point } }
+  - { id: v08-ok, media: chat, misleading: false, text: { ja: '技術部門「期限と担当を出せば、相手も判断できます」。', en: '' }, trigger: { at: point } }
+  - { id: v08-after, media: news, misleading: false, text: { ja: '監査を受け入れるのか。また弱みを見せることになる。', en: '' }, trigger: { at: after, choice: e08-c-deadline } }
+  - { id: v09-a, media: boss, misleading: true, type: boss-pressure, text: { ja: '警察が入ったら、取引先に知られる。今はやめておけ。', en: '' }, trigger: { at: point } }
+  - { id: v09-b, media: sns, misleading: true, type: public-opinion, text: { ja: '届け出ても、データは戻らないらしいぞ。', en: '' }, trigger: { at: point } }
+  - { id: v09-ok, media: chat, misleading: false, text: { ja: '法務「相談と届け出は別です。まず相談しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v10-a, media: vendor, misleading: true, type: vendor-interest, text: { ja: '当社の認証は正常です。設定は御社側の問題です。', en: '' }, trigger: { at: point } }
+  - { id: v10-b, media: board, misleading: true, type: law-ish, text: { ja: '契約に書いていない以上、当社は責任を負いません。', en: '' }, trigger: { at: point } }
+  - { id: v10-ok, media: chat, misleading: false, text: { ja: '法務「契約が薄くても、調査への協力は求められます」。', en: '' }, trigger: { at: point } }
+  - { id: v10-after, media: vendor, misleading: false, text: { ja: '共同調査なんて、時間の無駄だ。', en: '' }, trigger: { at: after, choice: e10-c-joint } }
+  - { id: v11-a, media: board, misleading: true, type: law-ish, text: { ja: '契約に補償条項がないなら、払う必要はありません。', en: '' }, trigger: { at: point } }
+  - { id: v11-b, media: boss, misleading: true, type: past-success, text: { ja: '前も似た件で、時間が解決した。今回も待て。', en: '' }, trigger: { at: point } }
+  - { id: v11-ok, media: chat, misleading: false, text: { ja: '営業「解約する会社にも、移行の支援を伝えましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v11-after, media: news, misleading: false, text: { ja: '補償を出すのか。責任を認めたことになるぞ。', en: '' }, trigger: { at: after, choice: e11-c-support } }
+  - { id: v12-a, media: chat, misleading: true, type: flattery, text: { ja: '社長なら、その場で答えられます。準備はいりません。', en: '' }, trigger: { at: point } }
+  - { id: v12-b, media: sns, misleading: true, type: popular, text: { ja: '他の会社も、会見は十五分で終わらせているらしい。', en: '' }, trigger: { at: point } }
+  - { id: v12-ok, media: chat, misleading: false, text: { ja: '広報「最初に、取引先と会員への対応を述べましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v13-a, media: boss, misleading: true, type: boss-pressure, text: { ja: '今期の利益が消えたら、会社が持たない。調査は切り上げろ。', en: '' }, trigger: { at: point } }
+  - { id: v13-b, media: vendor, misleading: true, type: fake-expert, text: { ja: '専門家「保険で戻るので、投資は後でも間に合います」。', en: '' }, trigger: { at: point } }
+  - { id: v13-ok, media: chat, misleading: false, text: { ja: '経理「保険と弁護士を入れれば、枠は作れます」。', en: '' }, trigger: { at: point } }
+  - { id: v14-a, media: board, misleading: true, type: law-ish, text: { ja: '契約は双方の合意です。今さら変えられません。', en: '' }, trigger: { at: point } }
+  - { id: v14-b, media: boss, misleading: true, type: past-success, text: { ja: '前の契約も、現場の注意で何とかなった。', en: '' }, trigger: { at: point } }
+  - { id: v14-ok, media: chat, misleading: false, text: { ja: '法務「連絡順と費用負担を、今のうちに書けます」。', en: '' }, trigger: { at: point } }
+  - { id: v15-a, media: vendor, misleading: true, type: fake-expert, text: { ja: '報告書を出すと、攻撃者に手の内が分かります。伏せましょう。', en: '' }, trigger: { at: point } }
+  - { id: v15-b, media: sns, misleading: true, type: public-opinion, text: { ja: '今さら報告書を出して、宣伝か。', en: '' }, trigger: { at: point } }
+  - { id: v15-ok, media: chat, misleading: false, text: { ja: '調査委員「攻撃に使える部分だけ伏せれば、公開できます」。', en: '' }, trigger: { at: point } }
+  - { id: v16-a, media: boss, misleading: true, type: bold-buzz, text: { ja: '前と同じ方式で行こう。今度こそ大丈夫だ。', en: '' }, trigger: { at: point } }
+  - { id: v16-b, media: vendor, misleading: true, type: vendor-interest, text: { ja: '新しい基盤を入れれば、預かったままでも安全です。', en: '' }, trigger: { at: point } }
+  - { id: v16-ok, media: chat, misleading: false, text: { ja: '技術部門「預からずに分析する方式なら、影響を小さくできます」。', en: '' }, trigger: { at: point } }
+  - { id: v-coward-2, media: sns, misleading: false, text: { ja: 'まだ「確認中」なのか。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-3, media: sns, misleading: false, text: { ja: '社長は責任を取りたくないだけだ。事なかれ主義の会社。', en: '' }, trigger: { at: manual } }
+  - { id: v-coward-4, media: news, misleading: false, text: { ja: '臆病な判断が、取引先の不信を広げた。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-attacker, media: attacker, misleading: false, text: { ja: '見せたデータは一部だ。公開が始まれば、委託元の会員も分かる。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-news, media: news, misleading: false, text: { ja: '業界紙「会員データ分析会社で漏えいか。委託元も調査を開始」。', en: '' }, trigger: { at: manual } }
+  - { id: v-ev-client, media: chat, misleading: false, text: { ja: '委託元「契約の継続を、どの条件なら判断できますか」。', en: '' }, trigger: { at: manual } }
