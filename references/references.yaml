@@ -259,3 +259,19 @@
   summary: { ja: "パスワードのみの認証は使い回しに弱い。多要素認証を段階的に導入し、設定できない利用者への代替手段も用意する", en: "Password-only authentication is weak against reuse; roll out MFA in stages with alternatives for those who cannot use it" }
   checkedAt: 2026-11-08
   legalPack: jp
+- id: no16-ppc-mail-address
+  title: { ja: "個人情報の保護に関する法律についてのガイドライン（通則編）", en: "Guidelines on the Act on the Protection of Personal Information (General Rules)" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
+  version: "2026-11"
+  section: { ja: "個人情報の該当性（メールアドレス等）", en: "Whether email addresses constitute personal information" }
+  summary: { ja: "氏名がなくても、メールアドレスなどにより特定の個人を識別できる場合は個人情報に当たる。会員名簿と結び付くアドレスは個人データとして扱う", en: "An email address can identify a person even without a name; addresses linked to a member list are personal data" }
+  checkedAt: "2026-11-08"
+  legalPack: "jp"
+- id: no16-ppc-breach-qa
+  title: { ja: "漏えい等事案への対応に関するQ&A", en: "Q&A on responding to data breach incidents" }
+  issuer: { ja: "個人情報保護委員会", en: "Personal Information Protection Commission" }
+  version: "2026-11"
+  section: { ja: "メールの誤送信が起きたときの対応", en: "Responding to misdirected email" }
+  summary: { ja: "誤送信も漏えい等に当たりうる。報告の対象かは要配慮個人情報、不正の目的、件数などで判断し、本人への通知と再発防止を検討する", en: "Misdirected email can be a breach; judge reportability by sensitive data, malicious intent and volume, and notify affected persons" }
+  checkedAt: "2026-11-08"
+  legalPack: "jp"

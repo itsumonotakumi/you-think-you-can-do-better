@@ -1,0 +1,701 @@
+# No.16 こもれびカルチャー / 役員（運営本部長）ロール
+# 入門編: 判断8、報告書1。教室・講師・保護者への説明と、配信の運用を扱う。
+# 視点: 12教室を統括する本部長。現場の混乱を抑え、本部と教室の説明をそろえる。
+estimateMinutes: 13
+intro: { ja: 'あなたはこもれびカルチャーの運営本部長。12教室の責任者と講師、約90人を束ねている。金曜の午前10時15分、教室から「保護者から電話が来ている」と連絡が入り始めた。会員向けメールの宛先を間違えたらしい。教室ごとに対応がばらつき始めている。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-of-coward-2
+  '3': v-of-coward-3
+  '4': v-of-coward-4
+events:
+  - id: ev-of-phones
+    at: { day: 0, minutes: 720 }
+    voices: [v-of-ev-phones]
+    gauges: { flame: 5 }
+    sound: { se: [phone_ring] }
+    caption: { ja: '教室と本部の電話が、同時に鳴り始めた。', en: '' }
+  - id: ev-of-sns
+    at: { day: 0, minutes: 930 }
+    voices: [v-of-ev-sns]
+    gauges: { flame: 5 }
+    sound: { se: [notify_sns] }
+    caption: { ja: '保護者の投稿が、地域のSNSで共有され始めた。', en: '' }
+points:
+  - id: p-of-01
+    at: { day: 0, minutes: 615 }
+    phase: detect
+    sound: { se: [phone_ring] }
+    text: { ja: '午前10時15分。12教室から「保護者から電話が来ている」と連絡が入り始めた。次の配信は来週の月曜に予定されている。教室ごとに、謝る人と様子を見る人が分かれている。', en: '' }
+    voices: [v-of-01-a, v-of-01-b, v-of-01-c]
+    notable:
+      - { id: note-cause, text: { ja: '会員412人のアドレスを To に入れ、Bcc を空のまま送信した。配信ツールの宛先設定の誤り。', en: '' } }
+    choices:
+      - id: p-of-01-a
+        text: { ja: '次の配信の予定を確認し、止めるかは各教室に任せる。', en: '' }
+        explain: { ja: '現場の判断を尊重した形だが、教室ごとに方針が分かれる。止める判断は本部がそろえたい。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 5 }
+        coward: true
+        items:
+          - { id: of01a-time, points: 3, axis: time, refs: [ipa-sme-guideline] }
+          - { id: of01a-order, points: 2, axis: order, refs: [ipa-sme-guideline] }
+          - { id: of01a-care, points: -2, axis: care, refs: [jpcert-handling] }
+      - id: p-of-01-b
+        text: { ja: '教室からの問い合わせを待ち、必要な教室にだけ連絡する。', en: '' }
+        explain: { ja: '問い合わせを待つと、何も言わない教室が取り残される。全教室に同じ情報を届けるべき場面。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [ipa-sme-guideline, jpcert-handling]
+        gauges: { flame: 10, trust: -5 }
+        items:
+          - { id: of01b-order, points: -8, axis: order, refs: [jpcert-handling] }
+          - { id: of01b-care, points: -6, axis: care, refs: [ipa-sme-guideline] }
+          - { id: of01b-time, points: -5, axis: time, refs: [ipa-sme-guideline] }
+      - id: p-of-01-c
+        text: { ja: '全教室に配信を止めさせ、事実と対応方針を伝える。', en: '' }
+        explain: { ja: '全教室に同じ指示と情報を出している。混乱の大きい現場ほど、本部の一本化が効く。指示をそろえる。', en: '' }
+        minutes: 45
+        category: increase
+        points: 300
+        refs: [jpcert-handling, ipa-sme-guideline]
+        gauges: { flame: -10, trust: 10, stamina: -10 }
+        setFlags: { mailingStopped: true }
+        detail: draft-of-field-note
+        items:
+          - { id: of01c-order, points: 8, axis: order, refs: [jpcert-handling] }
+          - { id: of01c-content, points: 10, axis: content, refs: [ipa-sme-guideline] }
+          - { id: of01c-time, points: 5, axis: time, refs: [jpcert-handling] }
+    lesson: { ja: '誤送信のあとは、次の配信を止めるかどうかを本部が決める。教室ごとに任せると、止める教室と止めない教室が混ざる。全教室に同じ事実と方針を出し、現場が同じ説明をできるようにする。', en: '' }
+
+  - id: p-of-x1
+    at: { day: 0, minutes: 630 }
+    when: { flags: { mailingStopped: false } }
+    phase: detect
+    text: { ja: '午前10時30分。次の配信の準備が進んでいる。教室からは「来週の案内、このままでいいか」と聞かれている。', en: '' }
+    voices: [v-of-01-a]
+    choices:
+      - id: p-of-x1-a
+        text: { ja: '各教室の判断で、予定どおり配信を続ける。', en: '' }
+        explain: { ja: '教室の判断に任せると、止める教室と続ける教室が混ざる。本部が方針をそろえたい。方針をそろえる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: ofx1a-order, points: -4, axis: order, refs: [ipa-sme-guideline] }
+          - { id: ofx1a-time, points: -3, axis: time, refs: [jpcert-handling] }
+      - id: p-of-x1-b
+        text: { ja: '次の配信を止め、宛先の確認が済むまで再開しない。', en: '' }
+        explain: { ja: '再発の可能性が残るうちは止める。確認が済むまで再開しない判断は安全。今から止める。', en: '' }
+        minutes: 30
+        category: recover
+        points: 120
+        refs: [jpcert-handling, ipa-sme-guideline]
+        gauges: { flame: -5, trust: 10 }
+        setFlags: { mailingStopped: true }
+        items:
+          - { id: ofx1b-order, points: 6, axis: order, refs: [jpcert-handling] }
+          - { id: ofx1b-content, points: 4, axis: content, refs: [ipa-sme-guideline] }
+    lesson: { ja: '配信を止めるのが遅れても、今から止めれば間に合う。宛先の確認が済むまで再開しない。教室ごとに任せると、止める教室と続ける教室が混ざる。止めるなら今からでも間に合う。本部が方針をそろえる。', en: '' }
+
+  - id: p-of-02
+    at: { day: 0, minutes: 645 }
+    phase: contain
+    sound: { se: [phone_ring] }
+    text: { ja: '午前10時45分。本部の電話が鳴り続けている。教室の受付にも保護者が来ている。誰が、どの窓口で、何を答えるのかが決まっていない。', en: '' }
+    voices: [v-of-02-a, v-of-02-b, v-of-02-c]
+    choices:
+      - id: p-of-02-a
+        text: { ja: '専用の電話とメール窓口を置き、受付時間と担当を決める。', en: '' }
+        explain: { ja: '窓口を一本化し、受付時間と担当まで決めている。教室が個別に抱えず、記録も一か所に集まる。', en: '' }
+        minutes: 45
+        category: increase
+        points: 300
+        refs: [ppc-notify-person, cissp-cbk-secops]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { windowOpened: true }
+        items:
+          - { id: of02a-care, points: 10, axis: care, refs: [ppc-notify-person] }
+          - { id: of02a-order, points: 8, axis: order, refs: [cissp-cbk-secops] }
+          - { id: of02a-content, points: 5, axis: content, refs: [ppc-notify-person] }
+      - id: p-of-02-b
+        text: { ja: '教室の受付で受け付け、本部には内容だけ共有する。', en: '' }
+        explain: { ja: '教室の負担が増え、答え方もばらつく。本部に集約しないと、件数も傾向も見えない。記録も散らばる。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 5 }
+        items:
+          - { id: of02b-time, points: 2, axis: time, refs: [ipa-sme-guideline] }
+          - { id: of02b-wording, points: 1, axis: wording, refs: [ipa-sme-guideline] }
+          - { id: of02b-record, points: 1, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-of-02-c
+        text: { ja: '問い合わせは本部の総務で受け、後で担当に回す。', en: '' }
+        explain: { ja: '受け付ける場所は決まったが、答える担当と時間がない。たらい回しになると不信が増す。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [ppc-notify-person]
+        gauges: { flame: 10, trust: -5 }
+        items:
+          - { id: of02c-care, points: -8, axis: care, refs: [ppc-notify-person] }
+          - { id: of02c-time, points: -6, axis: time, refs: [ipa-sme-guideline] }
+          - { id: of02c-order, points: -5, axis: order, refs: [cissp-cbk-secops] }
+    lesson: { ja: '問い合わせは、受ける場所と答える人を決めてから案内する。専用の電話とメール、受付時間、担当者を明記すれば、教室は保護者に案内できる。記録が一か所に集まると、二次被害の兆候も早く見つかる。', en: '' }
+
+  - id: p-of-x2
+    at: { day: 0, minutes: 675 }
+    when: { flags: { windowOpened: false } }
+    phase: contain
+    text: { ja: '午前11時15分。問い合わせの窓口がまだ決まっていない。教室の電話が鳴り続け、本部にも保護者が直接来ている。', en: '' }
+    voices: [v-of-02-b]
+    choices:
+      - id: p-of-x2-a
+        text: { ja: '今から専用の電話とメール窓口を置き、教室に案内する。', en: '' }
+        explain: { ja: '窓口を今からでも一本化している。受付時間と担当を決めれば、教室も保護者も迷わない。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [ppc-notify-person]
+        gauges: { flame: -5, trust: 10, stamina: -5 }
+        setFlags: { windowOpened: true }
+        items:
+          - { id: ofx2a-care, points: 6, axis: care, refs: [ppc-notify-person] }
+          - { id: ofx2a-order, points: 4, axis: order, refs: [cissp-cbk-secops] }
+      - id: p-of-x2-b
+        text: { ja: '教室の受付で受けてもらい、本部は記録だけ集める。', en: '' }
+        explain: { ja: '教室の負担が増え、答え方もばらつく。本部の窓口を決めてから記録を集めたい。窓口を決める。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: ofx2b-care, points: -4, axis: care, refs: [ipa-sme-guideline] }
+          - { id: ofx2b-record, points: -3, axis: record, refs: [cissp-cbk-secops] }
+    lesson: { ja: '窓口が遅れても、今から作れば間に合う。専用の電話とメール、受付時間、担当を決めて教室に案内する。教室に任せきりにすると、答え方も記録もばらつく。今から窓口を作り、教室に案内する。', en: '' }
+
+  - id: p-of-03
+    at: { day: 0, minutes: 690 }
+    phase: contain
+    text: { ja: '午前11時30分。教室の入口に貼る掲示と、保護者に配る文の相談が来た。教室ごとに文面を作ると、言い方の差が大きくなりそうだ。', en: '' }
+    voices: [v-of-03-a, v-of-03-b, v-of-03-c]
+    choices:
+      - id: p-of-03-a
+        text: { ja: '教室に貼り紙を出し、保護者に口頭で伝える。', en: '' }
+        explain: { ja: 'すぐ伝えられるが、口頭だけでは内容が残らない。教室によって言い方が変わる。文面を残したい。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { trust: 5 }
+        items:
+          - { id: of03a-time, points: 3, axis: time, refs: [ipa-sme-guideline] }
+          - { id: of03a-care, points: 2, axis: care, refs: [ppc-notify-person] }
+          - { id: of03a-record, points: -2, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-of-03-b
+        text: { ja: '本部で統一した文を作り、全教室の掲示と配布に使う。', en: '' }
+        explain: { ja: '文面を本部でそろえている。教室が同じ説明をでき、あとから配った内容も確認できる。', en: '' }
+        minutes: 60
+        category: increase
+        points: 300
+        refs: [ipa-sme-guideline, ppc-notify-person]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { commonNotice: true }
+        items:
+          - { id: of03b-content, points: 10, axis: content, refs: [ppc-notify-person] }
+          - { id: of03b-wording, points: 8, axis: wording, refs: [ipa-sme-guideline] }
+          - { id: of03b-record, points: 5, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-of-03-c
+        text: { ja: '掲示はせず、聞かれた人にだけ教室で説明する。', en: '' }
+        explain: { ja: '聞かれた人だけに説明すると、知らない保護者が不安を抱える。掲示も配布も必要。全員に届ける。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [ppc-notify-person]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: of03c-care, points: -8, axis: care, refs: [ppc-notify-person] }
+          - { id: of03c-content, points: -6, axis: content, refs: [ipa-sme-guideline] }
+          - { id: of03c-record, points: -5, axis: record, refs: [cissp-cbk-secops] }
+    lesson: { ja: '教室に貼る文と配る文は、本部で作って統一する。教室ごとに文面を作ると、言い方の差が不信になる。配った日と部数を記録すれば、あとから「知らなかった」という声にも答えられる。', en: '' }
+
+  - id: p-of-x3
+    at: { day: 0, minutes: 735 }
+    when: { flags: { commonNotice: false } }
+    phase: contain
+    text: { ja: '午後0時15分。教室に配る文がまだない。教室ごとに、口頭で違う説明をしている。', en: '' }
+    voices: [v-of-03-a]
+    choices:
+      - id: p-of-x3-a
+        text: { ja: '教室ごとに、それぞれの言葉で説明してもらう。', en: '' }
+        explain: { ja: '教室の判断は尊重したいが、言い方が違うと保護者の不信を招く。文面をそろえる。統一文にする。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: ofx3a-wording, points: -4, axis: wording, refs: [ipa-sme-guideline] }
+          - { id: ofx3a-care, points: -3, axis: care, refs: [ppc-notify-person] }
+      - id: p-of-x3-b
+        text: { ja: '本部で短い統一文を作り、全教室に配る。', en: '' }
+        explain: { ja: '短くても統一文があれば、教室は同じ説明ができる。配った記録も残る。今からすぐ配る。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [ipa-sme-guideline, ppc-notify-person]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { commonNotice: true }
+        items:
+          - { id: ofx3b-wording, points: 6, axis: wording, refs: [ipa-sme-guideline] }
+          - { id: ofx3b-content, points: 4, axis: content, refs: [ppc-notify-person] }
+    lesson: { ja: '文面が遅れても、短い統一文なら今から配れる。事実、お詫び、窓口の3つだけでもよい。教室ごとの言葉に任せると、説明が食い違う。短い統一文を今から配り、説明をそろえる。', en: '' }
+
+  - id: p-of-04
+    at: { day: 0, minutes: 795 }
+    phase: notify
+    sound: { se: [phone_ring] }
+    text: { ja: '午後1時15分。広報が発表文の下書きを持ってきた。「漏えい」と書くか、「誤送信」と書くかで迷っている。社長は「事実を正確に」と言ったが、表現はまだ決まっていない。', en: '' }
+    voices: [v-of-04-a, v-of-04-b, v-of-04-c]
+    choices:
+      - id: p-of-04-a
+        text: { ja: '「情報漏えいの可能性」と書いて、断定を避ける。', en: '' }
+        explain: { ja: '断定を避けたい気持ちは分かるが、起きたことは誤送信。曖昧な表現は不安を大きくする。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 5 }
+        coward: true
+        items:
+          - { id: of04a-wording, points: 2, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: of04a-time, points: 1, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: of04a-care, points: 1, axis: care, refs: [ppc-notify-person] }
+      - id: p-of-04-b
+        text: { ja: '「システムの不具合」と書いて、社内の混乱を抑える。', en: '' }
+        explain: { ja: '事実と違う原因を書くと、後で訂正が必要になる。社内を守るつもりが信頼を壊す。訂正も難しくなる。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [meti-disclosure-guidance, ppc-report-scope]
+        gauges: { flame: 25, trust: -20 }
+        setFlags: { liedPublic: true }
+        items:
+          - { id: of04b-content, points: -12, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: of04b-wording, points: -10, axis: wording, refs: [ppc-report-scope] }
+          - { id: of04b-care, points: -5, axis: care, refs: [ppc-notify-person] }
+      - id: p-of-04-c
+        text: { ja: '誤送信の事実と対象、原因、再発防止を正確に書く。', en: '' }
+        explain: { ja: '起きたことをそのまま書き、対象と原因と対策まで示している。あいまいさが残らない。', en: '' }
+        minutes: 60
+        category: increase
+        points: 300
+        refs: [meti-disclosure-guidance, no16-ppc-breach-qa]
+        gauges: { flame: -10, trust: 15, stamina: -10 }
+        setFlags: { statementMade: true }
+        items:
+          - { id: of04c-content, points: 10, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: of04c-wording, points: 8, axis: wording, refs: [no16-ppc-breach-qa] }
+          - { id: of04c-record, points: 5, axis: record, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '発表文は、起きたことをそのまま書く。誤送信は誤送信と書き、対象、原因、本人がすること、窓口を示す。「可能性」や「システムの不具合」でぼかすと、後から事実が分かった時に信頼を失う。', en: '' }
+
+  - id: p-of-x4
+    at: { day: 0, minutes: 825 }
+    when: { flags: { statementMade: false } }
+    phase: notify
+    text: { ja: '午後1時45分。公表はまだ。地域紙の記者が本部の受付に来て、帰らないと言っている。', en: '' }
+    voices: [v-of-04-a]
+    choices:
+      - id: p-of-x4-a
+        text: { ja: '今日中に、事実と対象と窓口を短く公表する。', en: '' }
+        explain: { ja: '短くても、事実と対象と窓口を出せば推測を止められる。記者にも同じ文を渡す。今日出す。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: -5, trust: 10 }
+        setFlags: { statementMade: true }
+        items:
+          - { id: ofx4a-content, points: 6, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: ofx4a-time, points: 4, axis: time, refs: [meti-disclosure-guidance] }
+      - id: p-of-x4-b
+        text: { ja: '発表は来週にし、記者には「検討中」と答える。', en: '' }
+        explain: { ja: '検討中と答えると、記者は別の情報を集め始める。今日出せる範囲を出す方がよい。今日中に出す。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: ofx4b-time, points: -5, axis: time, refs: [meti-disclosure-guidance] }
+          - { id: ofx4b-wording, points: -4, axis: wording, refs: [ppc-notify-person] }
+    lesson: { ja: '公表が遅れても、今日中に短く出せば間に合う。事実、対象、窓口の3点だけでもよい。記者に「検討中」と答えると、別の情報が先に出る。今日中に短く公表し、記者にも同じ文を渡す。', en: '' }
+
+  - id: p-of-05
+    at: { day: 0, minutes: 870 }
+    phase: notify
+    text: { ja: '午後2時30分。対象は412人。電話で全員に説明するには時間がかかる。体験申込者と退会者は18人で、名簿の更新も止まっている。', en: '' }
+    voices: [v-of-05-a, v-of-05-b, v-of-05-c]
+    notable:
+      - { id: note-check, text: { ja: '受信者からの返信と不審メールの相談を集計している。現時点で悪用の申し出はない。', en: '' } }
+    choices:
+      - id: p-of-05-a
+        text: { ja: '影響の大きい体験申込者と退会者から先に電話する。', en: '' }
+        explain: { ja: '連絡が届きにくい人から先に電話している。名簿の更新が止まった人ほど、説明が届かない。', en: '' }
+        minutes: 90
+        category: increase
+        points: 300
+        refs: [ppc-notify-person, no16-ppc-breach-qa]
+        gauges: { flame: -5, trust: 10, stamina: -15 }
+        setFlags: { calledPriority: true }
+        items:
+          - { id: of05a-order, points: 10, axis: order, refs: [ppc-notify-person] }
+          - { id: of05a-care, points: 8, axis: care, refs: [no16-ppc-breach-qa] }
+          - { id: of05a-time, points: 5, axis: time, refs: [ppc-notify-person] }
+      - id: p-of-05-b
+        text: { ja: '全員に同じ文を送り、電話は希望者にだけかける。', en: '' }
+        explain: { ja: '全員に届く点はよいが、退会者や体験申込者には文が届かないことがある。電話の優先順位が要る。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [ppc-notify-person]
+        gauges: { trust: 5 }
+        items:
+          - { id: of05b-time, points: 3, axis: time, refs: [ppc-notify-person] }
+          - { id: of05b-content, points: 2, axis: content, refs: [ppc-notify-person] }
+          - { id: of05b-care, points: -2, axis: care, refs: [no16-ppc-breach-qa] }
+      - id: p-of-05-c
+        text: { ja: '教室ごとの判断で、保護者への説明を進めてもらう。', en: '' }
+        explain: { ja: '現場に任せると、電話をかける教室とかけない教室が出る。対象者への連絡が漏れる。記録も残らない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [ppc-notify-person]
+        gauges: { flame: 10, trust: -5 }
+        items:
+          - { id: of05c-order, points: -8, axis: order, refs: [ppc-notify-person] }
+          - { id: of05c-care, points: -6, axis: care, refs: [ipa-sme-guideline] }
+          - { id: of05c-record, points: -5, axis: record, refs: [cissp-cbk-secops] }
+    lesson: { ja: '全員に同じ文を送るだけでは、退会者や体験申込者に届かないことがある。電話は、名簿の更新が止まっている人、不安の強い人から先にする。誰にいつ連絡したかを記録すれば、連絡漏れを防げる。', en: '' }
+
+  - id: p-of-x5
+    at: { day: 0, minutes: 900 }
+    when: { flags: { calledPriority: false } }
+    phase: notify
+    text: { ja: '午後3時。電話での説明がまだ終わっていない。退会者と体験申込者の名簿は、更新が止まっている。', en: '' }
+    voices: [v-of-05-a]
+    choices:
+      - id: p-of-x5-a
+        text: { ja: '全員に同じ文を送り、電話は希望者だけにする。', en: '' }
+        explain: { ja: '文を送るだけでは、退会者や体験申込者に届かないことがある。電話の順番を決める。順番を決める。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ppc-notify-person]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: ofx5a-care, points: -4, axis: care, refs: [ppc-notify-person] }
+          - { id: ofx5a-time, points: -3, axis: time, refs: [no16-ppc-breach-qa] }
+      - id: p-of-x5-b
+        text: { ja: '退会者と体験申込者から先に電話する。', en: '' }
+        explain: { ja: '名簿の更新が止まった人から先に電話している。連絡が届きにくい人を後回しにしない。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [ppc-notify-person, no16-ppc-breach-qa]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { calledPriority: true }
+        items:
+          - { id: ofx5b-order, points: 6, axis: order, refs: [ppc-notify-person] }
+          - { id: ofx5b-care, points: 4, axis: care, refs: [no16-ppc-breach-qa] }
+    lesson: { ja: '電話が遅れても、順番を決めれば進む。退会者と体験申込者は、名簿の更新が止まっていて連絡が届きにくい。先に電話し、記録を残す。順番を決め、記録を残しながら電話する。', en: '' }
+
+  - id: p-of-06
+    at: { day: 0, minutes: 960 }
+    phase: recover
+    text: { ja: '午後4時。配信ツール会社の担当者が「設定は正しいはずです」と言いに来た。送信履歴と、誰が宛先を入力したのかを突き合わせる必要がある。', en: '' }
+    voices: [v-of-06-a, v-of-06-b, v-of-06-c]
+    choices:
+      - id: p-of-06-a
+        text: { ja: 'ツール会社に原因を聞き、設定の見直しを依頼する。', en: '' }
+        explain: { ja: '依頼で終わると、自社の手順が直らない。原因と再発防止は、自社で確かめる必要がある。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [no07-ipa-insider]
+        gauges: { trust: 5 }
+        items:
+          - { id: of06a-time, points: 2, axis: time, refs: [no07-ipa-insider] }
+          - { id: of06a-content, points: 1, axis: content, refs: [ipa-sme-guideline] }
+          - { id: of06a-record, points: 1, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-of-06-b
+        text: { ja: '送信履歴と設定を突き合わせ、再発防止の設定を決める。', en: '' }
+        explain: { ja: '履歴と設定を自社で確かめ、再発防止まで決めている。原因を人の記憶だけに頼らない。', en: '' }
+        minutes: 60
+        category: increase
+        points: 300
+        refs: [no07-ipa-insider, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { toolChecked: true }
+        items:
+          - { id: of06b-content, points: 10, axis: content, refs: [no07-ipa-insider] }
+          - { id: of06b-record, points: 8, axis: record, refs: [nist-sp800-61r3] }
+          - { id: of06b-order, points: 5, axis: order, refs: [cissp-cbk-secops] }
+      - id: p-of-06-c
+        text: { ja: 'ツールを入れ替えれば解決するとして、契約を見直す。', en: '' }
+        explain: { ja: '入れ替えても、宛先の確認手順がなければ同じ誤りは起きる。原因の特定が先。設定の確認が必要。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -100
+        refs: [no07-ipa-insider]
+        gauges: { flame: 5, trust: -5 }
+        delayed:
+          - { afterPhases: 1, points: -30, gauges: { flame: 5 }, reason: { ja: '新しいツールでも、宛先の確認をしないまま送信する誤りが起きた。', en: '' } }
+        items:
+          - { id: of06c-record, points: -8, axis: record, refs: [no07-ipa-insider] }
+          - { id: of06c-content, points: -6, axis: content, refs: [nist-sp800-61r3] }
+          - { id: of06c-time, points: -5, axis: time, refs: [cissp-cbk-secops] }
+    lesson: { ja: '原因は、ツール会社の説明だけで決めない。送信履歴、宛先の入力者、設定の画面を突き合わせる。そのうえで、宛先の固定や承認の手順を決める。ツールを替えても、確認の手順がなければ同じ誤りは起きる。', en: '' }
+
+  - id: p-of-x6
+    at: { day: 0, minutes: 990 }
+    when: { flags: { toolChecked: false } }
+    phase: recover
+    text: { ja: '午後4時30分。配信ツールの原因調査が止まっている。担当者は「ツール会社が正しいと言っている」と話す。', en: '' }
+    voices: [v-of-06-b]
+    choices:
+      - id: p-of-x6-a
+        text: { ja: '送信履歴と設定を見直し、再発防止の設定を決める。', en: '' }
+        explain: { ja: '会社の説明を待たず、自社の履歴と設定を確かめている。原因と対策を自分たちで決められる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [no07-ipa-insider, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { toolChecked: true }
+        items:
+          - { id: ofx6a-content, points: 6, axis: content, refs: [no07-ipa-insider] }
+          - { id: ofx6a-record, points: 4, axis: record, refs: [nist-sp800-61r3] }
+      - id: p-of-x6-b
+        text: { ja: 'ツール会社の説明を信じ、設定はそのままにする。', en: '' }
+        explain: { ja: '説明を待つ間に、同じ手順が残る。自社で履歴を見れば、原因は確かめられる。自分で見る。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [no07-ipa-insider]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: ofx6b-content, points: -4, axis: content, refs: [no07-ipa-insider] }
+          - { id: ofx6b-record, points: -3, axis: record, refs: [cissp-cbk-secops] }
+    lesson: { ja: '原因は、ツール会社の説明だけで決めない。送信履歴、宛先の入力者、設定の画面を自分たちで見る。そのうえで、宛先の固定や承認の手順を決める。自社の履歴と設定を見て、対策を決める。', en: '' }
+
+  - id: p-of-07
+    at: { day: 0, minutes: 1035 }
+    phase: recover
+    text: { ja: '午後5時15分。教室からは「本部に送信を集められると、急な案内が出せない」という声が出ている。本部には「教室に任せると、また起きる」という声もある。', en: '' }
+    voices: [v-of-07-a, v-of-07-b, v-of-07-c]
+    choices:
+      - id: p-of-07-a
+        text: { ja: '各教室が自由に送れるままにして、注意を促す。', en: '' }
+        explain: { ja: '自由度は保たれるが、同じ誤りを止める仕組みがない。注意だけでは再発する。仕組みを決めたい。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [no07-ipa-insider]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: of07a-record, points: -8, axis: record, refs: [no07-ipa-insider] }
+          - { id: of07a-order, points: -6, axis: order, refs: [ipa-sme-guideline] }
+          - { id: of07a-care, points: -5, axis: care, refs: [ipa-sme-guideline] }
+      - id: p-of-07-b
+        text: { ja: '本部の承認を得た人だけが送信できるようにする。', en: '' }
+        explain: { ja: '送信できる人を絞るのは有効。誰が承認するか、急ぎの時の扱いまで決めたい。例外も決める。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [no07-ipa-insider, ipa-sme-guideline]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { senderLimited: true }
+        items:
+          - { id: of07b-order, points: 8, axis: order, refs: [no07-ipa-insider] }
+          - { id: of07b-record, points: 5, axis: record, refs: [ipa-sme-guideline] }
+          - { id: of07b-content, points: 3, axis: content, refs: [ipa-sme-guideline] }
+      - id: p-of-07-c
+        text: { ja: '本部に送信を集約し、名簿と文面を二重に確認する。', en: '' }
+        explain: { ja: '送信を集約し、名簿と文面を二重に確かめている。急ぎの案内は雛形で回せる。現場の不便も小さい。', en: '' }
+        minutes: 90
+        category: increase
+        points: 300
+        refs: [no07-ipa-insider, nist-sp800-61r3]
+        gauges: { trust: 15, stamina: -15 }
+        setFlags: { centralized: true }
+        items:
+          - { id: of07c-order, points: 10, axis: order, refs: [no07-ipa-insider] }
+          - { id: of07c-record, points: 8, axis: record, refs: [nist-sp800-61r3] }
+          - { id: of07c-content, points: 5, axis: content, refs: [ipa-sme-guideline] }
+    lesson: { ja: '送信の権限は、人の注意力ではなく仕組みで絞る。本部に集約する、承認者を決める、名簿と文面を二重に確認する。急ぎの案内は雛形を用意しておけば、現場の不便も小さくできる。', en: '' }
+
+  - id: p-of-x7
+    at: { day: 0, minutes: 1065 }
+    when: { flags: { centralized: false } }
+    phase: recover
+    text: { ja: '午後5時45分。送信の権限は、まだ各教室にある。明日も同じ手順で送る予定だという。', en: '' }
+    voices: [v-of-07-b]
+    choices:
+      - id: p-of-x7-a
+        text: { ja: '各教室の送信を続け、注意の文を全員に配る。', en: '' }
+        explain: { ja: '注意は必要だが、同じ手順が残る。送信の権限か確認の手順を変えないと再発する。手順を変える。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [no07-ipa-insider]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: ofx7a-record, points: -4, axis: record, refs: [no07-ipa-insider] }
+          - { id: ofx7a-order, points: -3, axis: order, refs: [ipa-sme-guideline] }
+      - id: p-of-x7-b
+        text: { ja: '本部に送信を集約し、名簿と文面を二重に確かめる。', en: '' }
+        explain: { ja: '送信を集約し、二重に確かめる形にしている。急ぎの案内は雛形で回せる。今から集約する。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [no07-ipa-insider, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { centralized: true }
+        items:
+          - { id: ofx7b-order, points: 6, axis: order, refs: [no07-ipa-insider] }
+          - { id: ofx7b-record, points: 4, axis: record, refs: [nist-sp800-61r3] }
+    lesson: { ja: '権限の見直しが遅れても、明日の送信までに間に合う。送信を本部に集約する、承認者を決める、名簿と文面を二重に確かめる。急ぎの案内は雛形を用意する。送信の権限か確認の手順を、明日までに変える。', en: '' }
+
+
+  - id: p-of-08
+    at: { day: 0, minutes: 1110 }
+    phase: after
+    text: { ja: '午後6時30分。教室から「掲示を出した」「電話をかけた」という報告が集まり始めた。なかには「まだ何もしていない」という教室もある。明日の朝までに、確認する必要がある。', en: '' }
+    voices: [v-of-08-a, v-of-08-b, v-of-08-c]
+    choices:
+      - id: p-of-08-a
+        text: { ja: '全教室の配信設定を点検し、直ったかを記録する。', en: '' }
+        explain: { ja: '設定を実際に見て、直ったかを記録している。やったつもりを防ぎ、次の点検にもつながる。', en: '' }
+        minutes: 90
+        category: increase
+        points: 300
+        refs: [cissp-cbk-secops, nist-sp800-61r3]
+        gauges: { trust: 15, stamina: -10 }
+        setFlags: { checkedClassrooms: true }
+        items:
+          - { id: of08a-record, points: 10, axis: record, refs: [cissp-cbk-secops] }
+          - { id: of08a-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: of08a-content, points: 5, axis: content, refs: [ipa-sme-guideline] }
+      - id: p-of-08-b
+        text: { ja: '本部が点検し、問題があればその場で直す。', en: '' }
+        explain: { ja: '点検して直す点はよいが、記録が残らないと、次に同じ確認を繰り返せない。記録を残す。', en: '' }
+        minutes: 60
+        category: maintain
+        points: 30
+        refs: [cissp-cbk-secops]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: of08b-record, points: 3, axis: record, refs: [cissp-cbk-secops] }
+          - { id: of08b-time, points: 2, axis: time, refs: [nist-sp800-61r3] }
+          - { id: of08b-content, points: 1, axis: content, refs: [ipa-sme-guideline] }
+      - id: p-of-08-c
+        text: { ja: '教室から報告を受けるだけにして、負担を減らす。', en: '' }
+        explain: { ja: '報告だけでは、やっていない教室を見つけられない。実際の設定を見る必要がある。本部が確かめる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [cissp-cbk-secops, ipa-sme-guideline]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: of08c-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: of08c-content, points: -6, axis: content, refs: [ipa-sme-guideline] }
+          - { id: of08c-care, points: -5, axis: care, refs: [ipa-sme-guideline] }
+    lesson: { ja: '対策は、実施したという報告だけで終わらせない。設定の画面を見て、直ったかを記録する。できていない教室を責めるのではなく、同じ手順で直せるようにする。点検の記録は、次の事故を防ぐ材料になる。', en: '' }
+
+drafts:
+  draft-of-field-note:
+    title: { ja: '教室責任者への説明メモ', en: '' }
+    slots:
+      - id: timing
+        label: { ja: '出す時刻', en: '' }
+        auto: true
+        items:
+          - { id: of-t-24h, when: { withinHours: 24 }, points: 10, axis: time, refs: [jpcert-handling] }
+          - { id: of-t-72h, when: { withinHours: 72 }, points: 3, axis: time, refs: [jpcert-handling] }
+          - { id: of-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [jpcert-handling] }
+      - id: fact
+        label: { ja: '教室に伝える内容', en: '' }
+        options:
+          - { id: of-f-none, text: { ja: '本部が調査中なので様子を見る', en: '' }, points: -10, axis: content, refs: [ipa-sme-guideline], explain: { ja: '何も伝えないと、教室は保護者に答えられない。分かっている事実だけでも先に伝える。', en: '' } }
+          - { id: of-f-fact, text: { ja: '誤送信の事実と対象の範囲', en: '' }, points: 10, axis: content, refs: [ppc-notify-person], explain: { ja: '起きたことと対象を先に伝えている。教室が想像で答えるのを防ぎ、説明がそろう。範囲も伝える。', en: '' } }
+          - { id: of-f-blame, text: { ja: '担当者の名前と失敗の経緯', en: '' }, points: -8, axis: wording, refs: [ipa-sme-guideline], explain: { ja: '個人名を現場に伝えると、責任の話にすり替わる。必要なのは事実と対応の方針。個人名は出さない。', en: '' } }
+      - id: parents
+        label: { ja: '保護者への言い方', en: '' }
+        options:
+          - { id: of-p-oral, text: { ja: '聞かれたら口頭で説明する', en: '' }, points: -6, axis: order, refs: [ppc-notify-person], explain: { ja: '聞かれた人にだけ説明すると、知らない保護者との差が生まれる。全員に同じ文を渡す。', en: '' } }
+          - { id: of-p-wait, text: { ja: '本部の連絡が来るまで待つ', en: '' }, points: -10, axis: time, refs: [ipa-sme-guideline], explain: { ja: '待つ間に保護者の不安が膨らむ。いつ、誰が説明するのかを先に決めておく。待たせない。', en: '' } }
+          - { id: of-p-common, text: { ja: '本部の統一文を渡して説明する', en: '' }, points: 10, axis: wording, refs: [ppc-notify-person], explain: { ja: '全教室が同じ文で説明できる。教室ごとの言い方の差が生まれず、記録も残る。迷わない。', en: '' } }
+      - id: contact
+        label: { ja: '問い合わせ先', en: '' }
+        options:
+          - { id: of-c-window, text: { ja: '本部の専用窓口と受付時間', en: '' }, points: 8, axis: care, refs: [ppc-notify-person], explain: { ja: '窓口と時間が分かれば、教室は迷わず案内できる。問い合わせの記録も本部に集まる。傾向も見える。', en: '' } }
+          - { id: of-c-person, text: { ja: '担当者の携帯電話番号', en: '' }, points: -12, axis: care, refs: [ppc-notify-person], explain: { ja: '個人の電話に集中すると、対応が止まり担当者も疲弊する。組織の窓口を用意する。担当者を守る。', en: '' } }
+          - { id: of-c-class, text: { ja: '教室の受付で受け付ける', en: '' }, points: -5, axis: order, refs: [ipa-sme-guideline], explain: { ja: '教室の受付は数が限られる。本部の窓口を決めてから、教室は案内に専念したい。窓口を一本化する。', en: '' } }
+      - id: update
+        label: { ja: '次の連絡', en: '' }
+        options:
+          - { id: of-u-morning, text: { ja: '明日の朝までに状況を更新', en: '' }, points: 5, axis: time, refs: [cissp-cbk-secops], explain: { ja: '短い間隔で更新すれば、教室は最新の情報で答えられる。無理のない時刻にする。朝に更新する。', en: '' } }
+          - { id: of-u-month, text: { ja: '来月の教室だよりで報告', en: '' }, points: -4, axis: time, refs: [ipa-sme-guideline], explain: { ja: '月に1度では遅い。保護者対応の途中で、古い説明のままになる。更新はもっと早めに出す。', en: '' } }
+          - { id: of-u-none, text: { ja: '次は特に連絡をしない', en: '' }, points: -6, axis: record, refs: [cissp-cbk-secops], explain: { ja: '次の連絡がないと、教室は古い情報のまま動く。更新する時刻を決めておく。次の連絡を決める。', en: '' } }
+      - id: record
+        label: { ja: '教室での記録', en: '' }
+        options:
+          - { id: of-r-none, text: { ja: '記録はすべて本部に任せる', en: '' }, points: -8, axis: record, refs: [cissp-cbk-secops], explain: { ja: '教室で受けた問い合わせこそ記録が要る。件数と内容が二次被害の発見につながる。教室にも記録を残す。', en: '' } }
+          - { id: of-r-oral, text: { ja: '口頭で本部に伝えるだけ', en: '' }, points: -4, axis: record, refs: [ipa-sme-guideline], explain: { ja: '口頭だけでは内容が抜け、件数も数えられない。簡単な書式で記録を残す。件数を数えたい。', en: '' } }
+          - { id: of-r-count, text: { ja: '教室ごとに件数と内容を記録', en: '' }, points: 10, axis: record, refs: [cissp-cbk-secops], explain: { ja: '教室ごとの記録が本部に集まれば、対応の偏りと二次被害の兆候が見える。件数を数える。', en: '' } }
+      - id: instructors
+        label: { ja: '講師への扱い', en: '' }
+        options:
+          - { id: of-i-nothing, text: { ja: '講師には何も伝えないまま', en: '' }, points: -6, axis: order, refs: [ipa-sme-guideline], explain: { ja: '講師は保護者と最も長く話す。知らないままだと、教室ごとに説明が食い違う。短いメモでよい。', en: '' } }
+          - { id: of-i-share, text: { ja: '事実を共有し質問を受け付ける', en: '' }, points: 8, axis: care, refs: [ipa-sme-guideline], explain: { ja: '講師が同じ説明をでき、疑問も集まる。現場の不安を減らし、説明の抜けも見つかる。講師も味方になる。', en: '' } }
+          - { id: of-i-secret, text: { ja: '口外しないよう強く求める', en: '' }, points: -10, axis: care, refs: [ppc-notify-person], explain: { ja: '口止めは現場を孤立させる。保護者と話す講師には、事実と説明の仕方を渡す。口止めはしない。', en: '' } }
+voices:
+  - { id: v-of-01-a, media: chat, misleading: false, text: { ja: '教室責任者「保護者に何と説明すればいいですか」。', en: '' }, trigger: { at: point } }
+  - { id: v-of-01-b, media: boss, misleading: true, type: boss-pressure, text: { ja: '教室を回るのはやめろ。本部で隠しておけ。', en: '' }, trigger: { at: point } }
+  - { id: v-of-01-c, media: board, misleading: true, type: popular, text: { ja: '他の教室は何も言っていない。うちだけ騒ぐな。', en: '' }, trigger: { at: point } }
+  - { id: v-of-02-a, media: chat, misleading: true, type: well-meant-field, text: { ja: '電話より、教室で直接聞く方が早いですよ。', en: '' }, trigger: { at: point } }
+  - { id: v-of-02-b, media: chat, misleading: false, text: { ja: '総務「電話がつながらないと、保護者が直接来ます」。', en: '' }, trigger: { at: point } }
+  - { id: v-of-02-c, media: sns, misleading: true, type: law-ish, text: { ja: '委員会に言えば、あとは役所が説明してくれる。', en: '' }, trigger: { at: point } }
+  - { id: v-of-03-a, media: chat, misleading: false, text: { ja: '教室責任者「貼り紙の文面を、本部で作ってください」。', en: '' }, trigger: { at: point } }
+  - { id: v-of-03-b, media: sns, misleading: true, type: public-opinion, text: { ja: '貼り紙なんて誰も読まない。SNSで十分だ。', en: '' }, trigger: { at: point } }
+  - { id: v-of-03-c, media: chat, misleading: true, type: well-meant-field, text: { ja: '現場でうまく言います。本部は来ないでください。', en: '' }, trigger: { at: point } }
+  - { id: v-of-04-a, media: chat, misleading: false, text: { ja: '広報「事実を正確に書く方針です」。', en: '' }, trigger: { at: point } }
+  - { id: v-of-04-b, media: sns, misleading: true, type: fake-expert, text: { ja: '「可能性」と書けば、責任を逃れられる。', en: '' }, trigger: { at: point } }
+  - { id: v-of-04-c, media: boss, misleading: true, type: boss-pressure, text: { ja: 'システムの不具合で通せ。その方が社内も納得する。', en: '' }, trigger: { at: point } }
+  - { id: v-of-05-a, media: chat, misleading: false, text: { ja: '会員担当「体験の申込者は、名簿の更新が止まっています」。', en: '' }, trigger: { at: point } }
+  - { id: v-of-05-b, media: sns, misleading: true, type: popular, text: { ja: '一斉メールで十分だ。電話は希望者だけでいい。', en: '' }, trigger: { at: point } }
+  - { id: v-of-05-c, media: board, misleading: true, type: well-meant-field, text: { ja: '教室に任せるのが現場主義だ。本部は口を出すな。', en: '' }, trigger: { at: point } }
+  - { id: v-of-06-a, media: vendor, misleading: true, type: vendor-interest, text: { ja: '設定は正しいはずです。使い方の問題だと思います。', en: '' }, trigger: { at: point } }
+  - { id: v-of-06-b, media: chat, misleading: false, text: { ja: '管理部長「送信履歴と画面を突き合わせましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v-of-06-c, media: vendor, misleading: true, type: vendor-interest, text: { ja: '新しいツールに替えれば、全部解決しますよ。', en: '' }, trigger: { at: point } }
+  - { id: v-of-07-a, media: sns, misleading: true, type: public-opinion, text: { ja: '現場の自由度を奪うな。本部は何も分かっていない。', en: '' }, trigger: { at: point } }
+  - { id: v-of-07-b, media: chat, misleading: false, text: { ja: '管理部長「承認の担当と、急ぎの時の扱いを決めましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v-of-07-c, media: boss, misleading: true, type: boss-pressure, text: { ja: '権限を集めると現場が回らない。今のままでいい。', en: '' }, trigger: { at: point } }
+  - { id: v-of-08-a, media: chat, misleading: false, text: { ja: '教室責任者「掲示と電話、終わりました」。', en: '' }, trigger: { at: point } }
+  - { id: v-of-08-b, media: news, misleading: true, type: past-success, text: { ja: '前回の点検も形式的だったが、問題は起きなかった。', en: '' }, trigger: { at: point } }
+  - { id: v-of-08-c, media: sns, misleading: true, type: coward-critique, text: { ja: '点検を何度もやるのは臆病。もう終わりにしろ。', en: '' }, trigger: { at: point } }
+  - { id: v-of-after-01, media: sns, misleading: true, type: public-opinion, text: { ja: '配信を止めるなんて、大げさすぎる。', en: '' }, trigger: { at: after, choice: p-of-01-c } }
+  - { id: v-of-coward-2, media: sns, misleading: false, text: { ja: '本部は何をしている。教室に任せきりか。', en: '' }, trigger: { at: manual } }
+  - { id: v-of-coward-3, media: news, misleading: false, text: { ja: '現場に丸投げの本部。責任者は出てこない。', en: '' }, trigger: { at: manual } }
+  - { id: v-of-coward-4, media: news, misleading: false, text: { ja: '臆病な対応で、保護者の不信が広がった。', en: '' }, trigger: { at: manual } }
+  - { id: v-of-ev-phones, media: chat, misleading: false, text: { ja: '教室「電話が止まりません。何と答えるんですか」。', en: '' }, trigger: { at: point } }
+  - { id: v-of-ev-sns, media: sns, misleading: false, text: { ja: '保護者「教室から説明がない。私たちは待つだけなのか」。', en: '' }, trigger: { at: point } }

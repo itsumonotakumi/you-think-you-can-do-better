@@ -1,0 +1,702 @@
+# No.16 こもれびカルチャー / セキュリティ担当者（本部事務局の会員担当）ロール
+# 入門編: 判断8、報告書1。送信した本人の初動、報告、削除依頼、記録を扱う。
+# 視点: 会員名簿と配信を担当する事務局スタッフ。失敗した本人として、何を先に動くか。
+estimateMinutes: 12
+intro: { ja: 'あなたはこもれびカルチャー本部事務局の会員担当。会員向けのお知らせメールを送るのが今日の仕事だった。送信ボタンを押して18分後、画面を見て気づく。宛先は Bcc ではなく、To に412件のアドレスが並んでいた。もう戻せない。まず何をするか。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-an-coward-2
+  '3': v-an-coward-3
+  '4': v-an-coward-4
+events:
+  - id: ev-an-reply
+    at: { day: 0, minutes: 660 }
+    voices: [v-an-ev-reply]
+    gauges: { flame: 5 }
+    sound: { se: [mail_arrive] }
+    caption: { ja: '返信が3件届いた。どれも「私のアドレスが見えています」という内容だった。', en: '' }
+  - id: ev-an-phone
+    at: { day: 0, minutes: 840 }
+    voices: [v-an-ev-phone]
+    gauges: { flame: 5 }
+    sound: { se: [phone_ring] }
+    caption: { ja: '教室から「保護者が直接、本部に電話をかけてきた」と連絡が入った。', en: '' }
+points:
+  - id: p-an-01
+    at: { day: 0, minutes: 600 }
+    phase: detect
+    sound: { se: [notify_chat] }
+    text: { ja: '午前10時。送信済みの画面を見て、宛先が To に並んでいることに気づいた。送信は9時42分。取り消しのボタンを探す手が震えている。', en: '' }
+    voices: [v-an-01-sns, v-an-01-boss, v-an-01-ok]
+    notable:
+      - { id: note-cause, text: { ja: '会員412人のアドレスを To に入れ、Bcc を空のまま送信した。宛先欄に手で貼り付けたのが原因。', en: '' } }
+      - { id: note-response, text: { ja: '送信は9時42分。気づいたのは10時。取り消しはできなかった。', en: '' } }
+    choices:
+      - id: p-an-01-a
+        text: { ja: '上司にすぐ報告し、送信履歴と画面を保存する。', en: '' }
+        explain: { ja: '隠さず報告し、証拠を押さえている。早い報告は、会社が動く時間を増やす。まず報告する。', en: '' }
+        minutes: 15
+        category: increase
+        points: 300
+        refs: [jpcert-handling, ipa-sme-guideline]
+        gauges: { flame: -5, trust: 10 }
+        setFlags: { reportedEarly: true }
+        items:
+          - { id: an01a-time, points: 10, axis: time, refs: [jpcert-handling] }
+          - { id: an01a-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an01a-order, points: 5, axis: order, refs: [ipa-sme-guideline] }
+      - id: p-an-01-b
+        text: { ja: '取り消しの方法を探し、見つかるまで報告を待つ。', en: '' }
+        explain: { ja: '取り消しを探す間に、報告と初動が遅れる。送信済みメールは自分では戻せない。報告が先。報告が先。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [no16-ppc-breach-qa]
+        gauges: { flame: 10, trust: -5 }
+        delayed:
+          - { afterPhases: 1, points: -5, gauges: { flame: 5 }, reason: { ja: '報告が遅れた間に、受信者からの指摘が広がった。', en: '' } }
+        items:
+          - { id: an01b-time, points: -5, axis: time, refs: [no16-ppc-breach-qa] }
+          - { id: an01b-order, points: -4, axis: order, refs: [jpcert-handling] }
+          - { id: an01b-record, points: -3, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-an-01-c
+        text: { ja: '自分の判断でお詫びのメールを送り、報告は後に回す。', en: '' }
+        explain: { ja: '自分で何とかしたい気持ちは分かるが、独断の連絡は会社の説明と食い違う。まず報告する。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -120
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: an01c-order, points: -8, axis: order, refs: [ipa-sme-guideline] }
+          - { id: an01c-wording, points: -6, axis: wording, refs: [ppc-notify-person] }
+          - { id: an01c-record, points: -5, axis: record, refs: [cissp-cbk-secops] }
+    lesson: { ja: '誤送信に気づいたら、まず上司に報告する。取り消しを探す時間は短くていい。報告のときに、送信時刻、宛先数、画面の状態を伝える。自分で何とかしようとして独断で連絡すると、会社の説明と食い違う。', en: '' }
+
+  - id: p-an-x1
+    at: { day: 0, minutes: 615 }
+    when: { flags: { reportedEarly: false } }
+    phase: detect
+    text: { ja: '午前10時15分。まだ上司に報告していない。画面には取り消しのボタンが見当たらない。', en: '' }
+    voices: [v-an-01-ok]
+    choices:
+      - id: p-an-x1-a
+        text: { ja: '自分の判断で取り消しを探し、報告は後にする。', en: '' }
+        explain: { ja: '取り消しを探す間に、報告と初動が遅れる。送信済みメールは自分では戻せない。報告が先。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [no16-ppc-breach-qa]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: anx1a-time, points: -4, axis: time, refs: [no16-ppc-breach-qa] }
+          - { id: anx1a-order, points: -3, axis: order, refs: [jpcert-handling] }
+      - id: p-an-x1-b
+        text: { ja: '今から上司に報告し、画面と履歴を保存する。', en: '' }
+        explain: { ja: '遅れても、今から報告すれば会社が動ける。画面と履歴を保存してから話す。今から話す。', en: '' }
+        minutes: 30
+        category: recover
+        points: 120
+        refs: [jpcert-handling, ipa-sme-guideline]
+        gauges: { flame: -5, trust: 10 }
+        setFlags: { reportedEarly: true }
+        items:
+          - { id: anx1b-time, points: 6, axis: time, refs: [jpcert-handling] }
+          - { id: anx1b-record, points: 4, axis: record, refs: [cissp-cbk-secops] }
+    lesson: { ja: '報告が遅れても、今から話せば間に合う。送信時刻、宛先数、気づいた時刻を伝え、画面と履歴を保存する。自分で取り消そうとする時間は短くていい。今から報告し、画面と履歴を保存する。', en: '' }
+
+  - id: p-an-02
+    at: { day: 0, minutes: 630 }
+    phase: contain
+    text: { ja: '午前10時30分。運営本部長が「何があったのか、正確に話してくれ」と言った。どこまで話すかで、自分の評価も変わりそうで怖い。', en: '' }
+    voices: [v-an-02-a, v-an-02-b, v-an-02-c]
+    choices:
+      - id: p-an-02-a
+        text: { ja: '報告はしたが、詳しいことは後でまとめると伝える。', en: '' }
+        explain: { ja: '報告を後回しにすると、本部が動くのが遅れる。分かっていることは、その場で話す。その場で話す。その場で話す。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { trust: 5, stamina: -5 }
+        coward: true
+        items:
+          - { id: an02a-content, points: 3, axis: content, refs: [jpcert-handling] }
+          - { id: an02a-time, points: 2, axis: time, refs: [ipa-sme-guideline] }
+          - { id: an02a-record, points: -2, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-an-02-b
+        text: { ja: '何をどこまで話すか整理し、事実と時刻を上司に伝える。', en: '' }
+        explain: { ja: '事実と時刻を整理して伝えている。上司が判断するための材料が、一度でそろう。整理して伝える。', en: '' }
+        minutes: 30
+        category: increase
+        points: 300
+        refs: [jpcert-handling, ipa-sme-guideline]
+        gauges: { flame: -5, trust: 10 }
+        setFlags: { reportedFacts: true }
+        items:
+          - { id: an02b-content, points: 10, axis: content, refs: [jpcert-handling] }
+          - { id: an02b-time, points: 8, axis: time, refs: [ipa-sme-guideline] }
+          - { id: an02b-record, points: 5, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-an-02-c
+        text: { ja: '自分の失敗を小さく見せようと、宛先数を少なく伝える。', en: '' }
+        explain: { ja: '数を小さく伝えると、対象の判断が狂う。あとで実際の数が分かり、信頼を大きく失う。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [jpcert-handling, ppc-report-scope]
+        gauges: { flame: 15, trust: -20 }
+        setFlags: { understated: true }
+        items:
+          - { id: an02c-content, points: -12, axis: content, refs: [jpcert-handling] }
+          - { id: an02c-record, points: -10, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an02c-wording, points: -5, axis: wording, refs: [ppc-report-scope] }
+    lesson: { ja: '報告では、送信時刻、宛先数、気づいた時刻、今の画面の状態を伝える。都合の悪い数字を小さくすると、対象の判断が狂い、あとで信頼を失う。自分の評価より、会社が早く動けることを優先する。', en: '' }
+
+  - id: p-an-x2
+    at: { day: 0, minutes: 645 }
+    when: { flags: { reportedFacts: false } }
+    phase: contain
+    text: { ja: '午前10時45分。上司への報告が、まだ要点だけになっている。宛先の数と時刻を、もう一度確かめる必要がある。', en: '' }
+    voices: [v-an-02-a]
+    choices:
+      - id: p-an-x2-a
+        text: { ja: '送信時刻と宛先数、気づいた時刻を整理して伝える。', en: '' }
+        explain: { ja: '数字と時刻をそろえて伝えている。上司が対象の範囲と初動を判断しやすくなる。数字をそろえる。', en: '' }
+        minutes: 30
+        category: recover
+        points: 120
+        refs: [jpcert-handling]
+        gauges: { trust: 10 }
+        setFlags: { reportedFacts: true }
+        items:
+          - { id: anx2a-content, points: 6, axis: content, refs: [jpcert-handling] }
+          - { id: anx2a-time, points: 4, axis: time, refs: [ipa-sme-guideline] }
+      - id: p-an-x2-b
+        text: { ja: '詳しいことは後でまとめると伝え、その場を離れる。', en: '' }
+        explain: { ja: '報告を後回しにすると、本部が動くのが遅れる。分かっていることは、その場で話す。その場で話す。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ipa-sme-guideline]
+        gauges: { flame: 5 }
+        items:
+          - { id: anx2b-content, points: -4, axis: content, refs: [jpcert-handling] }
+          - { id: anx2b-time, points: -3, axis: time, refs: [ipa-sme-guideline] }
+    lesson: { ja: '報告の内容が薄くても、数字と時刻を足せば伝わる。送信時刻、宛先数、気づいた時刻、今の画面の状態を、その場で話す。あとでまとめる约束は、遅れのもとになる。数字を先に伝える。', en: '' }
+
+  - id: p-an-03
+    at: { day: 0, minutes: 660 }
+    phase: organize
+    sound: { se: [mail_arrive] }
+    text: { ja: '午前11時。受信者に削除をお願いする連絡を出すことになった。412人にどう送るか。全員のアドレスをもう一度扱うことになる。', en: '' }
+    voices: [v-an-03-a, v-an-03-b, v-an-03-c]
+    choices:
+      - id: p-an-03-a
+        text: { ja: '全員に一斉メールを送り、削除をお願いする。', en: '' }
+        explain: { ja: '一斉メールは速いが、宛先の扱いをまた間違える危険がある。個別か Bcc で送りたい。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [ppc-notify-person]
+        gauges: { flame: 5 }
+        items:
+          - { id: an03a-time, points: 3, axis: time, refs: [ppc-notify-person] }
+          - { id: an03a-wording, points: 2, axis: wording, refs: [ppc-notify-person] }
+          - { id: an03a-care, points: -2, axis: care, refs: [no16-ppc-breach-qa] }
+      - id: p-an-03-b
+        text: { ja: '教室の掲示板に、削除のお願いを貼り出す。', en: '' }
+        explain: { ja: '掲示板を見ない人には届かない。削除のお願いは、相手に直接届く形で出す。直接届ける。直接届ける。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [ppc-notify-person]
+        gauges: { flame: 10, trust: -5 }
+        items:
+          - { id: an03b-care, points: -8, axis: care, refs: [ppc-notify-person] }
+          - { id: an03b-time, points: -6, axis: time, refs: [ppc-notify-person] }
+          - { id: an03b-order, points: -5, axis: order, refs: [ipa-sme-guideline] }
+      - id: p-an-03-c
+        text: { ja: '一人ずつ個別に送り、Bcc で削除をお願いする。', en: '' }
+        explain: { ja: '宛先を見せずに一人ずつ届けている。同じ誤りを繰り返さず、相手にも真剣さが伝わる。', en: '' }
+        minutes: 90
+        category: increase
+        points: 300
+        refs: [ppc-notify-person, no16-ppc-breach-qa]
+        gauges: { flame: -5, trust: 10, stamina: -15 }
+        setFlags: { askedDeletion: true }
+        items:
+          - { id: an03c-care, points: 10, axis: care, refs: [ppc-notify-person] }
+          - { id: an03c-order, points: 8, axis: order, refs: [no16-ppc-breach-qa] }
+          - { id: an03c-wording, points: 5, axis: wording, refs: [ppc-notify-person] }
+    lesson: { ja: '削除のお願いは、相手に直接届く形で出す。全員に一斉メールを送ると、宛先の扱いをまた間違えるおそれがある。一人ずつ送るか、必ず Bcc を使う。文面には、何を削除してほしいかと、相談先を書く。', en: '' }
+
+  - id: p-an-x3
+    at: { day: 0, minutes: 690 }
+    when: { flags: { askedDeletion: false } }
+    phase: organize
+    text: { ja: '午前11時30分。削除のお願いをまだ出していない。受信者から「どうすればいいのか」と返信が来ている。', en: '' }
+    voices: [v-an-03-b]
+    choices:
+      - id: p-an-x3-a
+        text: { ja: '教室の掲示板に、削除のお願いを貼り出す。', en: '' }
+        explain: { ja: '掲示板を見ない人には届かない。削除のお願いは、相手に直接届く形で出す。直接届ける。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ppc-notify-person]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: anx3a-care, points: -4, axis: care, refs: [ppc-notify-person] }
+          - { id: anx3a-time, points: -3, axis: time, refs: [no16-ppc-breach-qa] }
+      - id: p-an-x3-b
+        text: { ja: '一人ずつ個別に送り、Bcc で削除をお願いする。', en: '' }
+        explain: { ja: '宛先を見せずに一人ずつ届けている。同じ誤りを繰り返さず、相手にも真剣さが伝わる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [ppc-notify-person, no16-ppc-breach-qa]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { askedDeletion: true }
+        items:
+          - { id: anx3b-care, points: 6, axis: care, refs: [ppc-notify-person] }
+          - { id: anx3b-order, points: 4, axis: order, refs: [no16-ppc-breach-qa] }
+    lesson: { ja: '削除依頼が遅れても、今から出せる。一人ずつ送るか、必ず Bcc を使う。何を削除してほしいかと、相談先を書く。掲示板だけでは、見ない人に届かない。一人ずつ、今から削除をお願いする。', en: '' }
+
+  - id: p-an-04
+    at: { day: 0, minutes: 750 }
+    phase: investigate
+    text: { ja: '午後0時30分。管理部長から「設定画面と操作履歴を、そのままの状態で残してほしい」と依頼が来た。画面を閉じると消える情報もある。', en: '' }
+    voices: [v-an-04-a, v-an-04-b, v-an-04-c]
+    choices:
+      - id: p-an-04-a
+        text: { ja: '配信ツールの設定画面を撮り、操作履歴も保存する。', en: '' }
+        explain: { ja: '設定と操作履歴をそのまま残している。原因の特定と、説明の材料になる。証拠をそろえる。', en: '' }
+        minutes: 30
+        category: increase
+        points: 300
+        refs: [cissp-cbk-secops, jpcert-handling]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { evidenceSaved: true }
+        items:
+          - { id: an04a-record, points: 10, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an04a-content, points: 8, axis: content, refs: [jpcert-handling] }
+          - { id: an04a-order, points: 5, axis: order, refs: [jpcert-handling] }
+      - id: p-an-04-b
+        text: { ja: '設定を直してから、写真を撮って記録に残す。', en: '' }
+        explain: { ja: '直したあとの画面では、誤りの状態が分からない。原因を確かめる前に設定を変えない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [cissp-cbk-secops]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: an04b-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an04b-content, points: -6, axis: content, refs: [jpcert-handling] }
+          - { id: an04b-order, points: -5, axis: order, refs: [jpcert-handling] }
+      - id: p-an-04-c
+        text: { ja: '何も変えず、自分の記憶をメモに残しておく。', en: '' }
+        explain: { ja: '記憶だけでは、時刻も設定もあいまいになる。画面と履歴を保存すれば確かめられる。画面を残す。画面を残す。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { stamina: -5 }
+        items:
+          - { id: an04c-content, points: 3, axis: content, refs: [jpcert-handling] }
+          - { id: an04c-time, points: 2, axis: time, refs: [cissp-cbk-secops] }
+          - { id: an04c-record, points: -2, axis: record, refs: [cissp-cbk-secops] }
+    lesson: { ja: '原因を調べる前に、画面と履歴をそのまま保存する。設定を直してしまうと、誤りがあった状態は分からなくなる。写真だけでなく、操作履歴も残す。証拠がそろうと、原因の説明と再発防止が具体的になる。', en: '' }
+
+  - id: p-an-x4
+    at: { day: 0, minutes: 780 }
+    when: { flags: { evidenceSaved: false } }
+    phase: investigate
+    text: { ja: '午後1時。設定画面の写真をまだ撮っていない。管理部長から「今の状態を残して」と再度言われた。', en: '' }
+    voices: [v-an-04-a]
+    choices:
+      - id: p-an-x4-a
+        text: { ja: '設定画面を撮り、操作履歴も今から保存する。', en: '' }
+        explain: { ja: '今からでも、残っている画面と履歴を保存すれば原因を確かめられる。今から保存する。', en: '' }
+        minutes: 30
+        category: recover
+        points: 120
+        refs: [cissp-cbk-secops, jpcert-handling]
+        gauges: { trust: 10 }
+        setFlags: { evidenceSaved: true }
+        items:
+          - { id: anx4a-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: anx4a-content, points: 4, axis: content, refs: [jpcert-handling] }
+      - id: p-an-x4-b
+        text: { ja: '自分の記憶をメモし、画面は閉じてしまう。', en: '' }
+        explain: { ja: '記憶だけでは、時刻も設定もあいまいになる。画面と履歴を保存すれば確かめられる。画面を残す。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [jpcert-handling]
+        gauges: { flame: 5 }
+        items:
+          - { id: anx4b-record, points: -4, axis: record, refs: [jpcert-handling] }
+          - { id: anx4b-content, points: -3, axis: content, refs: [cissp-cbk-secops] }
+    lesson: { ja: '証拠を残すのが遅れても、今の画面は残せる。設定画面の写真と操作履歴を保存する。設定を直す前に、誤りがあった状態を残す。設定画面と操作履歴を、今から保存しておく。', en: '' }
+
+  - id: p-an-05
+    at: { day: 0, minutes: 840 }
+    phase: notify
+    sound: { se: [mail_arrive] }
+    text: { ja: '午後2時。削除のお願いを出したあと、返信が続いている。なかには「知らない人からメールが来た」という相談や、怒った文面もある。', en: '' }
+    voices: [v-an-05-a, v-an-05-b, v-an-05-c]
+    notable:
+      - { id: note-check, text: { ja: '受信者からの返信と不審メールの相談を集計している。現時点で悪用の申し出はない。', en: '' } }
+    choices:
+      - id: p-an-05-a
+        text: { ja: '返信はすべて無視し、本部の窓口に任せる。', en: '' }
+        explain: { ja: '窓口に任せるのはよいが、無視すると相談が届かない。転送して、返事は窓口から出す。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [ppc-notify-person]
+        gauges: { flame: 10, trust: -10 }
+        items:
+          - { id: an05a-care, points: -8, axis: care, refs: [ppc-notify-person] }
+          - { id: an05a-time, points: -6, axis: time, refs: [ppc-notify-person] }
+          - { id: an05a-record, points: -5, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-an-05-b
+        text: { ja: '返信を一人ずつ読み、削除の確認と相談先を返す。', en: '' }
+        explain: { ja: '一人ずつ読み、確認と相談先を返している。不審メールの相談を、ここで拾える。相談を拾う。相談を拾う。', en: '' }
+        minutes: 90
+        category: increase
+        points: 300
+        refs: [ppc-notify-person, no16-ppc-breach-qa]
+        gauges: { flame: -5, trust: 10, stamina: -15 }
+        setFlags: { repliedEach: true }
+        items:
+          - { id: an05b-care, points: 10, axis: care, refs: [ppc-notify-person] }
+          - { id: an05b-content, points: 8, axis: content, refs: [no16-ppc-breach-qa] }
+          - { id: an05b-record, points: 5, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-an-05-c
+        text: { ja: '返信をまとめて読み、代表の人にだけ返事をする。', en: '' }
+        explain: { ja: '代表にだけ返すと、他の人の相談が届かない。全員に返すか、窓口へつなぐ。全員に返す。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [ppc-notify-person]
+        gauges: { trust: 5 }
+        coward: true
+        items:
+          - { id: an05c-time, points: 3, axis: time, refs: [ppc-notify-person] }
+          - { id: an05c-content, points: 2, axis: content, refs: [ipa-sme-guideline] }
+          - { id: an05c-care, points: -2, axis: care, refs: [ppc-notify-person] }
+    lesson: { ja: '返信は一人ずつ読む。削除できたかの確認と、不審メールの相談先を返す。怒った文面にも、定型文だけでなく短いお詫びを添える。相談を拾うことが、二次被害を早く見つけることに直結する。', en: '' }
+
+  - id: p-an-x5
+    at: { day: 0, minutes: 885 }
+    when: { flags: { repliedEach: false } }
+    phase: notify
+    text: { ja: '午後2時45分。返信が20件を超えた。なかには「知らない人からメールが来た」という相談も混ざっている。', en: '' }
+    voices: [v-an-05-a]
+    choices:
+      - id: p-an-x5-a
+        text: { ja: '返信は窓口に転送し、自分では読まない。', en: '' }
+        explain: { ja: '転送だけでは、緊急の相談が埋もれる。不審メールの相談は、早く拾いたい。自分でも読む。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ppc-notify-person]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: anx5a-care, points: -4, axis: care, refs: [ppc-notify-person] }
+          - { id: anx5a-record, points: -3, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-an-x5-b
+        text: { ja: '返信を一人ずつ読み、削除の確認と相談先を返す。', en: '' }
+        explain: { ja: '一人ずつ読み、確認と相談先を返している。不審メールの相談を、ここで拾える。相談を拾う。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [ppc-notify-person, no16-ppc-breach-qa]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { repliedEach: true }
+        items:
+          - { id: anx5b-care, points: 6, axis: care, refs: [ppc-notify-person] }
+          - { id: anx5b-content, points: 4, axis: content, refs: [no16-ppc-breach-qa] }
+    lesson: { ja: '返信が遅れても、今から読める。削除できたかの確認と、不審メールの相談先を返す。まとめて転送するだけでは、緊急の相談が埋もれる。返信を一人ずつ読み、相談を拾う。一人ずつ返す。', en: '' }
+
+  - id: p-an-06
+    at: { day: 0, minutes: 930 }
+    phase: recover
+    text: { ja: '午後3時30分。作業を家に持ち帰ろうとしたところで、管理部長に止められた。「会員名簿を個人のパソコンに入れないでくれ」と言う。今日中に終わらせたい仕事はまだある。', en: '' }
+    voices: [v-an-06-a, v-an-06-b, v-an-06-c]
+    choices:
+      - id: p-an-06-a
+        text: { ja: '名簿を個人のパソコンに保存し、自宅で作業する。', en: '' }
+        explain: { ja: '自宅のパソコンは管理が届かない。名簿が漏れれば、今回より大きな事故になる。持ち出さない。持ち出さない。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [no07-ipa-insider, cissp-cbk-secops]
+        gauges: { flame: 15, trust: -15 }
+        setFlags: { tookListHome: true }
+        items:
+          - { id: an06a-record, points: -12, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an06a-content, points: -10, axis: content, refs: [no07-ipa-insider] }
+          - { id: an06a-care, points: -5, axis: care, refs: [ipa-sme-guideline] }
+      - id: p-an-06-b
+        text: { ja: '名簿を印刷して各教室に配り、回収しない。', en: '' }
+        explain: { ja: '紙は持ち出しが見えず、回収もできない。名簿の範囲を広げるほど危険が増える。紙も危ない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [no07-ipa-insider]
+        gauges: { flame: 10, trust: -5 }
+        items:
+          - { id: an06b-record, points: -3, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an06b-content, points: -3, axis: content, refs: [no07-ipa-insider] }
+          - { id: an06b-order, points: -3, axis: order, refs: [ipa-sme-guideline] }
+      - id: p-an-06-c
+        text: { ja: '名簿は社内の共有フォルダだけに置き、持ち出さない。', en: '' }
+        explain: { ja: '名簿を社内に留めている。持ち出さなければ、漏えいの範囲を広げずに済む。範囲を広げない。', en: '' }
+        minutes: 45
+        category: increase
+        points: 300
+        refs: [no07-ipa-insider, cissp-cbk-secops]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { listKeptInside: true }
+        items:
+          - { id: an06c-record, points: 10, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an06c-content, points: 8, axis: content, refs: [no07-ipa-insider] }
+          - { id: an06c-care, points: 5, axis: care, refs: [ipa-sme-guideline] }
+    lesson: { ja: '会員名簿は、決められた場所から出さない。個人のパソコン、私物のUSBメモリ、印刷した紙は、管理が届かない。今日中に終わらせたい仕事より、名簿を広げないことを優先する。持ち出しの決まりは、全員に同じように伝える。', en: '' }
+
+  - id: p-an-x6
+    at: { day: 0, minutes: 975 }
+    when: { flags: { listKeptInside: false } }
+    phase: recover
+    text: { ja: '午後4時15分。会員名簿が個人のパソコンに残っている。作業を家に持ち帰る準備をしていた。', en: '' }
+    voices: [v-an-06-a]
+    choices:
+      - id: p-an-x6-a
+        text: { ja: '名簿を社内の共有フォルダに戻し、私物から消す。', en: '' }
+        explain: { ja: '名簿を社内に戻している。私物に残さなければ、漏えいの範囲を広げずに済む。今から戻す。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [no07-ipa-insider, cissp-cbk-secops]
+        gauges: { trust: 10 }
+        setFlags: { listKeptInside: true }
+        items:
+          - { id: anx6a-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: anx6a-content, points: 4, axis: content, refs: [no07-ipa-insider] }
+      - id: p-an-x6-b
+        text: { ja: '名簿は個人のパソコンに残し、作業を続ける。', en: '' }
+        explain: { ja: '自宅のパソコンは管理が届かない。名簿が漏れれば、今回より大きな事故になる。持ち出さない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [no07-ipa-insider]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: anx6b-record, points: -4, axis: record, refs: [no07-ipa-insider] }
+          - { id: anx6b-content, points: -3, axis: content, refs: [cissp-cbk-secops] }
+    lesson: { ja: '名簿を私物に置いてしまっても、今から戻せる。共有フォルダに戻し、私物から削除する。持ち出したままにすると、管理の届かない場所に個人データが残る。名簿を共有フォルダに戻し、私物から消す。', en: '' }
+
+  - id: p-an-07
+    at: { day: 0, minutes: 1020 }
+    phase: after
+    text: { ja: '午後5時。本部長から「今日、君が何をしたか記録に残してくれ」と言われた。失敗した本人として、何をどこまで書くか。', en: '' }
+    voices: [v-an-07-a, v-an-07-b, v-an-07-c]
+    choices:
+      - id: p-an-07-a
+        text: { ja: '自分がしたことと時刻を、時系列で記録に残す。', en: '' }
+        explain: { ja: '自分の行動を時刻で残している。失敗も対応も、次の改善の材料になる。今すぐ記録する。記録に残そう。', en: '' }
+        minutes: 45
+        category: increase
+        points: 300
+        refs: [cissp-cbk-secops, jpcert-handling]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { selfRecorded: true }
+        detail: draft-an-report
+        items:
+          - { id: an07a-record, points: 10, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an07a-time, points: 8, axis: time, refs: [jpcert-handling] }
+          - { id: an07a-content, points: 5, axis: content, refs: [jpcert-handling] }
+      - id: p-an-07-b
+        text: { ja: '上司に口頭で伝え、記録は上司に任せる。', en: '' }
+        explain: { ja: '口頭では、細かい時刻と手順が抜ける。自分で書くから、失敗の原因も具体的に残る。自分で書く。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { stamina: -5 }
+        items:
+          - { id: an07b-content, points: 3, axis: content, refs: [jpcert-handling] }
+          - { id: an07b-time, points: 2, axis: time, refs: [jpcert-handling] }
+          - { id: an07b-record, points: -2, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-an-07-c
+        text: { ja: '記録は作らず、反省は口頭で伝える。', en: '' }
+        explain: { ja: '反省だけでは、何が起きたかを共有できない。同じ手順の人が、また同じ誤りをする。記録を残す。記録を残す。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [cissp-cbk-secops]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: an07c-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an07c-content, points: -6, axis: content, refs: [jpcert-handling] }
+          - { id: an07c-wording, points: -5, axis: wording, refs: [ipa-sme-guideline] }
+    lesson: { ja: '失敗した本人が書く記録は、いちばん具体的な教材になる。送信時刻、宛先数、押した操作、気づいた時刻、その後の対応を時系列で残す。隠さず書くことで、同じ手順の人が同じ誤りを繰り返さずに済む。', en: '' }
+
+  - id: p-an-x7
+    at: { day: 0, minutes: 1065 }
+    when: { flags: { selfRecorded: false } }
+    phase: after
+    text: { ja: '午後5時45分。今日の記録がまだない。本部長から「あとで振り返れるように」と言われている。', en: '' }
+    voices: [v-an-07-a]
+    choices:
+      - id: p-an-x7-a
+        text: { ja: '記録は作らず、反省は口頭で伝える。', en: '' }
+        explain: { ja: '反省だけでは、何が起きたかを共有できない。同じ手順の人が、また同じ誤りをする。記録を残す。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [cissp-cbk-secops]
+        gauges: { flame: 5 }
+        items:
+          - { id: anx7a-record, points: -4, axis: record, refs: [cissp-cbk-secops] }
+          - { id: anx7a-content, points: -3, axis: content, refs: [jpcert-handling] }
+      - id: p-an-x7-b
+        text: { ja: '自分がしたことと時刻を、時系列で書き残す。', en: '' }
+        explain: { ja: '自分の行動を時刻で残している。失敗も対応も、次の改善の材料になる。今すぐ記録する。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [cissp-cbk-secops, jpcert-handling]
+        gauges: { trust: 10 }
+        setFlags: { selfRecorded: true }
+        items:
+          - { id: anx7b-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: anx7b-time, points: 4, axis: time, refs: [jpcert-handling] }
+    lesson: { ja: '記録が遅れても、記憶が新しいうちに書ける。送信時刻、宛先数、押した操作、気づいた時刻、その後の対応を時系列で残す。失敗した本人の記録は、具体的な教材になる。その記録が、次の人の教材になる。', en: '' }
+
+
+  - id: p-an-08
+    at: { day: 0, minutes: 1110 }
+    phase: after
+    text: { ja: '午後6時30分。本部長から「再発防止について、現場から意見があれば聞きたい」と言われた。自分が失敗したからこそ、言えることがある。', en: '' }
+    voices: [v-an-08-a, v-an-08-b, v-an-08-c]
+    choices:
+      - id: p-an-08-a
+        text: { ja: '注意喚起の文を社内に回し、全員に気をつけてもらう。', en: '' }
+        explain: { ja: '注意喚起は必要だが、それだけでは同じ画面と同じ手順が残る。仕組みの変更も提案したい。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { trust: 5 }
+        items:
+          - { id: an08a-wording, points: 3, axis: wording, refs: [ipa-sme-guideline] }
+          - { id: an08a-content, points: 2, axis: content, refs: [no07-ipa-insider] }
+          - { id: an08a-record, points: -2, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-an-08-b
+        text: { ja: '宛先の固定と承認を提案し、手順書の変更を願い出る。', en: '' }
+        explain: { ja: '自分が失敗した手順を、仕組みで変える提案をしている。人の注意に頼らない対策になる。', en: '' }
+        minutes: 45
+        category: increase
+        points: 300
+        refs: [no07-ipa-insider, ipa-sme-guideline]
+        gauges: { trust: 15, stamina: -5 }
+        setFlags: { proposedFix: true }
+        items:
+          - { id: an08b-content, points: 10, axis: content, refs: [no07-ipa-insider] }
+          - { id: an08b-record, points: 8, axis: record, refs: [ipa-sme-guideline] }
+          - { id: an08b-order, points: 5, axis: order, refs: [cissp-cbk-secops] }
+      - id: p-an-08-c
+        text: { ja: '自分の失敗を謝るだけで、提案は特にしない。', en: '' }
+        explain: { ja: '謝るだけでは、次の人が同じ手順を使う。現場から出る提案は、再発防止の材料になる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [ipa-sme-guideline]
+        gauges: { trust: -5 }
+        items:
+          - { id: an08c-content, points: -8, axis: content, refs: [no07-ipa-insider] }
+          - { id: an08c-record, points: -6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: an08c-wording, points: -5, axis: wording, refs: [ipa-sme-guideline] }
+    lesson: { ja: '失敗した本人にしか分からないことがある。宛先を手で貼った理由、Bcc の欄を見落とした理由、急いでいた事情を、仕組みの提案につなげる。注意喚起で終えず、設定と手順を変える案を出す。', en: '' }
+
+drafts:
+  draft-an-report:
+    title: { ja: '社内報告メモ', en: '' }
+    slots:
+      - id: timing
+        label: { ja: '書く時刻', en: '' }
+        auto: true
+        items:
+          - { id: an-t-24h, when: { withinHours: 24 }, points: 10, axis: time, refs: [jpcert-handling] }
+          - { id: an-t-72h, when: { withinHours: 72 }, points: 3, axis: time, refs: [jpcert-handling] }
+          - { id: an-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [jpcert-handling] }
+      - id: fact
+        label: { ja: '起きたこと', en: '' }
+        options:
+          - { id: an-f-exact, text: { ja: '412件を To に入れて送信した', en: '' }, points: 10, axis: content, refs: [no16-ppc-breach-qa], explain: { ja: '件数と宛先の欄を具体的に書いている。対象の範囲と説明の material になる。', en: '' } }
+          - { id: an-f-approx, text: { ja: '約400件を To に入れて送信した', en: '' }, points: -4, axis: content, refs: [cissp-cbk-secops], explain: { ja: '概数では、通知した人数と合わなくなる。分かっている数字は正確に書く。正確に書く。', en: '' } }
+          - { id: an-f-vague, text: { ja: 'メールの宛先の欄を間違えて送信', en: '' }, points: -8, axis: content, refs: [jpcert-handling], explain: { ja: '何をどう間違えたかが分からない。件数と欄を書けば、対策が見えてくる。欄まで書く。', en: '' } }
+      - id: cause
+        label: { ja: '原因', en: '' }
+        options:
+          - { id: an-ca-tool, text: { ja: '配信ツールの不具合として記録', en: '' }, points: -12, axis: content, refs: [no07-ipa-insider], explain: { ja: '確認した事実と違う原因を書くと、対策がずれる。操作履歴を見て書く。履歴を先に見る。', en: '' } }
+          - { id: an-ca-manual, text: { ja: '宛先の手貼りと Bcc 未設定', en: '' }, points: 10, axis: content, refs: [no07-ipa-insider], explain: { ja: '実際の操作を具体的に書いている。どの手順を変えるかが決まり、再発防止につながる。', en: '' } }
+          - { id: an-ca-careless, text: { ja: '自分の不注意として記録する', en: '' }, points: -6, axis: wording, refs: [ipa-sme-guideline], explain: { ja: '不注意で終わると、手順のどこが抜けたかが見えない。操作を具体的に書く。操作を書く。', en: '' } }
+      - id: response
+        label: { ja: '取った対応', en: '' }
+        options:
+          - { id: an-r-delete, text: { ja: '受信者に削除を依頼した', en: '' }, points: 6, axis: care, refs: [ppc-notify-person], explain: { ja: '削除依頼は必要だが、窓口の案内が抜けると相談が届かない。窓口も書く。窓口も書く。', en: '' } }
+          - { id: an-r-none, text: { ja: 'まだ何も連絡していない', en: '' }, points: -10, axis: order, refs: [cissp-cbk-secops], explain: { ja: '連絡がないまま時間が過ぎると、二次被害と不信が広がる。最初の対応を書く。対応を書く。', en: '' } }
+          - { id: an-r-window, text: { ja: '削除依頼と窓口の設置', en: '' }, points: 10, axis: order, refs: [ppc-notify-person], explain: { ja: '削除依頼と相談窓口を一組で記録している。本人が困った時の連絡先まで残る。一組で書く。', en: '' } }
+      - id: evidence
+        label: { ja: '証拠', en: '' }
+        options:
+          - { id: an-e-log, text: { ja: '画面と操作履歴を保存した', en: '' }, points: 10, axis: record, refs: [jpcert-handling], explain: { ja: '画面と履歴の両方を残している。何をいつ押したかを、同じ材料で説明できる。材料になる。', en: '' } }
+          - { id: an-e-memory, text: { ja: '自分の記憶をメモした', en: '' }, points: -8, axis: record, refs: [jpcert-handling], explain: { ja: '記憶は時間とともに変わる。画面と履歴を保存すれば、後から確かめられる。履歴を残す。', en: '' } }
+          - { id: an-e-screen, text: { ja: '設定画面の写真を撮った', en: '' }, points: 5, axis: record, refs: [cissp-cbk-secops], explain: { ja: '画面の写真は役に立つ。操作履歴と合わせると、より正確に説明できる。履歴も保存する。', en: '' } }
+      - id: impact
+        label: { ja: '影響の見通し', en: '' }
+        options:
+          - { id: an-i-none, text: { ja: '悪用はないと断言する', en: '' }, points: -10, axis: content, refs: [ppc-report-scope], explain: { ja: '確認していないことを断言すると、後で事実が変わった時に訂正が必要になる。断言しない。', en: '' } }
+          - { id: an-i-check, text: { ja: '現時点で悪用なし、調査中', en: '' }, points: 10, axis: content, refs: [no16-ppc-breach-qa], explain: { ja: '分かったことと調査中を分けて書いている。あとで続報を出しても、説明がぶれない。分けて書く。', en: '' } }
+          - { id: an-i-unknown, text: { ja: '影響は不明とだけ書く', en: '' }, points: -4, axis: content, refs: [jpcert-handling], explain: { ja: '不明とだけでは、今できる確認をしたのか分からない。確認した範囲を書く。範囲を書く。', en: '' } }
+      - id: next
+        label: { ja: '次の確認', en: '' }
+        options:
+          - { id: an-n-week, text: { ja: '来週に一度だけ確認する', en: '' }, points: 4, axis: time, refs: [nist-sp800-61r3], explain: { ja: '一度の確認はよいが、その後の変化は見えない。定期的な点検にしたい。続けて確認する。', en: '' } }
+          - { id: an-n-none, text: { ja: '次の確認は特に決めない', en: '' }, points: -8, axis: record, refs: [cissp-cbk-secops], explain: { ja: '次の確認がないと、対策が動いたかを確かめられない。日付と担当を決める。予定を書く。', en: '' } }
+          - { id: an-n-month, text: { ja: '1か月後に設定を点検する', en: '' }, points: 8, axis: time, refs: [cissp-cbk-secops], explain: { ja: '点検の予定を記録している。設定は変わっていくので、定期的な確認が必要になる。点検する。', en: '' } }
+voices:
+  - { id: v-an-01-sns, media: sns, misleading: true, type: public-opinion, text: { ja: '取り消せば済む。上司に言うと怒られるぞ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-01-boss, media: boss, misleading: true, type: boss-pressure, text: { ja: '自分の判断で処理しろ。いちいち報告するな。', en: '' }, trigger: { at: point } }
+  - { id: v-an-01-ok, media: chat, misleading: false, text: { ja: '同僚「送信履歴、まだ残っているよ。保存しよう」。', en: '' }, trigger: { at: point } }
+  - { id: v-an-02-a, media: chat, misleading: false, text: { ja: '運営本部長「まず、何があったのか正確に聞かせてくれ」。', en: '' }, trigger: { at: point } }
+  - { id: v-an-02-b, media: sns, misleading: true, type: public-opinion, text: { ja: '担当者を守るために、黙っておけ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-02-c, media: boss, misleading: true, type: flattery, text: { ja: '君なら大丈夫だ。うまくまとめておいてくれ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-03-a, media: sns, misleading: true, type: popular, text: { ja: '全員に謝罪メールを一度送れば十分だ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-03-b, media: chat, misleading: false, text: { ja: '管理部長「宛先は Bcc にして、一人ずつ確かめて」。', en: '' }, trigger: { at: point } }
+  - { id: v-an-03-c, media: board, misleading: true, type: fake-expert, text: { ja: 'Bcc に入れれば見えないから、大丈夫だ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-04-a, media: chat, misleading: false, text: { ja: '管理部長「画面を閉じると消える情報もある。そのまま残して」。', en: '' }, trigger: { at: point } }
+  - { id: v-an-04-b, media: sns, misleading: true, type: law-ish, text: { ja: 'メールアドレスは個人情報じゃないから、証拠はいらない。', en: '' }, trigger: { at: point } }
+  - { id: v-an-04-c, media: vendor, misleading: true, type: vendor-interest, text: { ja: '画面が分かりにくいのが原因です。操作は正しいですよ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-05-a, media: chat, misleading: false, text: { ja: '同僚「返信、かなり来てるよ。窓口に回そう」。', en: '' }, trigger: { at: point } }
+  - { id: v-an-05-b, media: attacker, misleading: true, type: attacker-shake, text: { ja: '集めたアドレスを全部公開するぞ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-05-c, media: news, misleading: true, type: public-opinion, text: { ja: '担当者を処分すれば、それで終わる話だ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-06-a, media: chat, misleading: false, text: { ja: '管理部長「名簿を個人のパソコンに入れないでくれ」。', en: '' }, trigger: { at: point } }
+  - { id: v-an-06-b, media: board, misleading: true, type: fake-insider, text: { ja: '中の人だけど、名簿はもう外に流れている。', en: '' }, trigger: { at: point } }
+  - { id: v-an-06-c, media: boss, misleading: true, type: boss-pressure, text: { ja: '今まで通りでいい。持ち帰っても分からないさ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-07-a, media: chat, misleading: false, text: { ja: '運営本部長「今日、君が何をしたか記録に残してくれ」。', en: '' }, trigger: { at: point } }
+  - { id: v-an-07-b, media: sns, misleading: true, type: popular, text: { ja: '記録なんて誰も見ない。書くだけ無駄だ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-07-c, media: news, misleading: true, type: coward-critique, text: { ja: '記録を作る時間があるなら、体を動かせ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-08-a, media: chat, misleading: false, text: { ja: '管理部長「現場からの提案を聞きたい」。', en: '' }, trigger: { at: point } }
+  - { id: v-an-08-b, media: news, misleading: true, type: past-success, text: { ja: '前回も注意で済んだ。今回も同じでいい。', en: '' }, trigger: { at: point } }
+  - { id: v-an-08-c, media: vendor, misleading: true, type: vendor-interest, text: { ja: '有料の機能は不要です。今のままで足りますよ。', en: '' }, trigger: { at: point } }
+  - { id: v-an-after-01, media: sns, misleading: true, type: public-opinion, text: { ja: 'すぐ報告なんて、大げさだ。自分で片づければいい。', en: '' }, trigger: { at: after, choice: p-an-01-a } }
+  - { id: v-an-coward-2, media: sns, misleading: false, text: { ja: 'まだ何も説明がない。何をしているんだ。', en: '' }, trigger: { at: manual } }
+  - { id: v-an-coward-3, media: news, misleading: false, text: { ja: '担当者は隠れているのか。責任者は出てこない。', en: '' }, trigger: { at: manual } }
+  - { id: v-an-coward-4, media: news, misleading: false, text: { ja: '臆病な対応で、二次被害が広がった。', en: '' }, trigger: { at: manual } }
+  - { id: v-an-ev-reply, media: chat, misleading: false, text: { ja: '会員「私のアドレスが見えています。どうしてくれるんですか」。', en: '' }, trigger: { at: point } }
+  - { id: v-an-ev-phone, media: chat, misleading: false, text: { ja: '教室「保護者が本部に電話をかけてきました」。', en: '' }, trigger: { at: point } }

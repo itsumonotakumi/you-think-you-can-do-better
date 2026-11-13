@@ -1,0 +1,701 @@
+# No.16 こもれびカルチャー / セキュリティ部門長（管理部長・情報システム担当）ロール
+# 入門編: 判断8、報告書1。証拠の保全、配信設定、権限、記録の作り方を扱う。
+# 視点: 一人で情報システムを見る管理部長。ログと設定を押さえ、再発しない仕組みを作る。
+estimateMinutes: 13
+intro: { ja: 'あなたはこもれびカルチャーの管理部長で、情報システムも一人で見ている。金曜の午前10時15分、会員担当から「メールの宛先を間違えました」と連絡が入った。配信ツールの画面を開くと、To に412件のアドレスが並んでいる。まず何を押さえるか。', en: '' }
+pressEnabled: true
+cowardVoices:
+  '2': v-le-coward-2
+  '3': v-le-coward-3
+  '4': v-le-coward-4
+events:
+  - id: ev-le-bounce
+    at: { day: 0, minutes: 705 }
+    voices: [v-le-ev-bounce]
+    gauges: { flame: 5 }
+    sound: { se: [mail_arrive] }
+    caption: { ja: '宛先不明で戻ってきたメールが、配信ツールの受信箱にたまった。', en: '' }
+  - id: ev-le-phish
+    at: { day: 0, minutes: 930 }
+    voices: [v-le-ev-phish]
+    gauges: { flame: 5 }
+    sound: { se: [mail_arrive] }
+    caption: { ja: '会員から「知らない人から請求のメールが来た」と連絡が入った。', en: '' }
+points:
+  - id: p-le-01
+    at: { day: 0, minutes: 615 }
+    phase: detect
+    sound: { se: [notify_chat] }
+    text: { ja: '午前10時15分。配信ツールの画面には、送信済みのメールと412件の宛先が残っている。担当者は「すぐ消した方がいいですか」と聞いてきた。', en: '' }
+    voices: [v-le-01-a, v-le-01-b, v-le-01-c]
+    notable:
+      - { id: note-cause, text: { ja: '会員412人のアドレスを To に入れ、Bcc を空のまま送信した。配信ツールの宛先設定の誤り。', en: '' } }
+    choices:
+      - id: p-le-01-a
+        text: { ja: '送信履歴を消し、担当者に口外しないよう伝える。', en: '' }
+        explain: { ja: '履歴を消すと、何をいつ送ったかを説明できなくなる。隠す意図がなくても証拠が失われる。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [jpcert-handling, cissp-cbk-secops]
+        gauges: { flame: 15, trust: -15 }
+        setFlags: { logsDeleted: true }
+        items:
+          - { id: le01a-record, points: -12, axis: record, refs: [jpcert-handling] }
+          - { id: le01a-content, points: -10, axis: content, refs: [cissp-cbk-secops] }
+          - { id: le01a-order, points: -5, axis: order, refs: [jpcert-handling] }
+      - id: p-le-01-b
+        text: { ja: '送信履歴と設定画面を保存し、時刻と宛先数を記録する。', en: '' }
+        explain: { ja: '履歴と設定を保全し、時刻と件数まで記録している。後の説明と原因調査の土台になる。', en: '' }
+        minutes: 30
+        category: increase
+        points: 300
+        refs: [jpcert-handling, cissp-cbk-secops]
+        gauges: { flame: -5, trust: 10, stamina: -5 }
+        setFlags: { evidencePreserved: true }
+        items:
+          - { id: le01b-record, points: 10, axis: record, refs: [cissp-cbk-secops] }
+          - { id: le01b-order, points: 8, axis: order, refs: [jpcert-handling] }
+          - { id: le01b-content, points: 5, axis: content, refs: [jpcert-handling] }
+      - id: p-le-01-c
+        text: { ja: '担当者に画面を見せてもらい、口頭で経緯を聞く。', en: '' }
+        explain: { ja: '経緯は分かるが、画面も履歴も残らない。時間がたつと記憶は変わり、説明ができなくなる。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { stamina: -5 }
+        items:
+          - { id: le01c-time, points: 3, axis: time, refs: [jpcert-handling] }
+          - { id: le01c-content, points: 2, axis: content, refs: [jpcert-handling] }
+          - { id: le01c-record, points: -3, axis: record, refs: [cissp-cbk-secops] }
+    lesson: { ja: '誤送信に気づいたら、まず送信履歴と設定画面を保存する。送った時刻、宛先の数、どの欄に何を入れたかを記録する。履歴を消すと、説明も原因調査もできなくなる。証拠を残すことが、隠すことより信頼につながる。', en: '' }
+
+  - id: p-le-x1
+    at: { day: 0, minutes: 630 }
+    when: { flags: { evidencePreserved: false } }
+    phase: detect
+    text: { ja: '午前10時30分。送信履歴をまだ保存していない。担当者が「画面を閉じると消えます」と言う。', en: '' }
+    voices: [v-le-01-a]
+    choices:
+      - id: p-le-x1-a
+        text: { ja: '今から送信履歴と操作履歴を保存する。', en: '' }
+        explain: { ja: '今からでも、残っている履歴を保存すれば説明できる。時刻と宛先数も一緒に記録する。', en: '' }
+        minutes: 30
+        category: recover
+        points: 120
+        refs: [jpcert-handling, cissp-cbk-secops]
+        gauges: { trust: 10 }
+        setFlags: { evidencePreserved: true }
+        items:
+          - { id: lex1a-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: lex1a-order, points: 4, axis: order, refs: [jpcert-handling] }
+      - id: p-le-x1-b
+        text: { ja: '担当者の説明を聞き、要点だけをメモする。', en: '' }
+        explain: { ja: '要点だけでは、時刻と宛先数が抜ける。履歴を保存すれば、後から確かめられる。履歴を残す。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [jpcert-handling]
+        gauges: { flame: 5 }
+        items:
+          - { id: lex1b-record, points: -4, axis: record, refs: [jpcert-handling] }
+          - { id: lex1b-content, points: -3, axis: content, refs: [cissp-cbk-secops] }
+    lesson: { ja: '証拠の保全が遅れても、残っている履歴はある。送信履歴、操作履歴、設定画面を今から保存する。要点だけのメモでは、時刻と宛先数が抜ける。今から履歴を保存し、時刻と宛先数を記録する。', en: '' }
+
+  - id: p-le-02
+    at: { day: 0, minutes: 645 }
+    phase: contain
+    sound: { se: [mail_arrive] }
+    text: { ja: '午前10時45分。担当者が「送信を取り消せませんか」と聞いてきた。配信ツールの画面には、送信済みの表示だけがある。受信者からの返信も届き始めた。', en: '' }
+    voices: [v-le-02-a, v-le-02-b, v-le-02-c]
+    choices:
+      - id: p-le-02-a
+        text: { ja: '受信者の端末から消せるよう、ツール会社に削除を依頼する。', en: '' }
+        explain: { ja: '送ったメールを他人の端末から消すことはできない。依頼しても時間だけが過ぎていく。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [no16-ppc-breach-qa]
+        gauges: { flame: 10, trust: -5 }
+        delayed:
+          - { afterPhases: 1, points: -30, gauges: { flame: 5 }, reason: { ja: '削除を待つ間に、受信者からの問い合わせが増えた。', en: '' } }
+        items:
+          - { id: le02a-time, points: -8, axis: time, refs: [no16-ppc-breach-qa] }
+          - { id: le02a-content, points: -6, axis: content, refs: [jpcert-handling] }
+          - { id: le02a-care, points: -5, axis: care, refs: [ppc-notify-person] }
+      - id: p-le-02-b
+        text: { ja: '返信に全員宛てで訂正を送り、削除をお願いする。', en: '' }
+        explain: { ja: '全員宛ての訂正は、アドレスを見せる誤りを繰り返す。同じ失敗を二度することになる。', en: '' }
+        minutes: 30
+        category: fatal
+        points: -250
+        refs: [no16-ppc-breach-qa, ppc-notify-person]
+        gauges: { flame: 25, trust: -20 }
+        items:
+          - { id: le02b-care, points: -12, axis: care, refs: [ppc-notify-person] }
+          - { id: le02b-content, points: -10, axis: content, refs: [no16-ppc-breach-qa] }
+          - { id: le02b-order, points: -5, axis: order, refs: [jpcert-handling] }
+      - id: p-le-02-c
+        text: { ja: '送信は戻せないと認め、個別の削除依頼と窓口を用意する。', en: '' }
+        explain: { ja: '取り消せない事実を受け止め、個別の依頼と窓口に切り替えている。二次被害を減らす行動。', en: '' }
+        minutes: 45
+        category: increase
+        points: 300
+        refs: [no16-ppc-breach-qa, ppc-notify-person]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { deletionRequested: true }
+        items:
+          - { id: le02c-care, points: 10, axis: care, refs: [ppc-notify-person] }
+          - { id: le02c-content, points: 8, axis: content, refs: [no16-ppc-breach-qa] }
+          - { id: le02c-time, points: 5, axis: time, refs: [no16-ppc-breach-qa] }
+    lesson: { ja: '一度送ったメールは、送信者の手元では取り消せない。受信者の端末から消すこともできない。だからこそ、取り消しを探す時間を、個別の削除依頼と相談窓口に使う。全員宛ての訂正は、同じ誤りを繰り返すだけになる。', en: '' }
+
+  - id: p-le-x2
+    at: { day: 0, minutes: 660 }
+    when: { flags: { deletionRequested: false } }
+    phase: contain
+    text: { ja: '午前11時。削除のお願いをまだ出していない。受信者からは「どうすればいいのか」と返信が来ている。', en: '' }
+    voices: [v-le-02-b]
+    choices:
+      - id: p-le-x2-a
+        text: { ja: '受信者からの返信を待ち、聞かれた人にだけ説明する。', en: '' }
+        explain: { ja: '聞かれた人にだけ説明すると、大多数に届かない。削除のお願いを全員に出したい。全員に出す。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [ppc-notify-person]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: lex2a-care, points: -4, axis: care, refs: [ppc-notify-person] }
+          - { id: lex2a-time, points: -3, axis: time, refs: [no16-ppc-breach-qa] }
+      - id: p-le-x2-b
+        text: { ja: '送信は戻せないと認め、個別の削除依頼を出す。', en: '' }
+        explain: { ja: '取り消せない事実を受け止め、個別の依頼に切り替えている。二次被害を減らせる。今から出す。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [ppc-notify-person, no16-ppc-breach-qa]
+        gauges: { flame: -5, trust: 10, stamina: -10 }
+        setFlags: { deletionRequested: true }
+        items:
+          - { id: lex2b-care, points: 6, axis: care, refs: [ppc-notify-person] }
+          - { id: lex2b-content, points: 4, axis: content, refs: [no16-ppc-breach-qa] }
+    lesson: { ja: '削除依頼が遅れても、今から出せば間に合う。送信は戻せないと認め、個別に削除をお願いする。聞かれた人だけに説明すると、大多数に届かない。今から個別の削除依頼を出し、窓口を案内する。', en: '' }
+
+  - id: p-le-03
+    at: { day: 0, minutes: 675 }
+    phase: organize
+    text: { ja: '午前11時15分。本部長から「あとで説明できるように、時系列をまとめてくれ」と言われた。何を、どの順で記録するか。', en: '' }
+    voices: [v-le-03-a, v-le-03-b, v-le-03-c]
+    notable:
+      - { id: note-response, text: { ja: '送信は9時42分。気づいたのは10時。取り消しはできず、削除依頼と窓口の設置を進めた。', en: '' } }
+    choices:
+      - id: p-le-03-a
+        text: { ja: '送信時刻、宛先数、気づいた時刻、対応を時系列で残す。', en: '' }
+        explain: { ja: '事実を時刻と件数で残している。後から説明する人も、同じ記録を見て同じ話ができる。', en: '' }
+        minutes: 45
+        category: increase
+        points: 300
+        refs: [cissp-cbk-secops, jpcert-handling]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { timelineRecorded: true }
+        detail: draft-le-record
+        items:
+          - { id: le03a-record, points: 10, axis: record, refs: [cissp-cbk-secops] }
+          - { id: le03a-time, points: 8, axis: time, refs: [jpcert-handling] }
+          - { id: le03a-content, points: 5, axis: content, refs: [cissp-cbk-secops] }
+      - id: p-le-03-b
+        text: { ja: '担当者の説明を聞き、要点だけをメモにまとめる。', en: '' }
+        explain: { ja: '要点だけでは、時刻と件数が抜ける。あとで食い違いが出た時に確かめられない。数字を残す。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [jpcert-handling]
+        gauges: { stamina: -5 }
+        coward: true
+        items:
+          - { id: le03b-content, points: 3, axis: content, refs: [jpcert-handling] }
+          - { id: le03b-time, points: 2, axis: time, refs: [jpcert-handling] }
+          - { id: le03b-record, points: -2, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-le-03-c
+        text: { ja: '記録は後回しにし、まず謝罪の文面づくりを手伝う。', en: '' }
+        explain: { ja: '謝罪も大事だが、記録がないまま文面を作ると、時刻と件数が曖昧なまま公表することになる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [cissp-cbk-secops]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: le03c-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: le03c-order, points: -6, axis: order, refs: [jpcert-handling] }
+          - { id: le03c-time, points: -5, axis: time, refs: [jpcert-handling] }
+    lesson: { ja: '記録は、送信時刻、宛先数、気づいた時刻、決めたこと、対応した人を時系列で残す。要点だけのメモでは、あとで数字が食い違う。記録があると、公表文も記者会見も同じ事実で答えられる。', en: '' }
+
+  - id: p-le-x3
+    at: { day: 0, minutes: 690 }
+    when: { flags: { timelineRecorded: false } }
+    phase: organize
+    text: { ja: '午前11時30分。時系列の記録がまだない。本部長から「あとで説明できるのか」と聞かれた。', en: '' }
+    voices: [v-le-03-a]
+    choices:
+      - id: p-le-x3-a
+        text: { ja: '送信時刻と宛先数、対応を時系列で書き残す。', en: '' }
+        explain: { ja: '時刻と件数を並べて残している。後から説明する人も、同じ記録を見れば同じ話ができる。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [cissp-cbk-secops, jpcert-handling]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { timelineRecorded: true }
+        items:
+          - { id: lex3a-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: lex3a-time, points: 4, axis: time, refs: [jpcert-handling] }
+      - id: p-le-x3-b
+        text: { ja: '記憶を頼りに、要点だけをあとでまとめる。', en: '' }
+        explain: { ja: '記憶は時間とともに変わる。時刻と件数は、今のうちに記録から拾って書く。今すぐ書く。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [jpcert-handling]
+        gauges: { flame: 5 }
+        items:
+          - { id: lex3b-record, points: -4, axis: record, refs: [jpcert-handling] }
+          - { id: lex3b-content, points: -3, axis: content, refs: [cissp-cbk-secops] }
+    lesson: { ja: '記録が遅れても、今から書ける。送信時刻、宛先数、気づいた時刻、決めたこと、対応した人を時系列で残す。記憶だけに頼ると、数字が食い違う。時刻と件数を、今のうちに記録から拾う。', en: '' }
+
+  - id: p-le-04
+    at: { day: 0, minutes: 720 }
+    phase: investigate
+    text: { ja: '正午。配信ツールの操作履歴をたどると、宛先欄にアドレスを手で貼り付けた記録があった。Bcc の欄は空のまま。担当者は「Bcc に入れたつもりでした」と言う。', en: '' }
+    voices: [v-le-04-a, v-le-04-b, v-le-04-c]
+    choices:
+      - id: p-le-04-a
+        text: { ja: '担当者だけの問題として、操作の注意を研修で伝える。', en: '' }
+        explain: { ja: '人だけの問題にすると、同じ画面と同じ手順が残る。次の担当者が同じ誤りを起こす。手順を直す。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { trust: 5 }
+        items:
+          - { id: le04a-wording, points: 3, axis: wording, refs: [ipa-sme-guideline] }
+          - { id: le04a-record, points: 1, axis: record, refs: [cissp-cbk-secops] }
+          - { id: le04a-content, points: -2, axis: content, refs: [no07-ipa-insider] }
+      - id: p-le-04-b
+        text: { ja: '操作履歴を画面ごと保存し、手順のどこが抜けたかを特定する。', en: '' }
+        explain: { ja: '画面と履歴で原因を特定している。誰が悪いかではなく、どの手順が抜けたかを見ている。', en: '' }
+        minutes: 60
+        category: increase
+        points: 300
+        refs: [cissp-cbk-secops, no07-ipa-insider]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { rootCauseFound: true }
+        items:
+          - { id: le04b-record, points: 10, axis: record, refs: [cissp-cbk-secops] }
+          - { id: le04b-content, points: 8, axis: content, refs: [no07-ipa-insider] }
+          - { id: le04b-order, points: 5, axis: order, refs: [jpcert-handling] }
+      - id: p-le-04-c
+        text: { ja: '原因はツールの画面の分かりにくさだと結論づける。', en: '' }
+        explain: { ja: '画面の問題だけで片づけると、手作業で貼った事実が見えなくなる。手順の見直しが残る。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [no07-ipa-insider, ipa-sme-guideline]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: le04c-content, points: -8, axis: content, refs: [no07-ipa-insider] }
+          - { id: le04c-record, points: -6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: le04c-order, points: -5, axis: order, refs: [ipa-sme-guideline] }
+    lesson: { ja: '原因は、人の注意力だけに求めない。操作履歴と画面を保存し、どの手順が抜けたかを特定する。手作業で宛先を貼ったのか、Bcc の欄を見ていなかったのか。分かった原因から、仕組みの対策を決める。', en: '' }
+
+  - id: p-le-x4
+    at: { day: 0, minutes: 750 }
+    when: { flags: { rootCauseFound: false } }
+    phase: investigate
+    text: { ja: '午後0時30分。原因がまだ特定できていない。担当者は「ツールの画面が分かりにくい」と話す。', en: '' }
+    voices: [v-le-04-c]
+    choices:
+      - id: p-le-x4-a
+        text: { ja: '原因はツールの画面の分かりにくさとする。', en: '' }
+        explain: { ja: '画面の問題だけで片づけると、手作業で貼った事実が見えなくなる。手順の見直しが残る。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [no07-ipa-insider]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: lex4a-content, points: -4, axis: content, refs: [no07-ipa-insider] }
+          - { id: lex4a-record, points: -3, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-le-x4-b
+        text: { ja: '操作履歴を保存し、抜けた手順を特定する。', en: '' }
+        explain: { ja: '画面と履歴で原因を特定している。誰が悪いかではなく、どの手順が抜けたかを見ている。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [cissp-cbk-secops, no07-ipa-insider]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { rootCauseFound: true }
+        items:
+          - { id: lex4b-record, points: 6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: lex4b-content, points: 4, axis: content, refs: [no07-ipa-insider] }
+    lesson: { ja: '原因の特定が遅れても、履歴は残っている。操作履歴と画面を保存し、手作業で貼ったのか、Bcc の欄を見ていなかったのかを確かめる。履歴を保存し、抜けた手順を一つずつ確かめる。', en: '' }
+
+  - id: p-le-05
+    at: { day: 0, minutes: 810 }
+    phase: notify
+    text: { ja: '午後1時30分。広報から「何が漏れたのか、技術的に説明してほしい」と依頼が来た。アドレスだけなのか、名前や住所も含まれるのか。', en: '' }
+    voices: [v-le-05-a, v-le-05-b, v-le-05-c]
+    choices:
+      - id: p-le-05-a
+        text: { ja: '漏れたのはメールアドレスだけで、名前は含まれないと説明する。', en: '' }
+        explain: { ja: '事実を正確に伝えている。アドレスだけでも、会員名簿と結び付けて個人を識別できる点は補足したい。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [no16-ppc-mail-address]
+        gauges: { trust: 5 }
+        items:
+          - { id: le05a-content, points: 3, axis: content, refs: [no16-ppc-mail-address] }
+          - { id: le05a-wording, points: 2, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: le05a-care, points: 1, axis: care, refs: [ppc-notify-person] }
+      - id: p-le-05-b
+        text: { ja: '名前も住所も漏れた可能性があると、多めに説明する。', en: '' }
+        explain: { ja: '確認していない情報を広げると、あとで訂正が必要になる。分かった事実と不明点を分けて書く。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [meti-disclosure-guidance]
+        gauges: { flame: 10, trust: -5 }
+        items:
+          - { id: le05b-content, points: -8, axis: content, refs: [meti-disclosure-guidance] }
+          - { id: le05b-wording, points: -6, axis: wording, refs: [ppc-notify-person] }
+          - { id: le05b-record, points: -5, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-le-05-c
+        text: { ja: '漏れた項目を特定し、アドレスでも個人データになると説明する。', en: '' }
+        explain: { ja: '漏れた項目を特定し、アドレスでも個人データになりうると補足している。説明が正確でぶれない。', en: '' }
+        minutes: 45
+        category: increase
+        points: 300
+        refs: [no16-ppc-mail-address, meti-disclosure-guidance]
+        gauges: { flame: -5, trust: 10, stamina: -5 }
+        setFlags: { explainedData: true }
+        items:
+          - { id: le05c-content, points: 10, axis: content, refs: [no16-ppc-mail-address] }
+          - { id: le05c-wording, points: 8, axis: wording, refs: [meti-disclosure-guidance] }
+          - { id: le05c-care, points: 5, axis: care, refs: [ppc-notify-person] }
+    lesson: { ja: '漏れた項目は、確認できた範囲で正確に伝える。名前がなくても、メールアドレスは会員名簿と結び付けて特定の個人を識別できるので、個人データとして扱う。分かっていないことは調査中と書き、推測で多めに言わない。', en: '' }
+
+  - id: p-le-x5
+    at: { day: 0, minutes: 840 }
+    when: { flags: { explainedData: false } }
+    phase: notify
+    text: { ja: '午後2時。広報への説明がまだ。何が漏れたのか、アドレスは個人情報なのかを聞かれている。', en: '' }
+    voices: [v-le-05-a]
+    choices:
+      - id: p-le-x5-a
+        text: { ja: '漏れた項目を確かめ、アドレスも個人データと説明する。', en: '' }
+        explain: { ja: '確認した項目と、アドレスでも個人データになりうる点を伝えている。説明が正確になる。', en: '' }
+        minutes: 45
+        category: recover
+        points: 120
+        refs: [no16-ppc-mail-address, meti-disclosure-guidance]
+        gauges: { trust: 10 }
+        setFlags: { explainedData: true }
+        items:
+          - { id: lex5a-content, points: 6, axis: content, refs: [no16-ppc-mail-address] }
+          - { id: lex5a-wording, points: 4, axis: wording, refs: [meti-disclosure-guidance] }
+      - id: p-le-x5-b
+        text: { ja: '名前がないので個人情報ではないと説明する。', en: '' }
+        explain: { ja: '名前がなくても、会員名簿と結び付けて個人を識別できる。個人データとして扱う。正確に伝える。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [no16-ppc-mail-address]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: lex5b-content, points: -4, axis: content, refs: [no16-ppc-mail-address] }
+          - { id: lex5b-wording, points: -3, axis: wording, refs: [meti-disclosure-guidance] }
+    lesson: { ja: '説明が遅れても、今から正確にできる。漏れた項目を確かめ、名前がなくてもメールアドレスは個人データになりうると伝える。分かっていないことは調査中と書く。正確な説明を、今日中に広報へ渡す。', en: '' }
+
+  - id: p-le-06
+    at: { day: 0, minutes: 900 }
+    phase: recover
+    text: { ja: '午後3時。配信ツールの設定を開くと、宛先の入力方法、Bcc の既定値、送信前の確認がすべて手作業のままだった。設定で防げる部分が多い。', en: '' }
+    voices: [v-le-06-a, v-le-06-b, v-le-06-c]
+    choices:
+      - id: p-le-06-a
+        text: { ja: 'Bcc を既定にし、宛先の上限と送信前の承認を設定する。', en: '' }
+        explain: { ja: '設定で防げる形に変えている。担当者が急いでいても、Bcc が外れたまま送信しにくくなる。', en: '' }
+        minutes: 90
+        category: increase
+        points: 300
+        refs: [no07-ipa-insider, nist-sp800-61r3]
+        gauges: { trust: 15, stamina: -10 }
+        setFlags: { toolFixed: true }
+        items:
+          - { id: le06a-content, points: 10, axis: content, refs: [no07-ipa-insider] }
+          - { id: le06a-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: le06a-record, points: 5, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-le-06-b
+        text: { ja: '送信のたびに、宛先を目で確認する決まりを作る。', en: '' }
+        explain: { ja: '目で確認する決まりは、忙しい日に抜ける。設定で強制できる対策と組み合わせたい。設定を先に。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [ipa-sme-guideline]
+        gauges: { trust: 5 }
+        coward: true
+        items:
+          - { id: le06b-wording, points: 3, axis: wording, refs: [ipa-sme-guideline] }
+          - { id: le06b-time, points: 2, axis: time, refs: [ipa-sme-guideline] }
+          - { id: le06b-content, points: -2, axis: content, refs: [no07-ipa-insider] }
+      - id: p-le-06-c
+        text: { ja: '設定を変えると現場が止まるとして、今のままにする。', en: '' }
+        explain: { ja: '現場の不便は配慮したいが、同じ事故が起きれば現場の負担はもっと大きくなる。段階的に変える。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [no07-ipa-insider]
+        gauges: { flame: 5, trust: -5 }
+        delayed:
+          - { afterPhases: 1, points: -30, gauges: { flame: 5 }, reason: { ja: '設定が変わらないまま、別の教室で同じ誤りが起きた。', en: '' } }
+        items:
+          - { id: le06c-content, points: -8, axis: content, refs: [no07-ipa-insider] }
+          - { id: le06c-record, points: -6, axis: record, refs: [cissp-cbk-secops] }
+          - { id: le06c-time, points: -5, axis: time, refs: [ipa-sme-guideline] }
+    lesson: { ja: '再発防止は、設定で強制できるものから始める。Bcc を既定にする、宛先の数を上限で止める、送信前の承認を必須にする。目で確認する決まりは、忙しい日ほど抜ける。設定と手順の両方で防ぐ。', en: '' }
+
+  - id: p-le-x6
+    at: { day: 0, minutes: 945 }
+    when: { flags: { toolFixed: false } }
+    phase: recover
+    text: { ja: '午後3時45分。配信ツールの設定は、まだ手作業のまま。次の配信の準備が始まっている。', en: '' }
+    voices: [v-le-06-b]
+    choices:
+      - id: p-le-x6-a
+        text: { ja: '設定は現場の判断に任せ、今のままにする。', en: '' }
+        explain: { ja: '現場の判断に任せると、同じ手順が残る。設定で強制できる対策を先に入れたい。設定を入れる。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [no07-ipa-insider]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: lex6a-content, points: -4, axis: content, refs: [no07-ipa-insider] }
+          - { id: lex6a-record, points: -3, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-le-x6-b
+        text: { ja: 'Bcc の既定と宛先の上限を、今から設定する。', en: '' }
+        explain: { ja: '設定で防げる形に変えている。急いでいても、Bcc が外れたまま送信しにくくなる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [no07-ipa-insider, nist-sp800-61r3]
+        gauges: { trust: 10, stamina: -5 }
+        setFlags: { toolFixed: true }
+        items:
+          - { id: lex6b-content, points: 6, axis: content, refs: [no07-ipa-insider] }
+          - { id: lex6b-order, points: 4, axis: order, refs: [nist-sp800-61r3] }
+    lesson: { ja: '設定の見直しが遅れても、次の配信までに間に合う。Bcc を既定にする、宛先の上限で止める。目で確認する決まりだけでは、忙しい日に抜ける。今から Bcc の既定と宛先の上限を入れる。', en: '' }
+
+  - id: p-le-07
+    at: { day: 0, minutes: 990 }
+    phase: recover
+    text: { ja: '午後4時30分。会員名簿の権限を調べると、12教室の責任者と講師の何人かが、全会員の名簿をダウンロードできる状態だった。配信ツール以外の持ち出しも心配になる。', en: '' }
+    voices: [v-le-07-a, v-le-07-b, v-le-07-c]
+    choices:
+      - id: p-le-07-a
+        text: { ja: '現場の使い勝手を優先し、名簿の権限は今のままにする。', en: '' }
+        explain: { ja: '使い勝手は保たれるが、名簿がどこにでも持ち出せる状態が続く。次の漏えいを招く。権限を絞る。', en: '' }
+        minutes: 45
+        category: hurt
+        points: -100
+        refs: [no07-ipa-insider]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: le07a-record, points: -8, axis: record, refs: [no07-ipa-insider] }
+          - { id: le07a-content, points: -6, axis: content, refs: [cissp-cbk-secops] }
+          - { id: le07a-care, points: -5, axis: care, refs: [ipa-sme-guideline] }
+      - id: p-le-07-b
+        text: { ja: '必要な人と教室だけに絞り、ダウンロードを制限する。', en: '' }
+        explain: { ja: '必要な範囲に権限を絞っている。名簿が持ち出せる範囲を狭めれば、漏えいの影響も小さくなる。', en: '' }
+        minutes: 90
+        category: increase
+        points: 300
+        refs: [no07-ipa-insider, cissp-cbk-secops]
+        gauges: { trust: 15, stamina: -10 }
+        setFlags: { accessLimited: true }
+        items:
+          - { id: le07b-content, points: 10, axis: content, refs: [no07-ipa-insider] }
+          - { id: le07b-record, points: 8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: le07b-order, points: 5, axis: order, refs: [no07-ipa-insider] }
+      - id: p-le-07-c
+        text: { ja: '名簿を印刷して配り、紙で管理する方が安全とする。', en: '' }
+        explain: { ja: '紙にすると持ち出しが見えにくく、回収もできない。置き場所と枚数の管理も難しい。持ち出しが増える。', en: '' }
+        minutes: 45
+        category: maintain
+        points: 20
+        refs: [cissp-cbk-secops]
+        gauges: { trust: 5, stamina: -5 }
+        items:
+          - { id: le07c-wording, points: 3, axis: wording, refs: [cissp-cbk-secops] }
+          - { id: le07c-record, points: 2, axis: record, refs: [no07-ipa-insider] }
+          - { id: le07c-content, points: -2, axis: content, refs: [no07-ipa-insider] }
+    lesson: { ja: '名簿の権限は、必要な人と必要な範囲に絞る。全教室が見られる状態や、簡単にダウンロードできる状態をやめる。紙にすれば安全ということはなく、置き場所と枚数の管理が必要になる。権限の棚卸しは定期的に行う。', en: '' }
+
+  - id: p-le-x7
+    at: { day: 0, minutes: 1035 }
+    when: { flags: { accessLimited: false } }
+    phase: recover
+    text: { ja: '午後5時15分。名簿の権限はまだ広い。教室の何人かが、全会員の名簿をダウンロードできる。', en: '' }
+    voices: [v-le-07-b]
+    choices:
+      - id: p-le-x7-a
+        text: { ja: '名簿の権限を必要な人だけに絞り、持ち出しを止める。', en: '' }
+        explain: { ja: '必要な範囲に権限を絞っている。名簿が持ち出せる範囲を狭めれば、漏えいの影響も小さくなる。', en: '' }
+        minutes: 60
+        category: recover
+        points: 120
+        refs: [no07-ipa-insider, cissp-cbk-secops]
+        gauges: { trust: 10, stamina: -10 }
+        setFlags: { accessLimited: true }
+        items:
+          - { id: lex7a-content, points: 6, axis: content, refs: [no07-ipa-insider] }
+          - { id: lex7a-record, points: 4, axis: record, refs: [cissp-cbk-secops] }
+      - id: p-le-x7-b
+        text: { ja: '名簿は印刷して各教室に配り、紙で管理する。', en: '' }
+        explain: { ja: '紙にすると持ち出しが見えにくく、回収もできない。デジタルの権限を絞る方が確かめやすい。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -80
+        refs: [cissp-cbk-secops]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: lex7b-record, points: -4, axis: record, refs: [cissp-cbk-secops] }
+          - { id: lex7b-content, points: -3, axis: content, refs: [no07-ipa-insider] }
+    lesson: { ja: '権限の見直しが遅れても、今から絞れる。必要な人と教室だけに名簿を見せ、ダウンロードを制限する。紙にすれば安全ではなく、置き場所と枚数の管理が必要になる。必要な人だけに絞り、持ち出しを止める。', en: '' }
+
+
+  - id: p-le-08
+    at: { day: 0, minutes: 1080 }
+    phase: after
+    text: { ja: '午後6時。設定を変えたあとの確認方法を決めていなかった。本当に Bcc が既定になったのか、承認が機能するのかを試す必要がある。', en: '' }
+    voices: [v-le-08-a, v-le-08-b, v-le-08-c]
+    choices:
+      - id: p-le-08-a
+        text: { ja: 'テスト送信をして、設定と承認が動くかを確かめる。', en: '' }
+        explain: { ja: '変えた設定を実際に試している。動かないまま本番を迎える事故を、ここで防げる。記録に残す。', en: '' }
+        minutes: 60
+        category: increase
+        points: 300
+        refs: [cissp-cbk-secops, nist-sp800-61r3]
+        gauges: { trust: 15, stamina: -10 }
+        setFlags: { testedSettings: true }
+        items:
+          - { id: le08a-record, points: 10, axis: record, refs: [cissp-cbk-secops] }
+          - { id: le08a-order, points: 8, axis: order, refs: [nist-sp800-61r3] }
+          - { id: le08a-content, points: 5, axis: content, refs: [no07-ipa-insider] }
+      - id: p-le-08-b
+        text: { ja: '設定画面を確認し、項目が変わっていることだけ見る。', en: '' }
+        explain: { ja: '画面の表示だけでは、実際に送信した時にどう動くか分からない。テスト送信まで行いたい。', en: '' }
+        minutes: 30
+        category: maintain
+        points: 20
+        refs: [cissp-cbk-secops]
+        gauges: { trust: 5 }
+        items:
+          - { id: le08b-record, points: 3, axis: record, refs: [cissp-cbk-secops] }
+          - { id: le08b-content, points: 2, axis: content, refs: [no07-ipa-insider] }
+          - { id: le08b-time, points: 1, axis: time, refs: [nist-sp800-61r3] }
+      - id: p-le-08-c
+        text: { ja: '設定はベンダーが入れたので、確認は任せる。', en: '' }
+        explain: { ja: '設定を入れた人が確認するとは限らない。自社で試さないと、動くかどうか分からない。', en: '' }
+        minutes: 30
+        category: hurt
+        points: -100
+        refs: [cissp-cbk-secops]
+        gauges: { flame: 5, trust: -5 }
+        items:
+          - { id: le08c-record, points: -8, axis: record, refs: [cissp-cbk-secops] }
+          - { id: le08c-content, points: -6, axis: content, refs: [no07-ipa-insider] }
+          - { id: le08c-order, points: -5, axis: order, refs: [nist-sp800-61r3] }
+    lesson: { ja: '設定を変えたら、テスト送信で確かめる。Bcc が本当に既定になるか、宛先の上限で止まるか、承認がないと送れないか。画面の表示だけでは分からない。確かめた記録が、次の点検の基準になる。', en: '' }
+
+drafts:
+  draft-le-record:
+    title: { ja: '誤送信のインシデント記録', en: '' }
+    slots:
+      - id: timing
+        label: { ja: '記録を作る時刻', en: '' }
+        auto: true
+        items:
+          - { id: le-t-24h, when: { withinHours: 24 }, points: 10, axis: time, refs: [cissp-cbk-secops] }
+          - { id: le-t-72h, when: { withinHours: 72 }, points: 3, axis: time, refs: [cissp-cbk-secops] }
+          - { id: le-t-late, when: { otherwise: true }, points: -15, axis: time, refs: [cissp-cbk-secops] }
+      - id: when
+        label: { ja: '発生日時', en: '' }
+        options:
+          - { id: le-w-exact, text: { ja: '9時42分に送信した', en: '' }, points: 10, axis: time, refs: [jpcert-handling], explain: { ja: '送信時刻を分単位で残している。気づいた時刻と並べれば、初動の速さも説明できる。二つを並べる。', en: '' } }
+          - { id: le-w-approx, text: { ja: '金曜の午前中ごろ', en: '' }, points: -8, axis: time, refs: [jpcert-handling], explain: { ja: '時刻が曖昧だと、あとで食い違った時に確かめられない。送信時刻を分単位で書き残す。', en: '' } }
+          - { id: le-w-detect, text: { ja: '10時に気づいた', en: '' }, points: 4, axis: time, refs: [jpcert-handling], explain: { ja: '気づいた時刻は大事だが、送信時刻と対にしないと、何分間放置したかが分からない。対で残す。', en: '' } }
+      - id: count
+        label: { ja: '宛先の数', en: '' }
+        options:
+          - { id: le-c-412, text: { ja: '412件と記録する', en: '' }, points: 10, axis: content, refs: [no16-ppc-breach-qa], explain: { ja: '実際の宛先数を記録している。対象の範囲と通知の人数を、後から確かめられる。人数も合う。', en: '' } }
+          - { id: le-c-400, text: { ja: '約400件と記録する', en: '' }, points: -4, axis: content, refs: [no16-ppc-breach-qa], explain: { ja: '概数では、通知した人数と合わなくなる。分かっている数字は正確に書く。概数は使わない。', en: '' } }
+          - { id: le-c-unknown, text: { ja: '調査中とだけ書く', en: '' }, points: -8, axis: content, refs: [cissp-cbk-secops], explain: { ja: '調査中でも、今分かっている数は書ける。空欄のままだと、対象の検討が進まない。今の数を書く。', en: '' } }
+      - id: cause
+        label: { ja: '原因', en: '' }
+        options:
+          - { id: le-ca-tool, text: { ja: 'ツールの不具合として記録', en: '' }, points: -12, axis: content, refs: [no07-ipa-insider], explain: { ja: '確認した事実と違う原因を書くと、対策がずれる。まず操作履歴を見て書く。事実を確かめる。', en: '' } }
+          - { id: le-ca-person, text: { ja: '担当者の不注意として記録', en: '' }, points: -6, axis: wording, refs: [ipa-sme-guideline], explain: { ja: '個人の不注意で終わると、手順の抜けが見えない。どの操作が抜けたかを書く。手順の話にする。', en: '' } }
+          - { id: le-ca-manual, text: { ja: '宛先の手貼りと Bcc 未設定', en: '' }, points: 10, axis: content, refs: [no07-ipa-insider], explain: { ja: '起きた操作を具体的に書いている。どの手順を直すかが決まり、再発防止につながる。手順が決まる。', en: '' } }
+      - id: response
+        label: { ja: '取った対応', en: '' }
+        options:
+          - { id: le-r-delete, text: { ja: '受信者に削除を依頼した', en: '' }, points: 8, axis: care, refs: [ppc-notify-person], explain: { ja: '削除依頼は必要だが、窓口や注意喚起が抜けると、二次被害の相談が届かない。窓口も書く。', en: '' } }
+          - { id: le-r-none, text: { ja: '特に何も対応していない', en: '' }, points: -12, axis: order, refs: [cissp-cbk-secops], explain: { ja: '対応がないまま時間が過ぎると、二次被害と不信が広がる。最初の対応を記録する。対応を残す。', en: '' } }
+          - { id: le-r-window, text: { ja: '削除依頼と窓口を設置した', en: '' }, points: 10, axis: order, refs: [ppc-notify-person], explain: { ja: '削除依頼と窓口を一組で記録している。本人が困った時の連絡先まで残る。一組で記録する。', en: '' } }
+      - id: evidence
+        label: { ja: '証拠の保全', en: '' }
+        options:
+          - { id: le-e-screen, text: { ja: '設定画面の写真を残した', en: '' }, points: 6, axis: record, refs: [cissp-cbk-secops], explain: { ja: '画面の写真は役に立つが、送信履歴と合わせると、より正確に説明できる。履歴と組み合わせる。', en: '' } }
+          - { id: le-e-log, text: { ja: '送信履歴と操作履歴を保存した', en: '' }, points: 10, axis: record, refs: [jpcert-handling], explain: { ja: '履歴を保存している。誰がいつ何をしたかを、後から同じ材料で説明できる。材料をそろえる。', en: '' } }
+          - { id: le-e-none, text: { ja: '証拠は特に残していない', en: '' }, points: -10, axis: record, refs: [jpcert-handling], explain: { ja: '証拠がないと、原因も経緯も説明できない。まず履歴と画面を保存し、証拠を残す。あとで説明できる。', en: '' } }
+      - id: next
+        label: { ja: '次の確認', en: '' }
+        options:
+          - { id: le-n-none, text: { ja: '次の確認は特に決めない', en: '' }, points: -8, axis: record, refs: [cissp-cbk-secops], explain: { ja: '次の確認がないと、対策が動いたかを確かめられない。日付と担当を決める。予定を書く。', en: '' } }
+          - { id: le-n-month, text: { ja: '1か月後に設定を点検する', en: '' }, points: 8, axis: time, refs: [cissp-cbk-secops], explain: { ja: '点検の予定を記録している。設定は変わっていくので、定期的な確認が必要になる。点検を続ける。', en: '' } }
+          - { id: le-n-nextweek, text: { ja: '来週に一度だけ確認する', en: '' }, points: 4, axis: time, refs: [nist-sp800-61r3], explain: { ja: '一度の確認はよいが、その後の変化は見えない。定期的な点検にしたい。続けて確認する。', en: '' } }
+voices:
+  - { id: v-le-01-a, media: chat, misleading: false, text: { ja: '会員担当「送信履歴、まだ残っています」。', en: '' }, trigger: { at: point } }
+  - { id: v-le-01-b, media: vendor, misleading: true, type: vendor-interest, text: { ja: 'ログはすぐ消えるので、気にしなくていいですよ。', en: '' }, trigger: { at: point } }
+  - { id: v-le-01-c, media: sns, misleading: true, type: public-opinion, text: { ja: '記録より謝罪が先だ。細かい話は後でいい。', en: '' }, trigger: { at: point } }
+  - { id: v-le-02-a, media: boss, misleading: true, type: boss-pressure, text: { ja: '送信履歴は消せ。あとで困るのは君だぞ。', en: '' }, trigger: { at: point } }
+  - { id: v-le-02-b, media: chat, misleading: false, text: { ja: '広報「取り消せないなら、削除のお願いを出しましょう」。', en: '' }, trigger: { at: point } }
+  - { id: v-le-02-c, media: board, misleading: true, type: fake-expert, text: { ja: 'メールはサポートに言えば取り消せる。昔はそうだった。', en: '' }, trigger: { at: point } }
+  - { id: v-le-03-a, media: chat, misleading: false, text: { ja: '本部長「あとで説明できるように、時系列で頼む」。', en: '' }, trigger: { at: point } }
+  - { id: v-le-03-b, media: sns, misleading: true, type: popular, text: { ja: '他の会社も、記録なんて残していない。', en: '' }, trigger: { at: point } }
+  - { id: v-le-03-c, media: boss, misleading: true, type: past-success, text: { ja: '前回も記録なしで乗り切った。大丈夫だ。', en: '' }, trigger: { at: point } }
+  - { id: v-le-04-a, media: chat, misleading: false, text: { ja: '会員担当「手で貼り付けて、そのまま送りました」。', en: '' }, trigger: { at: point } }
+  - { id: v-le-04-b, media: sns, misleading: true, type: law-ish, text: { ja: '名前が入っていないなら、個人情報じゃない。', en: '' }, trigger: { at: point } }
+  - { id: v-le-04-c, media: vendor, misleading: true, type: vendor-interest, text: { ja: '画面が分かりにくいのが原因です。運用でカバーを。', en: '' }, trigger: { at: point } }
+  - { id: v-le-05-a, media: chat, misleading: false, text: { ja: '広報「何が漏れたのか、正確に知りたい」。', en: '' }, trigger: { at: point } }
+  - { id: v-le-05-b, media: sns, misleading: true, type: fake-insider, text: { ja: '中の人だけど、名簿はもう売られている。全部漏れたと思え。', en: '' }, trigger: { at: point } }
+  - { id: v-le-05-c, media: news, misleading: true, type: public-opinion, text: { ja: '技術の話は要らない。謝って終わりにしろ。', en: '' }, trigger: { at: point } }
+  - { id: v-le-06-a, media: vendor, misleading: true, type: vendor-interest, text: { ja: '有料オプションは不要です。今の設定で十分ですよ。', en: '' }, trigger: { at: point } }
+  - { id: v-le-06-b, media: chat, misleading: false, text: { ja: '本部長「設定で防げるなら、すぐ変えよう」。', en: '' }, trigger: { at: point } }
+  - { id: v-le-06-c, media: boss, misleading: true, type: boss-pressure, text: { ja: '設定を変えると現場が止まる。今のままでいい。', en: '' }, trigger: { at: point } }
+  - { id: v-le-07-a, media: sns, misleading: true, type: public-opinion, text: { ja: '現場の権限を奪うな。教室は待ってくれないぞ。', en: '' }, trigger: { at: point } }
+  - { id: v-le-07-b, media: chat, misleading: false, text: { ja: '本部長「名簿は、必要な人だけが見る形にしよう」。', en: '' }, trigger: { at: point } }
+  - { id: v-le-07-c, media: boss, misleading: true, type: flattery, text: { ja: '君の管理は完璧だ。わざわざ変える必要はない。', en: '' }, trigger: { at: point } }
+  - { id: v-le-08-a, media: chat, misleading: false, text: { ja: '会員担当「テスト送信、やってみましょうか」。', en: '' }, trigger: { at: point } }
+  - { id: v-le-08-b, media: news, misleading: true, type: coward-critique, text: { ja: '点検を何度もやるのは臆病。もう終わりにしろ。', en: '' }, trigger: { at: point } }
+  - { id: v-le-08-c, media: vendor, misleading: true, type: vendor-interest, text: { ja: '監査機能は高いです。必要ないと思いますよ。', en: '' }, trigger: { at: point } }
+  - { id: v-le-after-01, media: sns, misleading: true, type: public-opinion, text: { ja: '履歴を残すなんて、責任逃れに見えるぞ。', en: '' }, trigger: { at: after, choice: p-le-01-b } }
+  - { id: v-le-coward-2, media: sns, misleading: false, text: { ja: '管理部は何もしていないのか。', en: '' }, trigger: { at: manual } }
+  - { id: v-le-coward-3, media: news, misleading: false, text: { ja: '記録も残さない管理部。責任者は誰だ。', en: '' }, trigger: { at: manual } }
+  - { id: v-le-coward-4, media: news, misleading: false, text: { ja: '臆病な対応で、二次被害を止められなかった。', en: '' }, trigger: { at: manual } }
+  - { id: v-le-ev-bounce, media: chat, misleading: false, text: { ja: '配信ツール「宛先不明で戻ったメールが20件あります」。', en: '' }, trigger: { at: point } }
+  - { id: v-le-ev-phish, media: chat, misleading: false, text: { ja: '会員「知らない人から、請求のメールが来ました」。', en: '' }, trigger: { at: point } }

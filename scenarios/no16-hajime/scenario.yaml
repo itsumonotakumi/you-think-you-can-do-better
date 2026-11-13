@@ -1,0 +1,112 @@
+# No.16 こもれびカルチャー（地域の習い事教室チェーン）／入門編
+# 元事件は「構造」だけを参考にしたフィクション。会社名・人物名・数字・地名はすべて架空。
+id: no16-hajime
+version: '1.0.0'
+status: latest
+published: '2026-11-13'
+sourcePeriod: { ja: '2020年代', en: '' }
+difficulty: 1
+languages: [ja]
+referencesVersion: '2026-11-08'
+legalPack: jp
+title: { ja: 'そのメール、全員に届いています', en: '' }
+tagline: { ja: '会員400人のアドレスが、BccではなくToに並んでいた。送信はもう戻せない。習い事教室チェーンの本部で、最初の1時間をどう使うか。', en: '' }
+company:
+  name: { ja: 'こもれびカルチャー', en: '' }
+  industry: { ja: '子ども向け習い事教室チェーン（ピアノ・書道・ダンス・英会話）', en: '' }
+  size: { ja: '12教室、会員4,200名、職員86名', en: '' }
+  people:
+    - id: ceo
+      name: { ja: '桜庭 千尋', en: '' }
+      title: { ja: '代表取締役社長', en: '' }
+    - id: officer
+      name: { ja: '大迫 亮', en: '' }
+      title: { ja: '運営本部長', en: '' }
+    - id: lead
+      name: { ja: '柏木 慎一', en: '' }
+      title: { ja: '管理部長（情報システム担当）', en: '' }
+    - id: analyst
+      name: { ja: '水城 ひなた', en: '' }
+      title: { ja: '本部事務局 会員担当', en: '' }
+    - id: instructor
+      name: { ja: '小野寺 みどり', en: '' }
+      title: { ja: 'こもれび台教室の責任者', en: '' }
+    - id: lawyer
+      name: { ja: '神谷 宗一郎', en: '' }
+      title: { ja: '顧問弁護士', en: '' }
+    - id: vendor
+      name: { ja: '江口 拓', en: '' }
+      title: { ja: '配信ツール会社の担当者', en: '' }
+start: { day: 0, minutes: 600 }
+initialGauges: { damage: 15, flame: 5, trust: 70, stamina: 100 }
+audio:
+  bgmDefault: tension_low
+  bgmByPhase:
+    detect: tension_low
+    contain: tension_low
+    organize: tension_mid
+    investigate: tension_mid
+    notify: tension_mid
+    recover: calm
+    after: calm
+press:
+  questions:
+    - id: q-cause
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: 'なぜ、会員のアドレスが見える形で送られたのですか。', en: '' }
+      answers:
+        - { id: a-cause-unknown, text: { ja: '確認中です。', en: '' }, points: -30 }
+        - { id: a-cause-mistake, text: { ja: '宛先の設定を誤りました。送信前に止める手順がありませんでした。', en: '' }, points: 30 }
+        - { id: a-cause-detail, text: { ja: '宛先欄に手作業でアドレスを貼り、Bcc の設定を確認しないまま送信しました。手順と確認の仕組みが欠けていました。', en: '' }, points: 80, requiresNote: note-cause }
+    - id: q-second
+      seconds: 30
+      timeoutPoints: -30
+      text: { ja: '二次被害は起きていないのですか。', en: '' }
+      answers:
+        - { id: a-second-none, text: { ja: '起きていません。', en: '' }, points: -100 }
+        - { id: a-second-unknown, text: { ja: '現時点では確認していません。', en: '' }, points: 30 }
+        - { id: a-second-check, text: { ja: '受信者からの返信と不審メールの連絡を集計し、全員に注意を案内しています。現時点で悪用の申し出はありません。', en: '' }, points: 80, requiresNote: note-check }
+    - id: q-report
+      seconds: 25
+      timeoutPoints: -30
+      text: { ja: '個人情報保護委員会への報告はしたのですか。', en: '' }
+      answers:
+        - { id: a-report-noanswer, text: { ja: '答えられません。', en: '' }, points: -30 }
+        - { id: a-report-filed, text: { ja: '速報を提出しました。対象の範囲と経緯をまとめて報告しています。', en: '' }, points: 80, when: { flags: { reportFiled: true } } }
+        - { id: a-report-notrequired, text: { ja: '今回は報告の要件に当たらないと判断しています。本人への通知は全員に行っています。', en: '' }, points: 30, when: { flags: { reportFiled: false } } }
+        - { id: a-report-claim, text: { ja: '報告しました。', en: '' }, points: -200, when: { flags: { reportFiled: false } } }
+  extraQuestions:
+    - when: { flags: { silenced: true } }
+      question:
+        id: q-silence
+        seconds: 25
+        timeoutPoints: -30
+        text: { ja: '受信者に口外しないよう求めたのは事実ですか。', en: '' }
+        answers:
+          - { id: a-silence-deny, text: { ja: 'そのようなことはしていません。', en: '' }, points: -200 }
+          - { id: a-silence-admit, text: { ja: '事実です。行き過ぎでした。', en: '' }, points: 30 }
+          - { id: a-silence-explain, text: { ja: '混乱を小さくしたいと考えて依頼しましたが、誤りでした。依頼を撤回し、自由に話していただけると伝えています。', en: '' }, points: 80, requiresNote: note-response }
+endings:
+  S:
+    bgm: ending_s
+    text: { ja: '1か月後、配信ツールは Bcc 固定になり、送信前の承認が全教室で回り始めた。問い合わせは落ち着き、退会は数名にとどまった。教室の朝、講師が「説明が早くて助かった」と言った。誤りは私たちの側にあった。問われたのは、起きた後にどう動くかだった。', en: '' }
+  A:
+    bgm: ending_a
+    text: { ja: '批判は受けたが、会員は戻った。誤送信の記録は社内の研修資料になり、新人が最初に読む文書になった。同じ誤りを二度しないための手順が、少しずつ根づいている。', en: '' }
+  B:
+    bgm: ending_b
+    text: { ja: '教室の一部で退会が続いた。お詫びと説明を重ね、半年かけて関係を戻している。送信の手順は変わったが、保護者の記憶はまだ新しい。', en: '' }
+  C:
+    bgm: ending_c
+    text: { ja: '説明の遅れと教室ごとの対応のばらつきを指摘され、本部長が交代した。残った職員が、送信の手順と確認の記録を作り直している。', en: '' }
+  D:
+    bgm: ending_d
+    text: { ja: '二次被害の相談が続き、教室の統合を決めた。送信の記録は残っておらず、何が起きたのかを今も説明できない。あの日の最初の1時間を、何度も思い返している。', en: '' }
+headlines:
+  S: { ja: '「Bcc 固定と送信前の承認、業界の手本に」', en: '' }
+  A: { ja: '「誤送信を謝罪、再発防止を公表」', en: '' }
+  B: { ja: '「説明の遅れに会員の不満」', en: '' }
+  C: { ja: '「本部の確認体制に批判」', en: '' }
+  D: { ja: '「誤送信を放置、二次被害に」', en: '' }
+salesModel: { base: 100, trustWeight: 0.4, fatalPenalty: 10, min: 40, max: 130 }
