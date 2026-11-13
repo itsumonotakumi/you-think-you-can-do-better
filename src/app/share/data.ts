@@ -69,7 +69,9 @@ export function siteUrl(envUrl: string | undefined = import.meta.env?.VITE_SITE_
 
 function illustrationUrl(scenarioId: string, base: string | undefined): string {
   const safeId = scenarioId.replace(/[^a-z0-9-]/gi, '');
-  const root = base && base.trim() !== '' ? base.trim() : './';
+  const fromEnv = import.meta.env?.BASE_URL;
+  const fallback = fromEnv && fromEnv.trim() !== '' ? fromEnv : './';
+  const root = base && base.trim() !== '' ? base.trim() : fallback;
   const prefix = root.endsWith('/') ? root : `${root}/`;
   return `${prefix}illustrations/${safeId}-key.webp`;
 }

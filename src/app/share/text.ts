@@ -68,22 +68,31 @@ export function buildPostText(card: ShareCard, platform: SharePlatform = 'x'): s
   const template = TEMPLATES[card.lang];
   const limit = PLATFORM_LIMITS[platform];
   const tail = joinLines([SHARE_HASHTAG, card.url]);
-  const extras = [
-    card.headline ? template.headline(card.headline) : undefined,
-    card.achievement ? template.achievement(card.achievement) : undefined,
-  ].filter((line): line is string => line !== undefined);
+  const headlineLine = card.headline ? template.headline(card.headline) : undefined;
+  const achievementLine = card.achievement ? template.achievement(card.achievement) : undefined;
+  const extras = [headlineLine, achievementLine].filter(
+    (line): line is string => line !== undefined,
+  );
+  const shortBase = joinLines([template.short(card), template.resultShort(card)]);
+
+  // 見出しを切り詰めて残す場合の文字数（改行1つ分を空ける）
+  const headlineRoom = limit - charCount(joinLines([shortBase, tail])) - 1;
+  const shortHeadline = headlineLine && headlineRoom > 2
+    ? joinLines([shortBase, truncateText(headlineLine, headlineRoom), tail])
+    : '';
 
   const candidates: string[] = [
     joinLines([template.head(card), template.result(card), ...extras, tail]),
     joinLines([template.short(card), template.result(card), ...extras, tail]),
     joinLines([template.short(card), template.resultShort(card), ...extras, tail]),
     // 称号を落とし、見出しだけ残す
-    joinLines([template.short(card), template.resultShort(card), extras[0], tail]),
+    joinLines([template.short(card), template.resultShort(card), headlineLine, tail]),
+    shortHeadline,
     // 見出しも落とす
     joinLines([template.short(card), template.resultShort(card), tail]),
   ];
   for (const text of candidates) {
-    if (charCount(text) <= limit) return text;
+    if (text !== '' && charCount(text) <= limit) return text;
   }
 
   // ここまで来るのはURLだけで上限を超える場合など。先頭を切ってでもタグとURLを残す

@@ -87,7 +87,8 @@ export function truncateToWidth(
     if (ctx.measureText(`${out}${char}…`).width > maxWidth) break;
     out += char;
   }
-  return out === '' ? '…' : `${out}…`;}
+  return out === '' ? '…' : `${out}…`;
+}
 
 function drawCover(
   ctx: CanvasRenderingContext2D,

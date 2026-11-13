@@ -29,12 +29,24 @@ describe('buildPostText', () => {
 
   it('Xの上限が厳しいときは称号から落とし、見出しも切り詰める', () => {
     const text = buildPostText(
-      makeCard({ headline: '障害対応の遅れを謝罪、原因は外部からの不正アクセスでした', achievement: '初動の達人' }),
+      makeCard({
+        headline: '障害対応の遅れを謝罪、原因は外部からの不正アクセスでした。復旧は翌朝までずれ込み、取引先への影響は数百社にのぼる見通しです。専門家は監視体制の見直しを求めています',
+        achievement: '初動の達人',
+      }),
       'x',
     );
     expect(charCount(text)).toBeLessThanOrEqual(PLATFORM_LIMITS.x);
+    expect(text).toContain('翌朝の新聞：「');
+    expect(text).toContain('…');
+    expect(text).not.toContain('称号');
     expect(text).toContain(SHARE_HASHTAG);
     expect(text).toContain('https://example.com/ytcdb');
+  });
+
+  it('見出しが無く称号だけなら、称号を落としても投稿文は崩れない', () => {
+    const text = buildPostText(makeCard({ achievement: '初動の達人' }), 'x');
+    expect(charCount(text)).toBeLessThanOrEqual(PLATFORM_LIMITS.x);
+    expect(text).toContain(SHARE_HASHTAG);
   });
 
   it('英語では英語の雛形を使う', () => {

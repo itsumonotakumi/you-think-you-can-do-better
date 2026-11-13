@@ -1,6 +1,6 @@
 // 結果のシェア: 画像を生成・保存し、投稿文をコピーできる（PC幅・スマホ幅）。
 import { expect, test } from '@playwright/test';
-import { openTitle, playToEnding, startNewPlay } from './helpers';
+import { openTitle, playToEnding, startNewPlay, waitForScreen } from './helpers';
 
 test.describe('結果のシェア', () => {
   test('シェア画像と投稿文を作り、画像を保存して投稿文をコピーできる', async ({ page }) => {
@@ -76,5 +76,28 @@ test.describe('結果のシェア', () => {
     await dialog.locator('button.share-close').click();
     await expect(dialog).toHaveCount(0);
     await expect(ending).toBeVisible();
+  });
+
+  test('英語に切り替えると、シェアの画面と投稿文も英語になる', async ({ page }) => {
+    test.setTimeout(420_000);
+
+    await openTitle(page);
+    await page.getByRole('button', { name: '設定' }).click();
+    await waitForScreen(page, 'S10Settings');
+    await page.locator('#set-lang').selectOption('en');
+    await page.getByRole('button', { name: 'Back' }).click();
+    await waitForScreen(page, 'S01Title');
+
+    await startNewPlay(page);
+    await playToEnding(page);
+
+    const ending = page.locator('[data-screen="S08Ending"]');
+    await ending.locator('button.share-open').click();
+    const dialog = ending.locator('.share-panel');
+    await expect(dialog).toContainText('Share result');
+    await expect(dialog.locator('button.share-save')).toHaveText('Save image');
+    const text = dialog.locator('textarea.share-text');
+    await expect(text).toHaveValue(/I played/);
+    await expect(text).toHaveValue(/#じゃあなたがやってみて/);
   });
 });

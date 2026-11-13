@@ -99,6 +99,11 @@ describe('buildShareCard', () => {
     const card = buildShareCard({ ...base, illustrationBase: '/sub/' });
     expect(card.illustrationUrl).toBe('/sub/illustrations/no01-nebula-key.webp');
   });
+
+  it('指定が無ければビルドの base（Vite の BASE_URL）を使う', () => {
+    const card = buildShareCard({ ...base, illustrationBase: undefined });
+    expect(card.illustrationUrl).toBe('/illustrations/no01-nebula-key.webp');
+  });
 });
 
 describe('shareFileName', () => {
