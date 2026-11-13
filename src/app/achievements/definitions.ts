@@ -187,6 +187,15 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     description: L('公開中のすべてのシナリオをプレイした。', 'Played every published scenario.'),
     hint: L('すべての事件を経験する。', 'Experience every incident.'),
   },
+  {
+    // 要件（requirements-ja.md）の全クリア後の称号
+    id: 'graduate',
+    scope: 'total',
+    weight: 10,
+    title: L('外野卒業', 'No Longer an Onlooker'),
+    description: L('公開中のすべてのシナリオを、全4ロールでプレイした。', 'Played every published scenario in all four roles.'),
+    hint: L('すべての事件を、すべての立場で経験する。', 'Experience every incident from every seat.'),
+  },
 ];
 
 const BY_ID = new Map(ACHIEVEMENTS.map((def) => [def.id, def]));

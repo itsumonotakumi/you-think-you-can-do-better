@@ -103,6 +103,9 @@ export function evaluateAchievements(input: AchievementInput): Achievement[] {
     'plays-20': totals.totalPlays >= 20,
     'all-scenarios': scenarioIds.length > 0
       && scenarioIds.every((id) => totals.scenarios.has(id)),
+    // 要件の「外野卒業」: 全シナリオを全4ロールで終える
+    graduate: scenarioIds.length > 0
+      && scenarioIds.every((id) => (totals.scenarios.get(id)?.roles.size ?? 0) >= ROLES.length),
   };
 
   return ACHIEVEMENTS

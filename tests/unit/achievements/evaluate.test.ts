@@ -215,6 +215,19 @@ describe('積み重ねで決まる称号', () => {
       .not.toContain('scenarios-3');
   });
 
+  it('全シナリオを全4ロールでプレイすると graduate（外野卒業）', () => {
+    const roles = ['executive', 'officer', 'lead', 'analyst'] as const;
+    const plays: PlaysStore = {};
+    for (const role of roles) {
+      plays[`a/${role}`] = playRecord(1);
+      plays[`b/${role}`] = playRecord(1);
+    }
+    expect(ids({ plays, scenarioIds: ['a', 'b'] })).toContain('graduate');
+    delete plays['b/analyst'];
+    expect(ids({ plays, scenarioIds: ['a', 'b'] })).not.toContain('graduate');
+    expect(ids({ plays })).not.toContain('graduate');
+  });
+
   it('2シナリオでSを取ると rank-s-two', () => {
     const plays: PlaysStore = { 'a/executive': playRecord(2, 'S'), 'b/lead': playRecord(1, 'S') };
     expect(ids({ plays })).toContain('rank-s-two');

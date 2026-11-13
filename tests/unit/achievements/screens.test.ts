@@ -117,7 +117,7 @@ describe('S13 の表示', () => {
     const { body } = render(S13Achievements);
     expect(body).toContain('ランクSを獲得した。');
     expect(body).toContain('2026-11-13');
-    expect(body).toContain('1 / 21 獲得');
+    expect(body).toContain('1 / 22 獲得');
   });
 });
 
