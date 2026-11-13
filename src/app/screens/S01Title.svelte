@@ -30,11 +30,13 @@
   } from '../../i18n';
   import { loadProgress, saveProgress, saveSettings } from '../../storage';
   import { backTo, errorMessage, play, scenario, screen, selectedScenarioId, settings } from '../store';
+  import { isRankingEnabled } from '../ranking';
   import type { Lang, PlayState } from '../../engine/types';
   import '../styles/base.css';
 
   let progress = $state<PlayState | null>(loadProgress());
   let resuming = $state(false);
+  const rankingEnabled = isRankingEnabled();
 
   const ui = $derived.by(() => {
     setLang($settings.lang);
@@ -52,6 +54,7 @@
       credits: t('sa.common.credits'),
       language: t('sa.common.language'),
       credit: t('sa.title.credit'),
+      ranking: t('rk.intro.link'),
       loading: t('sa.common.loading'),
       loadError: t('sa.scenarios.loadError'),
       purpose: notice('purpose'),
@@ -155,6 +158,12 @@
         {resuming ? ui.loading : ui.continueLabel}
       </button>
       <p class="hint">{ui.resumeTarget(progress.scenarioId, progress.role)}</p>
+    {/if}
+
+    {#if rankingEnabled}
+      <button class="btn btn--wide" data-ranking-link onclick={() => screen.set('S12')}>
+        {ui.ranking}
+      </button>
     {/if}
 
     <div class="row row--center">

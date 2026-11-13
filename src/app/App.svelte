@@ -40,10 +40,12 @@
   import S09Review from './screens/S09Review.svelte';
   import S10Settings from './screens/S10Settings.svelte';
   import S11Credits from './screens/S11Credits.svelte';
+  import S12Ranking from './screens/S12Ranking.svelte';
   import ErrorScreen from './screens/ErrorScreen.svelte';
 
   const screens = { S01: S01Title, S02: S02Prologue, S03: S03ScenarioSelect, S04: S04RoleSelect, S05: S05Main,
-    S06: S06Draft, S07: S07Press, S08: S08Ending, S09: S09Review, S10: S10Settings, S11: S11Credits, error: ErrorScreen };
+    S06: S06Draft, S07: S07Press, S08: S08Ending, S09: S09Review, S10: S10Settings, S11: S11Credits,
+    S12: S12Ranking, error: ErrorScreen };
   const Current = $derived(screens[$screen]);
 
   /** 字幕を1件表示しておく時間（ミリ秒） */
