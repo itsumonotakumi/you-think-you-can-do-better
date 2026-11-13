@@ -31,12 +31,14 @@
   import { loc, notice, t } from '../../i18n';
   import { recordResult, saveProgress } from '../../storage';
   import { play, scenario, screen, settings } from '../store';
+  import { isRankingEnabled, RANKING_KEYS } from '../ranking';
   import { runFx } from '../effects';
   import { minutesBetween } from '../parts/logic';
   import ShareButton from '../parts/ShareButton.svelte';
   import '../effects/effects.css';
 
   let recorded = false;
+  const rankingEnabled = isRankingEnabled();
 
   const result = $derived($play && $scenario ? computeResult($play, $scenario) : null);
   const ending = $derived(result && $scenario ? $scenario.endings[result.rank] : null);
@@ -165,6 +167,16 @@
     </div>
 
     <div class="actions">
+      {#if rankingEnabled && result.playCount === 1}
+        <button
+          type="button"
+          class="btn rank-join"
+          data-ranking-join
+          onclick={() => screen.set('S12')}
+        >
+          {t(RANKING_KEYS.endingJoin)}
+        </button>
+      {/if}
       <button type="button" class="btn btn--ghost" onclick={() => screen.set('S01')}>
         {t('sc.ending.titleButton')}
       </button>

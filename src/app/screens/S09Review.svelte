@@ -43,7 +43,7 @@
   import { onMount } from 'svelte';
   import { buildReport } from '../../engine';
   import type {
-    Choice, DecisionPoint, Media, PressQuestion, Reference, Voice,
+    Choice, ChoiceStatsResponse, DecisionPoint, Media, PressQuestion, Reference, Voice,
   } from '../../engine/types';
   import { audio } from '../../audio';
   import { loadReferences } from '../../data/loader';
@@ -56,10 +56,12 @@
   import {
     formatClock, mediaGlyph, minutesBetween,
   } from '../parts/logic';
+  import { choicePercent, fetchChoiceStats, isRankingEnabled, RANKING_KEYS } from '../ranking';
 
   let refs = $state<Record<string, Reference>>({});
   let refsLoading = $state(true);
   let refsError = $state(false);
+  let stats = $state<ChoiceStatsResponse | null>(null);
 
   const role = $derived($play && $scenario ? $scenario.roles[$play.role] : undefined);
   // 保存が壊れていても振り返り画面を落とさない（組めなければ「データなし」表示へ）
@@ -104,7 +106,21 @@
 
   onMount(() => {
     audio.playBgm('calm');
+    const state = $play;
+    const current = $scenario;
     let cancelled = false;
+
+    // 選択率は振り返りだけで出す。取れなくても画面は止めない
+    if (isRankingEnabled() && state && current) {
+      void fetchChoiceStats({
+        scenarioId: state.scenarioId,
+        role: state.role,
+        mode: state.mode ?? 'normal',
+      }).then((response) => {
+        if (!cancelled) stats = response;
+      });
+    }
+
     loadReferences()
       .then((list) => {
         if (cancelled) return;
@@ -203,12 +219,16 @@
             {@const choice = choiceOf(entry.choiceId)}
             {@const best = point ? bestChoiceOf(point) : null}
             {@const notBest = point !== null && choice !== null && !isBestChoice(point, choice)}
+            {@const percent = choicePercent(stats, entry.pointId, entry.choiceId)}
             <li class="entry">
               <div class="entry-head">
                 <span class="entry-time">{formatClock(entry.at)}</span>
                 <span class="entry-point">{point ? loc(point.text) : entry.pointId}</span>
               </div>
               <p class="entry-choice">{choice ? loc(choice.text) : entry.choiceId}</p>
+              {#if percent !== null}
+                <p class="choice-stats" data-choice-stats>{t(RANKING_KEYS.reviewLine, { percent })}</p>
+              {/if}
 
               <dl class="entry-points">
                 <div>
@@ -535,6 +555,11 @@
     margin: 0.35rem 0 0.5rem;
     font-size: 1.02em;
     line-height: 1.8;
+  }
+  .choice-stats {
+    margin: -0.2rem 0 0.5rem;
+    color: var(--accent-strong);
+    font-size: 0.85em;
   }
   .entry-points {
     display: flex;

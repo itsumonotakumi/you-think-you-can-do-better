@@ -6,7 +6,8 @@ import type { CueCaption, ShownCaption } from './parts/logic';
 import { shiftCaption, withCaptionIds } from './parts/logic';
 
 export type ScreenId =
-  | 'S01' | 'S02' | 'S03' | 'S04' | 'S05' | 'S06' | 'S07' | 'S08' | 'S09' | 'S10' | 'S11' | 'error';
+  | 'S01' | 'S02' | 'S03' | 'S04' | 'S05' | 'S06' | 'S07' | 'S08' | 'S09' | 'S10' | 'S11' | 'S12'
+  | 'error';
 
 export const screen = writable<ScreenId>('S01');
 /** S10/S11 から戻る先 */
