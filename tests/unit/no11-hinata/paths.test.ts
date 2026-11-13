@@ -140,6 +140,29 @@ describe('記者会見の出し分け', () => {
     expect(pressQuestionIds({})).not.toContain('q-hidden');
     expect(pressQuestionIds({})).not.toContain('q-orders');
   });
+
+  it('記録が要る回答は、どのロールでも記録を取れる', () => {
+    const questions = [
+      ...scenario.press!.questions,
+      ...(scenario.press!.extraQuestions ?? []).map((extra) => extra.question),
+    ];
+    const required = new Set(
+      questions.flatMap((question) =>
+        question.answers.flatMap((answer) =>
+          typeof answer.requiresNote === 'string' ? [answer.requiresNote] : [],
+        ),
+      ),
+    );
+    expect(required.size).toBeGreaterThan(0);
+    for (const role of ROLES) {
+      const notes = new Set(
+        script(role).points.flatMap((point) => (point.notable ?? []).map((note) => note.id)),
+      );
+      for (const id of required) {
+        expect(notes.has(id), `${role} は ${id} を記録できない`).toBe(true);
+      }
+    }
+  });
 });
 
 describe('物語の筋', () => {

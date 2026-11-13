@@ -57,7 +57,7 @@ points:
     text: { ja: '午前8時。ハコブ物流から電話が入る。「出荷システムが止まり、今日の便が出せません」。通販の注文は今朝も入っている。受注をどうするか。', en: '' }
     voices: [v01-boss, v01-public, v01-ok]
     notable:
-      - { id: note-officer-stop, text: { ja: '午前8時、物流から出荷停止の連絡。今朝の注文は未出荷のまま残っている。', en: '' } }
+      - { id: note-outage, text: { ja: '午前8時、物流から出荷停止の連絡。今朝の注文は未出荷のまま残っている。', en: '' } }
     choices:
       - id: o01-a-continue
         text: { ja: '受注は続け、発送が遅れることだけをサイトに出す', en: '' }
@@ -439,7 +439,7 @@ points:
     text: { ja: '午前10時。物流の管理本部長が来社した。「再委託先の一つに、古い端末が残っていた」と打ち明ける。', en: '' }
     voices: [v09-vendor, v09-law, v09-ok]
     notable:
-      - { id: note-officer-revendor, text: { ja: '物流は再委託先の一つに古い端末が残っていたことを認めた。', en: '' } }
+      - { id: note-audit, text: { ja: '物流は再委託先の一つに古い端末が残っていたことを認めた。', en: '' } }
     choices:
       - id: o09-a-blame
         text: { ja: '委託先の責任として、契約上の賠償を求める方針を固める', en: '' }
@@ -618,7 +618,7 @@ points:
     text: { ja: '午前10時。物流から「攻撃者が配送データの一部を公開した」と連絡。氏名、住所、電話、注文した商品が含まれる。', en: '' }
     voices: [v13-attacker, v13-coward, v13-ok]
     notable:
-      - { id: note-officer-leak, text: { ja: '攻撃者が配送データの一部を公開。氏名、住所、電話、注文商品が含まれる。', en: '' } }
+      - { id: note-leak, text: { ja: '攻撃者が配送データの一部を公開。氏名、住所、電話、注文商品が含まれる。', en: '' } }
     choices:
       - id: o13-a-wait
         text: { ja: '可能性の段階では公表せず、確定するまで待つ', en: '' }

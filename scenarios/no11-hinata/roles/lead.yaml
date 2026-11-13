@@ -57,7 +57,7 @@ points:
     text: { ja: '午前8時。ハコブ物流の出荷システムが止まった。自社の通販は止まるが、店舗は動いている。情報システム部として、まず何を押さえるか。', en: '' }
     voices: [v01-boss, v01-coward, v01-ok]
     notable:
-      - { id: note-lead-first, text: { ja: '午前8時、委託先の出荷停止。自社の受注と出荷は物流の接続点で止まっている。', en: '' } }
+      - { id: note-outage, text: { ja: '午前8時、委託先の出荷停止。自社の受注と出荷は物流の接続点で止まっている。', en: '' } }
     choices:
       - id: l01-a-scope
         text: { ja: '自社の受注と出荷の接続点を確認する体制を作る', en: '' }
@@ -329,6 +329,8 @@ points:
     sound: { se: [mail_arrive] }
     text: { ja: '午後3時。物流の権限管理が問題になった。委託先には、こちらの注文データを読めるアカウントがある。', en: '' }
     voices: [v07-vendor, v07-law, v07-ok]
+    notable:
+      - { id: note-audit, text: { ja: '委託先のアカウントと権限の棚卸しを、期限を決めて求める必要がある。', en: '' } }
     choices:
       - id: l07-a-clause
         text: { ja: '契約書の監督条項だけを確認して、対応を決める', en: '' }
@@ -600,7 +602,7 @@ points:
     text: { ja: '午前10時。攻撃者が配送データの一部を公開した。自社の台帳と突き合わせ、対象を特定する必要がある。', en: '' }
     voices: [v13-attacker, v13-vendor, v13-ok]
     notable:
-      - { id: note-lead-leak, text: { ja: '公開されたデータには、氏名、住所、電話、注文商品が含まれる。', en: '' } }
+      - { id: note-leak, text: { ja: '公開されたデータには、氏名、住所、電話、注文商品が含まれる。', en: '' } }
     choices:
       - id: l13-a-wait
         text: { ja: '物流の発表を待ち、公開の範囲は相手に任せる', en: '' }

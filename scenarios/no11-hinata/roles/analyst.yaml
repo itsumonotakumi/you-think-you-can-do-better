@@ -57,7 +57,7 @@ points:
     text: { ja: '午前8時。ハコブ物流の担当者から電話。「出荷システムが止まりました」。まず、何を聞き取るか。', en: '' }
     voices: [v01-vendor, v01-coward, v01-ok]
     notable:
-      - { id: note-analyst-call, text: { ja: '午前8時、委託先の担当者から出荷停止の連絡。原因はまだ不明。', en: '' } }
+      - { id: note-outage, text: { ja: '午前8時、委託先の担当者から出荷停止の連絡。原因はまだ不明。', en: '' } }
     choices:
       - id: a01-a-when
         text: { ja: '復旧の見込みだけを聞き、詳しくは後で聞く', en: '' }
@@ -104,7 +104,7 @@ points:
     text: { ja: '午前10時。委託契約書と、預けているデータの台帳を確認する。何を渡しているかが分からないと、報告もできない。', en: '' }
     voices: [v02-law, v02-vendor, v02-ok]
     notable:
-      - { id: note-analyst-contract, text: { ja: '委託しているデータは、氏名、住所、電話、注文商品。契約に再委託の条項がある。', en: '' } }
+      - { id: note-audit, text: { ja: '委託しているデータは、氏名、住所、電話、注文商品。契約に再委託の条項がある。', en: '' } }
     choices:
       - id: a02-a-join
         text: { ja: '契約書とデータ項目の台帳を突き合わせて確認する', en: '' }
@@ -601,7 +601,7 @@ points:
     text: { ja: '午前10時。攻撃者が配送データの一部を公開した。通知を出すには、対象のリストを作る必要がある。', en: '' }
     voices: [v13-attacker, v13-coward, v13-ok]
     notable:
-      - { id: note-analyst-list, text: { ja: '公開されたデータと、自社の注文台帳を突き合わせて対象を特定する。', en: '' } }
+      - { id: note-leak, text: { ja: '公開されたデータと、自社の注文台帳を突き合わせて対象を特定する。', en: '' } }
     choices:
       - id: a13-a-wait
         text: { ja: '物流が作る対象リストを待ってから動く', en: '' }

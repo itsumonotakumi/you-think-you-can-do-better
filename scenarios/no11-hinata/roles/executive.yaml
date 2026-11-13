@@ -491,6 +491,8 @@ points:
     sound: { se: [phone_ring] }
     text: { ja: '午前10時。物流の管理本部長が来社した。「弊社の権限管理が甘かった。契約の監督条項も曖昧だった」と認める。', en: '' }
     voices: [v10-vendor, v10-law, v10-ok]
+    notable:
+      - { id: note-audit, text: { ja: '委託先は権限管理の甘さと、契約の監督条項の曖昧さを認めた。', en: '' } }
     choices:
       - id: p10-a-blame
         text: { ja: '委託先の責任として、契約上の賠償を求める方針を固める', en: '' }
