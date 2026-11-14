@@ -2,22 +2,27 @@
 import type { Env, PagesFunction } from '../_lib/types';
 import { clientIp, isSameOrigin, jsonError, jsonResponse, readJsonBody } from '../_lib/http';
 import { checkNickname } from '../_lib/nickname';
-import { hashIp, checkRateLimit } from '../_lib/ratelimit';
-import { verifyTurnstile } from '../_lib/turnstile';
+import { checkRateLimit, cleanupOldRows, dayOf, hashIp } from '../_lib/ratelimit';
+import { parseAllowedHosts, verifyTurnstile } from '../_lib/turnstile';
 import { parseSubmission } from '../_lib/submission';
 import { replaySubmission } from '../_lib/replay';
 import { findScenario } from '../_lib/scenarios';
 import {
   countPlays,
-  countPlaysSince,
   countRankedBefore,
   findPlayByClient,
-  insertPlay,
+  insertPlayWithinBudget,
+  recordDailyWrite,
+  takeDailyRegistrationSlot,
+  type PlayKey,
 } from '../_lib/db';
 
-/** 無料枠の安全装置。既定は 1日 50,000 件 */
-export const DEFAULT_DAILY_WRITE_LIMIT = 50_000;
-const DAY_MS = 24 * 60 * 60 * 1000;
+/** 無料枠の安全装置。1日の登録件数（≒書き込み行数）の既定。
+ * 1 登録あたり plays・daily_writes・ip_registrations・rate_limits で 4〜5 行を書くので、
+ * 2 万件でも D1 無料枠の 10 万行/日（書き込み）に収まる。 */
+export const DEFAULT_DAILY_WRITE_LIMIT = 20_000;
+/** 同じ IP ハッシュが 1 日に登録できる件数（端末 ID の付け替え対策） */
+export const DEFAULT_MAX_REGISTRATIONS_PER_IP = 20;
 
 export interface HandlerDeps {
   /** テストで固定するための現在時刻（ミリ秒） */
@@ -26,18 +31,28 @@ export interface HandlerDeps {
   fetcher?: typeof fetch;
 }
 
-function dailyWriteLimit(env: Env): number {
-  const value = Number(env.DAILY_WRITE_LIMIT ?? '');
-  return Number.isFinite(value) && value > 0 ? Math.trunc(value) : DEFAULT_DAILY_WRITE_LIMIT;
+function positiveInt(value: string | undefined, fallback: number): number {
+  const parsed = Number(value ?? '');
+  return Number.isFinite(parsed) && parsed > 0 ? Math.trunc(parsed) : fallback;
 }
 
-function startOfDayUtc(nowMs: number): number {
-  return Math.floor(nowMs / DAY_MS) * DAY_MS;
+export function dailyWriteLimit(env: Env): number {
+  return positiveInt(env.DAILY_WRITE_LIMIT, DEFAULT_DAILY_WRITE_LIMIT);
+}
+
+export function maxRegistrationsPerIp(env: Env): number {
+  return positiveInt(env.MAX_REGISTRATIONS_PER_IP, DEFAULT_MAX_REGISTRATIONS_PER_IP);
 }
 
 function percentileOf(position: number, total: number): number {
   if (total <= 0) return 100;
   return Math.min(100, Math.ceil((position / total) * 100));
+}
+
+async function playSummary(env: Env, key: PlayKey, score: number, createdAt: number) {
+  const position = (await countRankedBefore(env.DB, key, score, createdAt)) + 1;
+  const total = await countPlays(env.DB, key);
+  return { position, total, percentile: percentileOf(position, total) };
 }
 
 export async function handlePlays(
@@ -48,6 +63,8 @@ export async function handlePlays(
   const now = deps.now ?? Date.now();
   if (request.method !== 'POST') return jsonError(405, 'method_not_allowed');
   if (!isSameOrigin(request)) return jsonError(403, 'cross_origin');
+  // IP は秘密鍵で匿名化する。鍵が無ければ辞書照合できる値を作らない
+  if (!env.IP_HASH_SECRET) return jsonError(503, 'ip_hash_not_configured');
 
   const body = await readJsonBody(request);
   if (!body.ok) return jsonError(body.status, body.error);
@@ -59,17 +76,14 @@ export async function handlePlays(
   const nickname = checkNickname(sub.nickname);
   if (!nickname.ok) return jsonError(400, nickname.error);
 
-  // レート制限は IP のハッシュで数える（生の IP は保存しない）
   const ip = clientIp(request);
-  const ipHash = await hashIp(ip, env.RATE_LIMIT_SALT ?? '');
-  const allowed = await checkRateLimit(env.DB, ipHash, now);
-  if (!allowed) return jsonError(429, 'rate_limited');
 
   const turnstile = await verifyTurnstile({
     secret: env.TURNSTILE_SECRET,
     token: sub.turnstileToken,
     ip,
-    required: env.REQUIRE_TURNSTILE === 'true',
+    allowUnverified: env.ALLOW_NO_TURNSTILE === 'true',
+    allowedHosts: parseAllowedHosts(env.ALLOWED_HOSTS),
     fetcher: deps.fetcher,
   });
   if (!turnstile.ok) {
@@ -86,48 +100,81 @@ export async function handlePlays(
     return jsonResponse({ ok: false, error: 'invalid_play', reason: replay.error }, 422);
   }
 
+  const ipHash = await hashIp(ip, env.IP_HASH_SECRET);
+
+  // 検証を通った送信だけを数える（無効な投稿や Turnstile の失敗で書き込みを増やさない）
+  const allowed = await checkRateLimit(env.DB, ipHash, now);
+  if (!allowed) return jsonError(429, 'rate_limited');
+
   const key = { scenarioId: sub.scenarioId, role: sub.role, mode: sub.mode };
 
   // 初回のみ登録。2 件目以降は登録せず、順位だけ返す
   const existing = await findPlayByClient(env.DB, key, sub.clientId);
   if (existing) {
-    const position = (await countRankedBefore(env.DB, key, existing.score, existing.created_at)) + 1;
-    const total = await countPlays(env.DB, key);
     return jsonResponse({
       ok: true,
       score: existing.score,
       rank: existing.rank,
-      position,
-      total,
-      percentile: percentileOf(position, total),
+      ...(await playSummary(env, key, existing.score, existing.created_at)),
       registered: false,
     });
   }
 
-  const written = await countPlaysSince(env.DB, startOfDayUtc(now));
-  if (written >= dailyWriteLimit(env)) return jsonError(503, 'write_limit_reached');
+  const day = dayOf(now);
+  // 同じ IP から 1 日に登録できる件数（匿名運用なので完全な防止にはならない）
+  const slot = await takeDailyRegistrationSlot(
+    env.DB,
+    ipHash,
+    day,
+    maxRegistrationsPerIp(env),
+  );
+  if (!slot) return jsonError(429, 'too_many_registrations');
 
-  await insertPlay(env.DB, {
-    clientId: sub.clientId,
-    scenarioId: sub.scenarioId,
-    role: sub.role,
-    mode: sub.mode,
-    nickname: nickname.value,
-    score: replay.score,
-    rank: replay.rank,
-    choicesJson: JSON.stringify(sub.choices),
-    createdAt: now,
-  });
+  const registered = await insertPlayWithinBudget(
+    env.DB,
+    {
+      clientId: sub.clientId,
+      scenarioId: sub.scenarioId,
+      role: sub.role,
+      mode: sub.mode,
+      nickname: nickname.value,
+      score: replay.score,
+      rank: replay.rank,
+      choicesJson: JSON.stringify(sub.choices),
+      createdAt: now,
+    },
+    day,
+    dailyWriteLimit(env),
+  );
 
-  const position = (await countRankedBefore(env.DB, key, replay.score, now)) + 1;
-  const total = await countPlays(env.DB, key);
+  if (!registered) {
+    // 同時投稿で重複した場合は、保存済みの記録を返す（今回の点数は返さない）
+    const saved = await findPlayByClient(env.DB, key, sub.clientId);
+    if (saved) {
+      return jsonResponse({
+        ok: true,
+        score: saved.score,
+        rank: saved.rank,
+        ...(await playSummary(env, key, saved.score, saved.created_at)),
+        registered: false,
+      });
+    }
+    return jsonError(503, 'write_limit_reached');
+  }
+
+  await recordDailyWrite(env.DB, day);
+  // 古いレート制限の行を確率的に掃除する（失敗しても応答は変えない）
+  try {
+    await cleanupOldRows(env.DB, now);
+  } catch {
+    // 掃除は次回に回す
+  }
+
   return jsonResponse({
     ok: true,
     score: replay.score,
     rank: replay.rank,
-    position,
-    total,
-    percentile: percentileOf(position, total),
+    ...(await playSummary(env, key, replay.score, now)),
     registered: true,
   });
 }

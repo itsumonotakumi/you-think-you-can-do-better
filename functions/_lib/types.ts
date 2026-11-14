@@ -19,14 +19,20 @@ export interface D1Database {
 
 export interface Env {
   DB: D1Database;
-  /** Turnstile の秘密鍵。未設定なら開発用として検証を飛ばす */
+  /** Turnstile の秘密鍵。未設定かつ開発用の明示フラグも無ければ 503 */
   TURNSTILE_SECRET?: string;
-  /** 'true' のとき Turnstile の未設定を設定不備として拒否する（本番用） */
+  /** 'false' のときだけ Turnstile を必須にしない（既定は必須） */
   REQUIRE_TURNSTILE?: string;
-  /** 1日の書き込み上限。既定 50000 */
+  /** ローカル開発専用。'true' のときだけ Turnstile の検証を省略する（wrangler.toml には書かない） */
+  ALLOW_NO_TURNSTILE?: string;
+  /** siteverify が返す hostname の許可リスト（カンマ区切り）。先頭 '.' はサフィックス一致 */
+  ALLOWED_HOSTS?: string;
+  /** IP のハッシュに使う秘密鍵（HMAC-SHA256）。未設定なら 503 */
+  IP_HASH_SECRET?: string;
+  /** 1日の登録件数上限（無料枠の安全装置）。既定 20000 */
   DAILY_WRITE_LIMIT?: string;
-  /** IP ハッシュに混ぜる任意の文字列（省略可） */
-  RATE_LIMIT_SALT?: string;
+  /** 同じ IP ハッシュが 1 日に登録できる件数。既定 20 */
+  MAX_REGISTRATIONS_PER_IP?: string;
 }
 
 export interface EventContext<E extends Env = Env> {

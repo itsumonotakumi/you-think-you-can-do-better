@@ -64,6 +64,45 @@
 - GitHub Pages: Source=GitHub Actions、github-pages 環境は main のみ配信可（設定済み）
 - 設計書は `docs/plan/` に移動。README から「現在の状況」「ドキュメント」を削除
 
+## ランキング API の本番設定（#7 レビュー対応）
+
+Turnstile 必須・無料枠保護・投稿とレート制限の原子化を行った。優先順位は開発コスト（無料枠）＞セキュリティ＞品質で、有料機能は使っていない（Cache API・D1・Turnstile の無料範囲のみ）。
+
+### 秘密鍵（`npx wrangler secret put <名前>`）
+
+| 名前 | 必須 | 用途 |
+| --- | --- | --- |
+| `TURNSTILE_SECRET` | 必須 | Turnstile の siteverify。未設定なら書き込みは 503（`turnstile_not_configured`） |
+| `IP_HASH_SECRET` | 必須 | IP の HMAC-SHA256 用の鍵。未設定なら書き込みは 503（`ip_hash_not_configured`）。変えるとレート制限の履歴がリセットされる |
+
+### 環境変数（`wrangler.toml` の `[vars]`）
+
+| 名前 | 既定 | 用途 |
+| --- | --- | --- |
+| `REQUIRE_TURNSTILE` | `true` | Turnstile を必須にする |
+| `ALLOWED_HOSTS` | `yattemite.pages.dev,localhost` | siteverify が返す hostname の許可リスト（カンマ区切り。先頭 `.` はサブドメイン一致）。**本番ドメインを変えたら必ず更新する** |
+| `DAILY_WRITE_LIMIT` | `20000` | 1 日の登録件数上限（無料枠の安全装置）。超えたら 503 |
+| `MAX_REGISTRATIONS_PER_IP` | `20` | 同じ IP ハッシュが 1 日に登録できる件数 |
+
+`ALLOW_NO_TURNSTILE` は**ローカル開発専用**。`.dev.vars` にだけ書き、`wrangler.toml` には書かない（書くと本番で検証を省略してしまう）。
+
+### デプロイ手順
+
+1. `npx wrangler d1 create yattemite-ranking` → 出力の `database_id` を `wrangler.toml` に入れる（現在は `TO_BE_FILLED`）
+2. `npx wrangler d1 migrations apply yattemite-ranking --remote`（`0001_init.sql` → `0002_ranking_hardening.sql`）
+3. 上の 2 つの秘密鍵を設定する
+4. フロントのビルドに `VITE_API_BASE` と `VITE_TURNSTILE_SITEKEY` を渡す
+5. Turnstile のウィジェットは action `submit-play` を送る（`src/app/ranking/turnstile.ts`）。siteverify の `hostname` と `action` が合わないトークンは拒否する
+6. ローカル確認: `.dev.vars` に `ALLOW_NO_TURNSTILE="true"` を置けば Turnstile 無しで動く（`IP_HASH_SECRET` は必要）
+
+### 設計上の割り切り（既知の限界）
+
+- `clientId` は端末が作る値なので付け替えを完全には防げない。初回限定は目安で、IP あたり 1 日 20 件の上限で悪用を減らす（README に明記）
+- 各判断の所要時間は送っていないので、制限時間モード（hard）の時間改ざんは検証できない。再生時には `mode` を渡すが、保証はしない（`functions/_lib/replay.ts` のコメントと README に明記）
+- 日次上限の判定は `daily_writes` の 1 行を条件にした条件付き INSERT。同時実行では数件だけ上限を超えうる（安全装置としての余裕を見て 20,000 件に設定）
+- レート制限の古い行の掃除は投稿のたびに 2%（50 分に 1 回）だけ行う。48 時間より古い行を消す
+- 読み取りは Cache API で 60 秒キャッシュ。stats は新しい 1000 件だけを集計する
+
 ## 運用メモ
 - 注意: エージェントが worktree の外（main の作業ツリー）に書いたことが1回あった（r05-officer）。共通指示に禁止を追記済み。マージ前に main で `git status` を確認する
 - エージェントの指示書: `.worktrees/_prompts/*.md`（共通部分 `_common.md`）、ログ: `.worktrees/_logs/`

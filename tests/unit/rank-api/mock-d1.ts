@@ -14,7 +14,7 @@ export interface FakePlayRow {
   created_at: number;
 }
 
-interface ExecResult {
+export interface ExecResult {
   rows: unknown[];
   changes: number;
   lastRowId: number;
@@ -26,10 +26,19 @@ function normalize(query: string): string {
   return query.replace(/\s+/g, ' ').trim();
 }
 
+function isWrite(query: string): boolean {
+  return /^(INSERT|UPDATE|DELETE)/.test(query);
+}
+
 export class FakeD1 implements D1Database {
   plays: FakePlayRow[] = [];
   /** キーは `${ipHash}|${windowStart}` */
   rateLimits = new Map<string, number>();
+  /** キーは `${ipHash}|${day}` */
+  ipRegistrations = new Map<string, number>();
+  dailyWrites = new Map<number, number>();
+  /** 書き込み系の文を実行した回数（無効な投稿で増えないことの確認用） */
+  writes = 0;
   private nextId = 1;
 
   prepare(query: string): D1PreparedStatement {
@@ -60,9 +69,13 @@ export class FakeD1 implements D1Database {
   }
 
   execute(query: string, values: unknown[]): ExecResult {
+    if (isWrite(query)) this.writes += 1;
+
     if (query.startsWith('INSERT INTO plays')) {
-      const [clientId, scenarioId, role, mode, nickname, score, rank, choicesJson, createdAt] =
-        values as [string, string, string, string, string, number, string, string, number];
+      const [clientId, scenarioId, role, mode, nickname, score, rank, choicesJson, createdAt, day, limit] =
+        values as [string, string, string, string, string, number, string, string, number, number, number];
+      // 日次上限（条件付き INSERT の WHERE 句）
+      if ((this.dailyWrites.get(day) ?? 0) >= limit) return EMPTY;
       const exists = this.plays.some(
         (row) =>
           row.client_id === clientId
@@ -87,11 +100,30 @@ export class FakeD1 implements D1Database {
       return { rows: [], changes: 1, lastRowId: id };
     }
 
-    if (query.startsWith('INSERT INTO rate_limits')) {
-      const [ipHash, windowStart] = values as [string, number];
-      const key = `${ipHash}|${windowStart}`;
-      this.rateLimits.set(key, (this.rateLimits.get(key) ?? 0) + 1);
+    if (query.startsWith('INSERT INTO daily_writes')) {
+      const [day] = values as [number];
+      this.dailyWrites.set(day, (this.dailyWrites.get(day) ?? 0) + 1);
       return { ...EMPTY, changes: 1 };
+    }
+
+    if (query.startsWith('INSERT INTO rate_limits')) {
+      const [ipHash, windowStart, limit] = values as [string, number, number];
+      const key = `${ipHash}|${windowStart}`;
+      const current = this.rateLimits.get(key) ?? 0;
+      if (current >= limit) return EMPTY;
+      const next = current + 1;
+      this.rateLimits.set(key, next);
+      return { rows: [{ count: next }], changes: 1, lastRowId: 0 };
+    }
+
+    if (query.startsWith('INSERT INTO ip_registrations')) {
+      const [ipHash, day, limit] = values as [string, number, number];
+      const key = `${ipHash}|${day}`;
+      const current = this.ipRegistrations.get(key) ?? 0;
+      if (current >= limit) return EMPTY;
+      const next = current + 1;
+      this.ipRegistrations.set(key, next);
+      return { rows: [{ count: next }], changes: 1, lastRowId: 0 };
     }
 
     if (query.startsWith('DELETE FROM rate_limits')) {
@@ -107,6 +139,18 @@ export class FakeD1 implements D1Database {
       return { ...EMPTY, changes };
     }
 
+    if (query.startsWith('DELETE FROM ip_registrations')) {
+      const [before] = values as [number];
+      let changes = 0;
+      for (const key of [...this.ipRegistrations.keys()]) {
+        if (Number(key.split('|')[1]) < before) {
+          this.ipRegistrations.delete(key);
+          changes += 1;
+        }
+      }
+      return { ...EMPTY, changes };
+    }
+
     if (query.startsWith('SELECT count FROM rate_limits')) {
       const [ipHash, windowStart] = values as [string, number];
       const count = this.rateLimits.get(`${ipHash}|${windowStart}`);
@@ -115,16 +159,15 @@ export class FakeD1 implements D1Database {
 
     if (query.startsWith('SELECT choices_json')) {
       const [scenarioId, role, mode] = values as [string, string, string];
+      const limit = Number(/LIMIT (\d+)/.exec(query)?.[1] ?? 5000);
       const rows = this.matching({ scenario_id: scenarioId, role, mode })
+        .sort((a, b) => b.created_at - a.created_at)
+        .slice(0, limit)
         .map((row) => ({ choices_json: row.choices_json }));
       return { ...EMPTY, rows };
     }
 
     if (query.startsWith('SELECT COUNT(*) AS n')) {
-      if (query.includes('created_at >= ?') && !query.includes('scenario_id = ?')) {
-        const [since] = values as [number];
-        return { ...EMPTY, rows: [{ n: this.plays.filter((row) => row.created_at >= since).length }] };
-      }
       if (query.includes('score > ?')) {
         const [scenarioId, role, mode, score, scoreAgain, createdAt] =
           values as [string, string, string, number, number, number];

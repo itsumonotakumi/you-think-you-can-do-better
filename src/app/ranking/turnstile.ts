@@ -4,8 +4,16 @@
 const SCRIPT_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 const SCRIPT_MARK = 'data-ytcdb-turnstile';
 
+/**
+ * ウィジェットの用途。サーバーの siteverify が action を照合するので、
+ * 別の用途で発行したトークンを投稿に転用できない。
+ */
+export const TURNSTILE_ACTION = 'submit-play';
+
 export interface TurnstileOptions {
   sitekey: string;
+  /** サーバー側で照合する用途。省略すると Turnstile の既定（未設定）になる */
+  action?: string;
   callback?: (token: string) => void;
   'error-callback'?: () => void;
   'expired-callback'?: () => void;
@@ -75,6 +83,7 @@ export async function mountTurnstile(
   try {
     widgetId = api.render(container, {
       sitekey,
+      action: TURNSTILE_ACTION,
       callback: onToken,
       'expired-callback': () => onToken(''),
       'error-callback': () => onToken(''),

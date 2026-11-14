@@ -49,7 +49,13 @@ function groupDrafts(sub: PlaySubmission): Map<string, DraftEntry[]> {
   return grouped;
 }
 
-/** 1回分のプレイをそのまま再生する。state は engine 側で複製される */
+/**
+ * 1回分のプレイをそのまま再生する。state は engine 側で複製される。
+ *
+ * 限界: 送信された選択の並びと、その選択が本当に可能だったかは検証できるが、
+ * 各判断にかかった時間は送られてこないため検証できない。つまり制限時間（hard）を
+ * 守ったかどうかは保証しない。開始時刻 startedAt もサーバーの受信時刻を使う。
+ */
 export function replaySubmission(
   sub: PlaySubmission,
   scenario: Scenario,
@@ -75,6 +81,8 @@ export function replaySubmission(
       { comment: '', predictedHours: null },
       startedAt,
       REFERENCES,
+      // 保存先の区分だけでなく、再生そのものも同じモードで行う
+      sub.mode,
     );
     state = started.state;
     next = started.next;
