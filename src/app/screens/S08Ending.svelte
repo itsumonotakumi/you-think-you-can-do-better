@@ -29,7 +29,7 @@
   import { computeResult } from '../../engine';
   import { audio } from '../../audio';
   import { loc, notice, t } from '../../i18n';
-  import { loadPlays, recordResult, saveProgress } from '../../storage';
+  import { loadPlays, loadProcessed, markAchievements, markRanking, markRecorded, recordResult, saveLastPlay, saveProgress } from '../../storage';
   import { loadIndex } from '../../data/loader';
   import { play, scenario, screen, settings } from '../store';
   import {
@@ -65,6 +65,18 @@
 
   function prepareRanking(state: PlayState, current: Scenario): void {
     if (!rankingEnabled) return;
+    const processed = loadProcessed();
+    const mark = processed?.startedAt === state.startedAt ? processed.ranking : 'none';
+    // 一度送ろうとして失敗したまま再読み込みしたときは、自動で送り直さず再送ボタンを出す
+    if (mark === 'attempted') {
+      rankingStatus = 'failed';
+      return;
+    }
+    if (mark === 'sent') {
+      rankingAlready = true;
+      rankingStatus = 'done';
+      return;
+    }
     if (!canSubmitRanking(state, current)) {
       rankingStatus = state.playCount > 1 ? 'notfirst' : 'hidden';
       return;
@@ -100,6 +112,8 @@
     if (!state || !current) return;
     posting = true;
     rankingStatus = 'sending';
+    // 送ろうとしたことを記録する。失敗したまま再読み込みしても自動では送り直さない
+    markRanking(state.startedAt, 'attempted');
     try {
       const profile = ensureRankingProfile();
       const deleteKey = ensureDeleteKey();
@@ -116,6 +130,7 @@
         rankingResult = response;
         const next = { ...profile, lastSubmittedAt: state.startedAt };
         saveRankingProfile(next);
+        markRanking(state.startedAt, 'sent');
         rankingAlready = false;
         rankingStatus = 'done';
       } else {
@@ -195,34 +210,48 @@
     const state = $play;
     const current = $scenario;
     const value = result;
-    if (!state || !current || !value || recorded) return;
-    recorded = true;
+    if (!state || !current || !value) return;
 
-    // 結果の記録はこの画面で一度だけ。進行中のプレイはここで閉じる
-    recordResult(state.scenarioId, state.role, {
-      rank: value.rank,
-      score: value.official,
-      raw: value.raw,
-      playCount: value.playCount,
-      at: new Date().toISOString(),
-    }, state.mode === 'hard' ? 'hard' : 'normal');
+    const startedAt = state.startedAt;
+    const processed = loadProcessed();
+    const done = processed?.startedAt === startedAt ? processed : null;
+
+    // 再読み込みで結果を出せるよう、進行中のプレイを閉じる前に「最後に終えたプレイ」を残す
+    saveLastPlay(state);
+
+    // 結果の記録はこのプレイで一度だけ（再読み込みで記録・回数を増やさない）
+    if (!done?.recorded && !recorded) {
+      recorded = true;
+      recordResult(state.scenarioId, state.role, {
+        rank: value.rank,
+        score: value.official,
+        raw: value.raw,
+        playCount: value.playCount,
+        at: new Date().toISOString(),
+      }, state.mode === 'hard' ? 'hard' : 'normal');
+      markRecorded(startedAt);
+    }
     saveProgress(null);
 
-    // 称号（#9）: 1回のプレイで決まるものと、積み重ねで決まるものをまとめて判定する
-    const at = new Date().toISOString();
-    const grant = (scenarioIds?: string[]): Achievement[] => grantAchievements({
-      state, scenario: current, result: value, plays: loadPlays(), scenarioIds, at,
-    });
-    newAchievements = grant();
-    // 全シナリオ制覇は公開中のシナリオ一覧が要る。読み込めたときだけ追加で判定する
-    void loadIndex()
-      .then((list) => {
-        const more = grant(list.map((item) => item.id));
-        if (more.length > 0) newAchievements = [...newAchievements, ...more];
-      })
-      .catch(() => {
-        // 一覧が読めなくても、その他の称号は判定済み
+    // 称号（#9）: 1回のプレイで決まるものと、積み重ねで決まるものをまとめて判定する。
+    // 同じプレイでは二度判定しない（再読み込みで増えないように）
+    if (!done?.achievements) {
+      const at = new Date().toISOString();
+      const grant = (scenarioIds?: string[]): Achievement[] => grantAchievements({
+        state, scenario: current, result: value, plays: loadPlays(), scenarioIds, at,
       });
+      newAchievements = grant();
+      // 全シナリオ制覇は公開中のシナリオ一覧が要る。読み込めたときだけ追加で判定する
+      void loadIndex()
+        .then((list) => {
+          const more = grant(list.map((item) => item.id));
+          if (more.length > 0) newAchievements = [...newAchievements, ...more];
+        })
+        .catch(() => {
+          // 一覧が読めなくても、その他の称号は判定済み
+        })
+        .finally(() => markAchievements(startedAt));
+    }
 
     audio.playBgm(current.endings[value.rank].bgm);
     audio.playSe('stamp');

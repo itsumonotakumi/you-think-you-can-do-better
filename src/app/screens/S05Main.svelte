@@ -7,7 +7,7 @@
   import { addNote, choose, currentPoint, decisionSeconds, startPress, timeoutChoice } from '../../engine';
   import { audio } from '../../audio';
   import { t, loc, notice, setLang } from '../../i18n';
-  import { saveProgress } from '../../storage';
+  import { loadTimer, saveProgress, saveTimer } from '../../storage';
   import { applyStep, errorMessage, play, resetCaptions, scenario, screen, settings } from '../store';
   import { portrait } from '../illustrations';
   import { choiceIndexFromKey, nextFreeNoteId, voiceViews } from '../parts/logic';
@@ -30,6 +30,9 @@
   let timeoutFired = false;
   let lastTick: number | null = null;
   let intervalId: ReturnType<typeof setInterval> | null = null;
+  /** 残り時間を最後に保存した秒。毎tick書かないための目印 */
+  let savedSecond = -1;
+  const TIMER_NAME = 'S05';
 
   const point = $derived($play && $scenario ? currentPoint($play, $scenario) : null);
   const draftPending = $derived(Boolean($play?.pendingDraft));
@@ -120,7 +123,13 @@
     if (key === timerKey) return;
     timerKey = key;
     timerTotal = decisionSeconds(scale);
-    remaining = timerTotal;
+    // 再読み込み前の残り時間があれば使う（保存した値より増やさない）
+    const saved = loadTimer(TIMER_NAME);
+    remaining = saved && saved.key === key
+      ? Math.min(timerTotal, Math.max(0, saved.remaining))
+      : timerTotal;
+    savedSecond = Math.ceil(remaining);
+    if (!saved || saved.key !== key) saveTimer(TIMER_NAME, { key, remaining, total: timerTotal });
     timeoutFired = false;
     lastTick = null;
     timerRunning = true;
@@ -128,7 +137,8 @@
 
   onMount(() => {
     const handleVisibility = (): void => {
-      // 背面に回っている間は数えない（記者会見と同じ扱い）
+      // 背面に回っている間は数えない（記者会見と同じ扱い）。離れる前に残り時間を残す
+      persistTimer();
       lastTick = null;
     };
     document.addEventListener('visibilitychange', handleVisibility);
@@ -156,6 +166,7 @@
     };
     window.addEventListener('keydown', handleKey);
     return () => {
+      persistTimer();
       if (intervalId !== null) clearInterval(intervalId);
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('keydown', handleKey);
@@ -179,6 +190,7 @@
     lastTick = now;
     if (!Number.isFinite(delta) || delta <= 0) return;
     remaining = Math.max(0, remaining - delta);
+    persistTimerIfSecond();
     if (remaining > 0 || timeoutFired) return;
     timeoutFired = true;
     timerRunning = false;
@@ -193,6 +205,20 @@
     if (!choice) return;
     lastTimeout = t('sb.main.timer.timeoutResult', { choice: loc(choice.text) });
     applyChoice(choice.id);
+  }
+
+  /** 残り時間を保存する（再読み込みで増えないように、保存した値だけ戻す） */
+  function persistTimer(): void {
+    if (!timerKey || timerTotal <= 0) return;
+    saveTimer(TIMER_NAME, { key: timerKey, remaining, total: timerTotal });
+  }
+
+  /** 表示している秒が変わったときだけ保存する（毎tick書かない） */
+  function persistTimerIfSecond(): void {
+    const second = Math.ceil(remaining);
+    if (second === savedSecond) return;
+    savedSecond = second;
+    persistTimer();
   }
 
   /** 選んだ後は次の「状況」の先頭まで画面を戻す（下の選択肢に居続けないように） */

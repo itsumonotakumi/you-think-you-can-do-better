@@ -255,7 +255,7 @@ describe('画面', () => {
     expect(text).toContain('value="normal"');
     expect(text).toMatch(/bind:group=\{mode\}/);
     expect(text).toMatch(/startPlay\([^)]*mode\)/);
-    expect(text).toMatch(/registerPlayStart\([^)]*mode\)/);
+    expect(text).toMatch(/beginPlayOnce\([^)]*mode[^)]*\)/);
     expect(text).toMatch(/nextPlayCount\([^)]*mode\)/);
   });
 

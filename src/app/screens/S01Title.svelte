@@ -29,7 +29,7 @@
     applyLang, notice, setLang, setPendingNotice, t, versionChangedNotice,
   } from '../../i18n';
   import { loadProgress, saveProgress, saveSettings } from '../../storage';
-  import { backTo, errorMessage, play, scenario, screen, selectedScenarioId, settings } from '../store';
+  import { backTo, errorMessage, play, scenario, screen, selectedScenarioId, settings, titleOverlay } from '../store';
   import { isRankingEnabled, RANKING_KEYS } from '../ranking';
   import { ACHIEVEMENTS_LABEL_KEY } from '../achievements';
   import S13Achievements from './S13Achievements.svelte';
@@ -39,7 +39,8 @@
   let progress = $state<PlayState | null>(loadProgress());
   let resuming = $state(false);
   const rankingEnabled = isRankingEnabled();
-  let showingAchievements = $state(false);
+  // 称号はタイトルの上に重ねる。開いたまま再読み込みしても戻せるよう store に持つ
+  const showingAchievements = $derived($titleOverlay === 'achievements');
 
   const ui = $derived.by(() => {
     setLang($settings.lang);
@@ -173,7 +174,7 @@
     <div class="row row--center">
       <button class="btn btn--ghost" onclick={() => open('S10')}>{ui.settings}</button>
       <button class="btn btn--ghost" onclick={() => open('S11')}>{ui.credits}</button>
-      <button class="btn btn--ghost" onclick={() => (showingAchievements = true)}>{ui.achievements}</button>
+      <button class="btn btn--ghost" onclick={() => titleOverlay.set('achievements')}>{ui.achievements}</button>
     </div>
   </div>
 
@@ -191,6 +192,6 @@
   <p class="footer-note">{ui.credit}</p>
 
   {#if showingAchievements}
-    <S13Achievements onBack={() => (showingAchievements = false)} />
+    <S13Achievements onBack={() => titleOverlay.set(null)} />
   {/if}
 </section>
