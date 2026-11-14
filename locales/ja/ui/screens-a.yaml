@@ -93,6 +93,8 @@ sa.settings.themeDark: ダーク
 sa.settings.bgm: BGMの音量
 sa.settings.se: 効果音の音量
 sa.settings.muted: ミュート
+sa.sound.mute: 音を消す
+sa.sound.unmute: 音を出す
 sa.settings.reduceMotion: 演出を減らす
 sa.settings.reduceMotionHint: 揺れ・フラッシュ・早送り・タイプ表示を止め、色と太字の変化だけにします。
 sa.settings.pressTime: 制限時間（記者会見・本番モード）

@@ -93,6 +93,8 @@ sa.settings.themeDark: Dark
 sa.settings.bgm: BGM volume
 sa.settings.se: Sound effect volume
 sa.settings.muted: Mute
+sa.sound.mute: Mute sound
+sa.sound.unmute: Unmute sound
 sa.settings.reduceMotion: Reduce motion
 sa.settings.reduceMotionHint: Stops shaking, flashes, fast-forward, and typing effects. Only color and weight changes remain.
 sa.settings.pressTime: Time limit (press conference and full-on mode)

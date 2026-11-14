@@ -27,6 +27,7 @@
   import { cueCaptions } from './parts/logic';
   import { showsCaptions } from './parts/captionScreens';
   import CaptionBar from './parts/CaptionBar.svelte';
+  import MuteButton from './parts/MuteButton.svelte';
   import { saveProgress } from '../storage';
   import { t } from '../i18n';
   import S01Title from './screens/S01Title.svelte';
@@ -157,6 +158,8 @@
           <CaptionBar />
         </div>
       {/if}
+
+      <MuteButton raised={captionVisible && hasCaptions} />
     </main>
 
     {#snippet failed(_error, reset)}
