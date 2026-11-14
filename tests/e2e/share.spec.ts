@@ -22,6 +22,8 @@ test.describe('結果のシェア', () => {
     // 1200×630 の canvas に実際に色が乗っている
     const canvas = dialog.locator('canvas.share-canvas');
     await expect(canvas).toBeVisible();
+    // 画像の描画は非同期（挿絵の読み込み待ち）。保存ボタンが有効になってから読む
+    await expect(dialog.locator('button.share-save')).toBeEnabled();
     const painted = await canvas.evaluate((el: HTMLCanvasElement) => {
       const ctx = el.getContext('2d');
       if (!ctx) return { width: el.width, height: el.height, alpha: 0, length: 0 };

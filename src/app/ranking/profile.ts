@@ -4,9 +4,12 @@ import { STORAGE_KEYS } from '../../engine/types';
 
 export interface RankingProfile {
   nickname: string;
-  consent: boolean;
+  /** 「ランキングに参加しない」。オンなら自動登録しない */
+  optOut: boolean;
   /** 端末ごとの乱数 ID。個人情報ではない */
   clientId: string;
+  /** 直近に自動登録したプレイの startedAt（同じ結果画面での二重送信を防ぐ） */
+  lastSubmittedAt: string;
 }
 
 /** テストで差し替えられる最小の保存先 */
@@ -17,7 +20,9 @@ export interface RankingStore {
 
 export const NICKNAME_MAX = 16;
 
-const EMPTY: RankingProfile = { nickname: '', consent: false, clientId: '' };
+const EMPTY: RankingProfile = {
+  nickname: '', optOut: false, clientId: '', lastSubmittedAt: '',
+};
 /** 保存できなかった値。保存先ごとに持つ（次の読み込みで古い localStorage より優先する） */
 const fallback = new WeakMap<RankingStore, Map<string, string>>();
 const fallbackWithoutStore = new Map<string, string>();
@@ -111,9 +116,20 @@ export function createClientId(cryptoObj?: Crypto): string {
 export function sanitizeRankingProfile(value: unknown): RankingProfile {
   if (!isRecord(value)) return { ...EMPTY };
   const nickname = typeof value.nickname === 'string' ? normalizeNickname(value.nickname) : '';
-  const consent = value.consent === true;
+  const optOut = value.optOut === true;
   const clientId = typeof value.clientId === 'string' ? value.clientId.trim().slice(0, 64) : '';
-  return { nickname, consent, clientId };
+  const lastSubmittedAt = typeof value.lastSubmittedAt === 'string'
+    ? value.lastSubmittedAt.trim().slice(0, 64)
+    : '';
+  return { nickname, optOut, clientId, lastSubmittedAt };
+}
+
+/** 空の設定。画面の初期値に使う */
+export const EMPTY_RANKING_PROFILE: Readonly<RankingProfile> = Object.freeze({ ...EMPTY });
+
+/** 保存に失敗してもメモリ上で動く保存先。delete-key からも使う */
+export function rankingStore(): RankingStore | null {
+  return defaultStore();
 }
 
 export function loadRankingProfile(store?: RankingStore | null): RankingProfile {
@@ -131,8 +147,9 @@ export function saveRankingProfile(profile: RankingProfile, store?: RankingStore
   const clean = sanitizeRankingProfile(profile);
   writeRaw(store ?? defaultStore(), JSON.stringify({
     nickname: clean.nickname,
-    consent: clean.consent,
+    optOut: clean.optOut,
     clientId: clean.clientId,
+    lastSubmittedAt: clean.lastSubmittedAt,
   }));
 }
 

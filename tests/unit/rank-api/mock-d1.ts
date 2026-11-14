@@ -11,6 +11,7 @@ export interface FakePlayRow {
   score: number;
   rank: string;
   choices_json: string;
+  delete_key_hash: string;
   created_at: number;
 }
 
@@ -61,6 +62,7 @@ export class FakeD1 implements D1Database {
       nickname: 'ためし',
       rank: 'B',
       choices_json: '[]',
+      delete_key_hash: '',
       created_at: 1_700_000_000_000,
       ...row,
     };
@@ -72,8 +74,8 @@ export class FakeD1 implements D1Database {
     if (isWrite(query)) this.writes += 1;
 
     if (query.startsWith('INSERT INTO plays')) {
-      const [clientId, scenarioId, role, mode, nickname, score, rank, choicesJson, createdAt, day, limit] =
-        values as [string, string, string, string, string, number, string, string, number, number, number];
+      const [clientId, scenarioId, role, mode, nickname, score, rank, choicesJson, deleteKeyHash, createdAt, day, limit] =
+        values as [string, string, string, string, string, number, string, string, string, number, number, number];
       // 日次上限（条件付き INSERT の WHERE 句）
       if ((this.dailyWrites.get(day) ?? 0) >= limit) return EMPTY;
       const exists = this.plays.some(
@@ -95,6 +97,7 @@ export class FakeD1 implements D1Database {
         score,
         rank,
         choices_json: choicesJson,
+        delete_key_hash: deleteKeyHash,
         created_at: createdAt,
       });
       return { rows: [], changes: 1, lastRowId: id };
@@ -124,6 +127,15 @@ export class FakeD1 implements D1Database {
       const next = current + 1;
       this.ipRegistrations.set(key, next);
       return { rows: [{ count: next }], changes: 1, lastRowId: 0 };
+    }
+
+    if (query.startsWith('DELETE FROM plays')) {
+      const [clientId, hash] = values as [string, string];
+      const before = this.plays.length;
+      this.plays = this.plays.filter(
+        (row) => !(row.client_id === clientId && row.delete_key_hash === hash),
+      );
+      return { ...EMPTY, changes: before - this.plays.length };
     }
 
     if (query.startsWith('DELETE FROM rate_limits')) {

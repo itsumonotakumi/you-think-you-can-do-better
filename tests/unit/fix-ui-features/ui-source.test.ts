@@ -106,7 +106,7 @@ describe('ランキング無効時の通信（#8）', () => {
   it('onMount の先頭で有効判定をしてから読み込む', () => {
     const start = ranking.indexOf('onMount(() => {');
     expect(start).toBeGreaterThanOrEqual(0);
-    const body = ranking.slice(start, start + 220);
+    const body = ranking.slice(start, start + 700);
     expect(body).toContain('if (!enabled) return;');
     const guard = body.indexOf('if (!enabled) return;');
     const load = body.indexOf('loadIndex()');

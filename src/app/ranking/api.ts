@@ -1,8 +1,9 @@
 // ランキング API クライアント（#7）。通信の失敗は例外にせず、静かに失敗を返す。
 import type {
-  ChoiceStatsResponse, PlayMode, PlaySubmission, Rank, RankingEntry, RankingResponse,
+  ChoiceStatsResponse, PlayMode, Rank, RankingEntry, RankingResponse,
   RoleId, SubmissionResult,
 } from '../../engine/types';
+import type { RankingPlaySubmission } from './submission';
 import { apiBase, apiUrl } from './config';
 
 /** テストで差し替えられる fetch */
@@ -72,7 +73,7 @@ function sanitizeSubmissionResult(raw: unknown): SubmissionResult {
 
 /** プレイを送る。点数は含めない（サーバーが計算する） */
 export async function submitPlay(
-  submission: PlaySubmission,
+  submission: RankingPlaySubmission,
   options: RequestOptions = {},
 ): Promise<SubmissionResult> {
   const base = options.base ?? apiBase();
@@ -89,6 +90,57 @@ export async function submitPlay(
   );
   if (raw === null) return { ok: false, error: 'network' };
   return sanitizeSubmissionResult(raw);
+}
+
+export interface DeletePlaysInput {
+  clientId: string;
+  deleteKey: string;
+}
+
+export interface DeletePlaysResult {
+  ok: boolean;
+  /** 消せた件数。ok のときだけ入る */
+  deleted?: number;
+  error?: string;
+}
+
+function sanitizeDeleteResult(raw: unknown): DeletePlaysResult {
+  if (isRecord(raw) && raw.ok === true) {
+    const deleted = isNum(raw.deleted) && raw.deleted >= 0 ? Math.trunc(raw.deleted) : 0;
+    return { ok: true, deleted };
+  }
+  const error = isRecord(raw) && typeof raw.error === 'string' ? raw.error : 'invalid';
+  return { ok: false, error };
+}
+
+/**
+ * この端末で登録した記録を消す。
+ * 削除用の鍵は端末から出さず、サーバーには登録時に SHA-256 のハッシュだけを置いている。
+ */
+export async function deletePlays(
+  input: DeletePlaysInput,
+  options: RequestOptions = {},
+): Promise<DeletePlaysResult> {
+  const base = options.base ?? apiBase();
+  if (base === '') return { ok: false, error: 'disabled' };
+  if (typeof input.clientId !== 'string' || input.clientId === '') {
+    return { ok: false, error: 'missing_client_id' };
+  }
+  if (typeof input.deleteKey !== 'string' || input.deleteKey === '') {
+    return { ok: false, error: 'missing_delete_key' };
+  }
+
+  const raw = await requestJson(
+    apiUrl(base, '/api/plays'),
+    {
+      method: 'DELETE',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ clientId: input.clientId, deleteKey: input.deleteKey }),
+    },
+    options,
+  );
+  if (raw === null) return { ok: false, error: 'network' };
+  return sanitizeDeleteResult(raw);
 }
 
 export interface RankingQuery {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { STORAGE_KEYS } from '../../../src/engine/types';
 import {
-  NICKNAME_MAX, createClientId, ensureRankingProfile, isValidNickname, loadRankingProfile,
-  normalizeNickname, saveRankingProfile,
+  EMPTY_RANKING_PROFILE, NICKNAME_MAX, createClientId, ensureRankingProfile, isValidNickname,
+  loadRankingProfile, normalizeNickname, saveRankingProfile,
 } from '../../../src/app/ranking/profile';
 import type { RankingStore } from '../../../src/app/ranking/profile';
 
@@ -37,30 +37,41 @@ describe('ニックネーム', () => {
 });
 
 describe('保存', () => {
-  it('3つの項目だけを STORAGE_KEYS.ranking に保存する', () => {
+  it('ニックネーム・参加設定・端末ID・登録済みの印だけを保存する', () => {
     const store = new FakeStore();
-    saveRankingProfile({ nickname: '  たろう ', consent: true, clientId: ' client-1 ' }, store);
+    saveRankingProfile({
+      nickname: '  たろう ',
+      optOut: true,
+      clientId: ' client-1 ',
+      lastSubmittedAt: ' 2026-01-01T00:00:00.000Z ',
+    }, store);
     const raw = store.getItem(STORAGE_KEYS.ranking);
     expect(raw).not.toBeNull();
     expect(JSON.parse(raw ?? '{}')).toEqual({
       nickname: 'たろう',
-      consent: true,
+      optOut: true,
       clientId: 'client-1',
+      lastSubmittedAt: '2026-01-01T00:00:00.000Z',
     });
   });
 
   it('壊れた保存値は空の設定に戻す', () => {
     const store = new FakeStore();
     store.setItem(STORAGE_KEYS.ranking, '{not json');
-    expect(loadRankingProfile(store)).toEqual({ nickname: '', consent: false, clientId: '' });
-    store.setItem(STORAGE_KEYS.ranking, JSON.stringify({ nickname: 3, consent: 'yes', clientId: [] }));
-    expect(loadRankingProfile(store)).toEqual({ nickname: '', consent: false, clientId: '' });
+    expect(loadRankingProfile(store)).toEqual({ ...EMPTY_RANKING_PROFILE });
+    store.setItem(STORAGE_KEYS.ranking, JSON.stringify({ nickname: 3, optOut: 'yes', clientId: [] }));
+    expect(loadRankingProfile(store)).toEqual({ ...EMPTY_RANKING_PROFILE });
   });
 
-  it('古い形（一部だけ）でも読める', () => {
+  it('古い形（同意フィールドだけ）でも読める', () => {
     const store = new FakeStore();
-    store.setItem(STORAGE_KEYS.ranking, JSON.stringify({ nickname: 'はなこ' }));
-    expect(loadRankingProfile(store)).toEqual({ nickname: 'はなこ', consent: false, clientId: '' });
+    store.setItem(STORAGE_KEYS.ranking, JSON.stringify({ nickname: 'はなこ', consent: true }));
+    expect(loadRankingProfile(store)).toEqual({
+      nickname: 'はなこ',
+      optOut: false,
+      clientId: '',
+      lastSubmittedAt: '',
+    });
   });
 });
 
@@ -80,7 +91,9 @@ describe('端末 ID', () => {
 
   it('保存済みの ID は変えない', () => {
     const store = new FakeStore();
-    saveRankingProfile({ nickname: 'たろう', consent: true, clientId: 'fixed' }, store);
+    saveRankingProfile({
+      nickname: 'たろう', optOut: false, clientId: 'fixed', lastSubmittedAt: '',
+    }, store);
     expect(ensureRankingProfile(store).clientId).toBe('fixed');
   });
 });

@@ -89,11 +89,25 @@ Turnstile 必須・無料枠保護・投稿とレート制限の原子化を行�
 ### デプロイ手順
 
 1. ✅ D1 `yattemite-ranking`（APAC）作成済み。`database_id` は `wrangler.toml` に設定済み（2026-11-14）
-2. ✅ `0001`・`0002` のマイグレーションを本番 D1 に適用済み（2026-11-14）
+2. ✅ `0001`・`0002` のマイグレーションを本番 D1 に適用済み（2026-11-14）。自動登録と削除の改修で `0003_play_delete.sql` を追加したので、デプロイ前に `npx wrangler d1 migrations apply yattemite-ranking --remote` を実行する
 3. 上の 2 つの秘密鍵を設定する
 4. フロントのビルドに `VITE_API_BASE` と `VITE_TURNSTILE_SITEKEY` を渡す
 5. Turnstile のウィジェットは action `submit-play` を送る（`src/app/ranking/turnstile.ts`）。siteverify の `hostname` と `action` が合わないトークンは拒否する
 6. ローカル確認: `.dev.vars` に `ALLOW_NO_TURNSTILE="true"` を置けば Turnstile 無しで動く（`IP_HASH_SECRET` は必要）
+
+### 自動登録と削除（#7 改修、2026-11-14）
+
+同意画面を廃止し、プレイ前にニックネームを決めて、初回の結果画面で自動登録する形に変えた（Cloudflare 版だけ）。
+
+- プレイ前: `src/app/screens/S04RoleSelect.svelte` にニックネーム欄・本名禁止の注意書き・自動登録の説明・「ランキングに参加しない」を置く。空なら開始できない
+- プレイ後: `src/app/screens/S08Ending.svelte` が Turnstile を描画し、トークンが取れたら自動で `POST /api/plays`。状態（待ち・送信中・登録済みと順位・失敗）を表示し、失敗時だけ「再送する」を出す
+- 削除: ランキング画面（`src/app/screens/S12Ranking.svelte`）の「自分の記録を削除する」から `DELETE /api/plays` を呼ぶ。本文は `{ clientId, deleteKey }`。同一オリジンだけ・IP 単位のレート制限あり
+- 鍵: `src/app/ranking/delete-key.ts` が端末で 32 バイトの乱数（`crypto.getRandomValues`）を作り、`ytcdb:v1:ranking:delete-key` に保存する。サーバーは `functions/_lib/deletion.ts` で SHA-256 にしたハッシュだけを `plays.delete_key_hash` に保存する
+- スキーマ: `migrations/0003_play_delete.sql`（`delete_key_hash TEXT NOT NULL DEFAULT ''`）。**本番 D1 への適用が必要**
+- 削除は `client_id` とハッシュが一致する行だけを消す（この端末が登録した全シナリオ・全ロール）。選択率は行そのものが消えるので集計から外れる。ランキング・選択率のキャッシュは 60 秒なので、表示の反映は最大 5 分ほど
+- 既知の限界: `delete_key_hash` が空の既存記録（この改修より前の登録）は画面から削除できない。端末の保存データを消した場合も同じ。README に Issue での依頼を残した
+- 削除後に「以後の自動登録を止める（ランキングに参加しない）」を選べる。設定は `RankingProfile.optOut` として保存し、ニックネーム欄の近くにも置いた
+- テスト: `tests/unit/rank-auto/`（削除鍵・API・サーバー・画面・文言）と `tests/e2e/ranking.spec.ts`（自動登録と削除）。`tests/unit/rank-ui/profile.test.ts` は保存項目の変更に合わせて更新
 
 ### 設計上の割り切り（既知の限界）
 

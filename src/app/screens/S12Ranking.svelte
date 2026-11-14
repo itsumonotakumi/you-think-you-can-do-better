@@ -1,22 +1,20 @@
 <script lang="ts">
   // S12 ランキング（#7）。API のベース URL が無いビルドでは何も表示しない。
-  // 送信は本人が同意した時だけ。初回プレイに限る。
+  // プレイ結果は S08 で自動登録する。ここでは表示・ニックネーム変更・削除だけを行う。
   import { onMount } from 'svelte';
   import { loadIndex } from '../../data/loader';
   import type {
-    PlayMode, RankingEntry, RankingResponse, RoleId, ScenarioSummary, SubmissionResult,
+    PlayMode, RankingEntry, RankingResponse, RoleId, ScenarioSummary,
   } from '../../engine/types';
   import { loc, t } from '../../i18n';
-  import { play, scenario, screen, settings } from '../store';
+  import { play, screen, settings } from '../store';
   import {
-    buildRankingSubmission, canSubmitRanking, ensureRankingProfile, fetchRanking,
-    isRankingEnabled, isValidNickname, loadRankingProfile, mountTurnstile, normalizeNickname,
-    saveRankingProfile, submitPlay, submissionInput, turnstileSiteKey,
+    deletePlays, EMPTY_RANKING_PROFILE, fetchRanking, isRankingEnabled, isValidNickname,
+    loadDeleteKey, loadRankingProfile, normalizeNickname, RANKING_KEYS, saveRankingProfile,
   } from '../ranking';
   import type { RankingProfile } from '../ranking';
 
   const enabled = isRankingEnabled();
-  const siteKey = turnstileSiteKey();
 
   let index = $state<ScenarioSummary[]>([]);
   let indexError = $state(false);
@@ -30,24 +28,20 @@
   let loadError = $state(false);
   let reloadSeq = $state(0);
 
-  let profile = $state<RankingProfile>({ nickname: '', consent: false, clientId: '' });
-  let consentOpen = $state(false);
+  let profile = $state<RankingProfile>({ ...EMPTY_RANKING_PROFILE });
   let nickname = $state('');
-  let agree = $state(false);
   let nicknameError = $state(false);
-  let turnstileToken = $state('');
-  let turnstileHost = $state<HTMLDivElement | null>(null);
-  let turnstileNonce = $state(0);
-  let submitting = $state(false);
-  let submitError = $state(false);
-  let submitResult = $state<SubmissionResult | null>(null);
-  let submitted = $state(false);
+  let nicknameSaved = $state(false);
+  let optOut = $state(false);
+
+  type DeleteState = { kind: 'ok'; count: number } | { kind: 'none' } | { kind: 'error' } | { kind: 'nokey' } | null;
+  let deleteOpen = $state(false);
+  let deleting = $state(false);
+  let deleteState = $state<DeleteState>(null);
 
   const summary = $derived(index.find((item) => item.id === scenarioId) ?? null);
   const roleOptions = $derived(summary?.roles.map((item) => item.role) ?? []);
-  const playCount = $derived($play?.playCount ?? 0);
   const finished = $derived($play?.finished === true);
-  const canParticipate = $derived(canSubmitRanking($play, $scenario));
 
   $effect(() => {
     // 条件が変わるたびに取り直す。古い応答は捨てる
@@ -77,44 +71,13 @@
     };
   });
 
-  $effect(() => {
-    // Turnstile はサイトキーがある時だけ読み込む
-    const host = turnstileHost;
-    const open = consentOpen;
-    void turnstileNonce;
-    if (!open || !host || siteKey === '') {
-      turnstileToken = '';
-      return;
-    }
-
-    let cancelled = false;
-    let cleanup: (() => void) | null = null;
-    void mountTurnstile(
-      host,
-      siteKey,
-      (token) => {
-        if (!cancelled) turnstileToken = token;
-      },
-      $settings.lang === 'en' ? 'en' : 'ja',
-    ).then((done) => {
-      if (cancelled) {
-        done?.();
-        return;
-      }
-      cleanup = done;
-    });
-    return () => {
-      cancelled = true;
-      cleanup?.();
-      cleanup = null;
-    };
-  });
-
   onMount(() => {
     // ランキングが無効なビルドでは、通信も UI も一切出さない
     if (!enabled) return;
     let cancelled = false;
     profile = loadRankingProfile();
+    nickname = profile.nickname;
+    optOut = profile.optOut;
     void loadIndex()
       .then((list) => {
         if (cancelled) return;
@@ -152,78 +115,69 @@
     if (next) role = next;
   }
 
-  function openConsent(): void {
-    profile = loadRankingProfile();
-    nickname = profile.nickname;
-    agree = profile.consent;
-    nicknameError = false;
-    submitError = false;
-    submitResult = null;
-    turnstileToken = '';
-    turnstileNonce += 1;
-    consentOpen = true;
-  }
-
-  function closeConsent(): void {
-    consentOpen = false;
-    nicknameError = false;
-    submitError = false;
-    turnstileToken = '';
-  }
-
-  async function submit(): Promise<void> {
-    if (submitting) return;
-    const state = $play;
-    const current = $scenario;
-    if (!state || !current || !canSubmitRanking(state, current)) {
-      submitError = true;
-      return;
-    }
+  function saveNickname(): void {
     if (!isValidNickname(nickname)) {
       nicknameError = true;
+      nicknameSaved = false;
       return;
     }
+    const next = { ...profile, nickname: normalizeNickname(nickname), optOut };
+    saveRankingProfile(next);
+    profile = next;
     nicknameError = false;
-    submitting = true;
-    submitError = false;
-    try {
-      const ensured = ensureRankingProfile();
-      const saved: RankingProfile = {
-        ...ensured,
-        nickname: normalizeNickname(nickname),
-        consent: agree,
-      };
-      saveRankingProfile(saved);
-      profile = saved;
+    nicknameSaved = true;
+  }
 
-      const payload = buildRankingSubmission(state, current, submissionInput(saved, turnstileToken));
-      if (!payload) {
-        submitError = true;
-        return;
-      }
-      const response = await submitPlay(payload);
-      if (response.ok) {
-        submitResult = response;
-        submitted = true;
-        consentOpen = false;
+  function changeOptOut(value: boolean): void {
+    optOut = value;
+    const next = {
+      ...profile,
+      nickname: isValidNickname(nickname) ? normalizeNickname(nickname) : profile.nickname,
+      optOut: value,
+    };
+    saveRankingProfile(next);
+    profile = next;
+  }
+
+  function openDelete(): void {
+    deleteState = null;
+    deleteOpen = true;
+  }
+
+  function cancelDelete(): void {
+    if (deleting) return;
+    deleteOpen = false;
+  }
+
+  async function deleteMine(): Promise<void> {
+    if (deleting) return;
+    const deleteKey = loadDeleteKey();
+    if (deleteKey === '' || profile.clientId === '') {
+      deleteOpen = false;
+      deleteState = { kind: 'nokey' };
+      return;
+    }
+    deleting = true;
+    try {
+      const response = await deletePlays({ clientId: profile.clientId, deleteKey });
+      if (!response.ok) {
+        deleteState = { kind: 'error' };
+      } else if ((response.deleted ?? 0) > 0) {
+        deleteState = { kind: 'ok', count: response.deleted ?? 0 };
         reloadSeq += 1;
       } else {
-        submitError = true;
-        // Turnstile のトークンは一度きりなので、やり直し用に作り直す
-        turnstileToken = '';
-        turnstileNonce += 1;
+        deleteState = { kind: 'none' };
       }
     } catch {
-      submitError = true;
+      deleteState = { kind: 'error' };
     } finally {
-      submitting = false;
+      deleting = false;
+      deleteOpen = false;
     }
   }
 
   function isSelf(entry: RankingEntry): boolean {
-    if (submitResult?.ok !== true) return false;
-    if (profile.nickname === '' || entry.nickname !== profile.nickname) return false;
-    return typeof submitResult.score !== 'number' || submitResult.score === entry.score;
+    return profile.nickname !== '' && entry.nickname === profile.nickname;
   }
 </script>
 
@@ -345,103 +299,104 @@
       </section>
     {/if}
 
-    {#if submitResult?.ok}
-      <section class="panel result" data-ranking-result>
-        <h2>{t('rk.join.resultHeading')}</h2>
-        {#if typeof submitResult.position === 'number' && typeof submitResult.total === 'number'}
-          <p class="result-line">
-            {t('rk.join.position', { position: submitResult.position, total: submitResult.total })}
-          </p>
-        {/if}
-        {#if typeof submitResult.percentile === 'number'}
-          <p class="result-line">
-            {t('rk.join.percentile', { percentile: submitResult.percentile })}
-          </p>
-        {/if}
-        {#if typeof submitResult.score === 'number' && submitResult.rank}
-          <p class="result-line">
-            {t('rk.join.score', { score: submitResult.score, rank: submitResult.rank })}
-          </p>
-        {/if}
-      </section>
-    {/if}
+    <section class="panel settings" aria-labelledby="ranking-settings-heading" data-ranking-settings>
+      <h2 id="ranking-settings-heading">{t('rk.settings.heading')}</h2>
+      <p class="hint">{t('rk.settings.lead')}</p>
 
-    {#if finished}
-      {#if canParticipate && !submitted}
-        <section class="panel join" aria-labelledby="ranking-join-heading">
-          <h2 id="ranking-join-heading">{t('rk.join.heading')}</h2>
-          <p>{t('rk.join.lead')}</p>
-          {#if !consentOpen}
-            <button type="button" class="btn btn--primary" data-ranking-open onclick={openConsent}>
-              {t('rk.join.open')}
-            </button>
-          {:else}
-            <div class="join-form">
-              <dl class="sent-grid">
-                <div>
-                  <dt>{t('rk.join.sentHeading')}</dt>
-                  <dd>{t('rk.join.sent')}</dd>
-                </div>
-                <div>
-                  <dt>{t('rk.join.notSentHeading')}</dt>
-                  <dd>{t('rk.join.notSent')}</dd>
-                </div>
-              </dl>
-
-              <label class="field">
-                <span>{t('rk.join.nickname')}</span>
-                <input
-                  type="text"
-                  maxlength={16}
-                  autocomplete="nickname"
-                  data-ranking-nickname
-                  bind:value={nickname}
-                  aria-invalid={nicknameError}
-                  aria-describedby="ranking-nickname-hint"
-                />
-              </label>
-              <p id="ranking-nickname-hint" class="hint">{t('rk.join.nicknameHint')}</p>
-              {#if nicknameError}
-                <p class="error-text" role="alert">{t('rk.join.nicknameInvalid')}</p>
-              {/if}
-
-              <label class="check">
-                <input type="checkbox" data-ranking-agree bind:checked={agree} />
-                <span>{t('rk.join.consent')}</span>
-              </label>
-
-              {#if siteKey !== ''}
-                <div class="turnstile">
-                  <p class="label">{t('rk.join.verify')}</p>
-                  <div class="turnstile-host" bind:this={turnstileHost}></div>
-                </div>
-              {/if}
-
-              {#if submitError}
-                <p class="error-text" role="alert">{t('rk.join.error')}</p>
-              {/if}
-
-              <div class="join-actions">
-                <button type="button" class="btn btn--ghost" onclick={closeConsent} disabled={submitting}>
-                  {t('rk.join.cancel')}
-                </button>
-                <button
-                  type="button"
-                  class="btn btn--primary"
-                  data-ranking-submit
-                  onclick={submit}
-                  disabled={submitting || !agree || playCount !== 1}
-                >
-                  {submitting ? t('rk.join.submitting') : t('rk.join.submit')}
-                </button>
-              </div>
-            </div>
-          {/if}
-        </section>
-      {:else if playCount > 1}
-        <p class="hint">{t('rk.join.firstOnly')}</p>
+      <label class="field">
+        <span>{t('rk.nickname.label')}</span>
+        <input
+          type="text"
+          maxlength={16}
+          autocomplete="nickname"
+          data-ranking-nickname
+          bind:value={nickname}
+          oninput={() => { nicknameError = false; nicknameSaved = false; }}
+          aria-invalid={nicknameError}
+          aria-describedby="ranking-nickname-hint"
+        />
+      </label>
+      <p id="ranking-nickname-hint" class="hint">{t('rk.nickname.hint')}</p>
+      {#if nicknameError}
+        <p class="error-text" role="alert">{t('rk.nickname.invalid')}</p>
       {/if}
-    {/if}
+      {#if nicknameSaved}
+        <p class="hint" role="status">{t('rk.nickname.saved')}</p>
+      {/if}
+
+      <p class="notice notice--warn" data-ranking-warning>{t(RANKING_KEYS.nicknameWarning)}</p>
+      <p class="hint">{t(RANKING_KEYS.autoNotice)}</p>
+
+      <label class="check">
+        <input
+          type="checkbox"
+          data-ranking-optout
+          checked={optOut}
+          onchange={(event) => changeOptOut((event.currentTarget as HTMLInputElement).checked)}
+        />
+        <span>{t(RANKING_KEYS.optOutLabel)}</span>
+      </label>
+      <p class="hint">{t('rk.optout.hint')}</p>
+
+      <div class="join-actions">
+        <button type="button" class="btn btn--primary" data-ranking-save onclick={saveNickname}>
+          {t('rk.nickname.save')}
+        </button>
+      </div>
+    </section>
+
+    <section class="panel delete-panel" aria-labelledby="ranking-delete-heading" data-ranking-delete-panel>
+      <h2 id="ranking-delete-heading">{t('rk.delete.heading')}</h2>
+      <p class="hint">{t('rk.delete.lead')}</p>
+
+      {#if !deleteOpen}
+        <button type="button" class="btn btn--ghost" data-ranking-delete onclick={openDelete}>
+          {t('rk.delete.button')}
+        </button>
+      {:else}
+        <p class="notice notice--warn" role="alert">{t('rk.delete.confirm')}</p>
+        <div class="join-actions">
+          <button type="button" class="btn btn--ghost" data-ranking-delete-cancel onclick={cancelDelete} disabled={deleting}>
+            {t('rk.delete.no')}
+          </button>
+          <button type="button" class="btn btn--primary" data-ranking-delete-confirm onclick={deleteMine} disabled={deleting}>
+            {deleting ? t('rk.delete.deleting') : t('rk.delete.yes')}
+          </button>
+        </div>
+      {/if}
+
+      {#if deleteState}
+        <p
+          role="status"
+          class:error-text={deleteState.kind === 'error'}
+          data-ranking-delete-status={deleteState.kind}
+        >
+          {#if deleteState.kind === 'ok'}
+            {t('rk.delete.done', { deleted: deleteState.count })}
+          {:else if deleteState.kind === 'none'}
+            {t('rk.delete.none')}
+          {:else if deleteState.kind === 'nokey'}
+            {t('rk.delete.noKey')}
+          {:else}
+            {t('rk.delete.error')}
+          {/if}
+        </p>
+      {/if}
+
+      <p class="hint">{t('rk.delete.cache')}</p>
+
+      {#if deleteState?.kind === 'ok'}
+        <label class="check">
+          <input
+            type="checkbox"
+            data-ranking-delete-optout
+            checked={optOut}
+            onchange={(event) => changeOptOut((event.currentTarget as HTMLInputElement).checked)}
+          />
+          <span>{t('rk.delete.optOutAfter')}</span>
+        </label>
+      {/if}
+    </section>
   </section>
 {/if}
 
@@ -547,30 +502,11 @@
   .rank-b { color: var(--ok); }
   .rank-c { color: var(--text-soft); }
   .rank-d { color: var(--danger); }
-  .join-form {
+  .settings,
+  .delete-panel {
     display: grid;
-    gap: 0.7rem;
-    margin-top: 0.7rem;
-  }
-  .sent-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-    gap: 0.5rem;
-    margin: 0;
-  }
-  .sent-grid div {
-    padding: 0.5rem 0.6rem;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: var(--bg-soft);
-  }
-  .sent-grid dt {
-    color: var(--muted);
-    font-size: 0.8em;
-  }
-  .sent-grid dd {
-    margin: 0.2rem 0 0;
-    line-height: 1.7;
+    gap: 0.6rem;
+    align-items: start;
   }
   .check {
     display: flex;
@@ -580,9 +516,6 @@
   }
   .check input {
     margin-top: 0.3rem;
-  }
-  .turnstile-host {
-    min-height: 2rem;
   }
   .join-actions {
     display: flex;

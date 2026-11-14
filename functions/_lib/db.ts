@@ -17,6 +17,8 @@ export interface PlayRow {
   score: number;
   rank: string;
   choices_json: string;
+  /** 削除用の鍵の SHA-256。鍵そのものは保存しない */
+  delete_key_hash: string;
   created_at: number;
 }
 
@@ -29,11 +31,12 @@ export interface NewPlay {
   score: number;
   rank: string;
   choicesJson: string;
+  deleteKeyHash: string;
   createdAt: number;
 }
 
 const PLAY_COLUMNS =
-  'id, client_id, scenario_id, role, mode, nickname, score, rank, choices_json, created_at';
+  'id, client_id, scenario_id, role, mode, nickname, score, rank, choices_json, delete_key_hash, created_at';
 
 /**
  * 選択率の集計に使う記録の上限。
@@ -80,8 +83,8 @@ export async function insertPlayWithinBudget(
 ): Promise<boolean> {
   const result = await db
     .prepare(
-      'INSERT INTO plays (client_id, scenario_id, role, mode, nickname, score, rank, choices_json, created_at)'
-      + ' SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?'
+      'INSERT INTO plays (client_id, scenario_id, role, mode, nickname, score, rank, choices_json, delete_key_hash, created_at)'
+      + ' SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?'
       + ' WHERE COALESCE((SELECT count FROM daily_writes WHERE day = ?), 0) < ?'
       + ' ON CONFLICT(client_id, scenario_id, role, mode) DO NOTHING',
     )
@@ -94,12 +97,30 @@ export async function insertPlayWithinBudget(
       play.score,
       play.rank,
       play.choicesJson,
+      play.deleteKeyHash,
       play.createdAt,
       day,
       dailyLimit,
     )
     .run();
   return (result.meta?.changes ?? 0) > 0;
+}
+
+/**
+ * その端末の記録をすべて消す。削除用の鍵のハッシュが一致した行だけを消すので、
+ * 端末 ID を知っているだけでは消せない。戻り値は消した件数。
+ */
+export async function deletePlaysByClient(
+  db: D1Database,
+  clientId: string,
+  deleteKeyHash: string,
+): Promise<number> {
+  if (deleteKeyHash === '') return 0;
+  const result = await db
+    .prepare('DELETE FROM plays WHERE client_id = ? AND delete_key_hash = ?')
+    .bind(clientId, deleteKeyHash)
+    .run();
+  return result.meta?.changes ?? 0;
 }
 
 /** 書き込み行数の目安を 1 増やす（登録できたときだけ呼ぶ） */

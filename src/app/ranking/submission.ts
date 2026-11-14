@@ -3,10 +3,15 @@
 import type { PlayState, PlaySubmission, Scenario } from '../../engine/types';
 import type { RankingProfile } from './profile';
 
+/** PlaySubmission に削除用の鍵を足したもの（共有契約 types.ts は変えない） */
+export type RankingPlaySubmission = PlaySubmission & { deleteKey?: string };
+
 export interface SubmissionInput {
   nickname: string;
   clientId: string;
   turnstileToken: string;
+  /** 端末で作った削除用の鍵。サーバーはハッシュだけ保存する */
+  deleteKey?: string;
 }
 
 /** 初回プレイの終了後だけ送れる（版が変わった続きは送らない） */
@@ -83,9 +88,9 @@ export function buildRankingSubmission(
   state: PlayState,
   scenario: Scenario,
   input: SubmissionInput,
-): PlaySubmission | null {
+): RankingPlaySubmission | null {
   if (!canSubmitRanking(state, scenario)) return null;
-  return {
+  const submission: RankingPlaySubmission = {
     scenarioId: state.scenarioId,
     scenarioVersion: state.scenarioVersion,
     role: state.role,
@@ -97,6 +102,8 @@ export function buildRankingSubmission(
     clientId: input.clientId,
     turnstileToken: input.turnstileToken,
   };
+  if (input.deleteKey) submission.deleteKey = input.deleteKey;
+  return submission;
 }
 
 /** 保存済みプロフィールから送信者情報を作る */

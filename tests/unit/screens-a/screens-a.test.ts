@@ -18,6 +18,12 @@ const localeSources = import.meta.glob('/locales/*/ui/screens-a.yaml', {
   eager: true,
 }) as Record<string, string>;
 
+const rankingSources = import.meta.glob('/locales/*/ui/ranking.yaml', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
+
 const css = readFileSync(new URL('../../../src/app/styles/base.css', import.meta.url).pathname, 'utf8') as string;
 
 const ownScreens = [
@@ -47,6 +53,27 @@ function readYaml(path: string): Record<string, string> {
 
 const ja = readYaml('/locales/ja/ui/screens-a.yaml');
 const en = readYaml('/locales/en/ui/screens-a.yaml');
+
+function flatten(value: unknown, prefix = ''): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (!value || typeof value !== 'object') return out;
+  for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+    const full = prefix ? `${prefix}.${key}` : key;
+    if (typeof child === 'string') out[full] = child;
+    else Object.assign(out, flatten(child, full));
+  }
+  return out;
+}
+
+function readRankingYaml(lang: 'ja' | 'en'): Record<string, string> {
+  const path = Object.keys(rankingSources).find((key) => key.includes(`/locales/${lang}/`));
+  if (path === undefined) return {};
+  return flatten(parse(rankingSources[path] ?? ''));
+}
+
+/** S04 はランキングの文言（rk.*）も使う */
+const jaAll = { ...ja, ...readRankingYaml('ja') };
+const enAll = { ...en, ...readRankingYaml('en') };
 
 describe('Svelte コンパイル', () => {
   for (const name of ownScreens) {
@@ -117,8 +144,8 @@ describe('UI 文言', () => {
     }
     expect(used.size).toBeGreaterThan(20);
     for (const key of used) {
-      expect(ja[key], `ja: ${key}`).toBeDefined();
-      expect(en[key], `en: ${key}`).toBeDefined();
+      expect(jaAll[key], `ja: ${key}`).toBeDefined();
+      expect(enAll[key], `en: ${key}`).toBeDefined();
     }
   });
 

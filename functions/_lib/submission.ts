@@ -1,6 +1,7 @@
 // 送信された記録の形を検査する（点数のフィールドは受け取らない）
 import type { PlayMode, PlaySubmission, RoleId } from '../../src/engine/types';
 import { ROLES } from '../../src/engine/types';
+import { isDeleteKey } from './deletion';
 
 export const MAX_CHOICES = 200;
 export const MAX_DRAFTS = 100;
@@ -9,8 +10,13 @@ export const CLIENT_ID_RE = /^[A-Za-z0-9_-]{8,64}$/;
 const ID_RE = /^[A-Za-z0-9_-]{1,80}$/;
 const MODES: readonly PlayMode[] = ['normal', 'hard'];
 
+/** 削除用の鍵は任意。付いていればハッシュにして保存する */
+export interface ParsedSubmission extends PlaySubmission {
+  deleteKey?: string;
+}
+
 export type ParseResult =
-  | { ok: true; value: PlaySubmission }
+  | { ok: true; value: ParsedSubmission }
   | { ok: false; error: string };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -45,6 +51,9 @@ export function parseSubmission(body: unknown): ParseResult {
   }
   if (typeof body.turnstileToken !== 'string' || body.turnstileToken.length > 4096) {
     return { ok: false, error: 'invalid_turnstile_token' };
+  }
+  if (body.deleteKey !== undefined && !isDeleteKey(body.deleteKey)) {
+    return { ok: false, error: 'invalid_delete_key' };
   }
 
   if (!Array.isArray(choices) || choices.length > MAX_CHOICES) {
@@ -96,6 +105,7 @@ export function parseSubmission(body: unknown): ParseResult {
       nickname,
       clientId,
       turnstileToken: body.turnstileToken,
+      ...(typeof body.deleteKey === 'string' ? { deleteKey: body.deleteKey } : {}),
     },
   };
 }
