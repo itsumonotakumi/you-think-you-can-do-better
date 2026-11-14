@@ -4,7 +4,7 @@
   import { onMount } from 'svelte';
   import { loadIndex } from '../../data/loader';
   import type {
-    RankingEntry, RankingResponse, RoleId, ScenarioSummary, SubmissionResult,
+    PlayMode, RankingEntry, RankingResponse, RoleId, ScenarioSummary, SubmissionResult,
   } from '../../engine/types';
   import { loc, t } from '../../i18n';
   import { play, scenario, screen, settings } from '../store';
@@ -23,6 +23,8 @@
   let scenarioId = $state('');
   let role = $state<RoleId>('executive');
   let period = $state<'week' | 'all'>('week');
+  /** 表示するランキングの難易度。直前のプレイとは独立して切り替えられる */
+  let mode = $state<PlayMode>($play?.mode === 'hard' ? 'hard' : 'normal');
   let ranking = $state<RankingResponse | null>(null);
   let loading = $state(false);
   let loadError = $state(false);
@@ -46,7 +48,6 @@
   const playCount = $derived($play?.playCount ?? 0);
   const finished = $derived($play?.finished === true);
   const canParticipate = $derived(canSubmitRanking($play, $scenario));
-  const mode = $derived($play?.mode ?? 'normal');
 
   $effect(() => {
     // 条件が変わるたびに取り直す。古い応答は捨てる
@@ -110,6 +111,8 @@
   });
 
   onMount(() => {
+    // ランキングが無効なビルドでは、通信も UI も一切出さない
+    if (!enabled) return;
     let cancelled = false;
     profile = loadRankingProfile();
     void loadIndex()
@@ -265,6 +268,26 @@
             {/each}
           </select>
         </label>
+
+        <div class="field">
+          <span>{t('rk.mode')}</span>
+          <div class="period-switch" role="group" aria-label={t('rk.mode')}>
+            <button
+              type="button"
+              class="btn btn--ghost btn--small"
+              class:is-active={mode === 'normal'}
+              aria-pressed={mode === 'normal'}
+              onclick={() => { mode = 'normal'; }}
+            >{t('rk.modeNormal')}</button>
+            <button
+              type="button"
+              class="btn btn--ghost btn--small"
+              class:is-active={mode === 'hard'}
+              aria-pressed={mode === 'hard'}
+              onclick={() => { mode = 'hard'; }}
+            >{t('rk.modeHard')}</button>
+          </div>
+        </div>
 
         <div class="field">
           <span>{t('rk.period')}</span>

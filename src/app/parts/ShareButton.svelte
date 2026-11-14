@@ -8,6 +8,7 @@
   import {
     buildShareCard, localizedFor, shareFileName, siteUrl, type ShareCard,
   } from '../share/data';
+  import { headlineFor } from '../headline';
   import {
     SHARE_IMAGE_HEIGHT, SHARE_IMAGE_WIDTH, canvasToBlob, renderShareCanvas,
   } from '../share/image';
@@ -42,13 +43,16 @@
   let saved = $state(false);
   let canvasEl: HTMLCanvasElement | undefined = $state();
   let closeButton: HTMLButtonElement | undefined = $state();
+  let openButton: HTMLButtonElement | undefined = $state();
+  let panelEl: HTMLDialogElement | undefined = $state();
 
   let requestSeq = 0;
 
   const postText = $derived(card ? buildPostText(card, platform) : '');
 
   function currentCard(): ShareCard {
-    const fromScenario = localizedFor(scenario.headlines?.[result.rank], $settings.lang);
+    // 見出しは結果画面と同じ共通の関数で決める（シナリオの上書きも反映される）
+    const fromHeadline = localizedFor(headlineFor(playState, scenario), $settings.lang);
     return buildShareCard({
       scenario,
       result,
@@ -56,7 +60,7 @@
       roleLabel: t(`sa.roles.role.${playState.role}`),
       productName: t('sa.title.product'),
       url: siteUrl(),
-      headline: headline ?? fromScenario,
+      headline: (headline ?? '').trim() || fromHeadline,
       achievement,
     });
   }
@@ -76,6 +80,8 @@
     card = data;
 
     await tick();
+    // モーダルとして開き、背面の操作とフォーカスの移動を止める
+    if (panelEl && !panelEl.open) panelEl.showModal();
     closeButton?.focus();
     const canvas = canvasEl;
     if (!canvas) {
@@ -100,6 +106,7 @@
 
   function closePanel(): void {
     requestSeq += 1;
+    if (panelEl?.open) panelEl.close();
     open = false;
     card = null;
     blob = null;
@@ -107,10 +114,13 @@
     imageReady = false;
     shareAvailable = false;
     error = '';
+    // 閉じたら、開いたボタンへフォーカスを戻す
+    void tick().then(() => openButton?.focus());
   }
 
-  function onWindowKeydown(event: KeyboardEvent): void {
-    if (open && event.key === 'Escape') closePanel();
+  function handleCancel(event: Event): void {
+    event.preventDefault();
+    closePanel();
   }
 
   async function saveImage(): Promise<void> {
@@ -141,11 +151,10 @@
   }
 </script>
 
-<svelte:window onkeydown={onWindowKeydown} />
-
 <button
   type="button"
   class="btn share-open"
+  bind:this={openButton}
   onclick={openPanel}
   aria-haspopup="dialog"
   aria-expanded={open}
@@ -155,7 +164,14 @@
 
 {#if open}
   <div class="share-backdrop">
-    <div class="share-panel" role="dialog" aria-modal="true" aria-labelledby="share-title">
+    <dialog
+      bind:this={panelEl}
+      class="share-panel"
+      aria-modal="true"
+      aria-labelledby="share-title"
+      oncancel={handleCancel}
+      onclose={() => { if (open) closePanel(); }}
+    >
       <div class="share-head">
         <h2 id="share-title">{t('share.title')}</h2>
         <button type="button" class="btn btn--small share-close" bind:this={closeButton} onclick={closePanel}>
@@ -211,7 +227,7 @@
       </div>
 
       <p class="hint">{t('share.hint')}</p>
-    </div>
+    </dialog>
   </div>
 {/if}
 
@@ -231,14 +247,23 @@
     background: var(--overlay);
   }
   .share-panel {
-    width: min(60rem, 100%);
+    position: fixed;
+    inset: 0;
+    width: min(60rem, calc(100% - 2rem));
+    max-width: min(60rem, calc(100% - 2rem));
+    max-height: calc(100dvh - 2rem);
     margin: auto;
+    overflow-y: auto;
     padding: 1rem 1.1rem 1.2rem;
     border: 1px solid var(--line-strong);
     border-radius: var(--radius);
     background: var(--bg);
     color: var(--text);
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  }
+  /* 暗幕は背面の .share-backdrop が描く */
+  .share-panel::backdrop {
+    background: transparent;
   }
   .share-head {
     display: flex;
@@ -302,6 +327,9 @@
       padding: 0.6rem;
     }
     .share-panel {
+      width: calc(100% - 1.2rem);
+      max-width: calc(100% - 1.2rem);
+      max-height: calc(100dvh - 1.2rem);
       padding: 0.8rem;
     }
     .share-actions .btn {

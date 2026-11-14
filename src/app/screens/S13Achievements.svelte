@@ -1,6 +1,7 @@
 <script lang="ts">
   // S13 称号一覧（#9）。獲得済みは条件を、未獲得はぼかしたヒントを出す。
   // ルーターはオーケストレーター所有のため、S01 から重ねて開く（data-screen は S13Achievements）。
+  import { onMount } from 'svelte';
   import { ACHIEVEMENTS, loadAchievements } from '../achievements';
   import type { AchievementStore } from '../achievements';
   import { loc, t } from '../../i18n';
@@ -11,14 +12,35 @@
   const items = $derived(ACHIEVEMENTS.map((def) => ({ def, record: store[def.id] })));
   const unlocked = $derived(items.filter((item) => item.record !== undefined).length);
 
-  function handleKey(event: KeyboardEvent): void {
-    if (event.key === 'Escape') onBack();
+  let dialogEl: HTMLDialogElement | undefined = $state();
+  /** 開く前にフォーカスがあった要素。閉じたら戻す */
+  let opener: HTMLElement | null = null;
+
+  onMount(() => {
+    const active = document.activeElement;
+    opener = active instanceof HTMLElement ? active : null;
+    // showModal でモーダル表示にし、Tab キーで背面へ移動させない
+    if (dialogEl && !dialogEl.open) dialogEl.showModal();
+    return () => {
+      if (dialogEl?.open) dialogEl.close();
+      opener?.focus();
+      opener = null;
+    };
+  });
+
+  function handleCancel(event: Event): void {
+    event.preventDefault();
+    onBack();
   }
 </script>
 
-<svelte:window onkeydown={handleKey} />
-
-<dialog open class="achievements" data-screen="S13Achievements" aria-labelledby="achievements-heading">
+<dialog
+  bind:this={dialogEl}
+  class="achievements"
+  data-screen="S13Achievements"
+  aria-labelledby="achievements-heading"
+  oncancel={handleCancel}
+>
   <section class="screen screen--narrow">
     <header class="screen-head">
       <p class="eyebrow">{t('ach.eyebrow')}</p>

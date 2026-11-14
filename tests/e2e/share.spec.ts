@@ -57,6 +57,9 @@ test.describe('結果のシェア', () => {
     const blueskyText = await text.inputValue();
     expect(Array.from(blueskyText).length).toBeLessThanOrEqual(300);
     expect(blueskyText).toContain('#じゃあなたがやってみて');
+    // 結果画面と同じ見出しと、新しく獲得した称号が入る
+    expect(blueskyText).toContain('翌朝の新聞：');
+    expect(blueskyText).toContain('称号：');
 
     // 画像の保存
     await expect(dialog.locator('button.share-save')).toBeEnabled();
@@ -96,6 +99,8 @@ test.describe('結果のシェア', () => {
     const dialog = ending.locator('.share-panel');
     await expect(dialog).toContainText('Share result');
     await expect(dialog.locator('button.share-save')).toHaveText('Save image');
+    // 見出しと称号が加わったぶん、X の140字には収まらないことがある。長い投稿先で確かめる
+    await dialog.locator('select.share-platform').selectOption('bluesky');
     const text = dialog.locator('textarea.share-text');
     await expect(text).toHaveValue(/I played/);
     await expect(text).toHaveValue(/#じゃあなたがやってみて/);

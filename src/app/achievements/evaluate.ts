@@ -1,10 +1,19 @@
 // 称号の判定（#9）。PlayState・Scenario・EndingResult・PlaysStore から決まる純粋関数。
 // 乱数・現在時刻・外部通信は使わない（at は呼び出し側が渡す）。
 import type {
-  Achievement, EndingResult, PlayState, PlaysStore, RoleId, Scenario,
+  Achievement, Choice, EndingResult, PlayState, PlaysStore, RoleId, Scenario,
 } from '../../engine/types';
 import { ROLES } from '../../engine/types';
 import { ACHIEVEMENTS } from './definitions';
+
+/**
+ * 通知フェーズの選択が、実際に通知・公表したものか。
+ * 先送り・否定・保身（coward）や、失点になる選択は「公表した」とみなさない。
+ */
+function isNotificationChoice(choice: Choice): boolean {
+  if (choice.coward) return false;
+  return choice.category === 'increase' || choice.category === 'recover' || choice.category === 'maintain';
+}
 
 export interface AchievementInput {
   state: PlayState;
@@ -27,7 +36,7 @@ export function firstReportHours(state: PlayState, scenario: Scenario): number |
     const point = role.points?.find((item) => item.id === record.pointId);
     if (!point || point.phase !== 'notify') continue;
     const choice = point.choices?.find((item) => item.id === record.choiceId);
-    if (!choice) continue;
+    if (!choice || !isNotificationChoice(choice)) continue;
     const at = record.at;
     if (!at || typeof at.day !== 'number' || typeof at.minutes !== 'number') continue;
     const minutes = (at.day - scenario.start.day) * 1440
@@ -43,22 +52,36 @@ interface PlayTotals {
   scenarios: Map<string, { roles: Set<RoleId>; hasS: boolean }>;
 }
 
-/** プレイ記録を、シナリオとロールの単位にまとめる */
+/**
+ * プレイ記録のキーを分ける。`scenarioId/role` に、本番モードだけ `/hard` が付く。
+ * 難易度を先に外さないと、ロールとして `hard` を読んでしまう。
+ */
+function splitPlayKey(key: string): { scenarioId: string; role: RoleId } | null {
+  const parts = key.split('/');
+  const last = parts[parts.length - 1];
+  const core = last === 'hard' || last === 'normal' ? parts.slice(0, -1) : parts;
+  if (core.length !== 2) return null;
+  const [scenarioId, role] = core;
+  if (!scenarioId || !role) return null;
+  if (!(ROLES as readonly string[]).includes(role)) return null;
+  return { scenarioId, role: role as RoleId };
+}
+
+/** プレイ記録を、シナリオとロールの単位にまとめる。制覇の判定は完了した記録だけを数える */
 export function playTotals(plays: PlaysStore): PlayTotals {
   const scenarios: PlayTotals['scenarios'] = new Map();
   let totalPlays = 0;
   for (const [key, record] of Object.entries(plays ?? {})) {
     if (!record || !Number.isFinite(record.count) || record.count <= 0) continue;
-    const slash = key.lastIndexOf('/');
-    if (slash <= 0) continue;
-    const scenarioId = key.slice(0, slash);
-    const role = key.slice(slash + 1);
-    if (!(ROLES as readonly string[]).includes(role)) continue;
+    const parsed = splitPlayKey(key);
+    if (!parsed) continue;
     totalPlays += record.count;
-    const entry = scenarios.get(scenarioId) ?? { roles: new Set<RoleId>(), hasS: false };
-    entry.roles.add(role as RoleId);
+    // 開始しただけ（中断）の記録は、制覇の条件に数えない
+    if (record.first === null) continue;
+    const entry = scenarios.get(parsed.scenarioId) ?? { roles: new Set<RoleId>(), hasS: false };
+    entry.roles.add(parsed.role);
     if (record.best?.rank === 'S') entry.hasS = true;
-    scenarios.set(scenarioId, entry);
+    scenarios.set(parsed.scenarioId, entry);
   }
   return { totalPlays, scenarios };
 }

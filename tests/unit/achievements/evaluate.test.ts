@@ -43,7 +43,8 @@ function baseResult(over: Partial<EndingResult> = {}): EndingResult {
 function playRecord(count: number, bestRank: 'S' | 'A' | 'B' | 'C' | 'D' | null = null) {
   return {
     count,
-    first: null,
+    // 制覇の判定は完了した記録だけを数える（first が入っていれば完了）
+    first: { rank: 'B' as const, score: 300, raw: 300, at: '2026-11-08T00:00:00Z' },
     best: bestRank === null ? null : { rank: bestRank, score: 1200, count },
   };
 }
