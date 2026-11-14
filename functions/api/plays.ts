@@ -4,12 +4,14 @@ import { clientIp, isSameOrigin, jsonError, jsonResponse, readJsonBody } from '.
 import { checkNickname } from '../_lib/nickname';
 import { checkRateLimit, cleanupOldRows, dayOf, hashIp } from '../_lib/ratelimit';
 import { parseAllowedHosts, verifyTurnstile } from '../_lib/turnstile';
-import { parseSubmission } from '../_lib/submission';
+import { parseSubmission, CLIENT_ID_RE } from '../_lib/submission';
+import { hashDeleteKey, isDeleteKey } from '../_lib/deletion';
 import { replaySubmission } from '../_lib/replay';
 import { findScenario } from '../_lib/scenarios';
 import {
   countPlays,
   countRankedBefore,
+  deletePlaysByClient,
   findPlayByClient,
   insertPlayWithinBudget,
   recordDailyWrite,
@@ -141,6 +143,7 @@ export async function handlePlays(
       score: replay.score,
       rank: replay.rank,
       choicesJson: JSON.stringify(sub.choices),
+      deleteKeyHash: sub.deleteKey ? await hashDeleteKey(sub.deleteKey) : '',
       createdAt: now,
     },
     day,
@@ -179,4 +182,58 @@ export async function handlePlays(
   });
 }
 
-export const onRequest: PagesFunction = ({ request, env }) => handlePlays(request, env);
+export interface DeleteHandlerDeps {
+  /** テストで固定するための現在時刻（ミリ秒） */
+  now?: number;
+}
+
+function parseDeleteBody(value: unknown): { clientId: string; deleteKey: string } | null {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
+  const { clientId, deleteKey } = value as { clientId?: unknown; deleteKey?: unknown };
+  if (typeof clientId !== 'string' || !CLIENT_ID_RE.test(clientId)) return null;
+  if (!isDeleteKey(deleteKey)) return null;
+  return { clientId, deleteKey };
+}
+
+/**
+ * DELETE /api/plays: この端末で登録した記録を消す。
+ * 本文 { clientId, deleteKey }。同一オリジンだけを受け付け、IP 単位のレート制限をかける。
+ * 端末 ID を知っているだけでは消せない（鍵のハッシュが一致した行だけ）。
+ */
+export async function handleDeletePlays(
+  request: Request,
+  env: Env,
+  deps: DeleteHandlerDeps = {},
+): Promise<Response> {
+  const now = deps.now ?? Date.now();
+  if (request.method !== 'DELETE') return jsonError(405, 'method_not_allowed');
+  if (!isSameOrigin(request)) return jsonError(403, 'cross_origin');
+  if (!env.IP_HASH_SECRET) return jsonError(503, 'ip_hash_not_configured');
+
+  const body = await readJsonBody(request);
+  if (!body.ok) return jsonError(body.status, body.error);
+
+  const parsed = parseDeleteBody(body.value);
+  if (!parsed) return jsonError(400, 'invalid_delete_request');
+
+  const ipHash = await hashIp(clientIp(request), env.IP_HASH_SECRET);
+  const allowed = await checkRateLimit(env.DB, ipHash, now);
+  if (!allowed) return jsonError(429, 'rate_limited');
+
+  const deleteKeyHash = await hashDeleteKey(parsed.deleteKey);
+  const deleted = await deletePlaysByClient(env.DB, parsed.clientId, deleteKeyHash);
+
+  // 古いレート制限の行を確率的に掃除する（失敗しても応答は変えない）
+  try {
+    await cleanupOldRows(env.DB, now);
+  } catch {
+    // 掃除は次回に回す
+  }
+
+  return jsonResponse({ ok: true, deleted });
+}
+
+export const onRequest: PagesFunction = ({ request, env }) => {
+  if (request.method === 'DELETE') return handleDeletePlays(request, env);
+  return handlePlays(request, env);
+};

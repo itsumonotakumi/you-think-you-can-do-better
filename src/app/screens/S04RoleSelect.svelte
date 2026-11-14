@@ -1,10 +1,16 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { audio } from '../../audio';
   import { loadReferences, loadScenario } from '../../data/loader';
   import { loc, setLang, t } from '../../i18n';
   import { loadPrologue, nextPlayCount, registerPlayStart, saveProgress } from '../../storage';
   import { applyStep, scenario, screen, selectedScenarioId, settings } from '../store';
   import { portrait } from '../illustrations';
+  import {
+    EMPTY_RANKING_PROFILE, isRankingEnabled, isValidNickname, loadRankingProfile,
+    normalizeNickname, RANKING_KEYS, saveRankingProfile,
+  } from '../ranking';
+  import type { RankingProfile } from '../ranking';
   import type { PlayMode, RoleId, Scenario } from '../../engine/types';
   import { ROLES } from '../../engine/types';
   // エンジン本体（src/engine/index.ts）は別担当。未着の間も型検査を通すため解決エラーだけ抑止する。
@@ -20,6 +26,34 @@
   let error = $state('');
   /** 難易度（#10）。本番は判断ごとに制限時間があり、時間切れは「判断の先送り」になる */
   let mode = $state<PlayMode>('normal');
+
+  // #7 ランキング: プレイ前にニックネームを決める。保存済みなら入力済みで出す
+  const rankingEnabled = isRankingEnabled();
+  let rankingProfile = $state<RankingProfile>({ ...EMPTY_RANKING_PROFILE });
+  let nickname = $state('');
+  let optOut = $state(false);
+  let nicknameError = $state(false);
+
+  onMount(() => {
+    if (!rankingEnabled) return;
+    const saved = loadRankingProfile();
+    rankingProfile = saved;
+    // 入力欄がすでに触られている場合は上書きしない
+    if (nickname === '') nickname = saved.nickname;
+    optOut = saved.optOut;
+  });
+
+  function saveNickname(nextNickname: string, nextOptOut: boolean): RankingProfile {
+    optOut = nextOptOut;
+    const saved = {
+      ...rankingProfile,
+      nickname: normalizeNickname(nextNickname),
+      optOut: nextOptOut,
+    };
+    saveRankingProfile(saved);
+    rankingProfile = saved;
+    return saved;
+  }
 
   $effect(() => {
     const id = $selectedScenarioId;
@@ -62,6 +96,15 @@
       modeHard: t('sa.roles.mode.hard'),
       modeHint: t('sa.roles.mode.hint'),
       modeHardNotice: t('sa.roles.mode.hardNotice'),
+      nicknameHeading: t('rk.nickname.heading'),
+      nicknameLabel: t('rk.nickname.label'),
+      nicknameHint: t('rk.nickname.hint'),
+      nicknameWarning: t(RANKING_KEYS.nicknameWarning),
+      autoNotice: t(RANKING_KEYS.autoNotice),
+      nicknameRequired: t('rk.nickname.required'),
+      nicknameInvalid: t('rk.nickname.invalid'),
+      optOutLabel: t(RANKING_KEYS.optOutLabel),
+      optOutHint: t('rk.optout.hint'),
     };
   });
 
@@ -97,10 +140,19 @@
   async function choose(role: RoleId): Promise<void> {
     const sc = current;
     if (!sc || busy) return;
+    if (rankingEnabled && !isValidNickname(nickname)) {
+      nicknameError = true;
+      return;
+    }
     audio.playSe('select');
     busy = role;
     error = '';
     try {
+      if (rankingEnabled) {
+        // 変更されていればここで保存する（次回からは入力済みで出す）
+        saveNickname(nickname, optOut);
+        nicknameError = false;
+      }
       const refs = await loadReferences();
       const count = registerPlayStart(sc.id, role, mode);
       const prologue = loadPrologue() ?? { comment: '', predictedHours: null };
@@ -135,6 +187,45 @@
       <button class="btn" onclick={back}>{ui.back}</button>
     </div>
   {:else}
+    {#if rankingEnabled}
+      <section class="panel nickname-panel" aria-labelledby="ranking-nickname-heading" data-ranking-nickname-panel>
+        <h2 id="ranking-nickname-heading">{ui.nicknameHeading}</h2>
+        <label class="field">
+          <span>{ui.nicknameLabel}</span>
+          <input
+            type="text"
+            maxlength={16}
+            autocomplete="nickname"
+            data-ranking-nickname
+            bind:value={nickname}
+            oninput={() => { nicknameError = false; }}
+            onchange={() => { if (isValidNickname(nickname)) saveNickname(nickname, optOut); }}
+            aria-invalid={nicknameError}
+            aria-describedby="ranking-nickname-hint"
+          />
+        </label>
+        <p id="ranking-nickname-hint" class="hint">{ui.nicknameHint}</p>
+        {#if !isValidNickname(nickname)}
+          <p class="hint" role="status" data-ranking-nickname-required>{ui.nicknameRequired}</p>
+        {/if}
+        {#if nicknameError}
+          <p class="error-text" role="alert">{ui.nicknameInvalid}</p>
+        {/if}
+        <p class="notice notice--warn" data-ranking-warning>{ui.nicknameWarning}</p>
+        <p class="hint" data-ranking-auto-notice>{ui.autoNotice}</p>
+        <label class="check">
+          <input
+            type="checkbox"
+            data-ranking-optout
+            checked={optOut}
+            onchange={(event) => saveNickname(nickname, (event.currentTarget as HTMLInputElement).checked)}
+          />
+          <span>{ui.optOutLabel}</span>
+        </label>
+        <p class="hint">{ui.optOutHint}</p>
+      </section>
+    {/if}
+
     <fieldset class="mode-select">
       <legend>{ui.modeLegend}</legend>
       <div class="mode-options">
@@ -185,7 +276,7 @@
           </div>
           <button
             class="btn btn--primary btn--wide"
-            disabled={busy !== null}
+            disabled={busy !== null || (rankingEnabled && !isValidNickname(nickname))}
             onclick={() => choose(item.role)}
           >{busy === item.role ? ui.loading : ui.choose}</button>
         </li>
@@ -203,6 +294,42 @@
 </section>
 
 <style>
+  .nickname-panel {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0 0 0.8em;
+  }
+  .nickname-panel h2 {
+    margin: 0;
+    font-size: 0.95em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .nickname-panel .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.85em;
+    color: var(--muted);
+  }
+  .nickname-panel input[type='text'] {
+    min-height: 2.4em;
+    padding: 0.35em 0.5em;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    background: var(--panel);
+    color: var(--text);
+    font: inherit;
+  }
+  .check {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    line-height: 1.6;
+  }
+  .check input {
+    margin-top: 0.3rem;
+  }
   .mode-select {
     margin: 0 0 0.8em;
     padding: 0.7rem 0.8rem;

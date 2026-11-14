@@ -28,13 +28,36 @@ export async function openTitle(page: Page): Promise<void> {
   await waitForScreen(page, 'S01Title');
 }
 
+/** ロール選択の画面で、ランキングが有効なときだけニックネームを入れる */
+export async function prepareRankingNickname(page: Page, nickname = 'ためし'): Promise<void> {
+  // シナリオの読み込みが終わるまで、ロールカードもニックネーム欄も出ない
+  await page.locator('[data-screen="S04RoleSelect"] .role-card').first().waitFor({ state: 'visible' });
+  const field = page.locator('[data-screen="S04RoleSelect"] [data-ranking-nickname]');
+  if ((await field.count()) === 0) return;
+  if ((await field.inputValue()) === '') await field.fill(nickname);
+  // onMount の読み込みと競合しないよう、開始ボタンが有効になるまで待つ
+  await expect(
+    page.locator('[data-screen="S04RoleSelect"] .role-card button.btn--primary').first(),
+  ).toBeEnabled();
+}
+
 /** タイトル → シナリオ選択 → 経営者ロール → プロローグ → 本編 */
-export async function startNewPlay(page: Page): Promise<void> {
+export async function startNewPlay(
+  page: Page,
+  options: { nickname?: string; optOut?: boolean } = {},
+): Promise<void> {
   await page.locator('[data-screen="S01Title"] button.btn--primary').first().click();
   await waitForScreen(page, 'S03ScenarioSelect');
 
   await page.locator('[data-screen="S03ScenarioSelect"] .scenario-card button.btn--primary').first().click();
   await waitForScreen(page, 'S04RoleSelect');
+
+  // ランキングが有効なビルドでは、開始前にニックネームが要る
+  await prepareRankingNickname(page, options.nickname ?? 'ためし');
+  if (options.optOut) {
+    const optOut = page.locator('[data-screen="S04RoleSelect"] [data-ranking-optout]');
+    if ((await optOut.count()) > 0) await optOut.check();
+  }
 
   // ROLES の並びは executive が先頭（No.1 ネビュラクラウドの経営者）
   await page.locator('[data-screen="S04RoleSelect"] .role-card button.btn--primary').first().click();

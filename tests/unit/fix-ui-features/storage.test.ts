@@ -24,10 +24,12 @@ class WriteFailingStore implements RankingStore {
 describe('ランキング設定の退避', () => {
   it('保存に失敗したら、次はメモリ上の値を返す', () => {
     const store = new WriteFailingStore();
-    saveRankingProfile({ nickname: 'もとの名前', consent: false, clientId: 'old' }, store);
+    saveRankingProfile({ nickname: 'もとの名前', optOut: false, clientId: 'old', lastSubmittedAt: '' }, store);
     store.failWrites = true;
 
-    const next: RankingProfile = { nickname: 'あたらしい', consent: true, clientId: 'new' };
+    const next: RankingProfile = {
+      nickname: 'あたらしい', optOut: true, clientId: 'new', lastSubmittedAt: '',
+    };
     saveRankingProfile(next, store);
     // localStorage には古い値が残っている
     expect(JSON.parse(store.data.get(STORAGE_KEYS.ranking) ?? '{}').nickname).toBe('もとの名前');
@@ -45,9 +47,9 @@ describe('ランキング設定の退避', () => {
   it('保存に成功し直したら localStorage を読み直す', () => {
     const store = new WriteFailingStore();
     store.failWrites = true;
-    saveRankingProfile({ nickname: '退避', consent: true, clientId: 'x' }, store);
+    saveRankingProfile({ nickname: '退避', optOut: true, clientId: 'x', lastSubmittedAt: '' }, store);
     store.failWrites = false;
-    saveRankingProfile({ nickname: '保存', consent: true, clientId: 'x' }, store);
+    saveRankingProfile({ nickname: '保存', optOut: true, clientId: 'x', lastSubmittedAt: '' }, store);
     expect(loadRankingProfile(store).nickname).toBe('保存');
     expect(JSON.parse(store.data.get(STORAGE_KEYS.ranking) ?? '{}').nickname).toBe('保存');
   });

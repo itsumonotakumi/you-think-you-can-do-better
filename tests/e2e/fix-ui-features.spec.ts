@@ -3,7 +3,9 @@
 // #7: ランキングの難易度が直前のプレイで固定されず、表示・切替できる。
 // #6: シェアと称号のダイアログがモーダルになり、閉じると元の要素へフォーカスが戻る。
 import { expect, test, type Page } from '@playwright/test';
-import { openTitle, playToEnding, startNewPlay, waitForScreen } from './helpers';
+import {
+  openTitle, playToEnding, prepareRankingNickname, startNewPlay, waitForScreen,
+} from './helpers';
 
 const API_BASE = '/rank-api';
 
@@ -54,6 +56,7 @@ async function chooseHardAndPlay(page: Page): Promise<void> {
   await waitForScreen(page, 'S03ScenarioSelect');
   await page.locator('[data-screen="S03ScenarioSelect"] .scenario-card button.btn--primary').first().click();
   await waitForScreen(page, 'S04RoleSelect');
+  await prepareRankingNickname(page);
   await page.locator('[data-screen="S04RoleSelect"] input[type="radio"][value="hard"]').check();
   await page.locator('[data-screen="S04RoleSelect"] .role-card button.btn--primary').first().click();
   await waitForScreen(page, 'S02Prologue');

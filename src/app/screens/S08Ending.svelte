@@ -32,7 +32,11 @@
   import { loadPlays, recordResult, saveProgress } from '../../storage';
   import { loadIndex } from '../../data/loader';
   import { play, scenario, screen, settings } from '../store';
-  import { isRankingEnabled, RANKING_KEYS } from '../ranking';
+  import {
+    buildRankingSubmission, canSubmitRanking, ensureDeleteKey, ensureRankingProfile,
+    isRankingEnabled, isValidNickname, loadRankingProfile, mountTurnstile, RANKING_KEYS,
+    saveRankingProfile, submitPlay, submissionInput, turnstileSiteKey,
+  } from '../ranking';
   import { runFx } from '../effects';
   import { minutesBetween } from '../parts/logic';
   import { headlineFor } from '../headline';
@@ -44,9 +48,96 @@
   let recorded = false;
   const rankingEnabled = isRankingEnabled();
   import { grantAchievements, representativeTitle } from '../achievements';
-  import type { Achievement } from '../../engine/types';
+  import type { Achievement, SubmissionResult } from '../../engine/types';
   /** このプレイで新しく獲得した称号（#9） */
   let newAchievements = $state<Achievement[]>([]);
+
+  // #7 ランキング: 結果画面で自動送信する。同意チェックや送信ボタンは置かない
+  type RankingStatus = 'hidden' | 'waiting' | 'sending' | 'done' | 'failed'
+    | 'optout' | 'notfirst' | 'nickname';
+  const siteKey = turnstileSiteKey();
+  let rankingStatus = $state<RankingStatus>('hidden');
+  let rankingResult = $state<SubmissionResult | null>(null);
+  let rankingAlready = $state(false);
+  let turnstileHost = $state<HTMLDivElement | null>(null);
+  let turnstileNonce = $state(0);
+  let posting = false;
+
+  function prepareRanking(state: PlayState, current: Scenario): void {
+    if (!rankingEnabled) return;
+    if (!canSubmitRanking(state, current)) {
+      rankingStatus = state.playCount > 1 ? 'notfirst' : 'hidden';
+      return;
+    }
+    const saved = loadRankingProfile();
+    if (saved.optOut) {
+      rankingStatus = 'optout';
+      return;
+    }
+    if (!isValidNickname(saved.nickname)) {
+      rankingStatus = 'nickname';
+      return;
+    }
+    if (saved.lastSubmittedAt !== '' && saved.lastSubmittedAt === state.startedAt) {
+      rankingAlready = true;
+      rankingStatus = 'done';
+      return;
+    }
+    // 送信に使う端末 ID をここで用意する（初回だけ作られる）
+    ensureRankingProfile();
+    if (siteKey === '') {
+      rankingStatus = 'sending';
+      void sendRanking('');
+      return;
+    }
+    rankingStatus = 'waiting';
+  }
+
+  async function sendRanking(token: string): Promise<void> {
+    if (posting || rankingStatus === 'done') return;
+    const state = $play;
+    const current = $scenario;
+    if (!state || !current) return;
+    posting = true;
+    rankingStatus = 'sending';
+    try {
+      const profile = ensureRankingProfile();
+      const deleteKey = ensureDeleteKey();
+      const payload = buildRankingSubmission(state, current, {
+        ...submissionInput(profile, token),
+        ...(deleteKey !== '' ? { deleteKey } : {}),
+      });
+      if (!payload) {
+        rankingStatus = 'failed';
+        return;
+      }
+      const response = await submitPlay(payload);
+      if (response.ok) {
+        rankingResult = response;
+        const next = { ...profile, lastSubmittedAt: state.startedAt };
+        saveRankingProfile(next);
+        rankingAlready = false;
+        rankingStatus = 'done';
+      } else {
+        rankingStatus = 'failed';
+      }
+    } catch {
+      rankingStatus = 'failed';
+    } finally {
+      posting = false;
+    }
+  }
+
+  function retryRanking(): void {
+    if (rankingStatus !== 'failed') return;
+    rankingResult = null;
+    if (siteKey === '') {
+      void sendRanking('');
+      return;
+    }
+    turnstileNonce += 1;
+    rankingStatus = 'waiting';
+  }
 
   const result = $derived($play && $scenario ? computeResult($play, $scenario) : null);
   const ending = $derived(result && $scenario ? $scenario.endings[result.rank] : null);
@@ -68,6 +159,36 @@
 
   $effect(() => {
     audio.setVolumes({ bgm: $settings.bgmVolume, se: $settings.seVolume, muted: $settings.muted });
+  });
+
+  $effect(() => {
+    // ボット対策のウィジェットは、トークン待ちのときだけ描画する
+    const host = turnstileHost;
+    const status = rankingStatus;
+    void turnstileNonce;
+    if (!host || status !== 'waiting' || siteKey === '') return;
+
+    let cancelled = false;
+    let cleanup: (() => void) | null = null;
+    void mountTurnstile(
+      host,
+      siteKey,
+      (token) => {
+        if (!cancelled && token !== '') void sendRanking(token);
+      },
+      $settings.lang === 'en' ? 'en' : 'ja',
+    ).then((done) => {
+      if (cancelled) {
+        done?.();
+        return;
+      }
+      cleanup = done;
+    });
+    return () => {
+      cancelled = true;
+      cleanup?.();
+      cleanup = null;
+    };
   });
 
   onMount(() => {
@@ -106,6 +227,9 @@
     audio.playBgm(current.endings[value.rank].bgm);
     audio.playSe('stamp');
     runFx('stamp');
+
+    // #7: 初回の結果は自動でランキングに登録する（同意チェックはしない）
+    prepareRanking(state, current);
   });
 
   function hoursText(hours: number): string {
@@ -218,17 +342,62 @@
       <p class="notice">{notice('score')}</p>
     </div>
 
+    {#if rankingEnabled && rankingStatus !== 'hidden'}
+      <section
+        class="panel ranking-panel"
+        aria-labelledby="ending-ranking-heading"
+        data-ranking-panel
+        data-ranking-status={rankingStatus}
+      >
+        <h2 id="ending-ranking-heading">{t('rk.status.heading')}</h2>
+
+        {#if rankingStatus === 'notfirst'}
+          <p class="hint">{t('rk.status.notFirst')}</p>
+        {:else if rankingStatus === 'optout'}
+          <p class="hint">{t('rk.status.optOut')}</p>
+        {:else if rankingStatus === 'nickname'}
+          <p class="hint">{t('rk.status.nicknameMissing')}</p>
+          <button type="button" class="btn btn--ghost" data-ranking-link onclick={() => screen.set('S12')}>
+            {t('rk.status.setNickname')}
+          </button>
+        {:else}
+          {#if rankingStatus === 'waiting'}
+            <p class="hint" role="status">{t('rk.status.waiting')}</p>
+            {#if siteKey !== ''}
+              <div class="turnstile-host" bind:this={turnstileHost}></div>
+            {/if}
+          {:else if rankingStatus === 'sending'}
+            <p class="hint" role="status">{t('rk.status.sending')}</p>
+          {:else if rankingStatus === 'done'}
+            <p class="result-line" role="status">
+              {rankingAlready ? t('rk.status.already') : t('rk.status.done')}
+            </p>
+            {#if rankingResult?.ok}
+              {#if typeof rankingResult.position === 'number' && typeof rankingResult.total === 'number'}
+                <p class="result-line">{t('rk.status.position', { position: rankingResult.position, total: rankingResult.total })}</p>
+              {/if}
+              {#if typeof rankingResult.percentile === 'number'}
+                <p class="result-line">{t('rk.status.percentile', { percentile: rankingResult.percentile })}</p>
+              {/if}
+              {#if typeof rankingResult.score === 'number' && rankingResult.rank}
+                <p class="result-line">{t('rk.status.score', { score: rankingResult.score, rank: rankingResult.rank })}</p>
+              {/if}
+            {/if}
+          {:else if rankingStatus === 'failed'}
+            <p class="error-text" role="alert">{t('rk.status.failed')}</p>
+            <button type="button" class="btn btn--ghost" data-ranking-retry onclick={retryRanking}>
+              {t('rk.status.retry')}
+            </button>
+          {/if}
+
+          <button type="button" class="btn btn--ghost" data-ranking-join onclick={() => screen.set('S12')}>
+            {t(RANKING_KEYS.endingJoin)}
+          </button>
+        {/if}
+      </section>
+    {/if}
+
     <div class="actions">
-      {#if rankingEnabled && result.playCount === 1}
-        <button
-          type="button"
-          class="btn rank-join"
-          data-ranking-join
-          onclick={() => screen.set('S12')}
-        >
-          {t(RANKING_KEYS.endingJoin)}
-        </button>
-      {/if}
       <button type="button" class="btn btn--ghost" onclick={() => screen.set('S01')}>
         {t('sc.ending.titleButton')}
       </button>
@@ -395,6 +564,23 @@
   .achievements span {
     color: var(--text-soft);
     font-size: 0.9em;
+  }
+  .ranking-panel {
+    display: grid;
+    gap: 0.45rem;
+    justify-items: start;
+  }
+  .ranking-panel .btn {
+    justify-self: end;
+  }
+  .turnstile-host {
+    min-height: 2rem;
+    width: 100%;
+  }
+  .result-line {
+    margin: 0;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }
   .actions {
     display: flex;
