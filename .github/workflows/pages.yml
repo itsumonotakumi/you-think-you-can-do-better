@@ -30,6 +30,9 @@ jobs:
           rm -rf .audio-src
       - run: npm ci
       - run: npm run build
+        env:
+          # シェアの投稿文に載せる URL。ランキング（VITE_API_BASE）はこの版では無効のまま
+          VITE_SITE_URL: https://itsumonotakumi.github.io/you-think-you-can-do-better
       - run: npm test
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with: { path: dist }
