@@ -68,7 +68,7 @@
 
 Turnstile 必須・無料枠保護・投稿とレート制限の原子化を行った。優先順位は開発コスト（無料枠）＞セキュリティ＞品質で、有料機能は使っていない（Cache API・D1・Turnstile の無料範囲のみ）。
 
-### 秘密鍵（`npx wrangler secret put <名前>`）
+### 秘密鍵（Pages なので `npx wrangler pages secret put <名前> --project-name yattemite`）
 
 | 名前 | 必須 | 用途 |
 | --- | --- | --- |
@@ -88,8 +88,8 @@ Turnstile 必須・無料枠保護・投稿とレート制限の原子化を行�
 
 ### デプロイ手順
 
-1. `npx wrangler d1 create yattemite-ranking` → 出力の `database_id` を `wrangler.toml` に入れる（現在は `TO_BE_FILLED`）
-2. `npx wrangler d1 migrations apply yattemite-ranking --remote`（`0001_init.sql` → `0002_ranking_hardening.sql`）
+1. ✅ D1 `yattemite-ranking`（APAC）作成済み。`database_id` は `wrangler.toml` に設定済み（2026-11-14）
+2. ✅ `0001`・`0002` のマイグレーションを本番 D1 に適用済み（2026-11-14）
 3. 上の 2 つの秘密鍵を設定する
 4. フロントのビルドに `VITE_API_BASE` と `VITE_TURNSTILE_SITEKEY` を渡す
 5. Turnstile のウィジェットは action `submit-play` を送る（`src/app/ranking/turnstile.ts`）。siteverify の `hostname` と `action` が合わないトークンは拒否する
@@ -102,6 +102,16 @@ Turnstile 必須・無料枠保護・投稿とレート制限の原子化を行�
 - 日次上限の判定は `daily_writes` の 1 行を条件にした条件付き INSERT。同時実行では数件だけ上限を超えうる（安全装置としての余裕を見て 20,000 件に設定）
 - レート制限の古い行の掃除は投稿のたびに 2%（50 分に 1 回）だけ行う。48 時間より古い行を消す
 - 読み取りは Cache API で 60 秒キャッシュ。stats は新しい 1000 件だけを集計する
+
+## 2026-11-14 の状態（Wave A 統合）
+
+- main に統合済み: #6 シェア、#7 ランキング（API＋画面、レビュー指摘20件対応済み）、#8 新聞見出し、#9 称号、#10 本番モード、#14〜#19 新シナリオ No.11〜16（計16本）
+- 挿絵: No.11〜16 も Codex で生成し `public/illustrations/` に追加済み（全16本）
+- No.11 の社名は No.13「ツムギ・アナリティクス」との重複を避けて「ヒナタマート／ヒナタ通販」に変更
+- 検査: 単体 1855・E2E 52 合格、svelte-check 0、validate OK（警告 328 は既存シナリオ由来）、gitleaks 漏えいなし
+- GitHub Pages 版はランキング無効（`VITE_API_BASE` を渡さない）。シェア URL は `VITE_SITE_URL` で版ごとに切替
+- Cloudflare 版のビルド: `VITE_SITE_URL=https://yattemite.pages.dev VITE_API_BASE=https://yattemite.pages.dev VITE_TURNSTILE_SITEKEY=<サイトキー>`
+- 残り: Turnstile サイトキー作成と秘密鍵2つの設定（ユーザー）→ Cloudflare 版デプロイ。Wave B（#11〜#13）
 
 ## 運用メモ
 - 注意: エージェントが worktree の外（main の作業ツリー）に書いたことが1回あった（r05-officer）。共通指示に禁止を追記済み。マージ前に main で `git status` を確認する
