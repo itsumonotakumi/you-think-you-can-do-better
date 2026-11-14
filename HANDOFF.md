@@ -111,7 +111,8 @@ Turnstile 必須・無料枠保護・投稿とレート制限の原子化を行�
 - 検査: 単体 1855・E2E 52 合格、svelte-check 0、validate OK（警告 328 は既存シナリオ由来）、gitleaks 漏えいなし
 - GitHub Pages 版はランキング無効（`VITE_API_BASE` を渡さない）。シェア URL は `VITE_SITE_URL` で版ごとに切替
 - Cloudflare 版のビルド: `VITE_SITE_URL=https://yattemite.pages.dev VITE_API_BASE=https://yattemite.pages.dev VITE_TURNSTILE_SITEKEY=<サイトキー>`
-- 残り: Turnstile サイトキー作成と秘密鍵2つの設定（ユーザー）→ Cloudflare 版デプロイ。Wave B（#11〜#13）
+- 2026-11-14: Turnstile サイトキー `0x4AAAAAAGArN3gZnsZocWcw`（公開値）作成済み、`TURNSTILE_SECRET`・`IP_HASH_SECRET` 設定済み。ランキング有効版を yattemite.pages.dev に公開済み
+- 残り: Wave B（#11〜#13）
 
 ## 運用メモ
 - 注意: エージェントが worktree の外（main の作業ツリー）に書いたことが1回あった（r05-officer）。共通指示に禁止を追記済み。マージ前に main で `git status` を確認する
