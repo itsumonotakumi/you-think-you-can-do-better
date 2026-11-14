@@ -75,7 +75,7 @@
   import { answerPress, availableAnswers } from '../../engine';
   import { audio } from '../../audio';
   import { loc } from '../../i18n';
-  import { saveProgress } from '../../storage';
+  import { loadTimer, saveProgress, saveTimer } from '../../storage';
   import {
     applyStep, cues, enqueueCaptions, errorMessage, play, scenario, screen, settings,
   } from '../store';
@@ -97,6 +97,9 @@
   let lastTick: number | null = null;
   let timerKey = '';
   let intervalId: ReturnType<typeof setInterval> | null = null;
+  /** 残り時間を最後に保存した秒。毎tick書かないための目印 */
+  let savedSecond = -1;
+  const TIMER_NAME = 'S07';
 
   const question = $derived.by(() => {
     const state = $play;
@@ -124,12 +127,18 @@
     const current = question;
     const scale = $settings.pressTimeScale;
     if (!current) return;
-    const key = `${current.id}:${scale}`;
+    const key = `${$play?.startedAt ?? ''}:${current.id}:${scale}`;
     if (key === timerKey) return;
     timerKey = key;
     total = pressSeconds(current, scale);
-    remaining = total;
-    warned = false;
+    // 再読み込み前の残り時間があれば使う（保存した値より増やさない）
+    const saved = loadTimer(TIMER_NAME);
+    remaining = saved && saved.key === key
+      ? Math.min(total, Math.max(0, saved.remaining))
+      : total;
+    savedSecond = Math.ceil(remaining);
+    if (!saved || saved.key !== key) saveTimer(TIMER_NAME, { key, remaining, total });
+    warned = remaining <= PRESS_WARN_SECONDS;
     lastTick = document.hidden ? null : performance.now();
     running = true;
     notesOpen = false;
@@ -159,6 +168,7 @@
 
     const handleVisibility = (): void => {
       // 背面に回っている間は数えない。戻ったら次の tick から再開する
+      persistTimer();
       lastTick = null;
     };
     document.addEventListener('visibilitychange', handleVisibility);
@@ -180,12 +190,27 @@
 
     intervalId = setInterval(tick, 200);
     return () => {
+      persistTimer();
       if (intervalId !== null) clearInterval(intervalId);
       window.removeEventListener('keydown', handleKey);
       document.removeEventListener('visibilitychange', handleVisibility);
       motionQuery.removeEventListener('change', handleMotion);
     };
   });
+
+  /** 残り時間を保存する（再読み込みで増えないように、保存した値だけ戻す） */
+  function persistTimer(): void {
+    if (!timerKey || total <= 0) return;
+    saveTimer(TIMER_NAME, { key: timerKey, remaining, total });
+  }
+
+  /** 表示している秒が変わったときだけ保存する（毎tick書かない） */
+  function persistTimerIfSecond(): void {
+    const second = Math.ceil(remaining);
+    if (second === savedSecond) return;
+    savedSecond = second;
+    persistTimer();
+  }
 
   function tick(): void {
     if (!running || busy) return;
@@ -203,6 +228,7 @@
     if (!Number.isFinite(delta) || delta <= 0) return;
 
     remaining = Math.max(0, remaining - delta);
+    persistTimerIfSecond();
     // ミュートでも分かるよう、残り5秒と時間切れは音だけでなく字幕でも知らせる
     const kinds = pressCaptionKinds(remaining, warned);
     if (kinds.includes('fiveSeconds')) {

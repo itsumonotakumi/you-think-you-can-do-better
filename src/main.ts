@@ -4,7 +4,7 @@ import { loadLocales } from './data/loader';
 import { initI18n, setLang } from './i18n';
 import { loadSettings } from './storage';
 import { audio } from './audio';
-import { settings } from './app/store';
+import { restoreSession, settings } from './app/store';
 
 const LOAD_ERROR = '読み込めませんでした。再読み込みしてください / Failed to load. Please reload the page.';
 
@@ -36,6 +36,8 @@ async function boot(): Promise<void> {
   document.documentElement.lang = s.lang;
   settings.set(s);
   audio.setVolumes({ bgm: s.bgmVolume, se: s.seVolume, muted: s.muted });
+  // 再読み込み前の画面へ戻す（タイトルを経由しない）。失敗してもタイトルで起動する
+  await restoreSession();
   mount(App, { target });
   mounted = true;
 }

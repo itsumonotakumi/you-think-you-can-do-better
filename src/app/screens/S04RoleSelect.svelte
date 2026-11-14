@@ -3,7 +3,7 @@
   import { audio } from '../../audio';
   import { loadReferences, loadScenario } from '../../data/loader';
   import { loc, setLang, t } from '../../i18n';
-  import { loadPrologue, nextPlayCount, registerPlayStart, saveProgress } from '../../storage';
+  import { beginPlayOnce, clearPrologueDraft, loadPrologue, nextPlayCount, saveProgress } from '../../storage';
   import { applyStep, scenario, screen, selectedScenarioId, settings } from '../store';
   import { portrait } from '../illustrations';
   import {
@@ -154,10 +154,13 @@
         nicknameError = false;
       }
       const refs = await loadReferences();
-      const count = registerPlayStart(sc.id, role, mode);
-      const prologue = loadPrologue() ?? { comment: '', predictedHours: null };
       const startedAt = new Date().toISOString();
+      // 同じ startedAt で二度呼ばれてもプレイ回数を数え直さない（再読み込み対策）
+      const count = beginPlayOnce(sc.id, role, mode, startedAt);
+      const prologue = loadPrologue() ?? { comment: '', predictedHours: null };
       const result = startPlay(sc, role, count, prologue, startedAt, refs, mode);
+      // 前のプレイの入力途中の内容を持ち越さない
+      clearPrologueDraft();
       applyStep(result);
       saveProgress(result.state);
       // 本編の前にプロローグ（S02）を挟む

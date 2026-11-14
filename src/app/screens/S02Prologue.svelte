@@ -2,18 +2,26 @@
   import type { PlayState } from '../../engine/types';
   import { audio } from '../../audio';
   import { notice, setLang, t, loc } from '../../i18n';
-  import { savePrologue, saveProgress } from '../../storage';
+  import { clearPrologueDraft, loadPrologueDraft, savePrologue, savePrologueDraft, saveProgress } from '../../storage';
   import { keyVisual } from '../illustrations';
   import { play, scenario, screen, settings } from '../store';
   import '../styles/base.css';
 
-  let comment = $state($play?.prologue.comment ?? '');
+  // 再読み込みしても入力中の内容を失わないようにする
+  const draft = loadPrologueDraft();
+  let comment = $state(draft?.comment ?? $play?.prologue.comment ?? '');
   let hours = $state(
-    $play?.prologue.predictedHours === null || $play?.prologue.predictedHours === undefined
-      ? ''
-      : String($play.prologue.predictedHours),
+    draft?.hours ?? (
+      $play?.prologue.predictedHours === null || $play?.prologue.predictedHours === undefined
+        ? ''
+        : String($play.prologue.predictedHours)
+    ),
   );
   let error = $state('');
+
+  $effect(() => {
+    savePrologueDraft({ comment, hours });
+  });
 
   const ui = $derived.by(() => {
     setLang($settings.lang);
@@ -64,6 +72,7 @@
     play.set(next);
     savePrologue(prologue);
     saveProgress(next);
+    clearPrologueDraft();
     error = '';
     screen.set('S05');
   }

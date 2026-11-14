@@ -1,13 +1,10 @@
-// (5) 再読込すると「続きから」が出て、再開できる
+// (5) 中断してタイトルに戻ると「続きから」が出て、再開できる
+// プレイ中は再読み込みで自動的に本編へ戻るため、タイトルへは中断操作で戻って確かめる。
 import { expect, test } from '@playwright/test';
-import {
-  DEFECT_I18N, DEFECT_RESUME, openTitle, startNewPlay, waitForScreen,
-} from './helpers';
+import { openTitle, startNewPlay, waitForScreen } from './helpers';
 
 test.describe('続きから', () => {
-  test('再読込で「続きから」が出て、押すと本編に戻る', async ({ page }) => {
-    // 不具合1（i18n 未初期化）と不具合2（再開後の structuredClone 失敗）のため確認できない。
-    // 修正後にこの行を消す。
+  test('中断してタイトルに戻ると「続きから」で本編に戻れる', async ({ page }) => {
     test.setTimeout(120_000);
 
     await openTitle(page);
@@ -19,6 +16,12 @@ test.describe('続きから', () => {
     const saved = await page.evaluate(() => window.localStorage.getItem('ytcdb:v1:progress'));
     expect(saved).not.toBeNull();
 
+    // 中断してタイトルへ（進行中の保存は残る）
+    await page.locator('[data-screen="S05Main"] .abort').click();
+    await page.locator('[data-screen="S05Main"] .abort-confirm').click();
+    await waitForScreen(page, 'S01Title');
+
+    // タイトルで再読み込みしても、タイトルと「続きから」が残る
     await page.reload();
     await waitForScreen(page, 'S01Title');
     const resumeButton = page.getByRole('button', { name: '続きから' });
@@ -29,7 +32,7 @@ test.describe('続きから', () => {
     await waitForScreen(page, 'S05Main');
     await expect(page.locator('[data-screen="S05Main"] .play-count')).toHaveText('1回目');
 
-    // 再開後も操作を続けられる（不具合2が起きない）
+    // 再開後も操作を続けられる
     await page.keyboard.press('1');
     await page.waitForTimeout(400);
     await expect(page.locator('[data-screen="ErrorScreen"]')).toHaveCount(0);

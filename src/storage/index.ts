@@ -391,7 +391,232 @@ export function saveProgress(s: PlayState | null): void {
   writeRaw(STORAGE_KEYS.progress, JSON.stringify(s));
 }
 
+// ---------------- 再読み込み後の復元 ----------------
+// 共有契約の STORAGE_KEYS は変えられないため、追加のキーはこのモジュールで持つ。
+export const SESSION_KEYS = {
+  /** いまいる画面と、その画面に戻るのに要る最小限の情報 */
+  screen: 'ytcdb:v1:screen',
+  /** 最後に終えたプレイ（S08/S09/S12 を再読み込みしても結果を残す） */
+  lastPlay: 'ytcdb:v1:lastPlay',
+  /** startedAt ごとの処理済みフラグ（二重計上を防ぐ） */
+  processed: 'ytcdb:v1:processed',
+  /** 画面ごとの制限時間の残り（残り時間を増やさないため） */
+  timers: 'ytcdb:v1:timers',
+  /** プロローグで入力中の内容（再読み込みで消えないように） */
+  prologueDraft: 'ytcdb:v1:prologueDraft',
+} as const;
+
+export const RESUME_SCREENS = [
+  'S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09', 'S10', 'S11', 'S12',
+] as const;
+export type ResumeScreenId = (typeof RESUME_SCREENS)[number];
+
+export interface ResumePoint {
+  screen: ResumeScreenId;
+  /** S02〜S07 のプレイ対象、S04 で選んだシナリオ */
+  scenarioId: string | null;
+  /** S10/S11 から戻る先 */
+  backTo: ResumeScreenId;
+  /** S08/S09/S12 で表示している終了済みプレイの startedAt */
+  playRef: string | null;
+  /** S01 の上に重ねて開いている画面 */
+  overlay: 'achievements' | null;
+}
+
+function isResumeScreen(v: unknown): v is ResumeScreenId {
+  return typeof v === 'string' && (RESUME_SCREENS as readonly string[]).includes(v);
+}
+
+export function loadResume(): ResumePoint | null {
+  const raw = parseJson(readRaw(SESSION_KEYS.screen));
+  if (!isRecord(raw) || !isResumeScreen(raw.screen)) return null;
+  return {
+    screen: raw.screen,
+    scenarioId: typeof raw.scenarioId === 'string' ? raw.scenarioId : null,
+    backTo: isResumeScreen(raw.backTo) ? raw.backTo : 'S01',
+    playRef: typeof raw.playRef === 'string' ? raw.playRef : null,
+    overlay: raw.overlay === 'achievements' ? 'achievements' : null,
+  };
+}
+
+export function saveResume(point: ResumePoint): void {
+  writeRaw(SESSION_KEYS.screen, JSON.stringify(point));
+}
+
+export function clearResume(): void {
+  removeRaw(SESSION_KEYS.screen);
+}
+
+export interface LastPlay {
+  startedAt: string;
+  scenarioId: string;
+  state: PlayState;
+}
+
+/** 最後に終えたプレイ。終えていない保存は受け付けない */
+export function loadLastPlay(): LastPlay | null {
+  const raw = parseJson(readRaw(SESSION_KEYS.lastPlay));
+  if (!isRecord(raw)) return null;
+  const state = raw.state;
+  if (!isPlayState(state) || state.finished !== true) return null;
+  const scenarioId = typeof raw.scenarioId === 'string' ? raw.scenarioId : state.scenarioId;
+  if (scenarioId !== state.scenarioId) return null;
+  return { startedAt: state.startedAt, scenarioId, state };
+}
+
+export function saveLastPlay(state: PlayState): void {
+  writeRaw(SESSION_KEYS.lastPlay, JSON.stringify({ scenarioId: state.scenarioId, state }));
+}
+
+export function clearLastPlay(): void {
+  removeRaw(SESSION_KEYS.lastPlay);
+}
+
+export type RankingMark = 'none' | 'attempted' | 'sent';
+
+export interface ProcessedPlay {
+  startedAt: string;
+  playRegistered: boolean;
+  playCount: number;
+  recorded: boolean;
+  achievements: boolean;
+  ranking: RankingMark;
+}
+
+function isRankingMark(v: unknown): v is RankingMark {
+  return v === 'none' || v === 'attempted' || v === 'sent';
+}
+
+export function loadProcessed(): ProcessedPlay | null {
+  const raw = parseJson(readRaw(SESSION_KEYS.processed));
+  if (!isRecord(raw)) return null;
+  if (typeof raw.startedAt !== 'string') return null;
+  return {
+    startedAt: raw.startedAt,
+    playRegistered: raw.playRegistered === true,
+    playCount: isInt(raw.playCount) && raw.playCount >= 0 ? raw.playCount : 0,
+    recorded: raw.recorded === true,
+    achievements: raw.achievements === true,
+    ranking: isRankingMark(raw.ranking) ? raw.ranking : 'none',
+  };
+}
+
+function saveProcessed(p: ProcessedPlay): void {
+  writeRaw(SESSION_KEYS.processed, JSON.stringify(p));
+}
+
+/** そのプレイの処理済み記録（startedAt が一致するときだけ） */
+export function processedFor(startedAt: string): ProcessedPlay | null {
+  const saved = loadProcessed();
+  return saved && saved.startedAt === startedAt ? saved : null;
+}
+
+function emptyProcessed(startedAt: string): ProcessedPlay {
+  return {
+    startedAt, playRegistered: false, playCount: 0,
+    recorded: false, achievements: false, ranking: 'none',
+  };
+}
+
+function patchProcessed(startedAt: string, patch: Partial<Omit<ProcessedPlay, 'startedAt'>>): void {
+  const saved = processedFor(startedAt) ?? emptyProcessed(startedAt);
+  saveProcessed({ ...saved, ...patch, startedAt });
+}
+
+/**
+ * プレイ開始の回数登録。同じ startedAt で二度呼ばれても数え直さない
+ * （再読み込みでプレイ回数が増えないようにする）。
+ */
+export function beginPlayOnce(
+  scenarioId: string, role: string, mode: PlayMode, startedAt: string,
+): number {
+  const saved = processedFor(startedAt);
+  if (saved?.playRegistered) return saved.playCount;
+  const count = registerPlayStart(scenarioId, role, mode);
+  patchProcessed(startedAt, { playRegistered: true, playCount: count });
+  return count;
+}
+
+export function markRecorded(startedAt: string): void {
+  patchProcessed(startedAt, { recorded: true });
+}
+
+export function markAchievements(startedAt: string): void {
+  patchProcessed(startedAt, { achievements: true });
+}
+
+export function markRanking(startedAt: string, ranking: RankingMark): void {
+  patchProcessed(startedAt, { ranking });
+}
+
+export interface TimerSnapshot {
+  /** どの判断・質問の時間か（変わったら数え直す） */
+  key: string;
+  remaining: number;
+  total: number;
+}
+
+type TimerStore = Record<string, TimerSnapshot>;
+
+const TIMER_NAME = /^[A-Za-z0-9-]+$/;
+
+function loadTimers(): TimerStore {
+  const raw = parseJson(readRaw(SESSION_KEYS.timers));
+  if (!isRecord(raw)) return {};
+  const out: TimerStore = {};
+  for (const [name, value] of Object.entries(raw)) {
+    if (!TIMER_NAME.test(name) || !isSafeKey(name) || !isRecord(value)) continue;
+    if (typeof value.key !== 'string') continue;
+    if (!isNum(value.remaining) || value.remaining < 0) continue;
+    if (!isNum(value.total) || value.total < 0) continue;
+    out[name] = { key: value.key, remaining: value.remaining, total: value.total };
+  }
+  return out;
+}
+
+/** 画面ごとの残り時間。再読み込みで増えないよう、保存した値より大きくは戻さない */
+export function loadTimer(name: string): TimerSnapshot | null {
+  if (!TIMER_NAME.test(name)) return null;
+  const all = loadTimers();
+  return Object.hasOwn(all, name) ? all[name] ?? null : null;
+}
+
+export function saveTimer(name: string, snap: TimerSnapshot): void {
+  if (!TIMER_NAME.test(name)) return;
+  const all = loadTimers();
+  all[name] = { key: snap.key, remaining: snap.remaining, total: snap.total };
+  writeRaw(SESSION_KEYS.timers, JSON.stringify(all));
+}
+
+export function clearTimer(name: string): void {
+  const all = loadTimers();
+  if (!Object.hasOwn(all, name)) return;
+  delete all[name];
+  writeRaw(SESSION_KEYS.timers, JSON.stringify(all));
+}
+
 // ---------------- プロローグ ----------------
+export interface PrologueDraft {
+  comment: string;
+  /** 入力欄の文字のまま（数値に直すのは確定時） */
+  hours: string;
+}
+
+export function loadPrologueDraft(): PrologueDraft | null {
+  const raw = parseJson(readRaw(SESSION_KEYS.prologueDraft));
+  if (!isRecord(raw) || typeof raw.comment !== 'string' || typeof raw.hours !== 'string') return null;
+  if (raw.comment.length > 200 || raw.hours.length > 8) return null;
+  return { comment: raw.comment, hours: raw.hours };
+}
+
+export function savePrologueDraft(draft: PrologueDraft): void {
+  writeRaw(SESSION_KEYS.prologueDraft, JSON.stringify(draft));
+}
+
+export function clearPrologueDraft(): void {
+  removeRaw(SESSION_KEYS.prologueDraft);
+}
+
 export function loadPrologue(): PlayState['prologue'] | null {
   const raw = parseJson(readRaw(STORAGE_KEYS.prologue));
   return isPrologue(raw) ? raw : null;
@@ -404,4 +629,5 @@ export function savePrologue(p: PlayState['prologue']): void {
 /** 全消去（確認は画面側） */
 export function clearAll(): void {
   for (const key of Object.values(STORAGE_KEYS)) removeRaw(key);
+  for (const key of Object.values(SESSION_KEYS)) removeRaw(key);
 }

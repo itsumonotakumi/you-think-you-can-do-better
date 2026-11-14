@@ -15,6 +15,7 @@ test.describe('テーマ', () => {
 
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    await expect(page.locator('[data-screen="S01Title"]')).toBeVisible();
+    // 開いていた画面（設定）に戻る
+    await expect(page.locator('[data-screen="S10Settings"]')).toBeVisible();
   });
 });

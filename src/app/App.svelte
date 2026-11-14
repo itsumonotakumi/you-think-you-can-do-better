@@ -123,6 +123,18 @@
     const onRejection = (event: PromiseRejectionEvent): void => {
       toErrorScreen(event.reason);
     };
+    // 再読み込み直後は自動再生ができない。最初の操作で音を解禁し、決めておいた曲を鳴らす
+    const unlockAudio = (): void => {
+      void audio.unlock();
+      removeUnlock();
+    };
+    const removeUnlock = (): void => {
+      window.removeEventListener('pointerdown', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+    };
+    window.addEventListener('pointerdown', unlockAudio);
+    window.addEventListener('keydown', unlockAudio);
+
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     systemReduce = motionQuery.matches;
     const handleMotion = (event: MediaQueryListEvent): void => {
@@ -135,6 +147,8 @@
     return () => {
       window.removeEventListener('error', onError);
       window.removeEventListener('unhandledrejection', onRejection);
+      window.removeEventListener('pointerdown', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
       motionQuery.removeEventListener('change', handleMotion);
     };
   });
