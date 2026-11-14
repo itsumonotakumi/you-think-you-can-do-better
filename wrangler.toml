@@ -8,7 +8,7 @@ compatibility_date = "2026-11-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "yattemite-ranking"
-database_id = "TO_BE_FILLED"
+database_id = "922e0961-aabe-469e-b7e4-f96699bb97f7"
 
 [vars]
 # 既定は Turnstile 必須。秘密鍵が無ければ 503 で書き込みを止める。
