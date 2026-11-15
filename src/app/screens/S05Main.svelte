@@ -9,7 +9,7 @@
   import { t, loc, notice, setLang } from '../../i18n';
   import { loadTimer, saveProgress, saveTimer } from '../../storage';
   import { applyStep, errorMessage, play, resetCaptions, scenario, screen, settings } from '../store';
-  import { portrait } from '../illustrations';
+  import { isFirstPointInPhase, portrait, sceneImage } from '../illustrations';
   import { choiceIndexFromKey, nextFreeNoteId, voiceViews } from '../parts/logic';
   import { orderChoices } from '../parts/shuffle';
   import TopBar from '../parts/TopBar.svelte';
@@ -17,6 +17,7 @@
   import ChoiceList from '../parts/ChoiceList.svelte';
   import VoiceList from '../parts/VoiceList.svelte';
   import NotePanel from '../parts/NotePanel.svelte';
+  import SceneIllustration from '../parts/SceneIllustration.svelte';
 
   let busy = $state(false);
   let tab = $state<'voices' | 'notes'>('voices');
@@ -69,6 +70,19 @@
       src: portrait(state.scenarioId, state.role),
       alt: t(`sa.roles.role.${state.role}`),
     };
+  });
+
+  // 段階の切り替わり（その段階で最初の判断）にだけ挿絵を出す。画像が無くても表示しないだけ
+  const sceneView = $derived.by(() => {
+    setLang($settings.lang);
+    const state = $play;
+    const current = point;
+    const role = state && $scenario ? $scenario.roles[state.role] : undefined;
+    if (!state || !current || !role) return null;
+    if (!isFirstPointInPhase(role.points, current.id)) return null;
+    const src = sceneImage(state.scenarioId, current.phase);
+    if (!src) return null;
+    return { src, alt: t('sa.images.scene', { phase: t(`common.phase.${current.phase}`) }) };
   });
 
   let noteStatus = $state('');
@@ -352,6 +366,9 @@
     <!-- 並び: 状況 → 世間の声 → 選択肢（状況を読み、世間の声を見てから選ぶ） -->
     <section class="situation" aria-labelledby="situation-heading">
       <h2 id="situation-heading" tabindex="-1">{t('sb.situation.heading')}</h2>
+      {#if sceneView}
+        <SceneIllustration src={sceneView.src} alt={sceneView.alt} />
+      {/if}
       {#if point}
         <Typewriter text={loc(point.text)} instant={$settings.reduceMotion} />
       {:else}

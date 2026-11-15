@@ -140,3 +140,4 @@ sa.error.noProgress: 続きから再開できるデータがありません。
 # --- イラスト ---
 sa.images.key: "「{title}」の場面"
 sa.images.portrait: "{role}の人物画"
+sa.images.scene: "{phase}の場面"

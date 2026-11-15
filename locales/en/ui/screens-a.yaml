@@ -140,3 +140,4 @@ sa.error.noProgress: There is no saved play to resume.
 # --- Illustrations ---
 sa.images.key: "A scene from {title}"
 sa.images.portrait: "Portrait of the {role}"
+sa.images.scene: "A scene from {phase}"
