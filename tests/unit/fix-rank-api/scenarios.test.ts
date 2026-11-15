@@ -69,7 +69,7 @@ describe('設定', () => {
   });
 
   it('許可ホストを設定する', () => {
-    expect(wrangler).toMatch(/ALLOWED_HOSTS = "yattemite\.pages\.dev,localhost"/);
+    expect(wrangler).toMatch(/ALLOWED_HOSTS = "\.yattemite\.pages\.dev,localhost"/);
   });
 
   it('秘密鍵は wrangler.toml に書かない', () => {

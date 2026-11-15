@@ -5,7 +5,7 @@ const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverif
 export const TURNSTILE_ACTION = 'submit-play';
 
 /** 既定の許可ホスト。本番は ALLOWED_HOSTS で上書きする */
-export const DEFAULT_ALLOWED_HOSTS = ['yattemite.pages.dev', 'localhost'];
+export const DEFAULT_ALLOWED_HOSTS = ['.yattemite.pages.dev', 'localhost'];
 
 export type TurnstileResult = { ok: true } | { ok: false; error: string };
 

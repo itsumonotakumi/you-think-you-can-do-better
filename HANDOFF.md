@@ -124,7 +124,7 @@ Turnstile 必須・無料枠保護・投稿とレート制限の原子化を行�
 - No.11 の社名は No.13「ツムギ・アナリティクス」との重複を避けて「ヒナタマート／ヒナタ通販」に変更
 - 検査: 単体 1855・E2E 52 合格、svelte-check 0、validate OK（警告 328 は既存シナリオ由来）、gitleaks 漏えいなし
 - GitHub Pages 版はランキング無効（`VITE_API_BASE` を渡さない）。シェア URL は `VITE_SITE_URL` で版ごとに切替
-- Cloudflare 版のビルド: `VITE_SITE_URL=https://yattemite.pages.dev VITE_API_BASE=https://yattemite.pages.dev VITE_TURNSTILE_SITEKEY=<サイトキー>`
+- Cloudflare 版のビルド: `VITE_SITE_URL=https://yattemite.pages.dev VITE_API_BASE=/（同じ URL に送る。プレビュー URL でも動く） VITE_TURNSTILE_SITEKEY=<サイトキー>`
 - 2026-11-14: Turnstile サイトキー `0x4AAAAAAGArN3gZnsZocWcw`（公開値）作成済み、`TURNSTILE_SECRET`・`IP_HASH_SECRET` 設定済み。ランキング有効版を yattemite.pages.dev に公開済み
 - 残り: Wave B（#11〜#13）
 

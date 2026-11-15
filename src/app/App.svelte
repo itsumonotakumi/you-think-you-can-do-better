@@ -14,7 +14,7 @@
 
 <script lang="ts">
   // 画面ルーター（オーケストレーター所有）
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { get } from 'svelte/store';
   import { audio } from '../audio';
   import {
@@ -80,6 +80,13 @@
       ? (['night', 'deadline'] as const)
       : [];
     clearFx(keep);
+  });
+
+  $effect(() => {
+    // 画面が切り替わったら、新しい画面を一番上から表示する
+    void $screen;
+    if (typeof window === 'undefined' || typeof window.scrollTo !== 'function') return;
+    void tick().then(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
   });
 
   $effect(() => {
